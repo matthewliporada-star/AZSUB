@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import supabase from "../../config/supabaseClient";
+import { logActivity } from "../../utils/logActivity";
 import "./Style/AdminLayout.css";
 import "./Style/Policies.css";
 import LogoImage from "../../assets/logo1.png";
@@ -25,7 +26,7 @@ const AdminPolicies = () => {
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [currentPolicy, setCurrentPolicy] = useState(null);
-    
+
     const [formData, setFormData] = useState({
         policy_name: "",
         form_type: "VUL",
@@ -120,7 +121,7 @@ const AdminPolicies = () => {
     const openAddModal = () => {
         setIsEditing(false);
         setFormData({ policy_name: "", form_type: "VUL", active_status: true, agency: "", request_type: "manual" });
-        setRequirements([]); 
+        setRequirements([]);
         setCurrentPolicy(null);
         setShowModal(true);
     };
@@ -156,7 +157,7 @@ const AdminPolicies = () => {
                 active_status: formData.active_status,
                 agency: formData.agency || null,
                 request_type: formData.request_type,
-                requirements: requirements 
+                requirements: requirements
             };
 
             if (isEditing && currentPolicy) {
@@ -165,10 +166,14 @@ const AdminPolicies = () => {
                     .update(payload)
                     .eq("policy_id", currentPolicy.policy_id);
                 if (error) throw error;
+
+                await logActivity("POLICY_UPDATE", `Updated policy: ${formData.policy_name}`);
                 alert("Policy updated successfully!");
             } else {
                 const { error } = await supabase.from("policy").insert([payload]);
                 if (error) throw error;
+
+                await logActivity("POLICY_CREATE", `Created new policy: ${formData.policy_name}`);
                 alert("Policy added successfully!");
             }
 
@@ -190,12 +195,16 @@ const AdminPolicies = () => {
     const confirmToggleStatus = async () => {
         if (!policyToToggle) return;
         try {
+            const newStatus = !policyToToggle.active_status;
             const { error } = await supabase
                 .from("policy")
-                .update({ active_status: !policyToToggle.active_status })
+                .update({ active_status: newStatus })
                 .eq("policy_id", policyToToggle.policy_id);
 
             if (error) throw error;
+
+            await logActivity("POLICY_STATUS_CHANGE", `Changed status of policy ${policyToToggle.policy_name} to ${newStatus ? 'Active' : 'Archived'}`);
+
             setShowConfirmModal(false);
             setPolicyToToggle(null);
             fetchPolicies();
@@ -204,7 +213,7 @@ const AdminPolicies = () => {
         }
     };
 
-    const filteredPolicies = policies.filter(policy => 
+    const filteredPolicies = policies.filter(policy =>
         viewArchived ? !policy.active_status : policy.active_status
     );
 
@@ -226,6 +235,9 @@ const AdminPolicies = () => {
                     <li onClick={() => navigate("/admin/dashboard")}><i className="fa-solid fa-chart-line"></i> {sidebarOpen && <span>Dashboard</span>}</li>
                     <li onClick={() => navigate("/admin/ManageUsers")}><i className="fa-solid fa-users"></i> {sidebarOpen && <span>Manage Users</span>}</li>
                     <li className="active"><i className="fa-solid fa-file-shield"></i> {sidebarOpen && <span>Policies</span>}</li>
+                    <li onClick={() => navigate("/admin/activity-logs")}>
+                        <i className="fa-solid fa-list-ul"></i> {sidebarOpen && <span>Activity Logs</span>}
+                    </li>
                 </ul>
             </aside>
 
@@ -293,11 +305,11 @@ const AdminPolicies = () => {
                                                     {policy.active_status ? 'Active' : 'Archived'}
                                                 </span>
                                             </td>
-                                            
+
                                             {/* --- UPDATED ACTIONS COLUMN (TEXT + COLORS) --- */}
                                             <td>
                                                 <div className="policy-actions" style={{ display: 'flex', gap: '8px' }}>
-                                                    <button 
+                                                    <button
                                                         onClick={() => openConfirmModal(policy)}
                                                         style={{
                                                             backgroundColor: policy.active_status ? '#dc3545' : '#28a745', // Red for Archive, Green for Restore
@@ -317,7 +329,7 @@ const AdminPolicies = () => {
                                                         {policy.active_status ? "Archive" : "Restore"}
                                                     </button>
 
-                                                    <button 
+                                                    <button
                                                         onClick={() => openEditModal(policy)}
                                                         style={{
                                                             backgroundColor: '#007bff', // Blue for Edit
@@ -392,30 +404,30 @@ const AdminPolicies = () => {
                                                 + Add File Slot
                                             </button>
                                         </div>
-                                        
+
                                         {requirements.length === 0 && <p style={{ fontSize: '12px', color: '#999', fontStyle: 'italic' }}>No specific documents defined. (Will use defaults)</p>}
 
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                             {requirements.map((req, idx) => (
                                                 <div key={idx} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                                    <input 
-                                                        type="text" 
-                                                        placeholder="Document Name (e.g. Valid ID)" 
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Document Name (e.g. Valid ID)"
                                                         value={req.label}
                                                         onChange={(e) => updateRequirement(idx, 'label', e.target.value)}
                                                         required
                                                         style={{ flex: 1, padding: '6px', fontSize: '13px' }}
                                                     />
                                                     <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', cursor: 'pointer', margin: 0 }}>
-                                                        <input 
-                                                            type="checkbox" 
+                                                        <input
+                                                            type="checkbox"
                                                             checked={req.required}
                                                             onChange={(e) => updateRequirement(idx, 'required', e.target.checked)}
-                                                        /> 
+                                                        />
                                                         Req?
                                                     </label>
-                                                    <button 
-                                                        type="button" 
+                                                    <button
+                                                        type="button"
                                                         onClick={() => removeRequirement(idx)}
                                                         style={{ background: '#ffebeb', color: '#dc3545', border: '1px solid #ffc9c9', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer' }}
                                                     >

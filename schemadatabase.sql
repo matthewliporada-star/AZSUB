@@ -7,6 +7,15 @@ CREATE TABLE public.CLIENT (
   CONSTRAINT CLIENT_pkey PRIMARY KEY (client_id),
   CONSTRAINT CLIENT_sub_id_fkey FOREIGN KEY (sub_id) REFERENCES public.az_submissions(sub_id)
 );
+CREATE TABLE public.activity_logs (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  action text NOT NULL,
+  details text,
+  performed_by uuid,
+  created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  CONSTRAINT activity_logs_pkey PRIMARY KEY (id),
+  CONSTRAINT activity_logs_performed_by_fkey FOREIGN KEY (performed_by) REFERENCES public.profiles(id)
+);
 CREATE TABLE public.agency (
   agency_id smallint GENERATED ALWAYS AS IDENTITY NOT NULL,
   name text NOT NULL,
@@ -35,6 +44,7 @@ CREATE TABLE public.az_submissions (
   date_issued timestamp with time zone,
   agency_id smallint,
   profile_id uuid,
+  app_password text,
   CONSTRAINT az_submissions_pkey PRIMARY KEY (sub_id),
   CONSTRAINT AZ SUB_policy_id_fkey FOREIGN KEY (policy_id) REFERENCES public.policy(policy_id),
   CONSTRAINT AZ SUB_serial_id_fkey FOREIGN KEY (serial_id) REFERENCES public.serial_number(serial_id),
@@ -72,6 +82,7 @@ CREATE TABLE public.policy (
   active_status boolean DEFAULT true,
   agency smallint,
   request_type text,
+  requirements jsonb DEFAULT '[]'::jsonb,
   CONSTRAINT policy_pkey PRIMARY KEY (policy_id),
   CONSTRAINT policy_agency_fkey FOREIGN KEY (agency) REFERENCES public.agency(agency_id)
 );
@@ -85,6 +96,14 @@ CREATE TABLE public.profiles (
   created_at timestamp with time zone DEFAULT now(),
   role_id bigint,
   last_submission_at timestamp with time zone,
+  Status USER-DEFINED DEFAULT 'Active'::"Status_User",
+  Address character varying,
+  contact_number bigint,
+  gender USER-DEFINED,
+  birthday date,
+  civil_status USER-DEFINED,
+  Middle text,
+  app_password text,
   CONSTRAINT profiles_pkey PRIMARY KEY (id),
   CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id),
   CONSTRAINT profiles_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.user_roles(role_id)

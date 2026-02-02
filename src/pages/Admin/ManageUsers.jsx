@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import supabase from "../../config/supabaseClient";
+import { logActivity } from "../../utils/logActivity";
 import "./Style/AdminLayout.css";
 import "./Style/ManageUsers.css";
 
@@ -9,80 +10,103 @@ import LogoImage from "../../assets/logo1.png";
 const ManageUsers = () => {
   const navigate = useNavigate();
 
-  // List Data
-  const [users, setUsers] = useState([]);
-  const [user, setUser] = useState(null); // Admin session user
-  const [statusFilter, setStatusFilter] = useState("Active");
-
-  const filteredUsers = users.filter((u) => {
-    const currentStatus = u.Status || "Active";
-    return currentStatus === statusFilter;
-  });
-
-  // UI States
-  const [showModal, setShowModal] = useState(false);
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [isEditMode, setIsEditMode] = useState(false);
+  // -- Auth & User State --
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]);
 
-  // Form State
-  const [editingUserId, setEditingUserId] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
+  // -- UI State --
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  // -- Modals --
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  // -- Form Data --
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
+    position: "MD",
     password: "",
-    position: "MP",
     reportsTo: "",
     appPassword: ""
   });
-
-  // Hierarchy/View Data
-  const [potentialUplines, setPotentialUplines] = useState([]);
-  const [viewingUser, setViewingUser] = useState(null);
-  const [viewingSupervisor, setViewingSupervisor] = useState(null);
-  const [viewingSubordinates, setViewingSubordinates] = useState([]);
-
-  // Messages
+  const [showPassword, setShowPassword] = useState(false);
   const [modalError, setModalError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
-  // Common Card Style for Hierarchy
-  const cardStyle = {
-    background: '#f8fafc',
-    padding: '12px 15px',
-    borderRadius: '10px',
-    border: '1px solid var(--border-color)',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    fontSize: '14px'
-  };
+  // -- Hierarchy Helper Data --
+  const [potentialUplines, setPotentialUplines] = useState([]);
+  const [viewingSupervisor, setViewingSupervisor] = useState(null);
+  const [viewingSubordinates, setViewingSubordinates] = useState([]);
 
+  // -- Role Statistics --
+  const [roleCounts, setRoleCounts] = useState({
+    AL: 0, AP: 0, MD: 0, MP: 0, ADMIN: 0
+  });
+
+  // -- Filter State --
+  const [showInactive, setShowInactive] = useState(false);
+
+  // -- Initialization --
   useEffect(() => {
-    fetchUsers();
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) setUser(session.user);
-    };
-    getSession();
+    checkAdmin();
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = (showModal || showViewModal) ? "hidden" : "auto";
-  }, [showModal, showViewModal]);
-
-  const fetchUsers = async () => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (!error) setUsers(data || []);
+  const checkAdmin = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      alert("You need to login first");
+      navigate("/");
+      return;
+    }
+    const type = session.user.user_metadata?.account_type;
+    // Basic check, adjust if case sensitivity needed
+    if (!type || type.toLowerCase() !== "admin") {
+      alert("You do not have access to this page");
+      navigate("/");
+      return;
+    }
+    setUser(session.user);
+    fetchUsers();
   };
 
+  const fetchUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching users:", error.message);
+      } else {
+        setUsers(data || []);
+        calculateRoleCounts(data || []);
+      }
+    } catch (err) {
+      console.error("Error fetching users:", err);
+    }
+  };
+
+  const calculateRoleCounts = (userData) => {
+    const counts = { AL: 0, AP: 0, MD: 0, MP: 0, ADMIN: 0 };
+    userData.forEach((u) => {
+      const role = u.account_type?.toUpperCase();
+      // Handle 'ADMIN' variations if any
+      const normalizedRole = role === 'ADMIN' ? 'ADMIN' : role;
+      if (counts.hasOwnProperty(normalizedRole)) {
+        counts[normalizedRole]++;
+      }
+    });
+    setRoleCounts(counts);
+  };
+
+  // -- Hierarchy Logic --
   const fetchPotentialUplines = useCallback(async (role, excludeUserId = null) => {
     const roleMap = { "AP": "AL", "AL": "MP" };
     const uplineRole = roleMap[role];
@@ -95,16 +119,19 @@ const ManageUsers = () => {
       .select("id, first_name, last_name, account_type")
       .eq("account_type", uplineRole)
       .neq("id", excludeUserId || "");
+
     if (!error) setPotentialUplines(data || []);
   }, []);
 
   useEffect(() => {
-    fetchPotentialUplines(formData.position, editingUserId);
-  }, [formData.position, editingUserId, fetchPotentialUplines]);
+    if (showAddModal) {
+      fetchPotentialUplines(formData.position, isEditMode ? selectedUser?.id : null);
+    }
+  }, [formData.position, showAddModal, isEditMode, selectedUser, fetchPotentialUplines]);
 
+  // -- Form Handlers --
   const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const generatePassword = () => {
@@ -113,19 +140,85 @@ const ManageUsers = () => {
       return;
     }
     const firstTwo = formData.lastName.substring(0, 2);
-    const pwd = `#${firstTwo.charAt(0).toUpperCase()}${firstTwo.charAt(1).toLowerCase()}8080`;
-    setFormData(prev => ({ ...prev, password: pwd }));
+    // Simple logic: #La8080
+    const pwd = `#${firstTwo.charAt(0).toUpperCase()}${firstTwo.length > 1 ? firstTwo.charAt(1).toLowerCase() : 'x'}8080`;
+    setFormData({ ...formData, password: pwd });
     setModalError("");
   };
 
-  const submitAddUser = async (e) => {
-    e.preventDefault();
+  const closeModal = () => {
+    setShowAddModal(false);
+    setShowViewModal(false);
+    setIsEditMode(false);
+    setSelectedUser(null);
+    setFormData({
+      firstName: "", lastName: "", email: "", position: "MD", password: "", reportsTo: "", appPassword: ""
+    });
     setModalError("");
     setSuccessMsg("");
+    setViewingSupervisor(null);
+    setViewingSubordinates([]);
+  };
+
+  const openAddModal = () => {
+    setIsEditMode(false);
+    setFormData({
+      firstName: "", lastName: "", email: "", position: "MD", password: "", reportsTo: "", appPassword: ""
+    });
+    setShowAddModal(true);
+  };
+
+  const openEditModal = async (u) => {
+    setIsEditMode(true);
+    setSelectedUser(u);
+    setFormData({
+      firstName: u.first_name,
+      lastName: u.last_name,
+      email: u.email,
+      position: u.account_type,
+      password: "", // Don't show password
+      reportsTo: "",
+      appPassword: u.app_password || ""
+    });
+
+    // Fetch current supervisor
+    const { data } = await supabase
+      .from("user_hierarchy")
+      .select("report_to_id")
+      .eq("user_id", u.id)
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if (data) setFormData(prev => ({ ...prev, reportsTo: data.report_to_id }));
+
+    setShowAddModal(true);
+  };
+
+  const openViewModal = async (u) => {
+    setSelectedUser(u);
+    setShowViewModal(true);
+
+    // Fetch hierarchy info for view
+    const [supRes, subRes] = await Promise.all([
+      supabase.from("user_hierarchy").select("profiles:report_to_id(first_name, last_name, account_type)").eq("user_id", u.id).eq("is_active", true).maybeSingle(),
+      supabase.from("user_hierarchy").select("profiles:user_id(first_name, last_name, account_type)").eq("report_to_id", u.id).eq("is_active", true)
+    ]);
+
+    setViewingSupervisor(supRes.data?.profiles || null);
+    setViewingSubordinates(subRes.data?.map(d => d.profiles).filter(Boolean) || []);
+  };
+
+  const submitUser = async (e) => {
+    e.preventDefault();
     setLoading(true);
+    setModalError("");
+    setSuccessMsg("");
+
     try {
-      let userIdToProcess = editingUserId;
+      let userIdToProcess = selectedUser?.id;
+
       if (isEditMode) {
+        // UPDATE
         const { error } = await supabase
           .from("profiles")
           .update({
@@ -134,10 +227,13 @@ const ManageUsers = () => {
             account_type: formData.position,
             app_password: formData.appPassword
           })
-          .eq("id", editingUserId);
+          .eq("id", userIdToProcess);
+
         if (error) throw error;
+        await logActivity("USER_UPDATE", `Updated user details for ${formData.firstName} ${formData.lastName}`);
         setSuccessMsg("User updated successfully!");
       } else {
+        // CREATE
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
@@ -145,27 +241,37 @@ const ManageUsers = () => {
             data: {
               first_name: formData.firstName,
               last_name: formData.lastName,
-              account_type: formData.position
+              account_type: formData.position,
+              status: "Active"
             },
           },
         });
+
         if (authError) throw authError;
-        userIdToProcess = authData.user.id;
-        const { error: profileError } = await supabase.from("profiles").insert({
-          id: userIdToProcess,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email,
-          account_type: formData.position,
-          Status: "Active",
-          app_password: formData.appPassword
-        });
-        if (profileError) throw profileError;
+        userIdToProcess = authData.user?.id;
+
+        if (userIdToProcess) {
+          const { error: profileError } = await supabase.from("profiles").insert([{
+            id: userIdToProcess,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            account_type: formData.position,
+            status: "Active",
+            app_password: formData.appPassword
+          }]);
+          if (profileError) throw profileError;
+        }
+
+        await logActivity("USER_CREATE", `Created new user ${formData.firstName} ${formData.lastName} (${formData.position})`);
         setSuccessMsg("User created successfully!");
       }
 
+      // Handle Hierarchy Update
       if (formData.reportsTo && userIdToProcess) {
+        // Deactivate old
         await supabase.from("user_hierarchy").update({ is_active: false }).eq("user_id", userIdToProcess);
+        // Insert new
         await supabase.from("user_hierarchy").insert({
           user_id: userIdToProcess,
           report_to_id: formData.reportsTo,
@@ -173,66 +279,60 @@ const ManageUsers = () => {
           is_active: true
         });
       }
+
       fetchUsers();
-      setTimeout(() => closeModal(), 1500);
+      setTimeout(closeModal, 1500);
+
     } catch (err) {
+      console.error("Error submitting user:", err);
       setModalError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const openViewModal = async (u) => {
-    setViewingUser(u);
-    setShowViewModal(true);
-    const [supRes, subRes] = await Promise.all([
-      supabase.from("user_hierarchy").select("profiles:report_to_id(first_name, last_name, account_type)").eq("user_id", u.id).eq("is_active", true).maybeSingle(),
-      supabase.from("user_hierarchy").select("profiles:user_id(first_name, last_name, account_type)").eq("report_to_id", u.id).eq("is_active", true)
-    ]);
-    setViewingSupervisor(supRes.data?.profiles || null);
-    setViewingSubordinates(subRes.data?.map(d => d.profiles).filter(Boolean) || []);
-  };
-
-  const openEditModal = async (u) => {
-    setIsEditMode(true);
-    setEditingUserId(u.id);
-    setFormData({
-      firstName: u.first_name,
-      lastName: u.last_name,
-      email: u.email,
-      password: "",
-      position: u.account_type,
-      reportsTo: "",
-      appPassword: u.app_password || ""
-    });
-    const { data } = await supabase.from("user_hierarchy").select("report_to_id").eq("user_id", u.id).eq("is_active", true).maybeSingle();
-    if (data) setFormData(prev => ({ ...prev, reportsTo: data.report_to_id }));
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setShowViewModal(false);
-    setIsEditMode(false);
-    setEditingUserId(null);
-    setFormData({ firstName: "", lastName: "", email: "", password: "", position: "MP", reportsTo: "", appPassword: "" });
-    setModalError("");
-    setSuccessMsg("");
-  };
-
   const toggleUserStatus = async (userItem) => {
-    const currentStatus = userItem.Status || "Active";
-    const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
-    const actionText = newStatus === "Inactive" ? "deactivate" : "reactivate";
-    if (window.confirm(`Are you sure you want to ${actionText} ${userItem.first_name} ${userItem.last_name}?`)) {
-      const { error } = await supabase.from("profiles").update({ Status: newStatus }).eq("id", userItem.id);
-      if (error) alert("Error: " + error.message);
-      else fetchUsers();
+    const newStatus = userItem.status === "Active" ? "Inactive" : "Active";
+    const confirmMsg = `Are you sure you want to set ${userItem.first_name} to ${newStatus}?`;
+
+    if (window.confirm(confirmMsg)) {
+      try {
+        const { error } = await supabase
+          .from("profiles")
+          .update({ status: newStatus })
+          .eq("id", userItem.id);
+
+        if (error) throw error;
+
+        await logActivity("USER_UPDATE", `Changed status of ${userItem.first_name} ${userItem.last_name} to ${newStatus}`);
+        fetchUsers();
+      } catch (err) {
+        console.error("Error updating status:", err);
+        alert("Failed to update status");
+      }
     }
+  };
+
+  // -- Render Helpers --
+  const filteredUsers = users.filter(u => {
+    const status = u.status || "Active";
+    return showInactive ? status === "Inactive" : status === "Active";
+  });
+
+  const cardStyle = {
+    background: '#f8fafc',
+    padding: '12px 15px',
+    borderRadius: '10px',
+    border: '1px solid var(--border-color)',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    fontSize: '14px'
   };
 
   return (
     <div className="admin-container">
+      {/* SIDEBAR */}
       <aside className={`admin-sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
         <button className="admin-sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
           <i className="fa-solid fa-bars"></i>
@@ -241,12 +341,22 @@ const ManageUsers = () => {
           <img src={LogoImage} alt="Logo" className="admin-logo-img" />
         </div>
         <ul className="admin-sidebar-menu">
-          <li onClick={() => navigate("/admin/dashboard")}><i className="fa-solid fa-chart-line"></i> {sidebarOpen && <span>Dashboard</span>}</li>
-          <li className="active"><i className="fa-solid fa-users"></i> {sidebarOpen && <span>Manage Users</span>}</li>
-          <li onClick={() => navigate("/admin/policies")}><i className="fa-solid fa-file-shield"></i> {sidebarOpen && <span>Policies</span>}</li>
+          <li onClick={() => navigate("/admin/dashboard")}>
+            <i className="fa-solid fa-chart-line"></i> {sidebarOpen && <span>Dashboard</span>}
+          </li>
+          <li className="active">
+            <i className="fa-solid fa-users"></i> {sidebarOpen && <span>Manage Users</span>}
+          </li>
+          <li onClick={() => navigate("/admin/policies")}>
+            <i className="fa-solid fa-file-shield"></i> {sidebarOpen && <span>Policies</span>}
+          </li>
+          <li onClick={() => navigate("/admin/activity-logs")}>
+            <i className="fa-solid fa-list-ul"></i> {sidebarOpen && <span>Activity Logs</span>}
+          </li>
         </ul>
       </aside>
 
+      {/* HEADER */}
       <header className={`admin-header ${sidebarOpen ? '' : 'expanded'}`}>
         <div className="admin-header-content">
           <h1>Admin Dashboard</h1>
@@ -261,10 +371,16 @@ const ManageUsers = () => {
             </button>
             {showProfileMenu && (
               <div className="admin-profile-dropdown">
-                <button onClick={() => navigate("/admin/Profile")} className="admin-dropdown-item"><i className="fa-solid fa-user"></i> Profile</button>
-                <button onClick={() => navigate("/admin/SerialNumber")} className="admin-dropdown-item"><i className="fa-solid fa-barcode"></i> Serial Numbers</button>
+                <button onClick={() => navigate("/admin/Profile")} className="admin-dropdown-item">
+                  <i className="fa-solid fa-user"></i> Profile
+                </button>
+                <button onClick={() => navigate("/admin/SerialNumber")} className="admin-dropdown-item">
+                  <i className="fa-solid fa-barcode"></i> Serial Numbers
+                </button>
                 <hr className="admin-dropdown-divider" />
-                <button onClick={async () => { await supabase.auth.signOut(); navigate("/"); }} className="admin-dropdown-item admin-logout-item">
+                <button
+                  onClick={async () => { await supabase.auth.signOut(); navigate("/"); }}
+                  className="admin-dropdown-item admin-logout-item">
                   <i className="fa-solid fa-right-from-bracket"></i> Logout
                 </button>
               </div>
@@ -273,155 +389,211 @@ const ManageUsers = () => {
         </div>
       </header>
 
-      <main className={`admin-main-content ${sidebarOpen ? '' : 'expanded'}`}>
+      {/* MAIN CONTENT */}
+      <main className={`main-content ${sidebarOpen ? "" : "expanded"}`}>
         <div className="header-row">
-          <h1>Manage Users</h1>
+          <div>
+            <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#333" }}>Manage Users</h1>
+            <p style={{ color: "#777" }}>Create, update, and manage user accounts</p>
+          </div>
           <div className="header-actions">
-            <button className="add-btn" onClick={() => setStatusFilter(statusFilter === "Active" ? "Inactive" : "Active")}>
-              <i className={`fa-solid ${statusFilter === "Active" ? "fa-user-slash" : "fa-user-check"}`}></i>
-              {statusFilter === "Active" ? " View Inactive Users" : " View Active Users"}
+            <button
+              className="btn-secondary"
+              onClick={() => setShowInactive(!showInactive)}
+            >
+              {showInactive ? "View Active Users" : "View Inactive Users"}
             </button>
-            <button className="add-btn" onClick={() => setShowModal(true)}>+ Add User</button>
+            <button className="add-btn" onClick={openAddModal}>
+              + Add User
+            </button>
           </div>
         </div>
 
-        <div className="admin-table-card">
-          <table className="admin-user-table">
-            <thead>
-              <tr><th>No.</th><th>Last Name</th><th>First Name</th><th>Position</th><th>Status</th><th>Action</th></tr>
-            </thead>
-            <tbody>
-              {filteredUsers.length === 0 ? (
-                <tr><td colSpan="6" style={{ textAlign: "center", padding: "30px", color: "#888" }}>No {statusFilter.toLowerCase()} users found.</td></tr>
-              ) : (
-                filteredUsers.map((u, index) => (
-                  <tr key={u.id}>
-                    <td>{index + 1}</td>
-                    <td>{u.last_name}</td>
-                    <td>{u.first_name}</td>
-                    <td>{u.account_type}</td>
-                    <td>
-                      <span className={`status-badge ${u.Status === "Inactive" ? "inactive" : "active"}`}>
-                        {u.Status || "Active"}
-                      </span>
-                    </td>
-                    <td className="action-cell">
-                      <button className="btn-view" onClick={() => openViewModal(u)}>View</button>
-                      <button className="btn-update" onClick={() => openEditModal(u)}>Update</button>
-                      <button className={u.Status === "Inactive" ? "btn-active-toggle" : "btn-delete"} onClick={() => toggleUserStatus(u)}>
-                        {u.Status === "Inactive" ? "Activate" : "Deactivate"}
-                      </button>
+        {/* ROLE STATISTICS CARDS */}
+        <div className="role-cards-grid">
+          <div className="role-card">
+            <h3>AGENCY LEADERS (AL)</h3>
+            <div className="count">{roleCounts.AL}</div>
+          </div>
+          <div className="role-card">
+            <h3>AGENCY PARTNERS (AP)</h3>
+            <div className="count">{roleCounts.AP}</div>
+          </div>
+          <div className="role-card">
+            <h3>MANAGING DIRECTORS (MD)</h3>
+            <div className="count">{roleCounts.MD}</div>
+          </div>
+          <div className="role-card">
+            <h3>MANAGEMENT PARTNERS (MP)</h3>
+            <div className="count">{roleCounts.MP}</div>
+          </div>
+          <div className="role-card">
+            <h3>ADMINS</h3>
+            <div className="count">{roleCounts.ADMIN}</div>
+          </div>
+        </div>
+
+        {/* USERS TABLE CONTAINER */}
+        <div className="content-container">
+          <div className="container-header">
+            <h2>User Database ({showInactive ? "Inactive" : "Active"})</h2>
+          </div>
+          <div className="container-body">
+            <table className="user-table">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Last Name</th>
+                  <th>First Name</th>
+                  <th>Position</th>
+                  <th>Status</th>
+                  <th style={{ textAlign: "center" }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" style={{ textAlign: "center", padding: "20px", color: "#666" }}>
+                      No {showInactive ? "inactive" : "active"} users found.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  filteredUsers.map((u, index) => (
+                    <tr key={u.id}>
+                      <td>{index + 1}</td>
+                      <td>{u.last_name}</td>
+                      <td>{u.first_name}</td>
+                      <td><span style={{ fontWeight: "600" }}>{u.account_type}</span></td>
+                      <td>
+                        <span className={`status-badge ${u.status === "Active" ? "active" : "inactive"}`}>
+                          {u.status || "Active"}
+                        </span>
+                      </td>
+                      <td className="action-cell">
+                        <button className="btn-view" onClick={() => openViewModal(u)} title="View Details">
+                          <i className="fa-solid fa-eye"></i> View
+                        </button>
+                        <button className="btn-update" onClick={() => openEditModal(u)} title="Edit User">
+                          <i className="fa-solid fa-pen"></i> Update
+                        </button>
+                        <button
+                          className="btn-delete"
+                          onClick={() => toggleUserStatus(u)}
+                          title={u.status === "Active" ? "Deactivate" : "Activate"}
+                          style={{ backgroundColor: u.status === "Active" ? "var(--danger-color)" : "var(--success-color)" }}
+                        >
+                          <i className={`fa-solid ${u.status === "Active" ? "fa-ban" : "fa-check"}`}></i> {u.status === "Active" ? "Deactivate" : "Activate"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </main>
 
       {/* Add/Edit Modal */}
-{showModal && (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      {/* HEADER - Fixed */}
-      <div className="modal-title" style={{ padding: '22px 35px', borderBottom: '1px solid var(--border-color)', background: '#f7f9fc' }}>
-        {isEditMode ? "Edit User" : "Add New User"}
-      </div>
-
-      {/* BODY - Scrollable (Uses .modal-form for the hidden scrollbar) */}
-      <form className="modal-form" onSubmit={submitAddUser} style={{ flex: 1, overflowY: 'auto' }}>
-        <div className="name-row">
-          <div className="input-group">
-            <label>First Name</label>
-            <input type="text" name="firstName" required value={formData.firstName} onChange={handleFormChange} />
-          </div>
-          <div className="input-group">
-            <label>Last Name</label>
-            <input type="text" name="lastName" required value={formData.lastName} onChange={handleFormChange} />
-          </div>
-        </div>
-
-        {!isEditMode && (
-          <div className="input-group">
-            <label>Email</label>
-            <input type="email" name="email" required value={formData.email} onChange={handleFormChange} />
-          </div>
-        )}
-
-        <div className="input-group" style={{ marginBottom: '20px' }}>
-          <label>Email App Password</label>
-          <input
-            type="password"
-            name="appPassword"
-            value={formData.appPassword}
-            onChange={handleFormChange}
-            placeholder="App Password for SMTP"
-          />
-        </div>
-
-        <div className="password-position-row">
-          {!isEditMode && (
-            <div className="input-group">
-              <label>Password</label>
-              <div className="password-input-wrapper">
-                <input type={showPassword ? "text" : "password"} name="password" required value={formData.password} readOnly />
-                <button type="button" className="generate-btn" onClick={generatePassword}>Generate</button>
-              </div>
+      {showAddModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-title" style={{ padding: '22px 35px', borderBottom: '1px solid var(--border-color)', background: '#f7f9fc' }}>
+              {isEditMode ? "Edit User" : "Add New User"}
             </div>
-          )}
-          <div className="input-group">
-            <label>Position</label>
-            <select name="position" value={formData.position} onChange={handleFormChange}>
-              <option value="Admin">Admin</option>
-              <option value="MP">Managing Partner (MP)</option>
-              <option value="AL">Agency Leader (AL)</option>
-              <option value="AP">Agency Partner (AP)</option>
-              <option value="MD">Managing Director (MD)</option>
-            </select>
+
+            <form className="modal-form" onSubmit={submitUser} style={{ flex: 1, overflowY: 'auto' }}>
+              <div className="name-row">
+                <div className="input-group">
+                  <label>First Name</label>
+                  <input type="text" name="firstName" required value={formData.firstName} onChange={handleFormChange} />
+                </div>
+                <div className="input-group">
+                  <label>Last Name</label>
+                  <input type="text" name="lastName" required value={formData.lastName} onChange={handleFormChange} />
+                </div>
+              </div>
+
+              {!isEditMode && (
+                <div className="input-group">
+                  <label>Email</label>
+                  <input type="email" name="email" required value={formData.email} onChange={handleFormChange} />
+                </div>
+              )}
+
+              <div className="input-group" style={{ marginBottom: '20px' }}>
+                <label>Email App Password</label>
+                <input
+                  type="text"
+                  name="appPassword"
+                  value={formData.appPassword}
+                  onChange={handleFormChange}
+                  placeholder="App Password for SMTP"
+                />
+              </div>
+
+              <div className="password-position-row">
+                {!isEditMode && (
+                  <div className="input-group">
+                    <label>Password</label>
+                    <div className="password-input-wrapper">
+                      <input type={showPassword ? "text" : "password"} name="password" required value={formData.password} readOnly />
+                      <button type="button" className="generate-btn" onClick={generatePassword}>Generate</button>
+                    </div>
+                  </div>
+                )}
+                <div className="input-group">
+                  <label>Position</label>
+                  <select name="position" value={formData.position} onChange={handleFormChange}>
+                    <option value="ADMIN">Admin</option>
+                    <option value="MP">Managing Partner (MP)</option>
+                    <option value="AL">Agency Leader (AL)</option>
+                    <option value="AP">Agency Partner (AP)</option>
+                    <option value="MD">Managing Director (MD)</option>
+                  </select>
+                </div>
+              </div>
+
+              {(formData.position === 'AP' || formData.position === 'AL') && (
+                <div className="input-group">
+                  <label>Reports To</label>
+                  <select name="reportsTo" value={formData.reportsTo} onChange={handleFormChange}>
+                    <option value="">-- Select Supervisor --</option>
+                    {potentialUplines.map((u) => <option key={u.id} value={u.id}>{u.first_name} {u.last_name}</option>)}
+                  </select>
+                </div>
+              )}
+
+              {modalError && <p className="modal-error" style={{ color: 'var(--danger-color)', fontSize: '14px' }}>{modalError}</p>}
+              {successMsg && <p className="modal-success" style={{ color: 'var(--success-color)', fontSize: '14px' }}>{successMsg}</p>}
+
+              <div className="modal-buttons" style={{ marginTop: '20px' }}>
+                <button type="button" className="modal-close" onClick={closeModal}>Cancel</button>
+                <button type="submit" className="modal-submit" disabled={loading}>
+                  {loading ? "Processing..." : (isEditMode ? "Update" : "Create")}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-
-        {(formData.position === 'AP' || formData.position === 'AL') && (
-          <div className="input-group">
-            <label>Reports To</label>
-            <select name="reportsTo" value={formData.reportsTo} onChange={handleFormChange}>
-              <option value="">-- Select Supervisor --</option>
-              {potentialUplines.map((u) => <option key={u.id} value={u.id}>{u.first_name} {u.last_name}</option>)}
-            </select>
-          </div>
-        )}
-
-        {modalError && <p className="modal-error" style={{ color: 'var(--danger-color)', fontSize: '14px' }}>{modalError}</p>}
-        {successMsg && <p className="modal-success" style={{ color: 'var(--success-color)', fontSize: '14px' }}>{successMsg}</p>}
-      </form>
-
-      {/* FOOTER - Fixed */}
-      <div className="modal-buttons" style={{ padding: '18px 35px', borderTop: '1px solid var(--border-color)', background: '#f7f9fc' }}>
-        <button type="button" className="modal-close" onClick={closeModal}>Back</button>
-        <button type="submit" className="modal-submit" onClick={submitAddUser} disabled={loading}>
-          {isEditMode ? "Update User" : "Create User"}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      )}
 
       {/* View Modal */}
-      {showViewModal && viewingUser && (
+      {showViewModal && selectedUser && (
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-title" style={{ padding: '22px 35px', borderBottom: '1px solid var(--border-color)', background: '#f7f9fc' }}>View User Details</div>
             <div className="modal-form">
               <div className="name-row">
-                <div className="input-group"><label>First Name</label><input type="text" value={viewingUser.first_name || ""} readOnly /></div>
-                <div className="input-group"><label>Last Name</label><input type="text" value={viewingUser.last_name || ""} readOnly /></div>
+                <div className="input-group"><label>Name</label><input type="text" value={`${selectedUser.first_name} ${selectedUser.last_name}`} readOnly /></div>
+                <div className="input-group"><label>Email</label><input type="text" value={selectedUser.email} readOnly /></div>
               </div>
               <div className="name-row">
-                <div className="input-group"><label>Email</label><input type="text" value={viewingUser.email || ""} readOnly /></div>
-                <div className="input-group"><label>Position</label><input type="text" value={viewingUser.account_type || ""} readOnly /></div>
+                <div className="input-group"><label>Position</label><input type="text" value={selectedUser.account_type} readOnly /></div>
+                <div className="input-group"><label>Status</label><input type="text" value={selectedUser.status} readOnly /></div>
               </div>
 
+              {/* Hierarchy View */}
               <div className="hierarchy-section" style={{ borderTop: '1px solid var(--border-color)', marginTop: '20px', paddingTop: '20px' }}>
                 <h3 style={{ fontSize: '16px', marginBottom: '15px', color: 'var(--primary-color)' }}>Hierarchy</h3>
                 <div className="hierarchy-item" style={{ marginBottom: '20px' }}>
@@ -452,6 +624,7 @@ const ManageUsers = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };
