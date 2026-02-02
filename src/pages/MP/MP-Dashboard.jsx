@@ -467,8 +467,8 @@ const MPDashboard = () => {
                 borderRadius: 6
             },
             {
-                label: 'ANP (Millions)',
-                data: monthlyIssuedPolicies.map(m => m.anp / 1000000),
+                label: 'ANP (Thousands)',
+                data: monthlyIssuedPolicies.map(m => m.anp / 1000),
                 backgroundColor: '#28a745',
                 borderRadius: 6,
                 yAxisID: 'y1'
@@ -538,327 +538,322 @@ const MPDashboard = () => {
 
 
 
-            {/* Top Stats Cards - Now clickable with hover effect */}
-            <div className="dashboard-grid">
-                <div
-                    className="stat-card hover-card"
-                    style={{ borderLeft: '4px solid #003781', cursor: 'pointer' }}
-                    onClick={() => handleStatCardClick('activityRatio')}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                >
-                    <div className="stat-header">
-                        <div className="stat-label">Activity Ratio</div>
-                        <div className={`stat-trend ${formatStatTrend('activityRatio').className}`}>
-                            {formatStatTrend('activityRatio').arrow} {formatStatTrend('activityRatio').percentage}
+            {/* Master Container - Wraps all dashboard content */}
+            <div className="dashboard-content-wrapper">
+                {/* Top Stats Cards - Now clickable with hover effect */}
+                <div className="dashboard-grid">
+                    <div
+                        className="stat-card hover-card"
+                        style={{ borderLeft: '4px solid #003781', cursor: 'pointer' }}
+                        onClick={() => handleStatCardClick('activityRatio')}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                    >
+                        <div className="stat-header">
+                            <div className="stat-label">Activity Ratio</div>
+                            <div className={`stat-trend ${formatStatTrend('activityRatio').className}`}>
+                                {formatStatTrend('activityRatio').arrow} {formatStatTrend('activityRatio').percentage}
+                            </div>
                         </div>
+                        <div className="stat-value">{monthSpecificStats.activityRatio}%</div>
+                        <div className="stat-subtext">{stats.activeAPs} of {mpStats.totalAPs} APs active</div>
                     </div>
-                    <div className="stat-value">{monthSpecificStats.activityRatio}%</div>
-                    <div className="stat-subtext">{stats.activeAPs} of {mpStats.totalAPs} APs active</div>
-                </div>
 
-                <div
-                    className="stat-card hover-card"
-                    style={{ borderLeft: '4px solid #28a745', cursor: 'pointer' }}
-                    onClick={() => handleStatCardClick('totalANP')}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                >
-                    <div className="stat-header">
-                        <div className="stat-label">Total ANP</div>
-                        <div className={`stat-trend ${formatStatTrend('totalANP').className}`}>
-                            {formatStatTrend('totalANP').arrow} {formatStatTrend('totalANP').percentage}
+                    <div
+                        className="stat-card hover-card"
+                        style={{ borderLeft: '4px solid #28a745', cursor: 'pointer' }}
+                        onClick={() => handleStatCardClick('totalANP')}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                    >
+                        <div className="stat-header">
+                            <div className="stat-label">Total ANP</div>
+                            <div className={`stat-trend ${formatStatTrend('totalANP').className}`}>
+                                {formatStatTrend('totalANP').arrow} {formatStatTrend('totalANP').percentage}
+                            </div>
                         </div>
+                        <div className="stat-value">₱ {(mpStats.totalANP / 1000000).toFixed(1)}M</div>
+                        <div className="stat-subtext">All-time Annual Premium</div>
                     </div>
-                    <div className="stat-value">₱ {(mpStats.totalANP / 1000000).toFixed(1)}M</div>
-                    <div className="stat-subtext">All-time Annual Premium</div>
-                </div>
 
-                <div
-                    className="stat-card hover-card"
-                    style={{ borderLeft: '4px solid #0055b8', cursor: 'pointer' }}
-                    onClick={() => handleStatCardClick('monthlyANP')}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                >
-                    <div className="stat-header">
-                        <div className="stat-label">Monthly ANP</div>
-                        <div className={`stat-trend ${formatStatTrend('monthlyANP').className}`}>
-                            {formatStatTrend('monthlyANP').arrow} {formatStatTrend('monthlyANP').percentage}
+                    <div
+                        className="stat-card hover-card"
+                        style={{ borderLeft: '4px solid #0055b8', cursor: 'pointer' }}
+                        onClick={() => handleStatCardClick('monthlyANP')}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                    >
+                        <div className="stat-header">
+                            <div className="stat-label">Monthly ANP</div>
+                            <div className={`stat-trend ${formatStatTrend('monthlyANP').className}`}>
+                                {formatStatTrend('monthlyANP').arrow} {formatStatTrend('monthlyANP').percentage}
+                            </div>
                         </div>
+                        <div className="stat-value">₱ {mpStats.monthlyANP.toLocaleString()}</div>
+                        <div className="stat-subtext">{selectedMonthYear} Performance</div>
                     </div>
-                    <div className="stat-value">₱ {mpStats.monthlyANP.toLocaleString()}</div>
-                    <div className="stat-subtext">{selectedMonthYear} Performance</div>
-                </div>
 
-                <div
-                    className="stat-card hover-card"
-                    style={{ borderLeft: '4px solid #f39c12', cursor: 'pointer' }}
-                    onClick={() => handleStatCardClick('totalCases')}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                >
-                    <div className="stat-header">
-                        <div className="stat-label">Total Cases</div>
-                        <div className={`stat-trend ${formatStatTrend('totalCases').className}`}>
-                            {formatStatTrend('totalCases').arrow} {formatStatTrend('totalCases').percentage}
+                    <div
+                        className="stat-card hover-card"
+                        style={{ borderLeft: '4px solid #f39c12', cursor: 'pointer' }}
+                        onClick={() => handleStatCardClick('totalCases')}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                    >
+                        <div className="stat-header">
+                            <div className="stat-label">Total Cases</div>
+                            <div className={`stat-trend ${formatStatTrend('totalCases').className}`}>
+                                {formatStatTrend('totalCases').arrow} {formatStatTrend('totalCases').percentage}
+                            </div>
                         </div>
+                        <div className="stat-value">{mpStats.monthlyCases.toLocaleString()}</div>
+                        <div className="stat-subtext">Policies Issued</div>
                     </div>
-                    <div className="stat-value">{mpStats.monthlyCases.toLocaleString()}</div>
-                    <div className="stat-subtext">Policies Issued</div>
                 </div>
-            </div>
 
-            {/* Second Row - Network Stats - Now clickable with hover effect */}
-            <div className="dashboard-grid">
-                <div
-                    className="stat-card hover-card"
-                    style={{ borderLeft: '4px solid #9b59b6', cursor: 'pointer' }}
-                    onClick={() => handleStatCardClick('totalALs')}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                >
-                    <div className="stat-header">
-                        <div className="stat-label">Agent Leaders</div>
-                        <div className={`stat-trend ${formatStatTrend('totalALs').className}`}>
-                            {formatStatTrend('totalALs').arrow} {formatStatTrend('totalALs').percentage}
+                {/* Second Row - Network Stats - Now clickable with hover effect */}
+                <div className="dashboard-grid">
+                    <div
+                        className="stat-card hover-card"
+                        style={{ borderLeft: '4px solid #9b59b6', cursor: 'pointer' }}
+                        onClick={() => handleStatCardClick('totalALs')}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                    >
+                        <div className="stat-header">
+                            <div className="stat-label">Agent Leaders</div>
+                            <div className={`stat-trend ${formatStatTrend('totalALs').className}`}>
+                                {formatStatTrend('totalALs').arrow} {formatStatTrend('totalALs').percentage}
+                            </div>
                         </div>
+                        <div className="stat-value">{mpStats.totalALs}</div>
+                        <div className="stat-subtext">{stats.performingALs} Performing ({mpStats.totalALs > 0 ? ((stats.performingALs / mpStats.totalALs) * 100).toFixed(0) : 0}%)</div>
                     </div>
-                    <div className="stat-value">{mpStats.totalALs}</div>
-                    <div className="stat-subtext">{stats.performingALs} Performing ({mpStats.totalALs > 0 ? ((stats.performingALs / mpStats.totalALs) * 100).toFixed(0) : 0}%)</div>
-                </div>
 
-                <div
-                    className="stat-card hover-card"
-                    style={{ borderLeft: '4px solid #e74c3c', cursor: 'pointer' }}
-                    onClick={() => handleStatCardClick('totalAPs')}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                >
-                    <div className="stat-header">
-                        <div className="stat-label">Agent Partners</div>
-                        <div className={`stat-trend ${formatStatTrend('totalAPs').className}`}>
-                            {formatStatTrend('totalAPs').arrow} {formatStatTrend('totalAPs').percentage}
+                    <div
+                        className="stat-card hover-card"
+                        style={{ borderLeft: '4px solid #e74c3c', cursor: 'pointer' }}
+                        onClick={() => handleStatCardClick('totalAPs')}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                    >
+                        <div className="stat-header">
+                            <div className="stat-label">Agent Partners</div>
+                            <div className={`stat-trend ${formatStatTrend('totalAPs').className}`}>
+                                {formatStatTrend('totalAPs').arrow} {formatStatTrend('totalAPs').percentage}
+                            </div>
                         </div>
+                        <div className="stat-value">{mpStats.totalAPs}</div>
+                        <div className="stat-subtext">{stats.activeAPs} Active ({mpStats.totalAPs > 0 ? ((stats.activeAPs / mpStats.totalAPs) * 100).toFixed(0) : 0}%)</div>
                     </div>
-                    <div className="stat-value">{mpStats.totalAPs}</div>
-                    <div className="stat-subtext">{stats.activeAPs} Active ({mpStats.totalAPs > 0 ? ((stats.activeAPs / mpStats.totalAPs) * 100).toFixed(0) : 0}%)</div>
-                </div>
 
-                <div
-                    className="stat-card hover-card"
-                    style={{ borderLeft: '4px solid #1abc9c', cursor: 'pointer' }}
-                    onClick={() => handleStatCardClick('activityRatio')}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                >
-                    <div className="stat-header">
-                        <div className="stat-label">AL Avg Activity</div>
-                        <div className={`stat-trend ${formatStatTrend('activityRatio').className}`}>
-                            {formatStatTrend('activityRatio').arrow} {formatStatTrend('activityRatio').percentage}
+                    <div
+                        className="stat-card hover-card"
+                        style={{ borderLeft: '4px solid #1abc9c', cursor: 'pointer' }}
+                        onClick={() => handleStatCardClick('activityRatio')}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                    >
+                        <div className="stat-header">
+                            <div className="stat-label">AL Avg Activity</div>
+                            <div className={`stat-trend ${formatStatTrend('activityRatio').className}`}>
+                                {formatStatTrend('activityRatio').arrow} {formatStatTrend('activityRatio').percentage}
+                            </div>
                         </div>
+                        <div className="stat-value">{stats.avgActivityRatio.toFixed(1)}%</div>
+                        <div className="stat-subtext">Average across all ALs</div>
                     </div>
-                    <div className="stat-value">{stats.avgActivityRatio.toFixed(1)}%</div>
-                    <div className="stat-subtext">Average across all ALs</div>
-                </div>
 
-                <div
-                    className="stat-card hover-card"
-                    style={{ borderLeft: '4px solid #2c3e50', cursor: 'pointer' }}
-                    onClick={() => handleStatCardClick('totalANP')}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                >
-                    <div className="stat-header">
-                        <div className="stat-label">AP Avg. ANP</div>
-                        <div className={`stat-trend ${formatStatTrend('totalANP').className}`}>
-                            {formatStatTrend('totalANP').arrow} {formatStatTrend('totalANP').percentage}
+                    <div
+                        className="stat-card hover-card"
+                        style={{ borderLeft: '4px solid #2c3e50', cursor: 'pointer' }}
+                        onClick={() => handleStatCardClick('totalANP')}
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                    >
+                        <div className="stat-header">
+                            <div className="stat-label">AP Avg. ANP</div>
+                            <div className={`stat-trend ${formatStatTrend('totalANP').className}`}>
+                                {formatStatTrend('totalANP').arrow} {formatStatTrend('totalANP').percentage}
+                            </div>
                         </div>
-                    </div>
-                    <div className="stat-value">₱ {stats.avgANPPerAP.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
-                    <div className="stat-subtext">Per Active Partner (Selected)</div>
-                </div>
-            </div>
-
-            {/* Charts Section */}
-            <div className="charts-grid">
-                <div className="chart-container">
-                    <div className="chart-header">
-                        <div className="chart-title">Most Availed Policies</div>
-                        <div className="chart-subtitle">Popularity by policy type</div>
-                    </div>
-                    <div className="chart-wrapper">
-                        <Bar
-                            data={policyChartData}
-                            options={{
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: { display: false }
-                                },
-                                scales: {
-                                    y: {
-                                        beginAtZero: true,
-                                        ticks: {
-                                            stepSize: 5
-                                        }
-                                    }
-                                }
-                            }}
-                        />
+                        <div className="stat-value">₱ {stats.avgANPPerAP.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+                        <div className="stat-subtext">Per Active Partner (Selected)</div>
                     </div>
                 </div>
 
-                <div className="chart-container">
-                    <div className="chart-header">
-                        <div className="chart-title">Monthly Issued Policies - {appliedFilters.year}</div>
-                        <div className="chart-subtitle">Policies vs ANP by month</div>
-                    </div>
-                    <div className="chart-wrapper">
-                        <Bar
-                            data={monthlyChartData}
-                            options={{
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: { position: 'top' }
-                                },
-                                scales: {
-                                    y: {
-                                        type: 'linear',
-                                        display: true,
-                                        position: 'left',
-                                        title: {
-                                            display: true,
-                                            text: 'Policies Issued'
-                                        }
-                                    },
-                                    y1: {
-                                        type: 'linear',
-                                        display: true,
-                                        position: 'right',
-                                        title: {
-                                            display: true,
-                                            text: 'ANP (M ₱)'
+                {/* Charts Section - Container Style */}
+                <div className="content-container">
+                    <div className="charts-grid">
+                        <div className="chart-container">
+                            <div className="chart-header">
+                                <div className="chart-title">Most Availed Policies</div>
+                                <div className="chart-subtitle">Popularity by policy type</div>
+                            </div>
+                            <div className="chart-wrapper">
+                                <Bar
+                                    data={policyChartData}
+                                    options={{
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                            legend: { display: false }
                                         },
-                                        grid: {
-                                            drawOnChartArea: false
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true,
+                                                ticks: {
+                                                    stepSize: 5
+                                                }
+                                            }
                                         }
-                                    }
-                                }
-                            }}
-                        />
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="chart-container">
+                            <div className="chart-header">
+                                <div className="chart-title">Monthly Issued Policies - {appliedFilters.year}</div>
+                                <div className="chart-subtitle">Policies vs ANP by month</div>
+                            </div>
+                            <div className="chart-wrapper">
+                                <Bar
+                                    data={monthlyChartData}
+                                    options={{
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                            legend: { position: 'top' }
+                                        },
+                                        scales: {
+                                            y: {
+                                                type: 'linear',
+                                                display: true,
+                                                position: 'left',
+                                                title: {
+                                                    display: true,
+                                                    text: 'Policies Issued'
+                                                }
+                                            },
+                                            y1: {
+                                                type: 'linear',
+                                                display: true,
+                                                position: 'right',
+                                                title: {
+                                                    display: true,
+                                                    text: 'ANP (K ₱)'
+                                                },
+                                                grid: {
+                                                    drawOnChartArea: false
+                                                }
+                                            }
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Top Performers Table */}
-            <div className="card" style={{ marginTop: '24px' }}>
-                <div className="card-header">
-                    <h2>🏆 Top Performing Agent Leaders - {selectedMonthYear}</h2>
-                    <div className="card-header-actions">
-                        <span className="stat-badge">Showing top 5 performers</span>
+                {/* Top Performers Table - Container Style */}
+                <div className="content-container">
+                    <div className="container-header">
+                        <h2>🏆 Top Performing Agent Leaders - {selectedMonthYear}</h2>
+                        <div className="container-header-actions">
+                            <span className="stat-badge">Showing top 5 performers</span>
+                        </div>
                     </div>
-                </div>
-                <div className="card-body">
-                    <table className="mp-al-table">
-                        <thead>
-                            <tr>
-                                <th>Rank</th>
-                                <th>AL Name</th>
-                                <th>Monthly ANP</th>
-                                <th>Activity Ratio</th>
-                                <th>Total Cases</th>
-                                <th>AP Count</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {topPerformers.map((al, index) => {
-                                return (
-                                    <tr key={al.id}>
-                                        <td>
-                                            <div className="rank-badge" style={{
-                                                background: index === 0 ? '#FFD700' :
-                                                    index === 1 ? '#C0C0C0' :
-                                                        index === 2 ? '#CD7F32' : '#f8fafc',
-                                                borderColor: index === 0 ? '#FFD700' :
-                                                    index === 1 ? '#C0C0C0' :
-                                                        index === 2 ? '#CD7F32' : '#e2e8f0',
-                                                color: index < 3 ? '#000' : '#0f172a'
-                                            }}>
-                                                {index === 0 ? '🥇 ' :
-                                                    index === 1 ? '🥈 ' :
-                                                        index === 2 ? '🥉 ' : `#${index + 1}`}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="agent-info">
-                                                <div className="agent-name">{al.name}</div>
-                                                <div className="agent-detail">ID: AL-{al.id.toString().padStart(4, '0')}</div>
-                                            </div>
-                                        </td>
-
-                                        <td>
-                                            <div style={{ fontWeight: '600', color: '#0f172a' }}>
-                                                ₱ {al.monthlyANP.toLocaleString()}
-                                            </div>
-                                            <div style={{ fontSize: '12px', color: '#64748b' }}>
-                                                Base ANP
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="activity-ratio">
-                                                <div className="ratio-bar">
-                                                    <div
-                                                        className="ratio-fill"
-                                                        style={{ width: `${al.activityRatio}%` }}
-                                                    ></div>
+                    <div className="container-body">
+                        <table className="mp-al-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>AL Name</th>
+                                    <th>Monthly ANP</th>
+                                    <th>Activity Ratio</th>
+                                    <th>Total Cases</th>
+                                    <th>AP Count</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {topPerformers.map((al, index) => {
+                                    return (
+                                        <tr key={al.id}>
+                                            <td>
+                                                <div className="rank-badge" style={{
+                                                    background: index === 0 ? '#FFD700' :
+                                                        index === 1 ? '#C0C0C0' :
+                                                            index === 2 ? '#CD7F32' : '#f8fafc',
+                                                    borderColor: index === 0 ? '#FFD700' :
+                                                        index === 1 ? '#C0C0C0' :
+                                                            index === 2 ? '#CD7F32' : '#e2e8f0',
+                                                    color: index < 3 ? '#000' : '#0f172a'
+                                                }}>
+                                                    {index === 0 ? '🥇 ' :
+                                                        index === 1 ? '🥈 ' :
+                                                            index === 2 ? '🥉 ' : `#${index + 1}`}
                                                 </div>
-                                                <span className="ratio-value">{al.activityRatio}%</span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div style={{ fontWeight: '600' }}>{al.totalCases}</div>
-                                            <div style={{ fontSize: '12px', color: '#64748b' }}>
-                                                {al.monthlyCases} this month
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div style={{ fontWeight: '600' }}>{al.totalAPs}</div>
-                                            <div style={{ fontSize: '12px', color: '#64748b' }}>
-                                                {al.activeAPs} active
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span className={`status-badge status-${al.status.toLowerCase().replace(' ', '-')}`}>
-                                                {al.status}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div className="action-buttons">
-                                                <button
-                                                    onClick={() => handleViewAPsModal(al)}
-                                                    className="view-button"
-                                                >
-                                                    View APs
-                                                </button>
-                                                <button
-                                                    onClick={() => handleViewPolicyDetails(al)}
-                                                    className="details-button"
-                                                >
-                                                    Policy Details
-                                                </button>
-                                            </div>
+                                            </td>
+                                            <td>
+                                                <div className="agent-info">
+                                                    <div className="agent-name">{al.name}</div>
+                                                    <div className="agent-detail">ID: AL-{al.id.toString().padStart(4, '0')}</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="value-primary">₱ {al.monthlyANP.toLocaleString()}</div>
+                                            </td>
+                                            <td>
+                                                <div className="value-secondary">{al.activityRatio || 0}%</div>
+                                            </td>
+                                            <td>
+                                                <div className="value-secondary">{al.monthlyCases}</div>
+                                            </td>
+                                            <td>
+                                                <div className="value-secondary">{al.totalAPs || 0}</div>
+                                            </td>
+                                            <td>
+                                                <span className={`status-badge status-${al.status?.toLowerCase().replace(' ', '-') || 'active'}`}>
+                                                    {al.status || 'Active'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div className="action-buttons">
+                                                    <button
+                                                        className="action-btn view-btn"
+                                                        onClick={() => handleViewAPsModal(al)}
+                                                        title="View APs"
+                                                    >
+                                                        👥
+                                                    </button>
+                                                    <button
+                                                        className="action-btn details-btn"
+                                                        onClick={() => handleViewPolicyDetails(al)}
+                                                        title="View Details"
+                                                    >
+                                                        📊
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                                {topPerformers.length === 0 && (
+                                    <tr>
+                                        <td colSpan="8" className="no-data-cell">
+                                            No performance data available for this month.
                                         </td>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+            {/* End Master Container */}
         </>
     );
 

@@ -24,6 +24,8 @@
     display: flex;
     flex-direction: row;
     overflow-x: hidden;
+    width: 100%;
+    /* Fill viewport width */
 }
 
 .mp-layout .app-layout-wrapper {
@@ -358,25 +360,26 @@
 /* --- MAIN CONTENT --- */
 .mp-layout .main-content {
     margin-left: 260px;
-    padding: 90px 30px 30px 30px;
+    padding: 90px 40px 30px 40px;
     flex: 1;
     min-height: 100vh;
     overflow-y: auto;
-    transition: margin-left 0.3s ease;
+    transition: margin-left 0.3s ease, padding 0.3s ease;
     display: block;
-    /* Override flex */
+    width: calc(100% - 260px);
 }
 
 .mp-layout .main-content.expanded {
     margin-left: 0 !important;
-    padding: 90px 60px 40px 60px;
+    padding: 90px 50px 40px 50px;
+    width: 100%;
 }
 
 .mp-layout .container {
     width: 100%;
-    max-width: 1600px;
-    margin: 0 auto;
-    /* padding is handled by main-content */
+    max-width: none;
+    margin: 0;
+    /* Allow full width utilization */
 }
 
 /* --- DASHBOARD HEADER --- */
@@ -511,9 +514,10 @@
 /* --- STAT CARDS --- */
 .mp-layout .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
     margin-bottom: 32px;
+    width: 100%;
 }
 
 .mp-layout .stat-card {
@@ -522,6 +526,8 @@
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     border-left: 4px solid;
+    transition: all 0.3s ease;
+    min-width: 0;
 }
 
 .mp-layout .stat-header {
@@ -576,9 +582,10 @@
 /* --- CHARTS --- */
 .mp-layout .charts-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 20px;
     margin-bottom: 24px;
+    width: 100%;
 }
 
 .mp-layout .chart-container {
@@ -586,6 +593,8 @@
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    min-width: 0;
+    width: 100%;
 }
 
 .mp-layout .chart-header {
@@ -609,6 +618,52 @@
     height: 250px;
 }
 
+/* --- DASHBOARD CONTENT WRAPPER (Master Container) --- */
+.mp-layout .dashboard-content-wrapper {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    transition: all 0.3s ease;
+}
+
+/* --- CONTENT CONTAINERS (New Container Style) --- */
+.mp-layout .content-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 24px;
+    overflow: hidden;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.mp-layout .container-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 20px 32px;
+    border-bottom: 2px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mp-layout .container-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.mp-layout .container-header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.mp-layout .container-body {
+    padding: 24px 32px;
+}
+
 /* --- CARDS --- */
 .mp-layout .card {
     background: white;
@@ -616,6 +671,7 @@
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     margin-bottom: 30px;
     overflow: hidden;
+    width: 100%;
 }
 
 .mp-layout .card-header {

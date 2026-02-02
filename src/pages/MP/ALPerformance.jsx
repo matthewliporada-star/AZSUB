@@ -406,16 +406,16 @@ const ALPerformance = () => {
                 </div>
             </div>
 
-            {/* Main Table */}
-            <div className="card">
-                <div className="card-header">
+            {/* Main Table - Container Style */}
+            <div className="content-container">
+                <div className="container-header">
                     <h2>Agency Leaders Detailed View - {months[appliedFilters.month]} {appliedFilters.year}</h2>
                     <div className="card-header-stats">
                         <span className="stat-badge">Showing: {filteredALs.length} of {alPerformance.length}</span>
                         <span className="stat-badge status-performing">Performing: {performingALs}</span>
                     </div>
                 </div>
-                <div className="card-body">
+                <div className="container-body">
                     <table className="mp-al-table">
                         <thead>
                             <tr>

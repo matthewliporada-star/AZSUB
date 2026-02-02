@@ -138,7 +138,6 @@ export const AppProvider = ({ children }) => {
         loadFormSubmissions,
         loadCustomers,
         loadPerformanceData,
-        loadPerformanceData,
         testConnection,
         loading
     };
