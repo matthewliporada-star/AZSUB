@@ -1,4 +1,4 @@
-// - Updated to fetch Requirements column
+// - Added Status Check to prevent reuse of Issued/Declined serials
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
@@ -34,7 +34,7 @@ router.get('/policies/active', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('policy')
-            .select('policy_id, policy_name, policy_type, form_type, request_type, agency, requirements') // Included requirements here too
+            .select('policy_id, policy_name, policy_type, form_type, request_type, agency, requirements') 
             .eq('active_status', true)
             .order('policy_name', { ascending: true });
 
@@ -107,7 +107,6 @@ router.post('/monitoring/submit', async (req, res) => {
             const { data: existingSerial } = await supabase.from('serial_number').select('serial_id').eq('serial_number', body.serialNumber).limit(1).maybeSingle();
             if (existingSerial) {
                 serialId = existingSerial.serial_id;
-                await supabase.from('serial_number').update({ is_issued: true }).eq('serial_id', serialId);
             } else {
                 const { data: newSerial, error: createError } = await supabase.from('serial_number')
                     .insert([{
@@ -126,6 +125,24 @@ router.post('/monitoring/submit', async (req, res) => {
             const { data: sysSerial } = await supabase.from('serial_number').select('serial_id').eq('serial_number', body.serialNumber).limit(1).maybeSingle();
             if (!sysSerial) throw new Error(`System Serial ${body.serialNumber} not found/valid in database.`);
             serialId = sysSerial.serial_id;
+        }
+
+        // Security Check: Prevent Duplicates
+        const { data: existingUsage } = await supabase
+            .from('az_submissions')
+            .select('sub_id')
+            .eq('serial_id', serialId)
+            .maybeSingle();
+
+        if (existingUsage) {
+            return res.status(400).json({ 
+                success: false, 
+                message: `Serial Number '${body.serialNumber}' is already in use by another application. Please verify.` 
+            });
+        }
+
+        if (isManual && serialId) {
+             await supabase.from('serial_number').update({ is_issued: true }).eq('serial_id', serialId);
         }
 
         const safePremium = parseFloat(body.premiumPaid) || 0;
@@ -149,7 +166,10 @@ router.post('/monitoring/submit', async (req, res) => {
         }]).select().single();
 
         if (error) throw error;
-        if (!isManual && body.serialNumber) await supabase.from('serial_number').update({ is_issued: true }).eq('serial_number', body.serialNumber);
+        
+        if (!isManual && body.serialNumber) {
+            await supabase.from('serial_number').update({ is_issued: true }).eq('serial_number', body.serialNumber);
+        }
 
         res.status(201).json({ success: true, data: { ...data, serial_number: body.serialNumber } });
     } catch (e) {
@@ -158,7 +178,7 @@ router.post('/monitoring/submit', async (req, res) => {
     }
 });
 
-// 3. GET DETAILS (Fixed: Select Requirements)
+// GET DETAILS (Updated with "Serial used" check)
 router.get('/submissions/details/:serialNumber', async (req, res) => {
     try {
         const { serialNumber } = req.params;
@@ -172,12 +192,27 @@ router.get('/submissions/details/:serialNumber', async (req, res) => {
 
         if (!sData) return res.status(404).json({ success: false, message: 'Serial not found' });
 
-        // --- UPDATED QUERY TO INCLUDE requirements ---
         const { data: sub } = await supabase.from('az_submissions')
             .select(`*, policy (policy_type, requirements), profiles (first_name, last_name)`)
             .eq('serial_id', sData.serial_id).limit(1).maybeSingle();
 
-        if (!sub) return res.status(404).json({ success: false, message: 'Submission not found' });
+        if (!sub) return res.status(404).json({ success: false, message: 'Submission not found. Please submit Monitoring Data first.' });
+
+        // --- NEW BLOCK: Detect already used serials ---
+        if (sub.status === 'Issued' || sub.status === 'Declined') {
+            return res.status(400).json({ 
+                success: false, 
+                message: `Serial Number '${serialNumber}' has already been finalized (${sub.status.toUpperCase()}).` 
+            });
+        }
+
+        if (sub.form_type) {
+            return res.status(400).json({ 
+                success: false, 
+                message: `Documents have already been submitted for Serial Number '${serialNumber}'.` 
+            });
+        }
+        // ----------------------------------------------
 
         const nameParts = (sub.client_name || '').split(' ');
         res.json({ 
@@ -189,7 +224,7 @@ router.get('/submissions/details/:serialNumber', async (req, res) => {
                 policyType: sub.policy?.policy_type, 
                 modeOfPayment: sub.mode_of_payment, 
                 policyDate: sub.issued_at,
-                requirements: sub.policy?.requirements // Pass requirements to frontend
+                requirements: sub.policy?.requirements
             } 
         });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
@@ -215,8 +250,6 @@ router.get('/form-submissions', async (req, res) => {
         res.json({ success: true, data });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
-
-// - Updated POST /form-submissions to fix Upload Error
 
 router.post('/form-submissions', upload.any(), async (req, res) => {
     try {
@@ -250,7 +283,6 @@ router.post('/form-submissions', upload.any(), async (req, res) => {
         const newFilesForDB = [];
         const emailAttachments = [];
 
-        // 1. Handle User Uploaded Files
         if (req.files) {
             for (const f of req.files) {
                 try {
@@ -261,28 +293,16 @@ router.post('/form-submissions', upload.any(), async (req, res) => {
             }
         }
 
-        // 2. Generate PDF
         const pdfBuffer = await generateApplicationPDF(parsedData, serialNumber);
         
-        // --- FIX: SEPARATE FILENAMES ---
-        
-        // A. Safe Name for Database (No brackets, no commas)
-        // Turns "Application [123, John].pdf" into "Application_123_John.pdf"
         const cleanName = existing.client_name.replace(/[^a-zA-Z0-9]/g, '_'); 
         const storageFilename = `Application_${serialNumber}_${cleanName}.pdf`;
-
-        // B. Pretty Name for Email (Keeps your desired format)
         const emailFilename = `Application [${serialNumber}, ${existing.client_name}].pdf`;
 
-        // Upload using SAFE name
         const pdfUpload = await uploadBufferToSupabase(pdfBuffer, storageFilename, existing.sub_id);
         newFilesForDB.push(pdfUpload);
         const generatedPdfUrl = pdfUpload.fileUrl;
-
-        // Attach to email using PRETTY name
         emailAttachments.push({ filename: emailFilename, content: pdfBuffer });
-
-        // -------------------------------
 
         const { data: updated, error } = await supabase.from('az_submissions').update({
             form_type: parsedData.formType, mode_of_payment: parsedData.modeOfPayment,
@@ -369,7 +389,6 @@ router.post('/submissions/:id/pay', async (req, res) => {
 
 // --- NEW VSP ENDPOINTS ---
 
-// 6. SEND ATTESTATION EMAIL
 router.post('/vsp/send-attestation', async (req, res) => {
     try {
         const inputSerial = String(req.body.serialNumber || '').trim();
@@ -406,7 +425,6 @@ router.post('/vsp/send-attestation', async (req, res) => {
         if (!clientEmail) return res.status(400).json({ success: false, message: 'Client email missing.' });
 
         // STEP 3: SEND EMAIL
-        // UPDATED: Checks for process.env.BASE_URL first
         const baseUrl = process.env.BASE_URL || 'http://localhost:3000/api'; 
         
         const yesLink = `${baseUrl}/vsp/verify-attestation?serial=${inputSerial}&response=yes&client=${encodeURIComponent(clientName)}`;

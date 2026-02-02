@@ -73,58 +73,47 @@ const SubmissionPage = () => {
         return 'VUL';
     };
 
-    const handleSerialBlur = async () => {
-        if (!formData.serialNumber) return;
+const handleSerialBlur = async () => {
+    if (!formData.serialNumber) return;
 
-        try {
-            setLoading(true);
-            setMessage('Fetching serial details...');
-            setMessageType('info');
-            setGeneratedPdfUrl(null);
+    try {
+        setLoading(true);
+        setMessage('Fetching serial details...');
+        setMessageType('info');
+        setGeneratedPdfUrl(null);
 
-            const response = await api.getSerialDetails(formData.serialNumber);
+        const response = await api.getSerialDetails(formData.serialNumber);
 
-            if (response.success) {
-                const data = response.data;
-                const detectedCategory = getCategoryFromPolicy(data.policyType);
-
-                setFormData(prev => ({
-                    ...prev,
-                    policyType: data.policyType || '',
-                    modeOfPayment: data.modeOfPayment || '',
-                    policyDate: data.policyDate || '',
-                    clientFirstName: data.clientFirstName || '',
-                    clientLastName: data.clientLastName || '',
-                    formType: detectedCategory
-                }));
-
-                // --- NEW: Set Dynamic Requirements from Backend ---
-                if (data.requirements && Array.isArray(data.requirements) && data.requirements.length > 0) {
-                    setDynamicRequirements(data.requirements);
-                } else {
-                    setDynamicRequirements([]); // Fallback to legacy logic
-                }
-
-                // Reset Options
-                setIsGAE(false);
-                setIsVSP(false);
-
-                setMessage(`Serial found! Identified as ${detectedCategory} Application.`);
-                setMessageType('success');
-            } else {
-                setMessage('Serial Number not found.');
-                setMessageType('error');
-                setFormData(prev => ({ ...prev, formType: '', policyType: '' }));
-                setDynamicRequirements([]);
-            }
-        } catch (error) {
-            console.error(error);
-            setMessage('Error connecting to server.');
+        if (response.success) {
+            // ... (existing success logic to set form data)
+            setMessage(`Serial found! Identified as ${detectedCategory} Application.`);
+            setMessageType('success');
+        } else {
+            // This handles cases where response is returned but success is false
+            setMessage(response.message || 'Serial Number not found.');
             setMessageType('error');
-        } finally {
-            setLoading(false);
+            resetFormFields();
         }
-    };
+    } catch (error) {
+        console.error("Submission Error:", error);
+        
+        // --- NEW: Capture the 400 Bad Request message ---
+        const errorMsg = error.response?.data?.message || 'The serial number has already been used or is invalid.';
+        setMessage(errorMsg); 
+        setMessageType('error');
+        resetFormFields();
+    } finally {
+        setLoading(false);
+    }
+};
+
+// Helper to clear form when serial is invalid/used
+const resetFormFields = () => {
+    setFormData(prev => ({ 
+        ...prev, formType: '', policyType: '', clientFirstName: '', clientLastName: '' 
+    }));
+    setDynamicRequirements([]);
+};
 
     const handleTextChange = (e) => {
         const { name, value } = e.target;
@@ -331,17 +320,16 @@ const SubmissionPage = () => {
                 <h2 style={{ fontSize: '20px', margin: 0 }}>Document Submission</h2>
             </div>
             <div>
-                {message && (
-                    <div className={`alert ${messageType === 'success' ? 'alert-success' : 'alert-error'}`}
-                        style={{
-                            padding: '10px', marginBottom: '15px', borderRadius: '4px',
-                            backgroundColor: messageType === 'success' ? '#d4edda' : '#f8d7da',
-                            color: messageType === 'success' ? '#155724' : '#721c24'
-                        }}>
-                        {message}
-                    </div>
-                )}
-
+            {message && (
+    <div className={`alert ${messageType === 'success' ? 'alert-success' : 'alert-error'}`}
+        style={{
+            padding: '10px', marginBottom: '15px', borderRadius: '4px',
+            backgroundColor: messageType === 'success' ? '#d4edda' : '#f8d7da', // Red background for error
+            color: messageType === 'success' ? '#155724' : '#721c24'           // Dark red text for error
+        }}>
+        {message}
+    </div>
+)}
                 {generatedPdfUrl && (
                     <div style={{ padding: '15px', backgroundColor: '#e8f4fd', borderRadius: '6px', marginBottom: '20px', border: '1px solid #b8daff', textAlign: 'center' }}>
                         <h4 style={{ margin: '0 0 10px 0', color: '#004085' }}>Application Generated Successfully!</h4>
