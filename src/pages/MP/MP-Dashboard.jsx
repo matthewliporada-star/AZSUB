@@ -165,11 +165,13 @@ const MPDashboard = () => {
         // To support historical filtering properly, the backend endpoint would need to accept month/year params.
         const currentMonthlyANP = safeALPerformance.reduce((sum, al) => sum + (al.monthlyANP || 0), 0);
         const currentMonthlyPolicies = safeALPerformance.reduce((sum, al) => sum + (al.monthlyCases || 0), 0);
+        const currentMonthlyDeclined = safeALPerformance.reduce((sum, al) => sum + (al.monthlyDeclined || 0), 0);
 
         const monthSpecificStats = {
             activityRatio: Math.round(avgActivityRatio),
             monthlyANP: currentMonthlyANP,
-            totalPolicies: currentMonthlyPolicies
+            totalPolicies: currentMonthlyPolicies,
+            monthlyDeclined: currentMonthlyDeclined
         };
 
         return {
@@ -327,12 +329,20 @@ const MPDashboard = () => {
                         <div>
                             <div style={{ fontSize: '12px', color: '#64748b' }}>Current Value</div>
                             <div style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a' }}>
-                                {selectedStat === 'activityRatio' && `${monthSpecificStats.activityRatio}%`}
-                                {selectedStat === 'totalANP' && `₱ ${Math.round(mpStats.totalANP || 0).toLocaleString()}`}
-                                {selectedStat === 'monthlyANP' && `₱ ${mpStats.monthlyANP.toLocaleString()}`}
-                                {selectedStat === 'totalCases' && mpStats.monthlyCases.toLocaleString()}
-                                {selectedStat === 'totalALs' && mpStats.totalALs}
-                                {selectedStat === 'totalAPs' && mpStats.totalAPs}
+                                {selectedStat === 'activityRatio' && `${currentHistoryData?.currentValue || 0}%`}
+                                {selectedStat === 'totalANP' && `₱ ${(currentHistoryData?.currentValue || 0).toLocaleString()}`}
+                                {selectedStat === 'monthlyANP' && `₱ ${(currentHistoryData?.currentValue || 0).toLocaleString()}`}
+                                {selectedStat === 'apAvgANP' && `₱ ${(currentHistoryData?.currentValue || 0).toLocaleString()}`}
+                                {selectedStat === 'totalCases' && (
+                                    <>
+                                        {(currentHistoryData?.currentValue || 0).toLocaleString()}
+                                        <div style={{ fontSize: '13px', color: '#64748b', fontWeight: '500', marginTop: '4px' }}>
+                                            {mpStats.monthlyCases?.toLocaleString() || 0} Issued · {mpStats.monthlyDeclined || 0} Declined
+                                        </div>
+                                    </>
+                                )}
+                                {selectedStat === 'totalALs' && (currentHistoryData?.currentValue || mpStats.totalALs)}
+                                {selectedStat === 'totalAPs' && (currentHistoryData?.currentValue || mpStats.totalAPs)}
                             </div>
                         </div>
                         <div>
@@ -420,7 +430,10 @@ const MPDashboard = () => {
                                         beginAtZero: true,
                                         ticks: {
                                             callback: function (value) {
-                                                return currentHistoryData.prefix ? `${currentHistoryData.prefix}${value}${currentHistoryData.unit}` : `${value}${currentHistoryData.unit}`;
+                                                if (value >= 1000) {
+                                                    return '₱' + (value / 1000).toFixed(0) + 'k';
+                                                }
+                                                return '₱' + value;
                                             }
                                         }
                                     }
@@ -461,8 +474,8 @@ const MPDashboard = () => {
         labels: monthlyIssuedPolicies.map(m => m.month),
         datasets: [
             {
-                label: 'Policies Issued',
-                data: monthlyIssuedPolicies.map(m => m.issued),
+                label: 'Total Cases',
+                data: monthlyIssuedPolicies.map(m => (m.issued || 0) + (m.declined || 0)),
                 backgroundColor: '#003781',
                 borderRadius: 6
             },
@@ -606,8 +619,8 @@ const MPDashboard = () => {
                                 {formatStatTrend('totalCases').arrow} {formatStatTrend('totalCases').percentage}
                             </div>
                         </div>
-                        <div className="stat-value">{mpStats.monthlyCases.toLocaleString()}</div>
-                        <div className="stat-subtext">Policies Issued</div>
+                        <div className="stat-value">{(mpStats.monthlyCases + (mpStats.monthlyDeclined || 0)).toLocaleString()}</div>
+                        <div className="stat-subtext">Policies (Issued + Declined)</div>
                     </div>
                 </div>
 
@@ -667,7 +680,7 @@ const MPDashboard = () => {
                     <div
                         className="stat-card hover-card"
                         style={{ borderLeft: '4px solid #2c3e50', cursor: 'pointer' }}
-                        onClick={() => handleStatCardClick('totalANP')}
+                        onClick={() => handleStatCardClick('apAvgANP')}
                         onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
                         onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                     >
@@ -1075,11 +1088,19 @@ const MPDashboard = () => {
                                                             legend: { display: false }
                                                         },
                                                         scales: {
+                                                            x: {
+                                                                stacked: true,
+                                                                grid: { display: false }
+                                                            },
                                                             y: {
                                                                 beginAtZero: true,
-                                                                ticks: {
-                                                                    stepSize: 10
-                                                                }
+                                                                display: false
+                                                            },
+                                                            y1: {
+                                                                type: 'linear',
+                                                                display: true,
+                                                                position: 'right',
+                                                                grid: { display: false }
                                                             }
                                                         }
                                                     }}

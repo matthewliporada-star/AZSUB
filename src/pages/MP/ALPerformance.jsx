@@ -1,5 +1,5 @@
 // ALPerformance.jsx - FINAL UPDATED VERSION
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ALPageSkeleton } from './MPSkeletons';
 import { useMPData } from './MPData';
@@ -11,7 +11,7 @@ import './MP_Styles.css';
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const ALPerformance = () => {
-    const { alPerformance, apPerformance, getAPsByAL, loading } = useMPData();
+    const { alPerformance, apPerformance, getAPsByAL, loading, refreshData } = useMPData();
     const navigate = useNavigate();
 
 
@@ -39,11 +39,17 @@ const ALPerformance = () => {
     const [policyDetailsData, setPolicyDetailsData] = useState(null);
     const [loadingPolicyDetails, setLoadingPolicyDetails] = useState(false);
 
+    // State for Stat History (Dashboard-like details)
+    const [statHistoryCache, setStatHistoryCache] = useState({});
+    const [loadingStatHistory, setLoadingStatHistory] = useState(false);
+    const [currentHistoryData, setCurrentHistoryData] = useState(null);
+
     // Month names
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const currentYear = new Date().getFullYear();
     const years = [currentYear - 2, currentYear - 1, currentYear];
 
+    // Apply filters
     // Apply filters
     const applyFilters = () => {
         setAppliedFilters({
@@ -52,6 +58,7 @@ const ALPerformance = () => {
             status: statusFilter,
             search: searchTerm
         });
+        refreshData(selectedMonth, selectedYear);
     };
 
     // Clear filters
@@ -119,7 +126,7 @@ const ALPerformance = () => {
     };
 
     // Filter ALs based on applied filters
-    const filteredALs = alPerformance.filter(al => {
+    const filteredALs = (alPerformance || []).filter(al => {
         // Status filter
         if (appliedFilters.status !== 'All' && al.status !== appliedFilters.status) {
             return false;
@@ -128,8 +135,8 @@ const ALPerformance = () => {
         // Search filter
         // Search filter
         if (appliedFilters.search &&
-            !al.name.toLowerCase().includes(appliedFilters.search.toLowerCase()) &&
-            !al.city.toLowerCase().includes(appliedFilters.search.toLowerCase())) {
+            !(al.name || '').toLowerCase().includes(appliedFilters.search.toLowerCase()) &&
+            !(al.city || '').toLowerCase().includes(appliedFilters.search.toLowerCase())) {
             return false;
         }
 
@@ -182,104 +189,248 @@ const ALPerformance = () => {
         };
     };
 
-    // Render stat details based on selected stat
-    const renderStatDetails = () => {
-        switch (selectedStat) {
-            case 'totalALs':
-                return (
-                    <div>
-                        <h3>Total Agency Leaders Details</h3>
-                        <p>Showing detailed information about all Agency Leaders in the network.</p>
-                        <div className="info-grid">
-                            <div className="info-item">
-                                <span className="info-label">Total ALs:</span>
-                                <span className="info-value">{totalALs}</span>
-                            </div>
-                            <div className="info-item">
-                                <span className="info-label">Performing ALs:</span>
-                                <span className="info-value">{performingALs}</span>
-                            </div>
-                            <div className="info-item">
-                                <span className="info-label">Average ALs:</span>
-                                <span className="info-value">{filteredALs.filter(al => al.status === 'AVERAGE').length}</span>
-                            </div>
-                            <div className="info-item">
-                                <span className="info-label">Needs Improvement:</span>
-                                <span className="info-value">{filteredALs.filter(al => al.status === 'NEEDS IMPROVEMENT').length}</span>
-                            </div>
-                        </div>
-                    </div>
-                );
-            case 'performingALs':
-                return (
-                    <div>
-                        <h3>Performing Agency Leaders Details</h3>
-                        <p>Agency Leaders with monthly cases ≥ 7 policies.</p>
-                        <table className="performance-table">
-                            <thead>
-                                <tr>
-                                    <th>AL Name</th>
-                                    <th>Monthly Cases</th>
-                                    <th>Activity Ratio</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredALs.filter(al => al.status === 'PERFORMING').map(al => (
-                                    <tr key={al.id}>
-                                        <td>{al.name}</td>
-                                        <td>{al.monthlyCases}</td>
-                                        <td>{al.activityRatio}%</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                );
-            case 'totalANP':
-                return (
-                    <div>
-                        <h3>Total ANP Details</h3>
-                        <p>Cumulative Annual Premium from all Agency Leaders.</p>
-                        <div className="info-grid">
-                            <div className="info-item">
-                                <span className="info-label">Total ANP:</span>
-                                <span className="info-value">₱ {totalANP.toLocaleString()}</span>
-                            </div>
-                            <div className="info-item">
-                                <span className="info-label">Average per AL:</span>
-                                <span className="info-value">₱ {Math.round(totalANP / totalALs).toLocaleString()}</span>
-                            </div>
-                            <div className="info-item">
-                                <span className="info-label">Monthly ANP:</span>
-                                <span className="info-value">₱ {filteredALs.reduce((sum, al) => sum + al.monthlyANP, 0).toLocaleString()}</span>
-                            </div>
-                        </div>
-                    </div>
-                );
-            case 'totalCases':
-                return (
-                    <div>
-                        <h3>Total Cases Details</h3>
-                        <p>Total policies issued by all Agency Leaders.</p>
-                        <div className="info-grid">
-                            <div className="info-item">
-                                <span className="info-label">Total Cases:</span>
-                                <span className="info-value">{totalCases}</span>
-                            </div>
-                            <div className="info-item">
-                                <span className="info-label">Average per AL:</span>
-                                <span className="info-value">{Math.round(totalCases / totalALs)}</span>
-                            </div>
-                            <div className="info-item">
-                                <span className="info-label">Monthly Cases:</span>
-                                <span className="info-value">{filteredALs.reduce((sum, al) => sum + al.monthlyCases, 0)}</span>
-                            </div>
-                        </div>
-                    </div>
-                );
-            default:
-                return null;
+    // Fetch historical data for stat details
+    useEffect(() => {
+        if (showStatDetailsModal && selectedStat) {
+            // Map selectedStat to backend supported types if needed
+            // Backend supports: totalANP, monthlyANP, totalCases, declined, activityRatio
+            // AL Cards: totalALs (unsupported), performingALs (unsupported), totalANP (supported), totalCases (monthly -> 'totalCases')
+            let backendStatType = selectedStat;
+            if (selectedStat === 'totalCases') backendStatType = 'totalCases'; // Monthly Cases
+
+            if (['totalANP', 'totalCases'].includes(backendStatType)) {
+                fetchStatHistoryData(backendStatType).then(data => setCurrentHistoryData(data));
+            } else {
+                setCurrentHistoryData(null); // Not supported for history yet
+            }
         }
+    }, [showStatDetailsModal, selectedStat, appliedFilters.year, appliedFilters.month]);
+
+    const fetchStatHistoryData = async (statType) => {
+        const cacheKey = `${statType}_${appliedFilters.year}_${appliedFilters.month}`;
+        if (statHistoryCache[cacheKey]) return statHistoryCache[cacheKey];
+
+        setLoadingStatHistory(true);
+        try {
+            const response = await fetch(
+                `http://localhost:3000/api/mp/monthly-history?year=${appliedFilters.year}&month=${appliedFilters.month}&statType=${statType}&view=al`
+            );
+            const result = await response.json();
+            if (result.success && result.data) {
+                setStatHistoryCache(prev => ({ ...prev, [cacheKey]: result.data }));
+                return result.data;
+            }
+        } catch (error) {
+            console.error('Error fetching stat history:', error);
+        } finally {
+            setLoadingStatHistory(false);
+        }
+        return null;
+    };
+
+    // Render stat details based on selected stat - UPDATED to match Dashboard
+    const renderStatDetails = () => {
+        const currentMonth = months[appliedFilters.month];
+
+        // For unsupported stats, fallback to static info
+        if (!['totalANP', 'totalCases'].includes(selectedStat)) {
+            // Render original static content for AL specific stats
+            switch (selectedStat) {
+                case 'totalALs':
+                    return (
+                        <div>
+                            <h3>Total Agency Leaders Details</h3>
+                            <p>Showing detailed information about all Agency Leaders in the network.</p>
+                            <div className="info-grid">
+                                <div className="info-item">
+                                    <span className="info-label">Total ALs:</span>
+                                    <span className="info-value">{totalALs}</span>
+                                </div>
+                                <div className="info-item">
+                                    <span className="info-label">Performing ALs:</span>
+                                    <span className="info-value">{performingALs}</span>
+                                </div>
+                                <div className="info-item">
+                                    <span className="info-label">Average ALs:</span>
+                                    <span className="info-value">{filteredALs.filter(al => al.status === 'AVERAGE').length}</span>
+                                </div>
+                                <div className="info-item">
+                                    <span className="info-label">Needs Improvement:</span>
+                                    <span className="info-value">{filteredALs.filter(al => al.status === 'NEEDS IMPROVEMENT').length}</span>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                case 'performingALs':
+                    return (
+                        <div>
+                            <h3>Performing Agency Leaders Details</h3>
+                            <p>Agency Leaders with monthly cases ≥ 7 policies.</p>
+                            <table className="performance-table">
+                                <thead>
+                                    <tr>
+                                        <th>AL Name</th>
+                                        <th>Monthly Cases</th>
+                                        <th>Activity Ratio</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredALs.filter(al => al.status === 'PERFORMING').map(al => (
+                                        <tr key={al.id}>
+                                            <td>{al.name}</td>
+                                            <td>{al.monthlyCases}</td>
+                                            <td>{al.activityRatio}%</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    );
+                default:
+                    return null;
+            }
+        }
+
+        // Logic for Chart-supported stats (Total ANP, Total Cases)
+        if (loadingStatHistory) {
+            return <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>Loading statistics history...</div>;
+        }
+
+        if (!currentHistoryData) {
+            return <div style={{ textAlign: 'center', padding: '40px', color: '#dc3545' }}>Failed to load history data.</div>;
+        }
+
+        const monthlyIssuedSum = filteredALs.reduce((sum, al) => sum + al.monthlyCases, 0);
+        const monthlyDeclinedSum = filteredALs.reduce((sum, al) => sum + (al.monthlyDeclined || 0), 0);
+
+        return (
+            <div>
+                <h3 style={{ marginBottom: '8px', color: '#0f172a' }}>{currentHistoryData.title}</h3>
+                <p style={{ marginBottom: '24px', color: '#64748b', fontSize: '14px' }}>
+                    {selectedStat === 'totalCases'
+                        ? `Total Policies (Issued + Declined) - ${currentMonth} ${appliedFilters.year}`
+                        : selectedStat === 'totalANP'
+                            ? `Year-to-Date Cumulative - ${appliedFilters.year}`
+                            : `Historical Data - ${currentMonth} ${appliedFilters.year}`
+                    }
+                </p>
+
+                <div style={{
+                    background: '#f8fafc',
+                    padding: '20px',
+                    borderRadius: '12px',
+                    marginBottom: '24px'
+                }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
+                        <div>
+                            <div style={{ fontSize: '12px', color: '#64748b' }}>
+                                {selectedStat === 'totalANP' ? 'Total Cumulative ANP' : 'Current Value'}
+                            </div>
+                            <div style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a' }}>
+                                {selectedStat === 'totalCases' ? (
+                                    <>
+                                        {(monthlyIssuedSum + monthlyDeclinedSum).toLocaleString()}
+                                        <div style={{ fontSize: '13px', color: '#64748b', fontWeight: '500', marginTop: '4px' }}>
+                                            {monthlyIssuedSum.toLocaleString()} Issued · {monthlyDeclinedSum.toLocaleString()} Declined
+                                        </div>
+                                    </>
+                                ) : (
+                                    `₱ ${(currentHistoryData?.currentValue || 0).toLocaleString()}`
+                                )}
+                            </div>
+                        </div>
+                        <div>
+                            <div style={{ fontSize: '12px', color: '#64748b' }}>Yearly Change</div>
+                            <div style={{
+                                fontSize: '24px',
+                                fontWeight: '700',
+                                color: currentHistoryData.trend === 'up' ? '#28a745' :
+                                    currentHistoryData.trend === 'down' ? '#dc3545' : '#6c757d'
+                            }}>
+                                {currentHistoryData.trend === 'up' && '+'}{currentHistoryData.yearlyChange.toFixed(1)}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style={{ marginBottom: '16px', color: '#0f172a' }}>Monthly History</h4>
+                <div className="modal-table-responsive">
+                    <table className="performance-table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Value</th>
+                                <th>Trend</th>
+                                <th>Change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {currentHistoryData.monthlyData.map((item, index) => {
+                                const prevValue = index > 0 ? currentHistoryData.monthlyData[index - 1].value : item.value;
+                                const change = prevValue > 0 ? ((item.value - prevValue) / prevValue * 100).toFixed(1) : 0;
+
+                                return (
+                                    <tr key={item.month}>
+                                        <td><div style={{ fontWeight: '600' }}>{item.month}</div></td>
+                                        <td>
+                                            <div style={{ fontWeight: '600' }}>
+                                                {selectedStat === 'totalANP' && '₱ '}{item.value.toLocaleString()}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span className={`stat-trend ${item.trend}`}>
+                                                {item.trend === 'up' ? '↑' : item.trend === 'down' ? '↓' : '→'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div style={{
+                                                fontWeight: '600',
+                                                color: item.trend === 'up' ? '#28a745' :
+                                                    item.trend === 'down' ? '#dc3545' : '#6c757d'
+                                            }}>
+                                                {item.trend === 'up' ? '+' : item.trend === 'down' ? '-' : ''}{index > 0 ? `${change}%` : 'N/A'}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style={{ marginTop: '24px' }}>
+                    <h4 style={{ marginBottom: '16px', color: '#0f172a' }}>Trend Visualization</h4>
+                    <div style={{ height: '200px' }}>
+                        <Bar
+                            data={{
+                                labels: currentHistoryData.monthlyData.map(d => d.month),
+                                datasets: [{
+                                    label: currentHistoryData.title,
+                                    data: currentHistoryData.monthlyData.map(d => d.value),
+                                    backgroundColor: '#003781',
+                                    borderRadius: 4
+                                }]
+                            }}
+                            options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { display: false } },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            callback: function (value) {
+                                                return selectedStat === 'totalANP' ? `₱ ${value}` : value;
+                                            }
+                                        }
+                                    }
+                                }
+                            }}
+                        />
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     if (loading) {
@@ -400,9 +551,11 @@ const ALPerformance = () => {
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
                     onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                 >
-                    <div className="stat-label">Total Cases</div>
-                    <div className="stat-value">{totalCases}</div>
-                    <div className="stat-subtext">{(totalALs > 0 ? (totalCases / totalALs).toFixed(0) : 0)} avg per AL</div>
+                    <div className="stat-label">Monthly Cases</div>
+                    <div className="stat-value">{(filteredALs.reduce((sum, al) => sum + al.monthlyCases, 0) + filteredALs.reduce((sum, al) => sum + (al.monthlyDeclined || 0), 0)).toLocaleString()}</div>
+                    <div className="stat-subtext" style={{ fontSize: '13px', color: '#64748b', fontWeight: '500' }}>
+                        {filteredALs.reduce((sum, al) => sum + al.monthlyCases, 0).toLocaleString()} Issued · {filteredALs.reduce((sum, al) => sum + (al.monthlyDeclined || 0), 0).toLocaleString()} Declined
+                    </div>
                 </div>
             </div>
 
@@ -483,9 +636,8 @@ const ALPerformance = () => {
                                             <div style={{ fontWeight: '600' }}>{al.totalCases}</div>
                                         </td>
                                         <td>
-                                            <div style={{ fontWeight: '600' }}>{monthlyPerformance.policiesIssued}</div>
-                                            <div style={{ fontSize: '12px', color: '#64748b' }}>
-                                                {monthlyPerformance.newClients} new clients
+                                            <div style={{ fontWeight: '600' }}>
+                                                {monthlyPerformance.policiesIssued + (al.monthlyDeclined || 0)}
                                             </div>
                                         </td>
                                         <td>
@@ -730,7 +882,7 @@ const ALPerformance = () => {
                                                 }}>
                                                     <span style={{ fontSize: '12px', color: '#0055b8', fontWeight: '600' }}>Total Cases:</span>
                                                     <span style={{ fontSize: '18px', fontWeight: '700', color: '#003781' }}>
-                                                        {policyDetailsData.totalCases}
+                                                        {policyDetailsData.totalCases + policyDetailsData.monthlyTrend.reduce((sum, m) => sum + (m.declined || 0), 0)}
                                                     </span>
                                                 </div>
                                             </div>
@@ -739,8 +891,8 @@ const ALPerformance = () => {
                                                     data={{
                                                         labels: months.map(m => m.substring(0, 3)),
                                                         datasets: [{
-                                                            label: 'Policies Issued',
-                                                            data: policyDetailsData.monthlyTrend.map(m => m.policiesIssued),
+                                                            label: 'Total Cases',
+                                                            data: policyDetailsData.monthlyTrend.map(m => m.policiesIssued + (m.declined || 0)),
                                                             backgroundColor: '#003781',
                                                             borderRadius: 6
                                                         }]
@@ -818,8 +970,6 @@ const ALPerformance = () => {
                                     <tbody>
                                         {policyDetailsData && policyDetailsData.policyDistribution && policyDetailsData.policyDistribution.length > 0 ? (
                                             policyDetailsData.policyDistribution.map((policy, index) => {
-                                                const estimatedANP = Math.floor(policy.count * 50000);
-
                                                 return (
                                                     <tr key={policy.policy_name}>
                                                         <td>
@@ -841,7 +991,7 @@ const ALPerformance = () => {
                                                             </div>
                                                         </td>
                                                         <td style={{ fontWeight: '600', color: '#28a745' }}>
-                                                            ₱ {estimatedANP.toLocaleString()}
+                                                            ₱ {(policy.totalANP || 0).toLocaleString()}
                                                         </td>
                                                     </tr>
                                                 );
