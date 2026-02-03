@@ -435,7 +435,7 @@ const APPerformance = () => {
     }
 
     return (
-        <MPLayout title="Agent Partners Performance">
+        <MPLayout title="Agency Partners Performance">
             {/* Header with Filters - Matching MPDashboard style */}
 
             <div className="mp-filters">

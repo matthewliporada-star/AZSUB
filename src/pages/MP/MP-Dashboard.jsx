@@ -634,7 +634,7 @@ const MPDashboard = () => {
                         onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                     >
                         <div className="stat-header">
-                            <div className="stat-label">Agent Leaders</div>
+                            <div className="stat-label">Agency Leaders</div>
                             <div className={`stat-trend ${formatStatTrend('totalALs').className}`}>
                                 {formatStatTrend('totalALs').arrow} {formatStatTrend('totalALs').percentage}
                             </div>
@@ -651,7 +651,7 @@ const MPDashboard = () => {
                         onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                     >
                         <div className="stat-header">
-                            <div className="stat-label">Agent Partners</div>
+                            <div className="stat-label">Agency Partners</div>
                             <div className={`stat-trend ${formatStatTrend('totalAPs').className}`}>
                                 {formatStatTrend('totalAPs').arrow} {formatStatTrend('totalAPs').percentage}
                             </div>
@@ -772,7 +772,7 @@ const MPDashboard = () => {
                 {/* Top Performers Table - Container Style */}
                 <div className="content-container">
                     <div className="container-header">
-                        <h2>🏆 Top Performing Agent Leaders - {selectedMonthYear}</h2>
+                        <h2>🏆 Top Performing Agency Leaders - {selectedMonthYear}</h2>
                         <div className="container-header-actions">
                             <span className="stat-badge">Showing top 5 performers</span>
                         </div>
@@ -917,9 +917,9 @@ const MPDashboard = () => {
                     <div className="mp-modal-content" style={{ maxWidth: '1000px', maxHeight: '90vh' }}>
                         <div className="mp-modal-header">
                             <div>
-                                <h2>{selectedAL.name} - Agent Partners</h2>
+                                <h2>{selectedAL.name} - Agency Partners</h2>
                                 <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>
-                                    APs under this Agent Leader and their performance
+                                    APs under this Agency Leader and their performance
                                 </p>
                             </div>
                             <button
@@ -964,7 +964,7 @@ const MPDashboard = () => {
                                 </div>
                             </div>
 
-                            <h4 style={{ marginBottom: '16px', color: '#0f172a' }}>Agent Partners List</h4>
+                            <h4 style={{ marginBottom: '16px', color: '#0f172a' }}>Agency Partners List</h4>
                             <table className="performance-table">
                                 <thead>
                                     <tr>
