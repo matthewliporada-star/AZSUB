@@ -1,831 +1,442 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/supabase');
-const { calculateMetrics } = require('../utils/helpers');
 
-// MP Dashboard API Endpoints
+// Helper to calculate Monthly ANP (Premium / 12)
+const calculateMonthlyANP = (premium) => (parseFloat(premium) || 0) / 12;
 
-// Get AL (Agent Leader) Performance Data (ENHANCED with filters and sorting)
+// ==========================================
+// 1. AL (Agent Leader) PERFORMANCE
+// ==========================================
 router.get('/mp/al-performance', async (req, res) => {
     try {
-        const { profileId, month, year, status, sortBy } = req.query;
+        const { month, year, status, sortBy } = req.query;
         const now = new Date();
         const queryYear = year ? parseInt(year) : now.getFullYear();
-        const queryMonth = month !== undefined ? parseInt(month) : now.getMonth();
+        
+        // FIX: Handle '0' (January) correctly
+        const queryMonth = (month !== undefined && month !== null) ? parseInt(month) : now.getMonth();
 
-        // Get all "Leaders" (anyone who has APs reporting to them)
-        // First, get all unique report_to_ids from active hierarchy
-        const { data: hierarchyData, error: hierarchyError } = await supabase
-            .from('user_hierarchy')
-            .select('report_to_id')
-            .eq('is_active', true);
-
-        if (hierarchyError) throw hierarchyError;
-
-        // Extract unique IDs
-        const leaderIds = [...new Set((hierarchyData || []).map(h => h.report_to_id))].filter(id => id);
-
-        // Fetch profiles for these leaders
-        const { data: alUsers, error: alError } = await supabase
-            .from('profiles')
-            .select('id, first_name, last_name, user_roles!inner(role_code)')
-            .in('id', leaderIds);
+        // A. Fetch pre-calculated data from SQL View (Instant)
+        const { data: alData, error: alError } = await supabase
+            .from('mp_al_performance_view')
+            .select('*');
 
         if (alError) throw alError;
 
-        const alPerformance = [];
+        // B. Fetch Monthly Stats for ALL ALs in ONE query (Bulk Fetch)
+        const startDate = new Date(queryYear, queryMonth, 1).toISOString();
+        // FIX: Set to VERY END of the month (23:59:59.999)
+        const endDate = new Date(queryYear, queryMonth + 1, 0, 23, 59, 59, 999).toISOString();
 
-        for (const al of alUsers || []) {
-            // Get APs under this AL
-            const { data: apHierarchy } = await supabase
-                .from('user_hierarchy')
-                .select('user_id')
-                .eq('report_to_id', al.id)
-                .eq('is_active', true);
+        const { data: monthlySubmissions, error: statsError } = await supabase
+            .from('az_submissions')
+            .select('profile_id, premium_paid, status')
+            .eq('status', 'Issued')
+            .gte('issued_at', startDate)
+            .lte('issued_at', endDate);
 
-            const apIds = (apHierarchy || []).map(h => h.user_id);
+        if (statsError) throw statsError;
 
-            // Get submissions for this AL's team
-            let submissionsQuery = supabase
-                .from('az_submissions')
-                .select('*, profiles(first_name, last_name)');
+        // C. Fetch Hierarchy Map to link APs to ALs
+        const { data: hierarchy } = await supabase
+            .from('user_hierarchy')
+            .select('user_id, report_to_id')
+            .eq('is_active', true);
 
-            if (apIds.length > 0) {
-                // Include AL and their APs
-                const teamIds = [al.id, ...apIds];
-                submissionsQuery = submissionsQuery.in('profile_id', teamIds);
-            } else {
-                // No APs, check AL's own sales
-                submissionsQuery = submissionsQuery.eq('profile_id', al.id);
-            }
+        const teamMap = {};
+        (hierarchy || []).forEach(h => {
+            if (!teamMap[h.report_to_id]) teamMap[h.report_to_id] = [];
+            teamMap[h.report_to_id].push(h.user_id);
+        });
 
-            const { data: submissions } = await submissionsQuery;
-
-            // Calculate metrics
-            let totalANP = 0;
-            (submissions || []).filter(s => s.status === 'Issued').forEach(s => {
-                totalANP += parseFloat(s.premium_paid) || 0;
-            });
-
-            const monthlySubmissions = (submissions || []).filter(s => {
-                const subDate = new Date(s.issued_at);
-                return subDate.getMonth() === queryMonth &&
-                    subDate.getFullYear() === queryYear &&
-                    s.status === 'Issued';
-            });
-
-            let monthlyANP = 0;
-            monthlySubmissions.forEach(s => {
-                // Monthly ANP = Total ANP / 12 (monthly equivalent)
-                const totalANP = parseFloat(s.premium_paid) || 0;
-                monthlyANP += totalANP / 12;
-            });
-            const monthlyCases = monthlySubmissions.length;
-            const totalCases = (submissions || []).filter(s => s.status === 'Issued').length;
-
-            // Calculate activity ratio (active APs / total APs)
-            const activeAPs = apIds.length > 0 ? new Set(monthlySubmissions.map(s => s.profile_id)).size : 0;
-            const activityRatio = apIds.length > 0 ? Math.round((activeAPs / apIds.length) * 100) : 0;
-
-            // Determine status
+        // D. Combine Data
+        const alPerformance = alData.map(al => {
+            const teamIds = new Set([al.al_id, ...(teamMap[al.al_id] || [])]);
+            
+            const teamSubs = monthlySubmissions.filter(s => teamIds.has(s.profile_id));
+            
+            const monthlyCases = teamSubs.length;
+            const monthlyANP = teamSubs.reduce((sum, s) => sum + calculateMonthlyANP(s.premium_paid), 0);
+            
             let alStatus = 'NEEDS IMPROVEMENT';
             if (monthlyCases >= 7) alStatus = 'PERFORMING';
             else if (monthlyCases >= 4) alStatus = 'AVERAGE';
 
-            const alData = {
-                id: al.id,
-                name: `${al.first_name} ${al.last_name}`,
-                region: 'Metro Manila', // Default, can be enhanced with actual data
-                city: 'Manila', // Default, can be enhanced with actual data
-                apCount: apIds.length,
-                activeAPs,
-                activityRatio,
-                totalANP: Math.round(totalANP),
+            // Calculate Activity Ratio (Active Team Members / Total Team Members)
+            const activeAPsInMonth = new Set(teamSubs.map(s => s.profile_id)).size;
+            const activityRatio = al.ap_count > 0 ? Math.round((activeAPsInMonth / al.ap_count) * 100) : 0;
+
+            return {
+                id: al.al_id,
+                name: al.name,
+                city: al.city,
+                apCount: al.ap_count,
+                activeAPs: activeAPsInMonth,
+                activityRatio: Math.min(activityRatio, 100),
+                totalANP: Math.round(al.total_anp),
                 monthlyANP: Math.round(monthlyANP),
-                totalCases,
+                totalCases: al.total_cases,
                 monthlyCases,
                 status: alStatus
             };
+        });
 
-            // Apply status filter if provided
-            if (!status || alStatus === status) {
-                alPerformance.push(alData);
-            }
-        }
-
-        // Apply sorting
+        // E. Sort & Filter
         const validSortFields = ['monthlyANP', 'totalANP', 'activityRatio', 'monthlyCases', 'totalCases'];
         if (sortBy && validSortFields.includes(sortBy)) {
             alPerformance.sort((a, b) => b[sortBy] - a[sortBy]);
         } else {
-            // Default sort by monthlyANP
             alPerformance.sort((a, b) => b.monthlyANP - a.monthlyANP);
         }
 
-        res.json({ success: true, data: alPerformance });
+        const finalData = status && status !== 'All' 
+            ? alPerformance.filter(p => p.status === status) 
+            : alPerformance;
+
+        res.json({ success: true, data: finalData });
     } catch (e) {
-        console.error('AL Performance endpoint error:', e);
+        console.error('AL Performance Error:', e);
         res.status(500).json({ success: false, message: e.message });
     }
 });
 
-// Get AP (Agent Partner) Performance Data (ENHANCED with AL filter and case range)
+// ==========================================
+// 2. AP (Agent Partner) PERFORMANCE
+// ==========================================
 router.get('/mp/ap-performance', async (req, res) => {
     try {
-        const { profileId, month, year, alId, minCases, maxCases } = req.query;
+        const { month, year, alId, minCases, maxCases } = req.query;
         const now = new Date();
         const queryYear = year ? parseInt(year) : now.getFullYear();
-        const queryMonth = month !== undefined ? parseInt(month) : now.getMonth();
+        // FIX: Handle '0' (January) correctly
+        const queryMonth = (month !== undefined && month !== null) ? parseInt(month) : now.getMonth();
 
-        // Get all APs (users with role_code 'AP')
+        // 1. Fetch AP Profiles + Hierarchy
         let apQuery = supabase
             .from('profiles')
-            .select('id, first_name, last_name, email, created_at, last_submission_at, user_roles!inner(role_code)')
-            .eq('user_roles.role_code', 'AP');
+            .select(`
+                id, first_name, last_name, email, created_at, last_submission_at, "Address",
+                user_roles!inner(role_code),
+                user_hierarchy!user_hierarchy_user_id_fkey(
+                    report_to_id, 
+                    leader:profiles!user_hierarchy_report_to_id_fkey(first_name, last_name)
+                )
+            `)
+            .eq('user_roles.role_code', 'AP')
+            .eq('user_hierarchy.is_active', true);
 
-        // Filter by AL if provided
         if (alId) {
-            const { data: apHierarchy } = await supabase
-                .from('user_hierarchy')
-                .select('user_id')
-                .eq('report_to_id', alId)
-                .eq('is_active', true);
-
-            const apIds = (apHierarchy || []).map(h => h.user_id);
-            if (apIds.length > 0) {
-                apQuery = apQuery.in('id', apIds);
-            } else {
-                // No APs under this AL
-                return res.json({ success: true, data: [] });
-            }
+            apQuery = apQuery.eq('user_hierarchy.report_to_id', alId);
         }
 
         const { data: apUsers, error: apError } = await apQuery;
         if (apError) throw apError;
 
-        const apPerformance = [];
+        if (!apUsers || apUsers.length === 0) return res.json({ success: true, data: [] });
 
-        for (const ap of apUsers || []) {
-            // Get AL for this AP
-            const { data: hierarchy } = await supabase
-                .from('user_hierarchy')
-                .select('report_to_id, profiles!user_hierarchy_report_to_id_fkey(first_name, last_name)')
-                .eq('user_id', ap.id)
-                .eq('is_active', true)
-                .maybeSingle();
+        // 2. Bulk Fetch Submissions
+        const apIds = apUsers.map(ap => ap.id);
+        const { data: allSubmissions } = await supabase
+            .from('az_submissions')
+            .select('*')
+            .in('profile_id', apIds)
+            .eq('status', 'Issued');
 
-            const alName = hierarchy?.profiles
-                ? `${hierarchy.profiles.first_name} ${hierarchy.profiles.last_name}`
-                : 'Unassigned';
+        // FIX: Javascript Dates for accurate filtering
+        const startDate = new Date(queryYear, queryMonth, 1);
+        const endDate = new Date(queryYear, queryMonth + 1, 0, 23, 59, 59, 999);
 
-            // Get submissions for this AP
-            const { data: submissions } = await supabase
-                .from('az_submissions')
-                .select('*')
-                .eq('profile_id', ap.id);
-
-            // Calculate metrics
-            let totalANP = 0;
-            (submissions || []).filter(s => s.status === 'Issued').forEach(s => {
-                totalANP += parseFloat(s.premium_paid) || 0;
+        // 3. Process Metrics
+        const apPerformance = apUsers.map(ap => {
+            const subs = allSubmissions.filter(s => s.profile_id === ap.id);
+            
+            const monthlySubs = subs.filter(s => {
+                const d = new Date(s.issued_at);
+                return d >= startDate && d <= endDate;
             });
 
-            const monthlySubmissions = (submissions || []).filter(s => {
-                const subDate = new Date(s.issued_at);
-                return subDate.getMonth() === queryMonth &&
-                    subDate.getFullYear() === queryYear &&
-                    s.status === 'Issued';
-            });
+            const totalANP = subs.reduce((sum, s) => sum + (parseFloat(s.premium_paid) || 0), 0);
+            const monthlyANP = monthlySubs.reduce((sum, s) => sum + calculateMonthlyANP(s.premium_paid), 0);
 
-            let monthlyANP = 0;
-            monthlySubmissions.forEach(s => {
-                // Monthly ANP = Total ANP / 12 (monthly equivalent)
-                const totalANP = parseFloat(s.premium_paid) || 0;
-                monthlyANP += totalANP / 12;
-            });
-            const monthlyCases = monthlySubmissions.length;
-            const totalCases = (submissions || []).filter(s => s.status === 'Issued').length;
+            const leader = ap.user_hierarchy?.[0]?.leader;
+            const lastActiveDate = ap.last_submission_at ? new Date(ap.last_submission_at).toLocaleDateString() : 'No activity';
 
-            // Get last activity
-            const lastSubmission = (submissions || []).sort((a, b) =>
-                new Date(b.issued_at) - new Date(a.issued_at)
-            )[0];
-            const lastActivity = lastSubmission
-                ? new Date(lastSubmission.issued_at).toLocaleDateString()
-                : 'No activity';
-
-            const apData = {
+            return {
                 id: ap.id,
                 name: `${ap.first_name} ${ap.last_name}`,
-                alName,
-                alId: hierarchy?.report_to_id || null,
-                region: 'Metro Manila', // Default
-                city: 'Manila', // Default
-                licenseNumber: `LIC-${ap.id.substring(0, 8)}`, // Generated
-                contactNumber: '+63 XXX XXX XXXX', // Default
+                alName: leader ? `${leader.first_name} ${leader.last_name}` : 'Unassigned',
+                city: ap.Address || 'Manila',
+                licenseNumber: `LIC-${ap.id.substring(0, 8)}`,
                 joinDate: new Date(ap.created_at).toLocaleDateString(),
-                lastActivity,
-                lastSubmissionAt: ap.last_submission_at,
+                lastActivity: lastActiveDate,
                 totalANP: Math.round(totalANP),
                 monthlyANP: Math.round(monthlyANP),
-                totalCases,
-                monthlyCases
+                totalCases: subs.length,
+                monthlyCases: monthlySubs.length
             };
+        });
 
-            // Apply case range filter if provided
-            const meetsMinCases = !minCases || monthlyCases >= parseInt(minCases);
-            const meetsMaxCases = !maxCases || monthlyCases <= parseInt(maxCases);
+        // 4. Filter by Case Range
+        const filteredData = apPerformance.filter(ap => {
+            const meetsMin = !minCases || ap.monthlyCases >= parseInt(minCases);
+            const meetsMax = !maxCases || ap.monthlyCases <= parseInt(maxCases);
+            return meetsMin && meetsMax;
+        });
 
-            if (meetsMinCases && meetsMaxCases) {
-                apPerformance.push(apData);
-            }
-        }
-
-        res.json({ success: true, data: apPerformance });
+        res.json({ success: true, data: filteredData });
     } catch (e) {
-        console.error('AP Performance endpoint error:', e);
+        console.error('AP Performance Error:', e);
         res.status(500).json({ success: false, message: e.message });
     }
 });
 
-// Get MP Dashboard Statistics (ENHANCED with comprehensive filtering)
+// ==========================================
+// 3. DASHBOARD STATS
+// ==========================================
 router.get('/mp/dashboard-stats', async (req, res) => {
     try {
-        const { year, month, alId, apId, status } = req.query;
-        const now = new Date();
-        const selectedYear = year ? parseInt(year) : now.getFullYear();
-        const selectedMonth = month !== undefined ? parseInt(month) : now.getMonth();
+        const { year, month } = req.query;
+        const selectedYear = year ? parseInt(year) : new Date().getFullYear();
+        // FIX: Handle '0' (January) correctly
+        const selectedMonth = (month !== undefined && month !== null) ? parseInt(month) : new Date().getMonth();
 
-        // Get counts of "Leaders" (anyone managing APs) and APs
-        // Count Leaders via hierarchy
-        const { data: hierarchyData, error: hierarchyError } = await supabase
-            .from('user_hierarchy')
-            .select('report_to_id')
-            .eq('is_active', true);
-
-        if (hierarchyError) throw hierarchyError;
-        const totalLeaderCount = new Set((hierarchyData || []).map(h => h.report_to_id).filter(id => id)).size;
-
-        // Count APs
-        let apQuery = supabase
+        const { data: summary } = await supabase.from('mp_al_performance_view').select('*');
+        
+        const totalALs = summary.length;
+        const totalANP = summary.reduce((sum, al) => sum + al.total_anp, 0);
+        const totalCases = summary.reduce((sum, al) => sum + al.total_cases, 0);
+        
+        const { count: totalAPs } = await supabase
             .from('profiles')
-            .select('id, created_at, last_submission_at, user_roles!inner(role_code)', { count: 'exact' })
-            .eq('user_roles.role_code', 'AP');
+            .select('id', { count: 'exact', head: true })
+            .eq('role_id', 3); // Adjust ID for AP role if needed
 
-        // Apply AL filter if provided
-        if (alId) {
-            // Get APs under this AL
-            const { data: apHierarchy } = await supabase
-                .from('user_hierarchy')
-                .select('user_id')
-                .eq('report_to_id', alId)
-                .eq('is_active', true);
+        // Fetch submissions for Charts
+        const startOfYear = new Date(selectedYear, 0, 1).toISOString();
+        const endOfYear = new Date(selectedYear, 11, 31, 23, 59, 59, 999).toISOString();
 
-            const apIds = (apHierarchy || []).map(h => h.user_id);
-            if (apIds.length > 0) {
-                apQuery = apQuery.in('id', apIds);
-            } else {
-                // No APs under this AL, filter will result in 0
-                apQuery = apQuery.eq('id', alId); // Will return empty for APs
-            }
-        }
-
-        const { data: apProfiles } = await apQuery;
-
-        // Calculate active APs (those with submissions in last hour OR in selected month)
-        const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-        const activeAPsLastHour = (apProfiles || []).filter(ap => {
-            if (!ap.last_submission_at) return false;
-            const lastActive = new Date(ap.last_submission_at);
-            return lastActive >= oneHourAgo;
-        }).length;
-
-        // Get all submissions with policy details
-        let submissionsQuery = supabase
+        const { data: yearSubmissions } = await supabase
             .from('az_submissions')
-            .select('*, policy:policy_id(policy_name, policy_type)');
+            .select('issued_at, premium_paid, status, profile_id, policy:policy_id(policy_name)')
+            .eq('status', 'Issued')
+            .gte('issued_at', startOfYear)
+            .lte('issued_at', endOfYear);
 
-        // Apply AP filter if provided
-        if (apId) {
-            submissionsQuery = submissionsQuery.eq('profile_id', apId);
-        } else if (alId) {
-            // Filter by APs under this AL
-            const { data: apHierarchy } = await supabase
-                .from('user_hierarchy')
-                .select('user_id')
-                .eq('report_to_id', alId)
-                .eq('is_active', true);
-
-            const apIds = (apHierarchy || []).map(h => h.user_id);
-            if (apIds.length > 0) {
-                const teamIds = [alId, ...apIds];
-                submissionsQuery = submissionsQuery.in('profile_id', teamIds);
-            } else {
-                submissionsQuery = submissionsQuery.eq('profile_id', alId);
-            }
-        }
-
-        // Apply status filter if provided
-        if (status) {
-            submissionsQuery = submissionsQuery.eq('status', status);
-        }
-
-        const { data: allSubmissions } = await submissionsQuery;
-
-        const issuedSubmissions = (allSubmissions || []).filter(s => s.status === 'Issued');
-        const pendingSubmissions = (allSubmissions || []).filter(s => s.status === 'Pending');
-        const declinedSubmissions = (allSubmissions || []).filter(s => s.status === 'Declined');
-
-        // Calculate Total ANP (All-time, only Issued)
-        let totalANP = 0;
-        issuedSubmissions.forEach(s => {
-            totalANP += parseFloat(s.premium_paid) || 0;
-        });
-
-        const totalCases = issuedSubmissions.length;
-
-        // Monthly data for stats (Based on selected year/month)
-        const currentMonthSubmissions = issuedSubmissions.filter(s => {
-            const subDate = new Date(s.issued_at);
-            return subDate.getMonth() === selectedMonth && subDate.getFullYear() === selectedYear;
-        });
-
-        // Calculate Monthly ANP using premium_paid / 12 formula
-        let monthlyANP = 0;
-        currentMonthSubmissions.forEach(s => {
-            const totalANP = parseFloat(s.premium_paid) || 0;
-            monthlyANP += totalANP / 12;
-        });
-
-        // Active APs (those with submissions this month)
-        const activeAPIds = new Set(currentMonthSubmissions.map(s => s.profile_id));
-        const activeAPsThisMonth = activeAPIds.size;
-
-        // --- Chart Data Calculations ---
-
-        // 1. Policy Distribution (Filtered by selected year)
-        const yearSubmissions = issuedSubmissions.filter(s => {
-            const subDate = new Date(s.issued_at);
-            return subDate.getFullYear() === selectedYear;
-        });
-
-        const policyDistribution = {};
-        yearSubmissions.forEach(sub => {
-            const policyName = sub.policy?.policy_name || 'Unknown Policy';
-            if (!policyDistribution[policyName]) {
-                policyDistribution[policyName] = 0;
-            }
-            policyDistribution[policyName]++;
-        });
-
-        const distributionArray = Object.entries(policyDistribution).map(([name, count]) => ({
-            policy_name: name,
-            count,
-            percentage: yearSubmissions.length > 0 ? Math.round((count / yearSubmissions.length) * 100) : 0
-        })).sort((a, b) => b.count - a.count);
-
-        // 2. Monthly Trend (For selected year)
-        const monthlyTrend = Array(12).fill(0).map((_, index) => ({
-            month: ['January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'][index],
-            monthIndex: index,
+        const monthlyTrend = Array(12).fill(0).map((_, i) => ({
+            month: new Date(0, i).toLocaleString('default', { month: 'long' }),
             issued: 0,
             anp: 0
         }));
 
-        yearSubmissions.forEach(sub => {
-            const monthIndex = new Date(sub.issued_at).getMonth();
-            if (monthIndex >= 0 && monthIndex < 12) {
-                monthlyTrend[monthIndex].issued++;
-                // Monthly ANP = Total ANP / 12
-                const totalANP = parseFloat(sub.premium_paid) || 0;
-                monthlyTrend[monthIndex].anp += totalANP / 12;
+        const policyDistributionMap = {};
+        let monthlyANP = 0;
+        let monthlyCases = 0;
+
+        (yearSubmissions || []).forEach(sub => {
+            const date = new Date(sub.issued_at);
+            const mIndex = date.getMonth();
+            const anp = calculateMonthlyANP(sub.premium_paid);
+
+            monthlyTrend[mIndex].issued++;
+            monthlyTrend[mIndex].anp += anp;
+
+            const pName = sub.policy?.policy_name || 'Unknown';
+            policyDistributionMap[pName] = (policyDistributionMap[pName] || 0) + 1;
+
+            if (mIndex === selectedMonth) {
+                monthlyANP += anp;
+                monthlyCases++;
             }
         });
+
+        const policyDistribution = Object.entries(policyDistributionMap)
+            .map(([name, count]) => ({ policy_name: name, count }))
+            .sort((a, b) => b.count - a.count);
+
+        const activeAPIds = new Set(
+            yearSubmissions
+                .filter(s => new Date(s.issued_at).getMonth() === selectedMonth)
+                .map(s => s.profile_id)
+        );
 
         res.json({
             success: true,
             data: {
-                totalALs: totalLeaderCount,
-                totalAPs: (apProfiles || []).length,
-                activeAPs: activeAPsThisMonth, // Active in selected month
-                activeAPsLastHour, // Active in last hour (for real-time monitoring)
+                totalALs,
+                totalAPs: totalAPs || 0,
+                activeAPs: activeAPIds.size,
                 totalANP: Math.round(totalANP),
                 monthlyANP: Math.round(monthlyANP),
                 totalCases,
-                monthlyCases: currentMonthSubmissions.length,
-                pendingCases: pendingSubmissions.length,
-                declinedCases: declinedSubmissions.length,
-                // Chart Data
-                policyDistribution: distributionArray,
-                monthlyTrend,
-                // Filter info
-                filters: {
-                    year: selectedYear,
-                    month: selectedMonth,
-                    alId: alId || null,
-                    apId: apId || null,
-                    status: status || null
-                }
+                monthlyCases,
+                policyDistribution,
+                monthlyTrend
             }
         });
     } catch (e) {
-        console.error('MP Dashboard stats endpoint error:', e);
         res.status(500).json({ success: false, message: e.message });
     }
 });
 
-// Get Monthly History for Statistics
+// ==========================================
+// 4. MONTHLY HISTORY
+// ==========================================
 router.get('/mp/monthly-history', async (req, res) => {
     try {
         const { year, month, statType } = req.query;
         const now = new Date();
         const selectedYear = year ? parseInt(year) : now.getFullYear();
-        const selectedMonth = month ? parseInt(month) : now.getMonth();
-        const previousYear = selectedYear - 1;
+        const selectedMonth = (month !== undefined && month !== null) ? parseInt(month) : now.getMonth();
+        const prevYear = selectedYear - 1;
 
-        if (!statType) {
-            return res.status(400).json({ success: false, message: 'statType is required' });
-        }
-
-        // Fetch all submissions for current and previous year
-        const { data: currentYearSubs } = await supabase
+        // Fetch 2 years of data for trend comparison
+        const { data: rawHistory } = await supabase
             .from('az_submissions')
-            .select('*, policy:policy_id(policy_name, policy_type), profile:profile_id(id, user_roles!inner(role_code))')
+            .select('issued_at, premium_paid, profile_id')
             .eq('status', 'Issued')
-            .gte('issued_at', `${selectedYear}-01-01`)
-            .lt('issued_at', `${selectedYear + 1}-01-01`);
+            .gte('issued_at', `${prevYear}-01-01`)
+            .lte('issued_at', `${selectedYear}-12-31`);
 
-        // 1. Calculate Base for All-Time ANP
-        const { data: baseANPSubs } = await supabase
-            .from('az_submissions')
-            .select('premium_paid, mode_of_payment')
-            .eq('status', 'Issued')
-            .lt('issued_at', `${selectedYear}-01-01`);
-
-        let baseANP = 0;
-        (baseANPSubs || []).forEach(s => {
-            baseANP += parseFloat(s.premium_paid) || 0;
-        });
-
-        // 2. Calculate Base for Previous Year Comparison
-        const { data: prevBaseANPSubs } = await supabase
-            .from('az_submissions')
-            .select('premium_paid, mode_of_payment')
-            .eq('status', 'Issued')
-            .lt('issued_at', `${previousYear}-01-01`);
-
-        let prevBaseANP = 0;
-        (prevBaseANPSubs || []).forEach(s => {
-            prevBaseANP += parseFloat(s.premium_paid) || 0;
-        });
-
-        // 3. Fetch previous year submissions for comparison
-        const { data: previousYearSubs } = await supabase
-            .from('az_submissions')
-            .select('*, policy:policy_id(policy_name, policy_type), profile:profile_id(id, user_roles!inner(role_code))')
-            .eq('status', 'Issued')
-            .gte('issued_at', `${previousYear}-01-01`)
-            .lt('issued_at', `${previousYear + 1}-01-01`);
-
-        // Get all profiles for AL/AP counts
-        const { data: allProfiles } = await supabase
-            .from('profiles')
-            .select('id, created_at, user_roles!inner(role_code)');
-
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const monthlyData = [];
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        
         let currentValue = 0;
+        let prevYearValue = 0;
 
-        const maxMonthIndex = selectedMonth;
-
-        // Calculate monthly data based on statType
-        for (let monthIndex = 0; monthIndex <= maxMonthIndex; monthIndex++) {
-            const currentMonthSubs = (currentYearSubs || []).filter(s => {
-                const date = new Date(s.issued_at);
-                return date.getMonth() === monthIndex;
+        for (let i = 0; i < 12; i++) {
+            const currMonthSubs = rawHistory.filter(s => {
+                const d = new Date(s.issued_at);
+                return d.getFullYear() === selectedYear && d.getMonth() === i;
+            });
+            
+            const prevMonthSubs = rawHistory.filter(s => {
+                const d = new Date(s.issued_at);
+                if (i === 0) return d.getFullYear() === prevYear && d.getMonth() === 11;
+                return d.getFullYear() === selectedYear && d.getMonth() === i - 1;
             });
 
-            const previousMonthSubs = monthIndex > 0
-                ? (currentYearSubs || []).filter(s => {
-                    const date = new Date(s.issued_at);
-                    return date.getMonth() === monthIndex - 1;
-                })
-                : [];
-
-            // For yearly change comparison (same month last year)
-            const prevYearSameMonthSubs = (previousYearSubs || []).filter(s => {
-                const date = new Date(s.issued_at);
-                return date.getMonth() === monthIndex;
-            });
-
-            let value = 0;
-            let prevMonthValue = 0;
-            let prevYearSameMonthValue = 0;
-
-            switch (statType) {
-                case 'activityRatio':
-                    const activeAPsThisMonth = new Set(currentMonthSubs.map(s => s.profile_id)).size;
-                    const totalAPsThisMonth = (allProfiles || []).filter(p =>
-                        p.user_roles?.role_code === 'AP' &&
-                        new Date(p.created_at) <= new Date(selectedYear, monthIndex, 31)
-                    ).length;
-                    value = totalAPsThisMonth > 0 ? Math.round((activeAPsThisMonth / totalAPsThisMonth) * 100) : 0;
-
-                    // Prev month
-                    const activeAPsPrevMonth = new Set(previousMonthSubs.map(s => s.profile_id)).size;
-                    const totalAPsPrevMonth = (allProfiles || []).filter(p =>
-                        p.user_roles?.role_code === 'AP' &&
-                        new Date(p.created_at) <= new Date(selectedYear, monthIndex - 1, 31)
-                    ).length;
-                    prevMonthValue = totalAPsPrevMonth > 0 ? Math.round((activeAPsPrevMonth / totalAPsPrevMonth) * 100) : 0;
-
-                    // Prev year same month
-                    const activeAPsPrevYear = new Set(prevYearSameMonthSubs.map(s => s.profile_id)).size;
-                    const totalAPsPrevYear = (allProfiles || []).filter(p =>
-                        p.user_roles?.role_code === 'AP' &&
-                        new Date(p.created_at) <= new Date(previousYear, monthIndex, 31)
-                    ).length;
-                    prevYearSameMonthValue = totalAPsPrevYear > 0 ? Math.round((activeAPsPrevYear / totalAPsPrevYear) * 100) : 0;
-                    break;
-
-                case 'totalANP':
-                    let cumANP = 0;
-                    const cumulativeSubs = (currentYearSubs || []).filter(s => {
-                        const date = new Date(s.issued_at);
-                        return date.getMonth() <= monthIndex;
-                    });
-                    cumulativeSubs.forEach(s => {
-                        cumANP += parseFloat(s.premium_paid) || 0;
-                    });
-                    value = Math.round(baseANP + cumANP);
-
-                    let cumPrevMonthANP = 0;
-                    const cumulativePrevMonth = (currentYearSubs || []).filter(s => {
-                        const date = new Date(s.issued_at);
-                        return date.getMonth() <= monthIndex - 1;
-                    });
-                    cumulativePrevMonth.forEach(s => {
-                        cumPrevMonthANP += parseFloat(s.premium_paid) || 0;
-                    });
-                    prevMonthValue = Math.round(baseANP + cumPrevMonthANP);
-
-                    let cumPrevYearANP = 0;
-                    const cumulativePrevYear = (previousYearSubs || []).filter(s => {
-                        const date = new Date(s.issued_at);
-                        return date.getMonth() <= monthIndex;
-                    });
-                    cumulativePrevYear.forEach(s => {
-                        cumPrevYearANP += parseFloat(s.premium_paid) || 0;
-                    });
-                    prevYearSameMonthValue = Math.round(prevBaseANP + cumPrevYearANP);
-                    break;
-
-                case 'monthlyANP':
-                    let mANP = 0;
-                    currentMonthSubs.forEach(s => {
-                        const totalANP = parseFloat(s.premium_paid) || 0;
-                        mANP += totalANP / 12;
-                    });
-                    value = Math.round(mANP);
-
-                    let mPrevMonthANP = 0;
-                    previousMonthSubs.forEach(s => {
-                        const totalANP = parseFloat(s.premium_paid) || 0;
-                        mPrevMonthANP += totalANP / 12;
-                    });
-                    prevMonthValue = Math.round(mPrevMonthANP);
-
-                    let mPrevYearANP = 0;
-                    prevYearSameMonthSubs.forEach(s => {
-                        const totalANP = parseFloat(s.premium_paid) || 0;
-                        mPrevYearANP += totalANP / 12;
-                    });
-                    prevYearSameMonthValue = Math.round(mPrevYearANP);
-                    break;
-
-                case 'totalCases':
-                    value = currentMonthSubs.length;
-                    prevMonthValue = previousMonthSubs.length;
-                    prevYearSameMonthValue = prevYearSameMonthSubs.length;
-                    break;
-
-                case 'totalALs':
-                    value = (allProfiles || []).filter(p =>
-                        p.user_roles?.role_code === 'AL' &&
-                        new Date(p.created_at) <= new Date(selectedYear, monthIndex, 31)
-                    ).length;
-
-                    prevMonthValue = (allProfiles || []).filter(p =>
-                        p.user_roles?.role_code === 'AL' &&
-                        new Date(p.created_at) <= new Date(selectedYear, monthIndex - 1, 31)
-                    ).length;
-
-                    prevYearSameMonthValue = (allProfiles || []).filter(p =>
-                        p.user_roles?.role_code === 'AL' &&
-                        new Date(p.created_at) <= new Date(previousYear, monthIndex, 31)
-                    ).length;
-                    break;
-
-                case 'totalAPs':
-                    value = (allProfiles || []).filter(p =>
-                        p.user_roles?.role_code === 'AP' &&
-                        new Date(p.created_at) <= new Date(selectedYear, monthIndex, 31)
-                    ).length;
-
-                    prevMonthValue = (allProfiles || []).filter(p =>
-                        p.user_roles?.role_code === 'AP' &&
-                        new Date(p.created_at) <= new Date(selectedYear, monthIndex - 1, 31)
-                    ).length;
-
-                    prevYearSameMonthValue = (allProfiles || []).filter(p =>
-                        p.user_roles?.role_code === 'AP' &&
-                        new Date(p.created_at) <= new Date(previousYear, monthIndex, 31)
-                    ).length;
-                    break;
+            let val = 0;
+            if (statType === 'totalANP' || statType === 'monthlyANP') {
+                val = currMonthSubs.reduce((sum, s) => sum + calculateMonthlyANP(s.premium_paid), 0);
+            } else if (statType === 'totalCases') {
+                val = currMonthSubs.length;
+            } else if (statType === 'activityRatio') {
+                val = new Set(currMonthSubs.map(s => s.profile_id)).size;
             }
 
-            // Determine trend (Month over Month)
-            let trend = 'stable';
-            if (monthIndex === 0) {
-                trend = value > prevYearSameMonthValue ? 'up' : value < prevYearSameMonthValue ? 'down' : 'stable';
-            } else {
-                trend = value > prevMonthValue ? 'up' : value < prevMonthValue ? 'down' : 'stable';
+            // Determine Trend (Up/Down) based on previous month
+            let prevVal = 0;
+             if (statType === 'totalANP' || statType === 'monthlyANP') {
+                prevVal = prevMonthSubs.reduce((sum, s) => sum + calculateMonthlyANP(s.premium_paid), 0);
+            } else if (statType === 'totalCases') {
+                prevVal = prevMonthSubs.length;
+            } else if (statType === 'activityRatio') {
+                prevVal = new Set(prevMonthSubs.map(s => s.profile_id)).size;
             }
 
-            monthlyData.push({
-                month: monthNames[monthIndex],
-                value,
-                trend
-            });
+            let trend = val > prevVal ? 'up' : val < prevVal ? 'down' : 'stable';
 
-            // Update result if this is the selected month
-            if (monthIndex === selectedMonth) {
-                currentValue = value;
+            // Capture Selected Month values
+            if (i === selectedMonth) {
+                currentValue = Math.round(val);
+                
+                // For Yearly Change calculation
+                const prevYearSubs = rawHistory.filter(s => {
+                    const d = new Date(s.issued_at);
+                    return d.getFullYear() === prevYear && d.getMonth() === i;
+                });
+                
+                if (statType.includes('ANP')) {
+                    prevYearValue = prevYearSubs.reduce((sum, s) => sum + calculateMonthlyANP(s.premium_paid), 0);
+                } else {
+                    prevYearValue = prevYearSubs.length;
+                }
+            }
+
+            if (i <= (selectedMonth || 11)) {
+                monthlyData.push({ month: monthNames[i], value: Math.round(val), trend });
             }
         }
 
-        let previousYearValueForSelectedMonth = 0;
-        const prevYearSameMonthSubs = (previousYearSubs || []).filter(s => {
-            const date = new Date(s.issued_at);
-            return date.getMonth() === selectedMonth;
-        });
-
-        switch (statType) {
-            case 'activityRatio':
-                const activeAPsPrevYear = new Set(prevYearSameMonthSubs.map(s => s.profile_id)).size;
-                const totalAPsPrevYear = (allProfiles || []).filter(p =>
-                    p.user_roles?.role_code === 'AP' &&
-                    new Date(p.created_at) <= new Date(previousYear, selectedMonth, 31)
-                ).length;
-                previousYearValueForSelectedMonth = totalAPsPrevYear > 0 ? Math.round((activeAPsPrevYear / totalAPsPrevYear) * 100) : 0;
-                break;
-            case 'totalANP':
-                let cumPrevYearANPSelected = 0;
-                const cumulativePrevYearForSelected = (previousYearSubs || []).filter(s => {
-                    const date = new Date(s.issued_at);
-                    return date.getMonth() <= selectedMonth;
-                });
-                cumulativePrevYearForSelected.forEach(s => {
-                    cumPrevYearANPSelected += parseFloat(s.premium_paid) || 0;
-                });
-                previousYearValueForSelectedMonth = Math.round(prevBaseANP + cumPrevYearANPSelected);
-                break;
-            case 'monthlyANP':
-                let mPrevYearANP = 0;
-                prevYearSameMonthSubs.forEach(s => {
-                    const { monthlyEquivalent } = calculateMetrics(s.premium_paid, s.mode_of_payment);
-                    mPrevYearANP += monthlyEquivalent;
-                });
-                previousYearValueForSelectedMonth = Math.round(mPrevYearANP / 1000);
-                break;
-            case 'totalCases':
-                previousYearValueForSelectedMonth = prevYearSameMonthSubs.length;
-                break;
-            case 'totalALs':
-                previousYearValueForSelectedMonth = (allProfiles || []).filter(p =>
-                    p.user_roles?.role_code === 'AL' &&
-                    new Date(p.created_at) <= new Date(previousYear, selectedMonth, 31)
-                ).length;
-                break;
-            case 'totalAPs':
-                previousYearValueForSelectedMonth = (allProfiles || []).filter(p =>
-                    p.user_roles?.role_code === 'AP' &&
-                    new Date(p.created_at) <= new Date(previousYear, selectedMonth, 31)
-                ).length;
-                break;
-        }
-
-        const yearlyChange = previousYearValueForSelectedMonth > 0
-            ? ((currentValue - previousYearValueForSelectedMonth) / previousYearValueForSelectedMonth) * 100
-            : 0;
-
-        const overallTrend = yearlyChange > 0 ? 'up' : yearlyChange < 0 ? 'down' : 'stable';
-
-        const metadata = {
-            activityRatio: { title: 'Activity Ratio History', description: 'Monthly activity ratio trend', unit: '%', prefix: '' },
-            totalANP: { title: 'Total ANP History', description: 'Cumulative Annual Premium growth', unit: '', prefix: '₱ ' },
-            monthlyANP: { title: 'Monthly ANP History', description: 'Monthly ANP performance trend', unit: '', prefix: '₱ ' },
-            totalCases: { title: 'Total Cases History', description: 'Total policies issued trend', unit: '', prefix: '' },
-            totalALs: { title: 'Agent Leaders History', description: 'Number of Agent Leaders', unit: 'ALs', prefix: '' },
-            totalAPs: { title: 'Agent Partners History', description: 'Number of Agent Partners', unit: 'APs', prefix: '' }
-        };
-
-        const statMetadata = metadata[statType] || { title: 'Statistic History', description: 'Historical data for this statistic', unit: '', prefix: '' };
+        const yearlyChange = prevYearValue > 0 ? ((currentValue - prevYearValue) / prevYearValue) * 100 : 0;
 
         res.json({
             success: true,
             data: {
-                ...statMetadata,
+                title: statType === 'totalANP' ? 'Total ANP' : statType === 'activityRatio' ? 'Active APs' : 'Total Cases',
                 currentValue,
-                yearlyChange: Math.round(yearlyChange * 10) / 10,
-                trend: overallTrend,
+                yearlyChange: parseFloat(yearlyChange.toFixed(1)),
+                trend: yearlyChange >= 0 ? 'up' : 'down',
                 monthlyData
             }
         });
+
     } catch (e) {
-        console.error('Monthly history endpoint error:', e);
         res.status(500).json({ success: false, message: e.message });
     }
 });
 
-// Get Policy Details for an AL
+// ==========================================
+// 5. POLICY DETAILS (Drill Down)
+// ==========================================
 router.get('/mp/policy-details/:alId', async (req, res) => {
     try {
         const { alId } = req.params;
-        const { year, month } = req.query;
+        const { year } = req.query;
         const selectedYear = year ? parseInt(year) : new Date().getFullYear();
 
-        // Get APs under this AL
-        const { data: apHierarchy } = await supabase
+        const { data: team } = await supabase
             .from('user_hierarchy')
             .select('user_id')
             .eq('report_to_id', alId)
             .eq('is_active', true);
 
-        const apIds = (apHierarchy || []).map(h => h.user_id);
+        const teamIds = [alId, ...(team || []).map(t => t.user_id)];
 
-        // Get all submissions for this AL's team
-        let submissionsQuery = supabase
+        const startDate = new Date(selectedYear, 0, 1).toISOString();
+        const endDate = new Date(selectedYear, 11, 31, 23, 59, 59).toISOString();
+
+        const { data: submissions } = await supabase
             .from('az_submissions')
-            .select('*, policy:policy_id(policy_name, policy_type)')
-            .eq('status', 'Issued');
+            .select('issued_at, premium_paid, policy:policy_id(policy_name)')
+            .in('profile_id', teamIds)
+            .eq('status', 'Issued')
+            .gte('issued_at', startDate)
+            .lte('issued_at', endDate);
 
-        if (apIds.length > 0) {
-            const teamIds = [alId, ...apIds];
-            submissionsQuery = submissionsQuery.in('profile_id', teamIds);
-        } else {
-            submissionsQuery = submissionsQuery.eq('profile_id', alId);
-        }
-
-        const { data: submissions, error } = await submissionsQuery;
-        if (error) throw error;
-
-        // Calculate Policy Distribution
-        const policyDistribution = {};
-        (submissions || []).forEach(sub => {
-            const policyName = sub.policy?.policy_name || 'Unknown Policy';
-            if (!policyDistribution[policyName]) {
-                policyDistribution[policyName] = 0;
-            }
-            policyDistribution[policyName]++;
-        });
-
-        const totalPolicies = (submissions || []).length;
-        const distributionArray = Object.entries(policyDistribution).map(([name, count]) => ({
-            policy_name: name,
-            count,
-            percentage: totalPolicies > 0 ? ((count / totalPolicies) * 100).toFixed(1) : 0
-        })).sort((a, b) => b.count - a.count);
-
-        // Calculate Monthly Trend for selected year
-        const monthlyTrend = Array(12).fill(0).map((_, index) => ({
-            month: ['January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'][index],
-            monthIndex: index,
-            policiesIssued: 0,
-            anp: 0
+        const policyCounts = {};
+        const monthlyTrend = Array(12).fill(0).map((_, i) => ({
+            month: new Date(0, i).toLocaleString('default', { month: 'short' }),
+            policiesIssued: 0
         }));
 
         (submissions || []).forEach(sub => {
-            const subDate = new Date(sub.issued_at);
-            if (subDate.getFullYear() === selectedYear) {
-                const monthIndex = subDate.getMonth();
-                monthlyTrend[monthIndex].policiesIssued++;
-                monthlyTrend[monthIndex].anp += parseFloat(sub.premium_paid) || 0;
-            }
+            const name = sub.policy?.policy_name || 'Other';
+            policyCounts[name] = (policyCounts[name] || 0) + 1;
+
+            const monthIdx = new Date(sub.issued_at).getMonth();
+            monthlyTrend[monthIdx].policiesIssued++;
         });
+
+        const policyDistribution = Object.entries(policyCounts)
+            .map(([name, count]) => ({ 
+                policy_name: name, 
+                count,
+                percentage: Math.round((count / submissions.length) * 100)
+            }))
+            .sort((a, b) => b.count - a.count);
 
         res.json({
             success: true,
             data: {
-                policyDistribution: distributionArray,
-                monthlyTrend,
-                totalCases: totalPolicies
+                totalCases: submissions.length,
+                policyDistribution,
+                monthlyTrend
             }
         });
+
     } catch (e) {
-        console.error('Policy details endpoint error:', e);
         res.status(500).json({ success: false, message: e.message });
     }
 });

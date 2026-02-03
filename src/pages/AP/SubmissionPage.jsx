@@ -85,34 +85,51 @@ const handleSerialBlur = async () => {
         const response = await api.getSerialDetails(formData.serialNumber);
 
         if (response.success) {
-            // ... (existing success logic to set form data)
+            const data = response.data;
+            const detectedCategory = getCategoryFromPolicy(data.policyType);
+
+            setFormData(prev => ({
+                ...prev,
+                policyType: data.policyType || '',
+                modeOfPayment: data.modeOfPayment || '',
+                policyDate: data.policyDate || '',
+                clientFirstName: data.clientFirstName || '',
+                clientLastName: data.clientLastName || '',
+                formType: detectedCategory
+            }));
+
+            if (data.requirements && Array.isArray(data.requirements) && data.requirements.length > 0) {
+                setDynamicRequirements(data.requirements);
+            } else {
+                setDynamicRequirements([]);
+            }
+
             setMessage(`Serial found! Identified as ${detectedCategory} Application.`);
             setMessageType('success');
         } else {
-            // This handles cases where response is returned but success is false
+            // --- THE ERROR MESSAGE IS SET HERE ---
+            // This captures the message from the backend (e.g., "Serial is already ISSUED")
             setMessage(response.message || 'Serial Number not found.');
             setMessageType('error');
-            resetFormFields();
+            
+            // Clear the form to reset the UI and hide the requirement sections
+            setFormData(prev => ({ 
+                ...prev, 
+                formType: '', 
+                policyType: '', 
+                clientFirstName: '', 
+                clientLastName: '' 
+            }));
+            setDynamicRequirements([]);
         }
     } catch (error) {
-        console.error("Submission Error:", error);
-        
-        // --- NEW: Capture the 400 Bad Request message ---
-        const errorMsg = error.response?.data?.message || 'The serial number has already been used or is invalid.';
-        setMessage(errorMsg); 
+        console.error(error);
+        // Fallback if the server is down or has a different error
+        setMessage(error.response?.data?.message || 'Error connecting to server.');
         setMessageType('error');
-        resetFormFields();
     } finally {
         setLoading(false);
     }
-};
-
-// Helper to clear form when serial is invalid/used
-const resetFormFields = () => {
-    setFormData(prev => ({ 
-        ...prev, formType: '', policyType: '', clientFirstName: '', clientLastName: '' 
-    }));
-    setDynamicRequirements([]);
 };
 
     const handleTextChange = (e) => {
@@ -320,12 +337,14 @@ const resetFormFields = () => {
                 <h2 style={{ fontSize: '20px', margin: 0 }}>Document Submission</h2>
             </div>
             <div>
-            {message && (
+                {message && (
     <div className={`alert ${messageType === 'success' ? 'alert-success' : 'alert-error'}`}
         style={{
-            padding: '10px', marginBottom: '15px', borderRadius: '4px',
-            backgroundColor: messageType === 'success' ? '#d4edda' : '#f8d7da', // Red background for error
-            color: messageType === 'success' ? '#155724' : '#721c24'           // Dark red text for error
+            padding: '10px', 
+            marginBottom: '15px', 
+            borderRadius: '4px',
+            backgroundColor: messageType === 'success' ? '#d4edda' : '#f8d7da',
+            color: messageType === 'success' ? '#155724' : '#721c24'
         }}>
         {message}
     </div>
