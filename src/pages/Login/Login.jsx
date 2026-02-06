@@ -64,7 +64,7 @@ function Login() {
     // Fetch the latest account_type from profiles table
     const { data: profileData, error: profileError } = await supabase
       .from("profiles")
-      .select("account_type, id, username, first_name, last_name, Status")
+      .select("account_type, id, username, first_name, last_name, status")
       .eq("id", user.id)
       .single();
 
@@ -74,7 +74,7 @@ function Login() {
     }
 
     // Check if account is inactive
-    if (profileData.Status === "Inactive") {
+    if (profileData.status === "Inactive") {
       const accountType = profileData.account_type?.toLowerCase();
       if (accountType === "ap") {
         setError("Your account is inactive. Contact the Agency Leader");

@@ -33,7 +33,6 @@ const ManageUsers = () => {
     position: "MD",
     password: "",
     reportsTo: "",
-    appPassword: ""
   });
   const [showPassword, setShowPassword] = useState(false);
   const [modalError, setModalError] = useState("");
@@ -152,7 +151,7 @@ const ManageUsers = () => {
     setIsEditMode(false);
     setSelectedUser(null);
     setFormData({
-      firstName: "", lastName: "", email: "", position: "MD", password: "", reportsTo: "", appPassword: ""
+      firstName: "", lastName: "", email: "", position: "MD", password: "", reportsTo: ""
     });
     setModalError("");
     setSuccessMsg("");
@@ -163,7 +162,7 @@ const ManageUsers = () => {
   const openAddModal = () => {
     setIsEditMode(false);
     setFormData({
-      firstName: "", lastName: "", email: "", position: "MD", password: "", reportsTo: "", appPassword: ""
+      firstName: "", lastName: "", email: "", position: "MD", password: "", reportsTo: ""
     });
     setShowAddModal(true);
   };
@@ -178,7 +177,6 @@ const ManageUsers = () => {
       position: u.account_type,
       password: "", // Don't show password
       reportsTo: "",
-      appPassword: u.app_password || ""
     });
 
     // Fetch current supervisor
@@ -224,8 +222,7 @@ const ManageUsers = () => {
           .update({
             first_name: formData.firstName,
             last_name: formData.lastName,
-            account_type: formData.position,
-            app_password: formData.appPassword
+            account_type: formData.position
           })
           .eq("id", userIdToProcess);
 
@@ -257,8 +254,7 @@ const ManageUsers = () => {
             last_name: formData.lastName,
             email: formData.email,
             account_type: formData.position,
-            status: "Active",
-            app_password: formData.appPassword
+            status: "Active"
           }]);
           if (profileError) throw profileError;
         }
@@ -521,16 +517,7 @@ const ManageUsers = () => {
                 </div>
               )}
 
-              <div className="input-group" style={{ marginBottom: '20px' }}>
-                <label>Email App Password</label>
-                <input
-                  type="text"
-                  name="appPassword"
-                  value={formData.appPassword}
-                  onChange={handleFormChange}
-                  placeholder="App Password for SMTP"
-                />
-              </div>
+
 
               <div className="password-position-row">
                 {!isEditMode && (

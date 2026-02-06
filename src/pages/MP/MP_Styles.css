@@ -1005,25 +1005,55 @@
 }
 
 /* --- VIEW BUTTON --- */
+/* --- VIEW BUTTON --- */
 .mp-layout .view-button {
-    background: linear-gradient(135deg, #003266, #002147);
-    color: #FAFAFA;
+    background: #003781;
+    color: white;
     border: none;
-    padding: 8px 20px;
-    border-radius: 6px;
+    padding: 6px 16px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
-    transition: all 0.3s ease;
+    font-size: 11px;
+    font-weight: 700;
+    transition: all 0.2s ease;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.5px;
+    min-width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .mp-layout .view-button:hover {
-    background: linear-gradient(135deg, #F4B43C, #FBD045);
-    color: #003266;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 50, 102, 0.2);
+    background: #002557;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* --- DETAILS BUTTON --- */
+.mp-layout .details-button {
+    background: white;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    padding: 6px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mp-layout .details-button:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+    transform: translateY(-1px);
 }
 
 /* --- MODALS --- */
@@ -1310,35 +1340,7 @@
     gap: 8px;
 }
 
-.view-button,
-.details-button {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.view-button {
-    background: #003781;
-    color: white;
-}
-
-.view-button:hover {
-    background: #002557;
-}
-
-.details-button {
-    background: #f1f5f9;
-    color: #0f172a;
-    border: 1px solid #e2e8f0;
-}
-
-.details-button:hover {
-    background: #e2e8f0;
-}
+/* Redundant button styles removed */
 
 /* --- RANK BADGE --- */
 .rank-badge {
@@ -2284,44 +2286,7 @@
     gap: 4px;
 }
 
-.view-button,
-.details-button {
-    padding: 4px 8px !important;
-    border: none;
-    border-radius: 4px;
-    font-size: 10px !important;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    min-width: 70px;
-    height: 26px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.view-button {
-    background: #003781;
-    color: white;
-}
-
-.view-button:hover {
-    background: #002557;
-    transform: translateY(-1px);
-}
-
-.details-button {
-    background: #f1f5f9;
-    color: #0f172a;
-    border: 1px solid #e2e8f0;
-}
-
-.details-button:hover {
-    background: #e2e8f0;
-    transform: translateY(-1px);
-}
+/* Consolidated Action Buttons - See "Enhanced Button Styles" section below */
 
 /* Enhanced Status Badges with borders */
 .status-badge {
@@ -2552,15 +2517,16 @@
 }
 
 .apply-filter-btn {
-    background: linear-gradient(135deg, #003781, #0055b8);
+    background: #003781;
     color: white;
-    border: none;
+    border: 1px solid #003781;
 }
 
 .apply-filter-btn:hover {
-    background: linear-gradient(135deg, #002557, #003781);
+    background: #002557;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 55, 129, 0.2);
+    border-color: #002557;
 }
 
 .clear-filter-btn {
@@ -2575,37 +2541,12 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* View and Details Buttons */
-.view-button,
-.details-button {
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
-}
+/* View and Details Buttons - Rectangular Style (Matches Screenshot) */
+/* View and Details Buttons - Consoldated above */
 
-.view-button {
-    background: #003781;
-    color: white;
-}
-
-.view-button:hover {
-    background: #002557;
-    transform: translateY(-1px);
-}
-
-.details-button {
-    background: #f1f5f9;
-    color: #0f172a;
-    border: 1px solid #e2e8f0;
-}
-
-.details-button:hover {
-    background: #e2e8f0;
-    transform: translateY(-1px);
+.view-button i,
+.details-button i {
+    font-size: 13px;
 }
 
 /* Activity Status Colors */

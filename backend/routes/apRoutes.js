@@ -2,10 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const fs = require('fs'); 
+const fs = require('fs');
 const path = require('path');
 const { supabase } = require('../config/supabase');
-const { transporter, ALLIANZ_HO_EMAIL } = require('../config/mailer');
+const { sendGraphEmail, ALLIANZ_HO_EMAIL } = require('../config/graphMailer');
 const {
     calculateNextPaymentDate,
     uploadFileToSupabase,
@@ -34,7 +34,7 @@ router.get('/policies/active', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('policy')
-            .select('policy_id, policy_name, policy_type, form_type, request_type, agency, requirements') 
+            .select('policy_id, policy_name, policy_type, form_type, request_type, agency, requirements')
             .eq('active_status', true)
             .order('policy_name', { ascending: true });
 
@@ -135,14 +135,14 @@ router.post('/monitoring/submit', async (req, res) => {
             .maybeSingle();
 
         if (existingUsage) {
-            return res.status(400).json({ 
-                success: false, 
-                message: `Serial Number '${body.serialNumber}' is already in use by another application. Please verify.` 
+            return res.status(400).json({
+                success: false,
+                message: `Serial Number '${body.serialNumber}' is already in use by another application. Please verify.`
             });
         }
 
         if (isManual && serialId) {
-             await supabase.from('serial_number').update({ is_issued: true }).eq('serial_id', serialId);
+            await supabase.from('serial_number').update({ is_issued: true }).eq('serial_id', serialId);
         }
 
         const safePremium = parseFloat(body.premiumPaid) || 0;
@@ -166,7 +166,7 @@ router.post('/monitoring/submit', async (req, res) => {
         }]).select().single();
 
         if (error) throw error;
-        
+
         if (!isManual && body.serialNumber) {
             await supabase.from('serial_number').update({ is_issued: true }).eq('serial_number', body.serialNumber);
         }
@@ -200,32 +200,32 @@ router.get('/submissions/details/:serialNumber', async (req, res) => {
 
         // --- NEW BLOCK: Detect already used serials ---
         if (sub.status === 'Issued' || sub.status === 'Declined') {
-            return res.status(400).json({ 
-                success: false, 
-                message: `Serial Number '${serialNumber}' has already been finalized (${sub.status.toUpperCase()}).` 
+            return res.status(400).json({
+                success: false,
+                message: `Serial Number '${serialNumber}' has already been finalized (${sub.status.toUpperCase()}).`
             });
         }
 
         if (sub.form_type) {
-            return res.status(400).json({ 
-                success: false, 
-                message: `Documents have already been submitted for Serial Number '${serialNumber}'.` 
+            return res.status(400).json({
+                success: false,
+                message: `Documents have already been submitted for Serial Number '${serialNumber}'.`
             });
         }
         // ----------------------------------------------
 
         const nameParts = (sub.client_name || '').split(' ');
-        res.json({ 
-            success: true, 
-            data: { 
-                clientFirstName: nameParts[0], 
-                clientLastName: nameParts.slice(1).join(' '), 
-                clientEmail: sub.client_email, 
-                policyType: sub.policy?.policy_type, 
-                modeOfPayment: sub.mode_of_payment, 
+        res.json({
+            success: true,
+            data: {
+                clientFirstName: nameParts[0],
+                clientLastName: nameParts.slice(1).join(' '),
+                clientEmail: sub.client_email,
+                policyType: sub.policy?.policy_type,
+                modeOfPayment: sub.mode_of_payment,
                 policyDate: sub.issued_at,
                 requirements: sub.policy?.requirements
-            } 
+            }
         });
     } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
@@ -294,8 +294,8 @@ router.post('/form-submissions', upload.any(), async (req, res) => {
         }
 
         const pdfBuffer = await generateApplicationPDF(parsedData, serialNumber);
-        
-        const cleanName = existing.client_name.replace(/[^a-zA-Z0-9]/g, '_'); 
+
+        const cleanName = existing.client_name.replace(/[^a-zA-Z0-9]/g, '_');
         const storageFilename = `Application_${serialNumber}_${cleanName}.pdf`;
         const emailFilename = `Application [${serialNumber}, ${existing.client_name}].pdf`;
 
@@ -311,9 +311,17 @@ router.post('/form-submissions', upload.any(), async (req, res) => {
 
         if (error) throw error;
 
+        // --- DYNAMIC SENDER FETCH ---
+        // Get the agent's email using the profile_id from existing submission
+        let senderEmail = null;
+        if (existing.profile_id) {
+            const { data: agentProfile } = await supabase.from('profiles').select('email').eq('id', existing.profile_id).single();
+            if (agentProfile) senderEmail = agentProfile.email;
+        }
+
         try {
-            await transporter.sendMail({
-                from: process.env.EMAIL_USER,
+            await sendGraphEmail({
+                from: senderEmail || process.env.EMAIL_USER, // Agent's email, fallback to System
                 to: ALLIANZ_HO_EMAIL,
                 subject: `Submission: ${serialNumber} - ${existing.client_name}`,
                 text: `New Application Received.\n\nSerial: ${serialNumber}\nClient: ${existing.client_name}\n\nDocuments attached.`,
@@ -368,7 +376,7 @@ router.post('/submissions/:id/pay', async (req, res) => {
 
         let totalPremium = policy.premium_paid;
         if (typeof totalPremium === 'string') totalPremium = parseFloat(totalPremium.replace(/,/g, ''));
-        
+
         let installmentAmount = totalPremium;
         if (policy.mode_of_payment === 'Monthly') installmentAmount = totalPremium / 12;
         else if (policy.mode_of_payment === 'Quarterly') installmentAmount = totalPremium / 4;
@@ -425,8 +433,8 @@ router.post('/vsp/send-attestation', async (req, res) => {
         if (!clientEmail) return res.status(400).json({ success: false, message: 'Client email missing.' });
 
         // STEP 3: SEND EMAIL
-        const baseUrl = process.env.BASE_URL || 'http://localhost:3000/api'; 
-        
+        const baseUrl = process.env.BASE_URL || 'http://localhost:3000/api';
+
         const yesLink = `${baseUrl}/vsp/verify-attestation?serial=${inputSerial}&response=yes&client=${encodeURIComponent(clientName)}`;
         const noLink = `${baseUrl}/vsp/verify-attestation?serial=${inputSerial}&response=no&client=${encodeURIComponent(clientName)}`;
 
@@ -446,8 +454,11 @@ router.post('/vsp/send-attestation', async (req, res) => {
             </div>
         `;
 
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
+        // Agent's email is already selected in STEP 2 (submission.profiles.email)
+        const agentEmail = submission.profiles?.email;
+
+        await sendGraphEmail({
+            from: agentEmail || process.env.EMAIL_USER, // Agent's email, fallback to System
             to: clientEmail,
             cc: submission.profiles?.email,
             subject: `Action Required: Attestation for Transaction ${inputSerial}`,
@@ -474,7 +485,7 @@ router.get('/vsp/verify-attestation', async (req, res) => {
     // --- EMBED LOGO 2.PNG ---
     let logoSrc = '';
     try {
-        const imagePath = path.join(__dirname, '../../src/assets/2.png'); 
+        const imagePath = path.join(__dirname, '../../src/assets/2.png');
         if (fs.existsSync(imagePath)) {
             const imageBuffer = fs.readFileSync(imagePath);
             logoSrc = `data:image/png;base64,${imageBuffer.toString('base64')}`;

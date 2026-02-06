@@ -597,7 +597,7 @@ const MPDashboard = () => {
                         onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                     >
                         <div className="stat-header">
-                            <div className="stat-label">Monthly ANP</div>
+                            <div className="stat-label">{months[appliedFilters.month]} ANP</div>
                             <div className={`stat-trend ${formatStatTrend('monthlyANP').className}`}>
                                 {formatStatTrend('monthlyANP').arrow} {formatStatTrend('monthlyANP').percentage}
                             </div>
@@ -668,13 +668,13 @@ const MPDashboard = () => {
                         onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                     >
                         <div className="stat-header">
-                            <div className="stat-label">AL Avg Activity</div>
+                            <div className="stat-label">AP Avg Activity</div>
                             <div className={`stat-trend ${formatStatTrend('activityRatio').className}`}>
                                 {formatStatTrend('activityRatio').arrow} {formatStatTrend('activityRatio').percentage}
                             </div>
                         </div>
                         <div className="stat-value">{stats.avgActivityRatio.toFixed(1)}%</div>
-                        <div className="stat-subtext">Average across all ALs</div>
+                        <div className="stat-subtext">Average across all APs</div>
                     </div>
 
                     <div
@@ -836,18 +836,18 @@ const MPDashboard = () => {
                                             <td>
                                                 <div className="action-buttons">
                                                     <button
-                                                        className="action-btn view-btn"
+                                                        className="view-button"
                                                         onClick={() => handleViewAPsModal(al)}
                                                         title="View APs"
                                                     >
-                                                        👥
+                                                        VIEW APS ({al.apCount || 0})
                                                     </button>
                                                     <button
-                                                        className="action-btn details-btn"
+                                                        className="details-button"
                                                         onClick={() => handleViewPolicyDetails(al)}
                                                         title="View Details"
                                                     >
-                                                        📊
+                                                        POLICY DETAILS
                                                     </button>
                                                 </div>
                                             </td>
@@ -1017,7 +1017,7 @@ const MPDashboard = () => {
                                                     <td>
                                                         <button
                                                             onClick={() => navigate(`/mp/ap-performance?ap=${ap.id}`)}
-                                                            className="view-button"
+                                                            className="details-button"
                                                         >
                                                             View Details
                                                         </button>

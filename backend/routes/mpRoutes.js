@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/supabase');
 
-// Helper to calculate Monthly ANP (Premium / 12)
-const calculateMonthlyANP = (premium) => (parseFloat(premium) || 0) / 12;
+// Helper to get premium value (previously divided by 12, now uses full premium)
+const getPremiumValue = (premium) => parseFloat(premium) || 0;
 
 // ==========================================
 // 1. AL (Agent Leader) PERFORMANCE
@@ -24,8 +24,8 @@ router.get('/mp/al-performance', async (req, res) => {
 
         if (alError) throw alError;
 
-        // B. Fetch Year-to-Date Stats for ALL ALs (Cumulative from Jan to selected month)
-        const startDate = new Date(queryYear, 0, 1).toISOString(); // Jan 1 of selected year
+        // B. Fetch Stats for the EXACT selected month only (not YTD)
+        const startDate = new Date(queryYear, queryMonth, 1).toISOString(); // First day of selected month
         // FIX: Set to VERY END of the selected month (23:59:59.999)
         const endDate = new Date(queryYear, queryMonth + 1, 0, 23, 59, 59, 999).toISOString();
 
@@ -62,7 +62,7 @@ router.get('/mp/al-performance', async (req, res) => {
 
             const monthlyCases = issuedSubs.length;
             const monthlyDeclined = declinedSubs.length;
-            const monthlyANP = issuedSubs.reduce((sum, s) => sum + calculateMonthlyANP(s.premium_paid), 0);
+            const monthlyANP = issuedSubs.reduce((sum, s) => sum + getPremiumValue(s.premium_paid), 0);
 
             let alStatus = 'NEEDS IMPROVEMENT';
             if (monthlyCases >= 7) alStatus = 'PERFORMING';
@@ -153,8 +153,8 @@ router.get('/mp/ap-performance', async (req, res) => {
             .in('profile_id', apIds)
             .in('status', ['Issued', 'Declined']);
 
-        // FIX: Year-to-Date calculation (from Jan 1 to end of selected month)
-        const startDate = new Date(queryYear, 0, 1); // Jan 1 of selected year
+        // Filter to EXACT selected month only (not YTD)
+        const startDate = new Date(queryYear, queryMonth, 1); // First day of selected month
         const endDate = new Date(queryYear, queryMonth + 1, 0, 23, 59, 59, 999);
 
         // 3. Process Metrics
@@ -162,7 +162,7 @@ router.get('/mp/ap-performance', async (req, res) => {
             // Get all subsmissions for this AP
             const subs = allSubmissions.filter(s => s.profile_id === ap.id);
 
-            // Filter by Year-to-Date (Jan 1 to selected month end)
+            // Filter to EXACT selected month only
             const monthlySubs = subs.filter(s => {
                 const d = new Date(s.issued_at);
                 return d >= startDate && d <= endDate;
@@ -177,7 +177,7 @@ router.get('/mp/ap-performance', async (req, res) => {
             // const totalDeclined = subs.filter(s => s.status === 'Declined'); // Not currently displayed but available
 
             const totalANP = totalIssued.reduce((sum, s) => sum + (parseFloat(s.premium_paid) || 0), 0);
-            const monthlyANP = monthlyIssued.reduce((sum, s) => sum + calculateMonthlyANP(s.premium_paid), 0);
+            const monthlyANP = monthlyIssued.reduce((sum, s) => sum + getPremiumValue(s.premium_paid), 0);
 
             const leader = ap.user_hierarchy?.[0]?.leader;
             const lastActiveDate = ap.last_submission_at ? new Date(ap.last_submission_at).toLocaleDateString() : 'No activity';
@@ -211,6 +211,94 @@ router.get('/mp/ap-performance', async (req, res) => {
         res.status(500).json({ success: false, message: e.message });
     }
 });
+
+// ==========================================
+// 2.5 AP DETAILS (Team/Recruits)
+// ==========================================
+router.get('/mp/ap-details/:apId', async (req, res) => {
+    try {
+        const { apId } = req.params;
+        const { month, year } = req.query;
+        const now = new Date();
+        const queryYear = year ? parseInt(year) : now.getFullYear();
+        // FIX: Handle '0' (January) correctly
+        const queryMonth = (month !== undefined && month !== null) ? parseInt(month) : now.getMonth();
+
+        // 1. Fetch Recruits (Hierarchy)
+        const { data: recruits } = await supabase
+            .from('user_hierarchy')
+            .select(`
+                user_id, is_active,
+                profile:profiles!user_hierarchy_user_id_fkey(
+                    id, first_name, last_name, email,
+                    user_roles!inner(role_code)
+                )
+            `)
+            .eq('report_to_id', apId)
+            .eq('is_active', true);
+
+        if (!recruits || recruits.length === 0) {
+            return res.json({ success: true, data: [] });
+        }
+
+        const recruitIds = recruits.map(r => r.user_id);
+
+        // 2. Fetch Submissions for Recruits
+        const { data: submissions } = await supabase
+            .from('az_submissions')
+            .select('issued_at, premium_paid, status, profile_id')
+            .in('profile_id', recruitIds)
+            .in('status', ['Issued', 'Declined']);
+
+        // Filter to EXACT selected month
+        const startDate = new Date(queryYear, queryMonth, 1);
+        const endDate = new Date(queryYear, queryMonth + 1, 0, 23, 59, 59, 999);
+
+        // 3. Process Metrics for each Recruit
+        const agentsList = recruits.map(r => {
+            const pid = r.user_id;
+            const profile = r.profile;
+
+            const subs = (submissions || []).filter(s => s.profile_id === pid);
+
+            // Monthly Filter
+            const monthlySubs = subs.filter(s => {
+                const d = new Date(s.issued_at);
+                return d >= startDate && d <= endDate;
+            });
+
+            const monthlyIssued = monthlySubs.filter(s => s.status === 'Issued');
+            const monthlyDeclined = monthlySubs.filter(s => s.status === 'Declined');
+
+            const totalIssued = subs.filter(s => s.status === 'Issued');
+
+            const totalANP = totalIssued.reduce((sum, s) => sum + (parseFloat(s.premium_paid) || 0), 0);
+            const monthlyANP = monthlyIssued.reduce((sum, s) => sum + getPremiumValue(s.premium_paid), 0);
+
+            let performanceStatus = 'NEEDS IMPROVEMENT';
+            if (monthlyIssued.length >= 7) performanceStatus = 'PERFORMING';
+            else if (monthlyIssued.length >= 4) performanceStatus = 'AVERAGE';
+
+            return {
+                id: pid,
+                name: `${profile.first_name} ${profile.last_name}`,
+                role: profile.user_roles?.role_code || 'Agent',
+                totalANP: Math.round(totalANP),
+                monthlyANP: Math.round(monthlyANP),
+                totalCases: totalIssued.length,
+                monthlyCases: monthlyIssued.length,
+                monthlyDeclined: monthlyDeclined.length,
+                status: performanceStatus
+            };
+        });
+
+        res.json({ success: true, data: agentsList });
+    } catch (e) {
+        console.error('AP Details Error:', e);
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
 
 // ==========================================
 // 3. DASHBOARD STATS
@@ -259,7 +347,7 @@ router.get('/mp/dashboard-stats', async (req, res) => {
         (yearSubmissions || []).forEach(sub => {
             const date = new Date(sub.issued_at);
             const mIndex = date.getMonth();
-            const anp = sub.status === 'Issued' ? calculateMonthlyANP(sub.premium_paid) : 0;
+            const anp = sub.status === 'Issued' ? getPremiumValue(sub.premium_paid) : 0;
 
             if (sub.status === 'Issued') {
                 monthlyTrend[mIndex].issued++;
@@ -283,8 +371,8 @@ router.get('/mp/dashboard-stats', async (req, res) => {
                 }
             }
 
-            // Cumulative YTD ANP (from Jan to selected month)
-            if (mIndex <= selectedMonth && sub.status === 'Issued') {
+            // Only count ANP for the EXACT selected month (not cumulative)
+            if (mIndex === selectedMonth && sub.status === 'Issued') {
                 monthlyANP += anp;
             }
         });
@@ -293,10 +381,10 @@ router.get('/mp/dashboard-stats', async (req, res) => {
             .map(([name, count]) => ({ policy_name: name, count }))
             .sort((a, b) => b.count - a.count);
 
-        // Count active APs YTD (Jan to selected month)
+        // Count active APs for the EXACT selected month only
         const activeAPIds = new Set(
             yearSubmissions
-                .filter(s => new Date(s.issued_at).getMonth() <= selectedMonth && s.status === 'Issued')
+                .filter(s => new Date(s.issued_at).getMonth() === selectedMonth && s.status === 'Issued')
                 .map(s => s.profile_id)
         );
 
@@ -407,11 +495,8 @@ router.get('/mp/monthly-history', async (req, res) => {
         let prevYearCumulativeApSet = new Set();
 
         if (statType === 'totalANP' || statType === 'monthlyANP') {
-            // For totalANP, sum all premium_paid
-            // For monthlyANP, sum premium_paid / 12
-            const calcFunc = statType === 'totalANP'
-                ? (s) => (parseFloat(s.premium_paid) || 0)
-                : (s) => calculateMonthlyANP(s.premium_paid);
+            // For both totalANP and monthlyANP, sum all premium_paid (full annual premium)
+            const calcFunc = (s) => getPremiumValue(s.premium_paid);
 
             cumulativeANP = rawHistory
                 .filter(s => {
@@ -448,7 +533,7 @@ router.get('/mp/monthly-history', async (req, res) => {
                 if (type === 'totalANP') {
                     return issued.reduce((sum, s) => sum + (parseFloat(s.premium_paid) || 0), 0);
                 } else if (type === 'monthlyANP') {
-                    return issued.reduce((sum, s) => sum + calculateMonthlyANP(s.premium_paid), 0);
+                    return issued.reduce((sum, s) => sum + getPremiumValue(s.premium_paid), 0);
                 } else if (type === 'totalCases') {
                     return issued.length + declined.length;
                 } else if (type === 'declined') { // NEW TYPE
@@ -462,8 +547,8 @@ router.get('/mp/monthly-history', async (req, res) => {
             let val = calculateVal(currMonthSubs, statType);
             let prevVal = calculateVal(prevMonthSubs, statType);
 
-            // Handle Cumulative Logic for Total ANP and Monthly ANP
-            if (statType === 'totalANP' || statType === 'monthlyANP') {
+            // Handle Cumulative Logic ONLY for Total ANP (not monthlyANP)
+            if (statType === 'totalANP') {
                 cumulativeANP += val;
                 const currentCumulative = cumulativeANP;
                 // Previous cumulative is (Current - CurrentMonthContrib). Start of year uses initial cumulativeANP.
@@ -477,11 +562,18 @@ router.get('/mp/monthly-history', async (req, res) => {
                 const prevYearSameMonthContrib = calculateVal(prevYearSameMonthSubs, statType);
                 prevYearCumulativeANP += prevYearSameMonthContrib;
                 prevYearValue = prevYearCumulativeANP;
+            } else if (statType === 'monthlyANP') {
+                // monthlyANP is NON-CUMULATIVE - just show each month's individual total
+                // val and prevVal are already set from calculateVal above
+
+                // For Yearly Change, compare to same month last year
+                const prevYearSameMonthSubs = getMonthSubs(prevYear, i);
+                prevYearValue = calculateVal(prevYearSameMonthSubs, statType);
             } else if (statType === 'apAvgANP') {
                 // Calculate Monthly AP Contribution (Filter by AP IDs)
                 const apSubs = currMonthSubs.filter(s => apIds.includes(s.profile_id));
                 const issued = apSubs.filter(s => s.status === 'Issued');
-                const monthlyTotal = issued.reduce((sum, s) => sum + calculateMonthlyANP(s.premium_paid), 0);
+                const monthlyTotal = issued.reduce((sum, s) => sum + getPremiumValue(s.premium_paid), 0);
 
                 // Update Cumulative Totals
                 cumulativeApAnp += monthlyTotal;
@@ -494,7 +586,7 @@ router.get('/mp/monthly-history', async (req, res) => {
                 const prevYearSameMonthSubs = getMonthSubs(prevYear, i);
                 const prevApSubs = prevYearSameMonthSubs.filter(s => apIds.includes(s.profile_id));
                 const prevIssued = prevApSubs.filter(s => s.status === 'Issued');
-                const prevMonthlyTotal = prevIssued.reduce((sum, s) => sum + calculateMonthlyANP(s.premium_paid), 0);
+                const prevMonthlyTotal = prevIssued.reduce((sum, s) => sum + getPremiumValue(s.premium_paid), 0);
 
                 prevYearCumulativeApAnp += prevMonthlyTotal;
                 prevIssued.forEach(s => prevYearCumulativeApSet.add(s.profile_id));
@@ -523,7 +615,7 @@ router.get('/mp/monthly-history', async (req, res) => {
 
         let title = '';
         if (statType === 'totalANP') title = 'Total ANP';
-        else if (statType === 'monthlyANP') title = 'Monthly ANP';
+        else if (statType === 'monthlyANP') title = 'Total Month ANP';
         else if (statType === 'apAvgANP') title = 'Monthly Avg. ANP (AP)';
         else if (statType === 'activityRatio') title = 'Active APs';
         else if (statType === 'declined') title = 'Declined';
@@ -583,24 +675,25 @@ router.get('/mp/policy-details/:alId', async (req, res) => {
         }));
 
         let totalIssuedCount = 0;
+        let totalDeclinedCount = 0;
 
         (submissions || []).forEach(sub => {
-            if (sub.status === 'Issued' || sub.status === 'Declined') {
-                // Only count Issued for Policy Distribution
-                if (sub.status === 'Issued') {
-                    const name = sub.policy?.policy_name || 'Other';
-                    const premium = parseFloat(sub.premium_paid) || 0;
-                    if (!policyStats[name]) {
-                        policyStats[name] = { count: 0, totalANP: 0 };
-                    }
-                    policyStats[name].count++;
-                    policyStats[name].totalANP += premium;
+            // Only count Issued for Policy Distribution
+            if (sub.status === 'Issued') {
+                const name = sub.policy?.policy_name || 'Other';
+                const premium = parseFloat(sub.premium_paid) || 0;
+                if (!policyStats[name]) {
+                    policyStats[name] = { count: 0, totalANP: 0 };
                 }
+                policyStats[name].count++;
+                policyStats[name].totalANP += premium;
                 totalIssuedCount++;
+            } else if (sub.status === 'Declined') {
+                totalDeclinedCount++;
             }
 
+            // Track Monthly Trend for both Issued and Declined
             const monthIdx = new Date(sub.issued_at).getMonth();
-
             if (sub.status === 'Issued') {
                 monthlyTrend[monthIdx].policiesIssued++;
             } else if (sub.status === 'Declined') {
@@ -621,6 +714,7 @@ router.get('/mp/policy-details/:alId', async (req, res) => {
             success: true,
             data: {
                 totalCases: totalIssuedCount,
+                totalDeclined: totalDeclinedCount,
                 policyDistribution,
                 monthlyTrend
             }

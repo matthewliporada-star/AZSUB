@@ -46,6 +46,40 @@ const APPerformance = () => {
     const [monthlyANPCache, setMonthlyANPCache] = useState({});
     const [loadingChart, setLoadingChart] = useState(false);
 
+    const [apTeamData, setApTeamData] = useState([]);
+    const [loadingApTeam, setLoadingApTeam] = useState(false);
+
+    // Policy Details Data for AP
+    const [policyDetailsData, setPolicyDetailsData] = useState(null);
+    const [loadingPolicyDetails, setLoadingPolicyDetails] = useState(false);
+
+    // Fetch Data when modal opens
+    useEffect(() => {
+        if (showAPDetailsModal && selectedAP) {
+            setLoadingApTeam(true);
+            setLoadingPolicyDetails(true);
+
+            // 1. Fetch Team (Recruits)
+            fetch(`http://localhost:3000/api/mp/ap-details/${selectedAP.id}?year=${appliedFilters.year}&month=${appliedFilters.month}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) setApTeamData(data.data);
+                    else setApTeamData([]);
+                })
+                .catch(err => console.error("Error fetching AP team:", err))
+                .finally(() => setLoadingApTeam(false));
+
+            // 2. Fetch Policy Details (Personal + Team Production)
+            fetch(`http://localhost:3000/api/mp/policy-details/${selectedAP.id}?year=${appliedFilters.year}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) setPolicyDetailsData(data.data);
+                })
+                .catch(err => console.error("Error fetching policy details:", err))
+                .finally(() => setLoadingPolicyDetails(false));
+        }
+    }, [showAPDetailsModal, selectedAP, appliedFilters.year, appliedFilters.month]);
+
     // Month names
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const currentYear = new Date().getFullYear();
@@ -659,7 +693,7 @@ const APPerformance = () => {
                                 <th>AP Name</th>
                                 <th>Agency Leader</th>
                                 <th>City</th>
-                                <th>Activity Status</th>
+                                <th>AP Activity</th>
                                 <th>Last Activity</th>
                                 <th>Total ANP</th>
                                 <th>Monthly ANP</th>
@@ -750,7 +784,7 @@ const APPerformance = () => {
             {/* AP Details Modal */}
             {showAPDetailsModal && selectedAP && (
                 <div className="mp-modal">
-                    <div className="mp-modal-content" style={{ maxWidth: '800px' }}>
+                    <div className="mp-modal-content" style={{ maxWidth: '1000px' }}>
                         <div className="mp-modal-header">
                             <div>
                                 <h2>AP Details - {selectedAP.name}</h2>
@@ -766,125 +800,195 @@ const APPerformance = () => {
                             </button>
                         </div>
                         <div className="mp-modal-body">
-                            <div style={{
-                                background: '#f8fafc',
-                                padding: '20px',
-                                borderRadius: '12px',
-                                marginBottom: '20px'
-                            }}>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
-                                    <div>
-                                        <div style={{ fontSize: '12px', color: '#64748b' }}>AP Name</div>
-                                        <div style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a' }}>
-                                            {selectedAP.name}
+                            {loadingPolicyDetails ? (
+                                <div style={{ textAlign: 'center', padding: '40px' }}>
+                                    <div style={{ fontSize: '16px', color: '#64748b' }}>Loading details...</div>
+                                </div>
+                            ) : policyDetailsData ? (
+                                <>
+                                    {/* Top Section: Charts */}
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                                        {/* Policy Distribution */}
+                                        <div>
+                                            <h3 style={{ marginBottom: '16px', color: '#0f172a' }}>Policy Distribution</h3>
+                                            <div style={{ height: '300px' }}>
+                                                <Bar
+                                                    data={{
+                                                        labels: policyDetailsData.policyDistribution.map(p => p.policy_name),
+                                                        datasets: [{
+                                                            label: 'Policy Count',
+                                                            data: policyDetailsData.policyDistribution.map(p => p.count),
+                                                            backgroundColor: ['#003781', '#0055b8', '#4d7cff', '#ffc107', '#e74c3c', '#2c3e50'],
+                                                            borderRadius: 6
+                                                        }]
+                                                    }}
+                                                    options={{
+                                                        responsive: true,
+                                                        maintainAspectRatio: false,
+                                                        plugins: { legend: { display: false } },
+                                                        scales: { y: { beginAtZero: true, ticks: { stepSize: 10 } } }
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Monthly Trend */}
+                                        <div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                                <h3 style={{ margin: 0, color: '#0f172a' }}>Monthly Trend - {appliedFilters.year}</h3>
+                                                <div style={{
+                                                    background: '#e3f2fd',
+                                                    padding: '8px 16px',
+                                                    borderRadius: '8px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '8px'
+                                                }}>
+                                                    <span style={{ fontSize: '12px', color: '#0055b8', fontWeight: '600' }}>Total Apps:</span>
+                                                    <span style={{ fontSize: '18px', fontWeight: '700', color: '#003781' }}>
+                                                        {policyDetailsData.totalCases + (policyDetailsData.totalDeclined || 0)}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div style={{ height: '300px' }}>
+                                                <Bar
+                                                    data={{
+                                                        labels: months.map(m => m.substring(0, 3)),
+                                                        datasets: [{
+                                                            label: 'Total Cases',
+                                                            data: policyDetailsData.monthlyTrend.map(m => m.policiesIssued + (m.policiesDeclined || 0)),
+                                                            backgroundColor: '#003781',
+                                                            borderRadius: 6
+                                                        }]
+                                                    }}
+                                                    options={{
+                                                        responsive: true,
+                                                        maintainAspectRatio: false,
+                                                        plugins: { legend: { display: false } },
+                                                        scales: { y: { beginAtZero: true, ticks: { stepSize: 5 } } }
+                                                    }}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
-                                    <div>
-                                        <div style={{ fontSize: '12px', color: '#64748b' }}>Agency Leader</div>
-                                        <div style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a' }}>
-                                            {selectedAP.alName}
+
+                                    {/* Policy Statistics Row */}
+                                    <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', marginBottom: '24px' }}>
+                                        <h4 style={{ marginBottom: '16px', color: '#0f172a' }}>Policy Statistics</h4>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+                                            <div>
+                                                <div style={{ fontSize: '12px', color: '#64748b' }}>Issued Policies</div>
+                                                <div style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a' }}>
+                                                    {selectedAP.totalCases}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div style={{ fontSize: '12px', color: '#64748b' }}>Declined</div>
+                                                <div style={{ fontSize: '24px', fontWeight: '700', color: '#dc3545' }}>
+                                                    {policyDetailsData.totalDeclined || 0}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div style={{ fontSize: '12px', color: '#64748b' }}>Monthly ANP</div>
+                                                <div style={{ fontSize: '24px', fontWeight: '700', color: '#0055b8' }}>
+                                                    ₱ {selectedAP.monthlyANP.toLocaleString()}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div style={{ fontSize: '12px', color: '#64748b' }}>Most Availed</div>
+                                                <div style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a' }}>
+                                                    {policyDetailsData.policyDistribution.length > 0
+                                                        ? policyDetailsData.policyDistribution[0].policy_name
+                                                        : 'N/A'}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div>
-                                        <div style={{ fontSize: '12px', color: '#64748b' }}>License Number</div>
-                                        <div style={{ fontSize: '16px', fontWeight: '600', color: '#0f172a' }}>
-                                            {selectedAP.licenseNumber}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div style={{ fontSize: '12px', color: '#64748b' }}>Contact Number</div>
-                                        <div style={{ fontSize: '16px', fontWeight: '600', color: '#0f172a' }}>
-                                            {selectedAP.contactNumber}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <h4 style={{ marginBottom: '16px', color: '#0f172a' }}>Performance Metrics</h4>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
-                                <div style={{
-                                    background: '#e3f2fd',
-                                    padding: '16px',
-                                    borderRadius: '8px',
-                                    textAlign: 'center'
-                                }}>
-                                    <div style={{ fontSize: '12px', color: '#0055b8' }}>Monthly Cases</div>
-                                    <div style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a' }}>
-                                        {selectedAP.monthlyCases + (selectedAP.monthlyDeclined || 0)}
+                                    {/* Policy Breakdown Table */}
+                                    <h4 style={{ marginBottom: '16px', color: '#0f172a' }}>Policy Breakdown</h4>
+                                    <div className="modal-table-responsive" style={{ marginBottom: '32px' }}>
+                                        <table className="policy-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Policy Name</th>
+                                                    <th>Category</th>
+                                                    <th style={{ textAlign: 'center' }}>Count</th>
+                                                    <th>Percentage</th>
+                                                    <th>ANP Generated</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {policyDetailsData.policyDistribution.length > 0 ? (
+                                                    policyDetailsData.policyDistribution.map((policy) => (
+                                                        <tr key={policy.policy_name}>
+                                                            <td><div style={{ fontWeight: '600' }}>{policy.policy_name}</div></td>
+                                                            <td><span className="category-badge system">System</span></td>
+                                                            <td style={{ fontWeight: '600', textAlign: 'center' }}>{policy.count}</td>
+                                                            <td>
+                                                                <div className="percentage-bar">
+                                                                    <div className="percentage-fill" style={{ width: `${policy.percentage}%` }}></div>
+                                                                    <span className="percentage-value">{policy.percentage}%</span>
+                                                                </div>
+                                                            </td>
+                                                            <td style={{ fontWeight: '600', color: '#28a745' }}>
+                                                                ₱ {(policy.totalANP || 0).toLocaleString()}
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                ) : (
+                                                    <tr><td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>No policies issued.</td></tr>
+                                                )}
+                                            </tbody>
+                                        </table>
                                     </div>
-                                    <div style={{ fontSize: '12px', color: '#64748b' }}>
-                                        {getAPPerformanceStatus(selectedAP.monthlyCases)} Status
-                                    </div>
-                                </div>
+                                </>
+                            ) : (
+                                <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>No data available.</div>
+                            )}
 
-                                <div style={{
-                                    background: '#d4edda',
-                                    padding: '16px',
-                                    borderRadius: '8px',
-                                    textAlign: 'center'
-                                }}>
-                                    <div style={{ fontSize: '12px', color: '#155724' }}>Monthly ANP</div>
-                                    <div style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a' }}>
-                                        ₱ {selectedAP.monthlyANP.toLocaleString()}
+                            {/* People under this AP Section */}
+                            {apTeamData.length > 0 && (
+                                <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px dashed #e2e8f0' }}>
+                                    <h4 style={{ marginBottom: '16px', color: '#0f172a' }}>People under this AP</h4>
+                                    <div className="modal-table-responsive">
+                                        <table className="performance-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Agent Name</th>
+                                                    <th>Role</th>
+                                                    <th>Monthly ANP</th>
+                                                    <th>Monthly Cases</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {apTeamData.map(agent => (
+                                                    <tr key={agent.id}>
+                                                        <td><div style={{ fontWeight: '600' }}>{agent.name}</div></td>
+                                                        <td>{agent.role}</td>
+                                                        <td style={{ color: '#28a745', fontWeight: '600' }}>₱ {agent.monthlyANP.toLocaleString()}</td>
+                                                        <td>
+                                                            <div style={{ fontWeight: '600' }}>{agent.monthlyCases}</div>
+                                                            <div style={{ fontSize: '11px', color: '#64748b' }}>
+                                                                {(agent.monthlyDeclined || 0)} Declined
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span className={`status-badge status-${agent.status.toLowerCase().replace(' ', '-')}`}>
+                                                                {agent.status}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
                                     </div>
+                                </div>
+                            )}
 
-                                </div>
-
-                                <div style={{
-                                    background: '#fff3cd',
-                                    padding: '16px',
-                                    borderRadius: '8px',
-                                    textAlign: 'center'
-                                }}>
-                                    <div style={{ fontSize: '12px', color: '#856404' }}>Total Cases</div>
-                                    <div style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a' }}>
-                                        {selectedAP.totalCases}
-                                    </div>
-                                    <div style={{ fontSize: '12px', color: '#64748b' }}>
-                                        All-time
-                                    </div>
-                                </div>
-                            </div>
-
-                            <h4 style={{ marginBottom: '16px', color: '#0f172a' }}>Additional Information</h4>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-                                <div>
-                                    <div style={{ fontSize: '12px', color: '#64748b' }}>City</div>
-                                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a' }}>
-                                        {selectedAP.city}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: '12px', color: '#64748b' }}>Join Date</div>
-                                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a' }}>
-                                        {selectedAP.joinDate}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: '12px', color: '#64748b' }}>Last Activity</div>
-                                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a' }}>
-                                        {selectedAP.lastActivity}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: '12px', color: '#64748b' }}>Activity Status</div>
-                                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a' }}>
-                                        <span className={`status-badge ${getAPActivityStatus(selectedAP.monthlyCases) === 'Active' ? 'status-active' : 'status-inactive'}`}>
-                                            {getAPActivityStatus(selectedAP.monthlyCases)}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: '12px', color: '#64748b' }}>Performance Status</div>
-                                    <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a' }}>
-                                        <span className={`status-badge status-${getAPPerformanceStatus(selectedAP.monthlyCases).toLowerCase().replace(' ', '-')}`}>
-                                            {getAPPerformanceStatus(selectedAP.monthlyCases)}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
+                            {/* Footer */}
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '20px', borderTop: '1px solid #e2e8f0', marginTop: '20px' }}>
                                 <button
                                     onClick={() => setShowAPDetailsModal(false)}
                                     className="clear-filter-btn"
@@ -896,43 +1000,46 @@ const APPerformance = () => {
                         </div>
                     </div>
                 </div>
-            )}
+            )
+            }
 
             {/* Stat Details Modal */}
-            {showStatDetailsModal && (
-                <div className="mp-modal">
-                    <div className="mp-modal-content" style={{ maxWidth: '800px' }}>
-                        <div className="mp-modal-header">
-                            <div>
-                                <h2>Statistic Details</h2>
-                                <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>
-                                    Detailed information for the selected statistic
-                                </p>
-                            </div>
-                            <button
-                                className="mp-modal-close"
-                                onClick={() => setShowStatDetailsModal(false)}
-                            >
-                                &times;
-                            </button>
-                        </div>
-                        <div className="mp-modal-body">
-                            {renderStatDetails()}
-
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
+            {
+                showStatDetailsModal && (
+                    <div className="mp-modal">
+                        <div className="mp-modal-content" style={{ maxWidth: '800px' }}>
+                            <div className="mp-modal-header">
+                                <div>
+                                    <h2>Statistic Details</h2>
+                                    <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: 'rgba(255,255,255,0.8)' }}>
+                                        Detailed information for the selected statistic
+                                    </p>
+                                </div>
                                 <button
+                                    className="mp-modal-close"
                                     onClick={() => setShowStatDetailsModal(false)}
-                                    className="clear-filter-btn"
-                                    style={{ padding: '10px 20px' }}
                                 >
-                                    Close
+                                    &times;
                                 </button>
+                            </div>
+                            <div className="mp-modal-body">
+                                {renderStatDetails()}
+
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
+                                    <button
+                                        onClick={() => setShowStatDetailsModal(false)}
+                                        className="clear-filter-btn"
+                                        style={{ padding: '10px 20px' }}
+                                    >
+                                        Close
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </MPLayout>
+                )
+            }
+        </MPLayout >
     );
 };
 

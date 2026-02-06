@@ -21,12 +21,12 @@ const MPLayout = ({ children, title = 'Dashboard' }) => {
         },
         {
             path: '/mp/al-performance',
-            label: 'Agent Leaders',
+            label: 'Agency Leaders',
             icon: <i className="fa-solid fa-users"></i>
         },
         {
             path: '/mp/ap-performance',
-            label: 'Agent Partners',
+            label: 'Agency Partners',
             icon: <i className="fa-solid fa-user-group"></i>
         }
     ];

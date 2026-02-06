@@ -52,7 +52,7 @@ export const DashboardSkeleton = () => (
 
 // AL Page Skeleton
 export const ALPageSkeleton = () => (
-    <MPLayout title="Agent Leaders">
+    <MPLayout title="Agency Leaders">
         <div className="mp-dashboard-content">
             <div className="skeleton skeleton-header-title"></div>
 
@@ -72,7 +72,7 @@ export const ALPageSkeleton = () => (
 
 // AP Page Skeleton
 export const APPageSkeleton = () => (
-    <MPLayout title="Agent Partners">
+    <MPLayout title="Agency Partners">
         <div className="mp-dashboard-content">
             <div className="skeleton skeleton-header-title"></div>
 
