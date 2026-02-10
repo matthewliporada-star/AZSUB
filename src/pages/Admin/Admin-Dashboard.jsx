@@ -208,7 +208,7 @@ const AdminDashboard = () => {
                 </div>
 
                 <div className="admin-card-info">
-                  <p className="admin-card-title">Total Users</p>
+                  <p className="admin-card-title">Totals Users</p>
                   <h2 className="admin-card-number">{totalUsers}</h2>
                   <div className="bar-chart">
                     <div className="bar" style={{ height: "85%", backgroundColor: "#003266" }}></div>
