@@ -13,7 +13,67 @@
   --light-bg: #f5f7fb;
   --border-color: #e5e5e5;
 }
+/* The Main Container */
+.box-card {
+  background: #ffffff;
+  border: 1px solid #d1d5db; /* Defined border for the 'box' look */
+  border-radius: 8px;        /* Slightly sharper corners for a boxy feel */
+  box-shadow: 4px 4px 0px 0px #f3f4f6; /* Optional: Hard shadow for a 'neo-brutalist' box look */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
+/* The Header Section */
+.box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: #fafafa; /* Light grey to distinguish the 'lid' of the box */
+  border-bottom: 1px solid #d1d5db;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.box-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  text-transform: uppercase; /* Adds to the 'box label' aesthetic */
+  letter-spacing: 0.025em;
+}
+
+.box-badge {
+  font-size: 0.75rem;
+  background: #e0e7ff;
+  color: #4338ca;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* Action Button */
+.box-action-btn {
+  background: transparent;
+  border: none;
+  color: #6366f1;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* The Content Area */
+.box-body {
+  padding: 20px;
+  background: #ffffff;
+  min-height: 200px;
+}
 /* SIDEBAR */
 .sidebar {
   width: 260px;

@@ -294,16 +294,20 @@ const AdminDashboard = () => {
           </div>
 
           {/* RIGHT COLUMN: ACTIVITY LOG */}
-          <div className="dashboard-right-col">
-            <div className="content-container">
-              <div className="container-header">
-                <h2>Activity Log</h2>
-              </div>
-              <div className="container-body">
-                <ActivityLog />
-              </div>
-            </div>
-          </div>
+<div className="dashboard-right-col">
+  <div className="box-card">
+    <div className="box-header">
+      <div className="header-content">
+        <h2 className="box-title">Activity Log</h2>
+        <span className="box-badge">Recent</span>
+      </div>
+      <button className="box-action-btn">View All</button>
+    </div>
+    <div className="box-body">
+      <ActivityLog />
+    </div>
+  </div>
+</div>
 
         </div>
       </main>
