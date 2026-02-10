@@ -9,7 +9,7 @@ import topLogo from '../../assets/2.png';
 const MPLayout = ({ children, title = 'Dashboard' }) => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { currentUser, userRole } = useApp();
+    const { currentUser, userRole, darkMode, toggleDarkMode } = useApp();
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
 
@@ -45,7 +45,7 @@ const MPLayout = ({ children, title = 'Dashboard' }) => {
                     onClick={() => setSidebarOpen(!sidebarOpen)}
                     title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
                 >
-                    <i className="fa-solid fa-bars"></i>
+                    <i className={`fa-solid ${sidebarOpen ? 'fa-chevron-left' : 'fa-chevron-right'}`}></i>
                 </button>
 
                 <div className="sidebar-header">
@@ -90,6 +90,14 @@ const MPLayout = ({ children, title = 'Dashboard' }) => {
                     </div>
 
                     <div className="mp-header-user">
+                        <button
+                            className="mp-dark-mode-toggle"
+                            onClick={toggleDarkMode}
+                            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '15px', fontSize: '18px', color: darkMode ? '#FFBD42' : '#64748b', transition: 'color 0.3s' }}
+                        >
+                            <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
+                        </button>
                         <button
                             className="mp-user-profile-btn"
                             onClick={() => setShowProfileMenu(!showProfileMenu)}

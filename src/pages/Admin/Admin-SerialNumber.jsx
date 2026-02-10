@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useApp } from "../../context/AppContext";
 import supabase from "../../config/supabaseClient";
 import "./Style/AdminLayout.css";
 import "./Style/SerialNumber.css";
@@ -8,6 +9,7 @@ import LogoImage from "../../assets/logo1.png";
 
 const AdminSerialNumber = () => {
   const navigate = useNavigate();
+  const { darkMode, toggleDarkMode } = useApp();
 
   const [totalUsers, setTotalUsers] = useState(0);
   const [serial_numbers, setserial_numbers] = useState([]);
@@ -233,6 +235,14 @@ const AdminSerialNumber = () => {
         <div className="admin-header-content">
           <h1>Admin Dashboard</h1>
           <div className="admin-header-user">
+            <button
+              className="admin-dark-mode-toggle"
+              onClick={toggleDarkMode}
+              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '15px', fontSize: '18px', color: darkMode ? '#FFBD42' : '#64748b', transition: 'color 0.3s' }}
+            >
+              <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
+            </button>
             <button
               className="admin-user-profile-btn"
               onClick={() => setShowProfileMenu(!showProfileMenu)}

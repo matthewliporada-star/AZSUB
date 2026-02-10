@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useApp } from "../../context/AppContext";
 import supabase from "../../config/supabaseClient";
 import "./Style/Profile.css";
 import LogoImage from "../../assets/logo1.png";
 
 const AdminProfile = () => {
   const navigate = useNavigate();
+  const { darkMode, toggleDarkMode } = useApp();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  
+
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -25,7 +27,7 @@ const AdminProfile = () => {
     email: "",
     contact_number: "",
     Address: "",
-    civil_status: "" 
+    civil_status: ""
   });
 
   // Password Form State
@@ -166,6 +168,14 @@ const AdminProfile = () => {
         <div className="admin-header-content">
           <h1>Admin Profile</h1>
           <div className="admin-header-user">
+            <button
+              className="admin-dark-mode-toggle"
+              onClick={toggleDarkMode}
+              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '15px', fontSize: '18px', color: darkMode ? '#FFBD42' : '#64748b', transition: 'color 0.3s' }}
+            >
+              <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
+            </button>
             <button className="admin-user-profile-btn" onClick={() => setShowProfileMenu(!showProfileMenu)}>
               <div className="admin-user-avatar">
                 <span className="admin-avatar-initials">
@@ -224,22 +234,22 @@ const AdminProfile = () => {
               <div className="modal-title" style={{ padding: '22px 35px', borderBottom: '1px solid var(--border-color)', background: '#f7f9fc' }}>Update Profile Information</div>
               <form onSubmit={handleUpdate} className="profile-form modal-form">
                 <div className="form-grid">
-                  <input type="text" placeholder="First Name" value={formData.first_name} onChange={(e) => setFormData({...formData, first_name: e.target.value})} />
-                  <input type="text" placeholder="Last Name" value={formData.last_name} onChange={(e) => setFormData({...formData, last_name: e.target.value})} />
-                  <input type="text" placeholder="Middle Name" value={formData.Middle} onChange={(e) => setFormData({...formData, Middle: e.target.value})} />
-                  
-                  <select value={formData.gender} onChange={(e) => setFormData({...formData, gender: e.target.value})}>
+                  <input type="text" placeholder="First Name" value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })} />
+                  <input type="text" placeholder="Last Name" value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })} />
+                  <input type="text" placeholder="Middle Name" value={formData.Middle} onChange={(e) => setFormData({ ...formData, Middle: e.target.value })} />
+
+                  <select value={formData.gender} onChange={(e) => setFormData({ ...formData, gender: e.target.value })}>
                     <option value="">Select Gender</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                   </select>
 
-                  <input type="date" value={formData.birthday} onChange={(e) => setFormData({...formData, birthday: e.target.value})} />
-                  <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
-                  <input type="text" placeholder="Contact Number" value={formData.contact_number} onChange={(e) => setFormData({...formData, contact_number: e.target.value})} />
-                  <input type="text" placeholder="Address" value={formData.Address} onChange={(e) => setFormData({...formData, Address: e.target.value})} />
-                  
-                  <select value={formData.civil_status} onChange={(e) => setFormData({...formData, civil_status: e.target.value})}>
+                  <input type="date" value={formData.birthday} onChange={(e) => setFormData({ ...formData, birthday: e.target.value })} />
+                  <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                  <input type="text" placeholder="Contact Number" value={formData.contact_number} onChange={(e) => setFormData({ ...formData, contact_number: e.target.value })} />
+                  <input type="text" placeholder="Address" value={formData.Address} onChange={(e) => setFormData({ ...formData, Address: e.target.value })} />
+
+                  <select value={formData.civil_status} onChange={(e) => setFormData({ ...formData, civil_status: e.target.value })}>
                     <option value="">Select Civil Status</option>
                     <option value="Single">Single</option>
                     <option value="Married">Married</option>
@@ -267,33 +277,33 @@ const AdminProfile = () => {
                 <div className="password-form-stack">
                   <div className="input-group">
                     <label>Old Password</label>
-                    <input 
-                      type="password" 
-                      placeholder="Current password" 
-                      required 
+                    <input
+                      type="password"
+                      placeholder="Current password"
+                      required
                       value={passwordData.oldPassword}
-                      onChange={(e) => setPasswordData({...passwordData, oldPassword: e.target.value})}
+                      onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
                     />
                   </div>
                   <hr className="password-divider" />
                   <div className="input-group">
                     <label>New Password</label>
-                    <input 
-                      type="password" 
-                      placeholder="Minimum 6 characters" 
-                      required 
+                    <input
+                      type="password"
+                      placeholder="Minimum 6 characters"
+                      required
                       value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                     />
                   </div>
                   <div className="input-group">
                     <label>Confirm New Password</label>
-                    <input 
-                      type="password" 
-                      placeholder="Confirm new password" 
-                      required 
+                    <input
+                      type="password"
+                      placeholder="Confirm new password"
+                      required
                       value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                      onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                     />
                   </div>
                 </div>

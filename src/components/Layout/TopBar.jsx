@@ -5,7 +5,7 @@ import supabase from '../../config/supabaseClient';
 import './TopBar.css';
 
 const TopBar = () => {
-    const { isConnected, currentUser } = useApp();
+    const { isConnected, currentUser, darkMode, toggleDarkMode } = useApp();
     const location = useLocation();
     const navigate = useNavigate();
     const [showDropdown, setShowDropdown] = useState(false);
@@ -43,6 +43,23 @@ const TopBar = () => {
                         <div className={`connection-dot ${isConnected ? 'connected' : ''}`}></div>
                         <span>{isConnected ? 'Connected' : 'Not Connected'}</span>
                     </div>
+
+                    <button
+                        className="dark-mode-toggle"
+                        onClick={toggleDarkMode}
+                        title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: darkMode ? '#FFBD42' : '#64748b',
+                            fontSize: '18px',
+                            marginRight: '10px',
+                            transition: 'color 0.3s ease'
+                        }}
+                    >
+                        <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
+                    </button>
 
                     {isDashboardPage && (
                         <div className="profile-section" style={{ position: 'relative' }}>

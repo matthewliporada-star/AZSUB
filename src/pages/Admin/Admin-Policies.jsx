@@ -1,6 +1,7 @@
 // - Updated Actions Column (Text + Colors)
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useApp } from "../../context/AppContext";
 import supabase from "../../config/supabaseClient";
 import { logActivity } from "../../utils/logActivity";
 import "./Style/AdminLayout.css";
@@ -10,6 +11,7 @@ import { toTitleCase } from "../../utils/textUtils";
 
 const AdminPolicies = () => {
     const navigate = useNavigate();
+    const { darkMode, toggleDarkMode } = useApp();
     const [user, setUser] = useState(null);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -245,6 +247,14 @@ const AdminPolicies = () => {
                 <div className="admin-header-content">
                     <h1>Admin Dashboard</h1>
                     <div className="admin-header-user">
+                        <button
+                            className="admin-dark-mode-toggle"
+                            onClick={toggleDarkMode}
+                            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '15px', fontSize: '18px', color: darkMode ? '#FFBD42' : '#64748b', transition: 'color 0.3s' }}
+                        >
+                            <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
+                        </button>
                         <button className="admin-user-profile-btn" onClick={() => setShowProfileMenu(!showProfileMenu)}>
                             <div className="admin-user-avatar">
                                 <i className="fa-solid fa-user"></i>

@@ -221,3 +221,95 @@
 .password-toggle-btn:hover {
   color: #003781;
 }
+
+/* --- DARK MODE LOGIN --- */
+.login-dark-mode-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: #003781;
+  z-index: 100;
+  transition: color 0.3s;
+}
+
+body.dark-mode .login-dark-mode-toggle {
+  color: #FFBD42;
+}
+
+body.dark-mode .login-page {
+  background: radial-gradient(circle at top right, #1a1a1a 0%, #000 90%);
+}
+
+body.dark-mode .login-left-panel h2 {
+  color: #FFBD42;
+}
+
+body.dark-mode .login-left-panel p {
+  color: #e2e8f0;
+}
+
+body.dark-mode .login-right-panel {
+  background: #111;
+  color: #e2e8f0;
+  box-shadow: 0 12px 30px rgba(255, 189, 66, 0.05);
+}
+
+body.dark-mode .logo {
+  /* Optional: Brighten logo if needed, or rely on image */
+}
+
+body.dark-mode .description {
+  color: #94a3b8;
+}
+
+body.dark-mode .signin-prompt {
+  color: #FFBD42;
+}
+
+body.dark-mode .form-label {
+  color: #e2e8f0;
+}
+
+body.dark-mode .form-input {
+  background: #1a1a1a;
+  border-color: #333;
+  color: #fff;
+}
+
+body.dark-mode .form-input::placeholder {
+  color: #666;
+}
+
+body.dark-mode .form-input:focus {
+  border-color: #FFBD42;
+  box-shadow: 0 4px 12px rgba(255, 189, 66, 0.2);
+}
+
+body.dark-mode .signin-button {
+  background: #FFBD42;
+  color: #000;
+}
+
+body.dark-mode .signin-button:hover {
+  background: #ffc965;
+  box-shadow: 0 6px 16px rgba(255, 189, 66, 0.2);
+}
+
+body.dark-mode .password-toggle-btn {
+  color: #aaa;
+}
+
+body.dark-mode .password-toggle-btn:hover {
+  color: #FFBD42;
+}
+
+/* Error text in dark mode */
+body.dark-mode .error-text {
+  background-color: #3f1816;
+  border-left: 4px solid #e74c3c;
+  color: #ffcccc;
+}

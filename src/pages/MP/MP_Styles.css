@@ -25,7 +25,17 @@
     flex-direction: row;
     overflow-x: hidden;
     width: 100%;
+
     /* Fill viewport width */
+}
+
+body.dark-mode .mp-layout {
+    background-color: #1a1a1a !important;
+}
+
+body.dark-mode .mp-sidebar {
+    background-color: #252525 !important;
+    border-right: 1px solid #333 !important;
 }
 
 .mp-layout .app-layout-wrapper {
@@ -173,10 +183,27 @@
 }
 
 .mp-layout .sidebar-item.active {
-    background: var(--mp-secondary-color);
-    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    /* Lighter transparent blue */
+    color: #fbbf24;
+    /* Gold text */
     border-left: none;
-    /* Override old style */
+    font-weight: 700;
+}
+
+.mp-layout .sidebar-item.active .sidebar-icon {
+    background: #fbbf24;
+    /* Gold background for icon */
+    color: #003266;
+    /* Dark blue icon color */
+    border-radius: 8px;
+    width: 30px;
+    height: 30px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.mp-layout .sidebar-item.active span {
+    color: #fbbf24;
 }
 
 .mp-layout .sidebar-icon {
@@ -268,6 +295,9 @@
 /* USER PROFILE BUTTON */
 .mp-layout .mp-header-user {
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .mp-layout .mp-user-profile-btn {
@@ -521,13 +551,60 @@
 }
 
 .mp-layout .stat-card {
-    background: white;
+    background: linear-gradient(135deg, var(--mp-primary-color) 0%, var(--mp-secondary-color) 100%);
+    /* Sidebar Blue Gradient */
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    border-left: 4px solid;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-left: 4px solid transparent;
+    /* Default, overridden by specific classes */
     transition: all 0.3s ease;
     min-width: 0;
+    position: relative;
+    overflow: hidden;
+    /* Ensure gradient stays within border-radius */
+    color: white;
+}
+
+/* Specific Card Colors with Neon Glow */
+.mp-layout .card-blue-dark {
+    border-left-color: #3b82f6 !important;
+    box-shadow: -5px 0 15px -3px rgba(59, 130, 246, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.mp-layout .card-green {
+    border-left-color: #4ade80 !important;
+    box-shadow: -5px 0 15px -3px rgba(74, 222, 128, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.mp-layout .card-blue-medium {
+    border-left-color: #60a5fa !important;
+    box-shadow: -5px 0 15px -3px rgba(96, 165, 250, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.mp-layout .card-orange {
+    border-left-color: #fbbf24 !important;
+    box-shadow: -5px 0 15px -3px rgba(251, 191, 36, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.mp-layout .card-purple {
+    border-left-color: #c084fc !important;
+    box-shadow: -5px 0 15px -3px rgba(192, 132, 252, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.mp-layout .card-red {
+    border-left-color: #f87171 !important;
+    box-shadow: -5px 0 15px -3px rgba(248, 113, 113, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.mp-layout .card-teal {
+    border-left-color: #2dd4bf !important;
+    box-shadow: -5px 0 15px -3px rgba(45, 212, 191, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.mp-layout .card-dark {
+    border-left-color: #94a3b8 !important;
+    box-shadow: -5px 0 15px -3px rgba(148, 163, 184, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .mp-layout .stat-header {
@@ -540,7 +617,8 @@
 .mp-layout .stat-label {
     font-size: 13px;
     font-weight: 600;
-    color: #6c757d;
+    color: #e2e8f0;
+    /* Light text for dark background */
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -570,13 +648,15 @@
 .mp-layout .stat-value {
     font-size: 24px;
     font-weight: 700;
-    color: #2c3e50;
+    color: #ffffff;
+    /* White text for dark background */
     margin-bottom: 8px;
 }
 
 .mp-layout .stat-subtext {
     font-size: 12px;
-    color: #6c757d;
+    color: #cbd5e1;
+    /* Lighter gray for dark background */
 }
 
 /* --- CHARTS --- */
@@ -2146,6 +2226,124 @@
     border: 1px solid #f5c6cb;
 }
 
+/* MP Dark Mode Cards */
+/* STAT CARDS - FORCE YELLOW OVERRIDE on ALL color variants */
+body.dark-mode .dashboard-grid .stat-card,
+body.dark-mode .dashboard-grid .stat-card.card-blue-dark,
+body.dark-mode .dashboard-grid .stat-card.card-green,
+body.dark-mode .dashboard-grid .stat-card.card-blue-medium,
+body.dark-mode .dashboard-grid .stat-card.card-orange {
+    background-color: #FFBD42 !important;
+    background: #FFBD42 !important;
+    /* Override gradients */
+    border: 1px solid #FFBD42 !important;
+    color: #000000 !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Ensure text inside stat cards is black */
+body.dark-mode .stat-card .stat-label,
+body.dark-mode .stat-card .stat-value,
+body.dark-mode .stat-card .stat-subtext {
+    color: #000000 !important;
+}
+
+/* CHART CONTAINERS - GRAY */
+body.dark-mode .content-container,
+body.dark-mode .chart-container,
+body.dark-mode .container-body {
+    background-color: #252525 !important;
+    border: 1px solid #333 !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.dark-mode .chart-title,
+body.dark-mode .chart-subtitle,
+body.dark-mode .content-container h2,
+body.dark-mode .content-container h3,
+body.dark-mode .content-container h4,
+body.dark-mode .content-container p,
+body.dark-mode .content-container span,
+body.dark-mode .content-container div {
+    color: #e2e8f0 !important;
+}
+
+/* MP Tables Dark Mode */
+body.dark-mode .mp-al-table,
+body.dark-mode .performance-table {
+    background-color: #252525 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .mp-al-table th,
+body.dark-mode .performance-table th,
+body.dark-mode .mp-al-table td,
+body.dark-mode .performance-table td {
+    border-color: #333 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .mp-al-table thead th,
+body.dark-mode .performance-table thead th {
+    background-color: #1a1a1a !important;
+    color: #FFBD42 !important;
+    /* Gold headers */
+}
+
+body.dark-mode .mp-al-table tbody tr:hover,
+body.dark-mode .performance-table tbody tr:hover {
+    background-color: #333 !important;
+}
+
+body.dark-mode .mp-al-table tbody tr,
+body.dark-mode .performance-table tbody tr,
+body.dark-mode .mp-al-table tbody td,
+body.dark-mode .performance-table tbody td {
+    background-color: #252525 !important;
+    color: #e2e8f0 !important;
+}
+
+/* Container Header - Dark Mode */
+body.dark-mode .container-header {
+    background: linear-gradient(135deg, #252525 0%, #252525 100%) !important;
+    border-bottom: 1px solid #333 !important;
+    color: #e2e8f0 !important;
+}
+
+/* MP Filters - Dark Mode */
+body.dark-mode .mp-filters {
+    background-color: #252525 !important;
+    border: 1px solid #333 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .mp-filters label {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .mp-filter-select {
+    background-color: #1a1a1a !important;
+    border: 1px solid #444 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .container-header h2 {
+    color: #FFBD42 !important;
+}
+
+/* Sidebar Toggle - Dark Mode */
+body.dark-mode .mp-sidebar-toggle {
+    background-color: #FFBD42 !important;
+    border-color: #FFBD42 !important;
+    color: #000000 !important;
+}
+
+body.dark-mode .mp-sidebar-toggle:hover {
+    background-color: #e5a83b !important;
+    color: #000 !important;
+}
+
 /* Chart Tooltip Customization */
 .chartjs-tooltip {
     background: rgba(0, 0, 0, 0.8) !important;
@@ -2159,6 +2357,89 @@
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
+}
+
+/* =========================================
+   DARK MODE MODAL OVERRIDES
+   ========================================= */
+body.dark-mode .mp-modal-content {
+    background-color: #252525 !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.dark-mode .mp-modal-header {
+    border-bottom: 1px solid #333 !important;
+}
+
+body.dark-mode .mp-modal-header h2 {
+    color: #FFBD42 !important;
+    /* Gold Title */
+}
+
+body.dark-mode .mp-modal-header p {
+    color: #aaa !important;
+}
+
+body.dark-mode .mp-modal-close {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .mp-modal-close:hover {
+    color: #FFBD42 !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode .mp-modal-body {
+    color: #e2e8f0 !important;
+}
+
+/* Force Text Colors in Modal */
+body.dark-mode .mp-modal-body h3,
+body.dark-mode .mp-modal-body h4,
+body.dark-mode .mp-modal-body .stat-label,
+body.dark-mode .mp-modal-body strong,
+body.dark-mode .mp-modal-body b {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .mp-modal-body .stat-value {
+    color: #e2e8f0 !important;
+}
+
+/* Override Inline Styles for "Cards" inside Modal 
+   Targeting elements with the specific light gray background used inline
+*/
+body.dark-mode .mp-modal-body div[style*="#f8fafc"],
+body.dark-mode .mp-modal-body div[style*="background: #f8fafc"],
+body.dark-mode .mp-modal-body div[style*="background:#f8fafc"] {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+    border: 1px solid #333 !important;
+    color: #e2e8f0 !important;
+}
+
+/* Override Text Colors inside those cards */
+body.dark-mode .mp-modal-body div[style*="#0f172a"],
+body.dark-mode .mp-modal-body div[style*="color: #0f172a"] {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .mp-modal-body div[style*="#64748b"],
+body.dark-mode .mp-modal-body div[style*="color: #64748b"] {
+    color: #aaa !important;
+}
+
+/* Modal Tables */
+body.dark-mode .mp-modal-body table th {
+    background-color: #1a1a1a !important;
+    color: #FFBD42 !important;
+    border-bottom: 1px solid #333 !important;
+}
+
+body.dark-mode .mp-modal-body table td {
+    border-bottom: 1px solid #333 !important;
+    color: #e2e8f0 !important;
 }
 
 ::-webkit-scrollbar-track {
@@ -2558,4 +2839,72 @@
 .activity-dot.inactive {
     background: #dc3545;
     box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.3);
+}
+
+/* Hide scrollbar for modal body */
+.mp-modal-body::-webkit-scrollbar {
+    display: none;
+}
+
+.mp-modal-body {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+/* Hide scrollbar for modal content */
+.mp-modal-content::-webkit-scrollbar {
+    display: none;
+}
+
+.mp-modal-content {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+/* =========================================
+   DARK MODE SUMMARY CARD & BUTTONS
+   ========================================= */
+body.dark-mode .stats-summary-card {
+    background-color: #1a1a1a !important;
+    border: 1px solid #333 !important;
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .summary-label {
+    color: #e2e8f0 !important;
+    /* Light Gray Labels */
+}
+
+body.dark-mode .stat-current-value {
+    color: #ffffff !important;
+    /* White Current Value */
+}
+
+/* Allow Yearly Change to keep its inline color (Green/Red) 
+   unless overridden by specific need, but user asked for Green.
+   The inline style sets it correctly based on trend. 
+   We just need to ensure we DO NOT override it with white. 
+*/
+body.dark-mode .stat-yearly-change {
+    /* No color override here to respect inline style */
+    position: relative;
+    /* Ensure it has some property to avoid empty rule lint */
+}
+
+body.dark-mode .clear-filter-btn {
+    background-color: #dc3545 !important;
+    /* Red Close Button */
+    color: #ffffff !important;
+    border: 1px solid #c82333 !important;
+}
+
+body.dark-mode .clear-filter-btn:hover {
+    background-color: #c82333 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.5) !important;
 }

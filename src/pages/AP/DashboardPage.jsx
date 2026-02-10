@@ -240,19 +240,19 @@ const DashboardPage = () => {
 
             <div className="dashboard-grid">
                 {/* TOP ROW */}
-                <div className="stat-card blue">
+                <div className="stat-card blue animate-spring delay-1">
                     <div className="stat-header"><div className="stat-label">Total ANP</div></div>
                     <div className="stat-value">PHP {stats.totalANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                     <div className="stat-subtext">All-time annual premium</div>
                 </div>
 
-                <div className="stat-card green">
+                <div className="stat-card green animate-spring delay-2">
                     <div className="stat-header"><div className="stat-label">Monthly ANP</div></div>
                     <div className="stat-value">PHP {stats.monthlyANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                     <div className="stat-subtext">This Month</div>
                 </div>
 
-                <div className="stat-card purple">
+                <div className="stat-card purple animate-spring delay-3">
                     <div className="stat-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div className="stat-label">Historical ANP</div>
                         <select
@@ -276,7 +276,7 @@ const DashboardPage = () => {
                 </div>
 
                 <div
-                    className="stat-card"
+                    className="stat-card animate-spring delay-4"
                     style={{ borderLeft: '4px solid #0055b8', cursor: 'pointer', transition: 'transform 0.2s', backgroundColor: '#f0f7ff' }}
                     onClick={() => setShowCalendarModal(true)}
                 >
@@ -293,25 +293,25 @@ const DashboardPage = () => {
                 </div>
 
                 {/* BOTTOM ROW */}
-                <div className="stat-card orange">
+                <div className="stat-card orange animate-spring delay-5">
                     <div className="stat-header"><div className="stat-label">Submitted</div></div>
                     <div className="stat-value">{stats.submitted}</div>
                     <div className="stat-subtext">Applications</div>
                 </div>
 
-                <div className="stat-card purple">
+                <div className="stat-card purple animate-spring delay-1">
                     <div className="stat-header"><div className="stat-label">Issued</div></div>
                     <div className="stat-value">{stats.issued}</div>
                     <div className="stat-subtext">{stats.submitted ? ((stats.issued / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
                 </div>
 
-                <div className="stat-card teal">
+                <div className="stat-card teal animate-spring delay-2">
                     <div className="stat-header"><div className="stat-label">Pending</div></div>
                     <div className="stat-value">{stats.pending}</div>
                     <div className="stat-subtext">Awaiting Action</div>
                 </div>
 
-                <div className="stat-card red">
+                <div className="stat-card red animate-spring delay-3">
                     <div className="stat-header"><div className="stat-label">Declined</div></div>
                     <div className="stat-value">{stats.declined}</div>
                     <div className="stat-subtext">{stats.submitted ? ((stats.declined / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
@@ -319,13 +319,13 @@ const DashboardPage = () => {
             </div>
 
             <div className="charts-grid">
-                <div className="chart-container">
+                <div className="chart-container animate-spring delay-4">
                     <div className="chart-title">Status Distribution</div>
                     <div className="chart-wrapper">
                         <Doughnut data={statusData} options={{ responsive: true, maintainAspectRatio: false }} />
                     </div>
                 </div>
-                <div className="chart-container">
+                <div className="chart-container animate-spring delay-5">
                     <div className="chart-title">Most Availed Policies</div>
                     <div className="chart-wrapper">
                         {/* UPDATED: Applied new options to remove grid and decimals */}
@@ -334,7 +334,7 @@ const DashboardPage = () => {
                 </div>
             </div>
 
-            <div className="content-container">
+            <div className="content-container animate-spring delay-1">
                 <div style={{ marginBottom: '20px', borderBottom: '2px solid #f1f1f1', paddingBottom: '15px' }}>
                     <h2 style={{ fontSize: '20px', margin: 0 }}>Serial Number Usage</h2>
                 </div>

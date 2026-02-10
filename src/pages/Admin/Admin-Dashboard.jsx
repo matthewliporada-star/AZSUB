@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useApp } from "../../context/AppContext";
 import supabase from "../../config/supabaseClient";
 import "./Style/AdminLayout.css";
 import "./Style/Dashboard.css";
@@ -8,6 +9,7 @@ import ActivityLog from "../../components/ActivityLog";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { darkMode, toggleDarkMode } = useApp();
   const [totalUsers, setTotalUsers] = useState(0);
   const [user, setUser] = useState(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -148,6 +150,14 @@ const AdminDashboard = () => {
           <h1>Admin Dashboard</h1>
           <div className="admin-header-user">
             <button
+              className="admin-dark-mode-toggle"
+              onClick={toggleDarkMode}
+              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '15px', fontSize: '18px', color: darkMode ? '#FFBD42' : '#64748b', transition: 'color 0.3s' }}
+            >
+              <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
+            </button>
+            <button
               className="admin-user-profile-btn"
               onClick={() => setShowProfileMenu(!showProfileMenu)}
             >
@@ -202,7 +212,7 @@ const AdminDashboard = () => {
             <div className="admin-cards-grid" style={{ marginBottom: "24px" }}>
 
               {/* Total Users */}
-              <div className="admin-card">
+              <div className="admin-card animate-spring delay-1">
                 <div className="admin-card-icon user-icon">
                   <i className="fa-solid fa-user-group"></i>
                 </div>
@@ -221,7 +231,7 @@ const AdminDashboard = () => {
               </div>
 
               {/* New Serial Numbers */}
-              <div className="admin-card admin-serial-card">
+              <div className="admin-card admin-serial-card animate-spring delay-2">
                 <div className="admin-card-icon admin-serial-icon">
                   <i className="fa-solid fa-barcode"></i>
                   <div className="admin-icon-badge"></div>
@@ -246,7 +256,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* USER TABLE CONTAINER */}
-            <div className="content-container">
+            <div className="content-container animate-spring delay-3">
               <div className="container-header">
                 <h2>Users List</h2>
                 <button
@@ -294,20 +304,20 @@ const AdminDashboard = () => {
           </div>
 
           {/* RIGHT COLUMN: ACTIVITY LOG */}
-<div className="dashboard-right-col">
-  <div className="box-card">
-    <div className="box-header">
-      <div className="header-content">
-        <h2 className="box-title">Activity Log</h2>
-        <span className="box-badge">Recent</span>
-      </div>
-      <button className="box-action-btn">View All</button>
-    </div>
-    <div className="box-body">
-      <ActivityLog />
-    </div>
-  </div>
-</div>
+          <div className="dashboard-right-col">
+            <div className="box-card animate-spring delay-4">
+              <div className="box-header">
+                <div className="header-content">
+                  <h2 className="box-title">Activity Log</h2>
+                  <span className="box-badge">Recent</span>
+                </div>
+                <button className="box-action-btn">View All</button>
+              </div>
+              <div className="box-body">
+                <ActivityLog />
+              </div>
+            </div>
+          </div>
 
         </div>
       </main>

@@ -20,6 +20,9 @@ export const AppProvider = ({ children }) => {
     const [userRole, setUserRole] = useState(null);
     const [performanceData, setPerformanceData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [darkMode, setDarkMode] = useState(() => {
+        return localStorage.getItem('darkMode') === 'true';
+    });
 
     // Test connection and load user on mount
     useEffect(() => {
@@ -40,6 +43,20 @@ export const AppProvider = ({ children }) => {
             loadPerformanceData();
         }
     }, [currentUser]);
+
+    // Apply Dark Mode class to body
+    useEffect(() => {
+        if (darkMode) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+        localStorage.setItem('darkMode', darkMode);
+    }, [darkMode]);
+
+    const toggleDarkMode = () => {
+        setDarkMode(prev => !prev);
+    };
 
     const loadUser = async () => {
         try {
@@ -138,8 +155,10 @@ export const AppProvider = ({ children }) => {
         loadFormSubmissions,
         loadCustomers,
         loadPerformanceData,
-        testConnection,
-        loading
+        loading,
+        darkMode,
+        toggleDarkMode,
+        testConnection
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
