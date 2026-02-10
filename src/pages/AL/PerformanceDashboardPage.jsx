@@ -404,7 +404,7 @@ const PerformanceDashboardPage = () => {
                     gap: '20px'
                 }}>
                     <div
-                        className="stat-card"
+                        className="stat-card animate-spring delay-1"
                         style={{
                             borderLeft: '4px solid #f39c12',
                             backgroundColor: '#fff',
@@ -428,7 +428,7 @@ const PerformanceDashboardPage = () => {
                     </div>
 
                     <div
-                        className="stat-card"
+                        className="stat-card animate-spring delay-2"
                         style={{
                             borderLeft: '4px solid #28a745',
                             backgroundColor: '#fff',
@@ -452,7 +452,7 @@ const PerformanceDashboardPage = () => {
                     </div>
 
                     <div
-                        className="stat-card"
+                        className="stat-card animate-spring delay-3"
                         style={{
                             borderLeft: '4px solid #0055b8',
                             backgroundColor: '#fff',
@@ -476,7 +476,7 @@ const PerformanceDashboardPage = () => {
                     </div>
 
                     <div
-                        className="stat-card"
+                        className="stat-card animate-spring delay-4"
                         style={{
                             borderLeft: '4px solid #9b59b6',
                             backgroundColor: '#fff',
@@ -508,7 +508,7 @@ const PerformanceDashboardPage = () => {
                     gridTemplateColumns: '1fr 1fr',
                     gap: '24px'
                 }}>
-                    <div className="chart-container" style={{ border: 'none', boxShadow: 'none', background: 'transparent' }}>
+                    <div className="chart-container animate-spring delay-5" style={{ border: 'none', boxShadow: 'none', background: 'transparent' }}>
                         <div className="chart-title" style={{ paddingLeft: '0', fontSize: '16px', marginBottom: '16px' }}>Team Efficiency (Issued)</div>
                         <div className="chart-wrapper" style={{
                             position: 'relative',
@@ -537,7 +537,7 @@ const PerformanceDashboardPage = () => {
                         </div>
                     </div>
 
-                    <div className="chart-container" style={{ border: 'none', boxShadow: 'none', background: 'transparent' }}>
+                    <div className="chart-container animate-spring delay-1" style={{ border: 'none', boxShadow: 'none', background: 'transparent' }}>
                         <div className="chart-title" style={{ paddingLeft: '0', fontSize: '16px', marginBottom: '16px' }}>Policy Distribution</div>
                         <div className="chart-wrapper" style={{
                             height: '350px',
@@ -574,7 +574,7 @@ const PerformanceDashboardPage = () => {
                 </div>
 
                 {/* AP Performance Table */}
-                <div style={{
+                <div className="animate-spring delay-2" style={{
                     marginTop: '32px',
                     borderRadius: '12px',
                     overflow: 'hidden',

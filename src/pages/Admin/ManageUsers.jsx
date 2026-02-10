@@ -417,30 +417,30 @@ const ManageUsers = () => {
 
         {/* ROLE STATISTICS CARDS */}
         <div className="role-cards-grid">
-          <div className="role-card">
+          <div className="role-card animate-spring delay-1">
             <h3>AGENCY LEADERS (AL)</h3>
             <div className="count">{roleCounts.AL}</div>
           </div>
-          <div className="role-card">
+          <div className="role-card animate-spring delay-2">
             <h3>AGENCY PARTNERS (AP)</h3>
             <div className="count">{roleCounts.AP}</div>
           </div>
-          <div className="role-card">
+          <div className="role-card animate-spring delay-3">
             <h3>MANAGING DIRECTORS (MD)</h3>
             <div className="count">{roleCounts.MD}</div>
           </div>
-          <div className="role-card">
+          <div className="role-card animate-spring delay-4">
             <h3>MANAGEMENT PARTNERS (MP)</h3>
             <div className="count">{roleCounts.MP}</div>
           </div>
-          <div className="role-card">
+          <div className="role-card animate-spring delay-5">
             <h3>ADMINS</h3>
             <div className="count">{roleCounts.ADMIN}</div>
           </div>
         </div>
 
         {/* USERS TABLE CONTAINER */}
-        <div className="content-container">
+        <div className="content-container animate-spring delay-1">
           <div className="container-header">
             <h2>User Database ({showInactive ? "Inactive" : "Active"})</h2>
           </div>

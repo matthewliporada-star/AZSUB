@@ -509,7 +509,7 @@ const ALPerformance = () => {
             {/* Clickable Stat Cards with Hover Effect */}
             <div className="dashboard-grid">
                 <div
-                    className="stat-card hover-card"
+                    className="stat-card hover-card animate-spring delay-1"
                     style={{ borderLeft: '4px solid #003781', cursor: 'pointer' }}
                     onClick={() => handleStatCardClick('totalALs')}
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
@@ -521,7 +521,7 @@ const ALPerformance = () => {
                 </div>
 
                 <div
-                    className="stat-card hover-card"
+                    className="stat-card hover-card animate-spring delay-2"
                     style={{ borderLeft: '4px solid #28a745', cursor: 'pointer' }}
                     onClick={() => handleStatCardClick('performingALs')}
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
@@ -533,7 +533,7 @@ const ALPerformance = () => {
                 </div>
 
                 <div
-                    className="stat-card hover-card"
+                    className="stat-card hover-card animate-spring delay-3"
                     style={{ borderLeft: '4px solid #0055b8', cursor: 'pointer' }}
                     onClick={() => handleStatCardClick('totalANP')}
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
@@ -545,7 +545,7 @@ const ALPerformance = () => {
                 </div>
 
                 <div
-                    className="stat-card hover-card"
+                    className="stat-card hover-card animate-spring delay-4"
                     style={{ borderLeft: '4px solid #f39c12', cursor: 'pointer' }}
                     onClick={() => handleStatCardClick('totalCases')}
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
