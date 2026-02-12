@@ -2265,3 +2265,60 @@ body.dark-mode div[style*="background: white"][style*="padding: 30px"] h3 {
 body.dark-mode div[style*="background: white"][style*="padding: 30px"] p {
     color: #999 !important;
 }
+
+
+/* --- MODERN SERIAL TABLE STYLES --- */
+.ap-layout .serial-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: none;
+    margin-top: 10px;
+}
+
+.ap-layout .serial-table th,
+.ap-layout .serial-table td {
+    border: none !important;
+    padding: 16px 20px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.ap-layout .serial-table thead tr {
+    background: transparent !important;
+}
+
+.ap-layout .serial-table thead th {
+    background-color: transparent !important;
+    color: #94a3b8 !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.ap-layout .serial-table tbody tr {
+    transition: background-color 0.2s ease;
+    background-color: transparent !important;
+}
+
+.ap-layout .serial-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+.ap-layout .serial-table td {
+    color: #e2e8f0;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02) !important;
+}
+
+.ap-layout .serial-table tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+.ap-layout .serial-table td .status-badge {
+    box-shadow: none;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}

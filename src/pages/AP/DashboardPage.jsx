@@ -240,28 +240,56 @@ const DashboardPage = () => {
 
             <div className="dashboard-grid">
                 {/* TOP ROW */}
-                <div className="stat-card blue animate-spring delay-1">
-                    <div className="stat-header"><div className="stat-label">Total ANP</div></div>
-                    <div className="stat-value">PHP {stats.totalANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                    <div className="stat-subtext">All-time annual premium</div>
+                <div className="stat-card blue animate-spring delay-1" style={{
+                    background: darkMode ? 'linear-gradient(145deg, #1e293b, #0f172a)' : 'linear-gradient(145deg, #ffffff, #f1f5f9)',
+                    border: 'none',
+                    boxShadow: darkMode ? '0 10px 15px -3px rgba(0, 0, 0, 0.3)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
+                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: '#395998' }}>💰</div>
+                    <div className="stat-header"><div className="stat-label" style={{ color: darkMode ? '#94a3b8' : '#64748b', fontSize: '14px', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: '600' }}>Total ANP</div></div>
+                    <div className="stat-value" style={{ color: darkMode ? '#FFFDFE' : '#1e293b', fontSize: '28px', fontWeight: '800', margin: '10px 0' }}>PHP {stats.totalANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div className="stat-subtext" style={{ color: '#22c55e', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px' }}>
+                        <span>▲</span> All-time annual premium
+                    </div>
                 </div>
 
-                <div className="stat-card green animate-spring delay-2">
-                    <div className="stat-header"><div className="stat-label">Monthly ANP</div></div>
-                    <div className="stat-value">PHP {stats.monthlyANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                    <div className="stat-subtext">This Month</div>
+                <div className="stat-card green animate-spring delay-2" style={{
+                    background: darkMode ? 'linear-gradient(145deg, #1e293b, #0f172a)' : 'linear-gradient(145deg, #ffffff, #f1f5f9)',
+                    border: 'none',
+                    boxShadow: darkMode ? '0 10px 15px -3px rgba(0, 0, 0, 0.3)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
+                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: '#22c55e' }}>📅</div>
+                    <div className="stat-header"><div className="stat-label" style={{ color: darkMode ? '#94a3b8' : '#64748b', fontSize: '14px', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: '600' }}>Monthly ANP</div></div>
+                    <div className="stat-value" style={{ color: darkMode ? '#FFFDFE' : '#1e293b', fontSize: '28px', fontWeight: '800', margin: '10px 0' }}>PHP {stats.monthlyANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div className="stat-subtext" style={{ color: darkMode ? '#94a3b8' : '#64748b', fontSize: '13px' }}>This Month</div>
                 </div>
 
-                <div className="stat-card purple animate-spring delay-3">
-                    <div className="stat-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div className="stat-label">Historical ANP</div>
+                <div className="stat-card purple animate-spring delay-3" style={{
+                    background: 'linear-gradient(135deg, #395998 0%, #2a407c 100%)',
+                    border: 'none',
+                    boxShadow: '0 10px 15px -3px rgba(57, 89, 152, 0.3)',
+                    color: 'white'
+                }}>
+                    <div className="stat-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
+                        <div className="stat-label" style={{ whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.9)', fontSize: '14px', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: '600' }}>Historical ANP</div>
                         <select
                             value={selectedMonthKey}
                             onChange={(e) => setSelectedMonthKey(e.target.value)}
                             style={{
-                                padding: '2px 6px', fontSize: '11px', borderRadius: '4px',
-                                border: '1px solid rgba(0,0,0,0.1)', backgroundColor: 'rgba(255,255,255,0.2)',
-                                cursor: 'pointer', color: 'inherit', outline: 'none'
+                                padding: '4px 12px',
+                                fontSize: '12px',
+                                borderRadius: '20px',
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                backgroundColor: 'rgba(255,255,255,0.1)',
+                                color: 'white',
+                                cursor: 'pointer',
+                                outline: 'none',
+                                fontWeight: '600',
+                                backdropFilter: 'blur(5px)'
                             }}
                         >
                             {sortedMonthKeys.length > 0 ? (
@@ -271,72 +299,140 @@ const DashboardPage = () => {
                             )}
                         </select>
                     </div>
-                    <div className="stat-value">PHP {selectedMonthANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                    <div className="stat-subtext">{selectedMonthKey ? formatMonthKey(selectedMonthKey) : 'Select Month'}</div>
+                    <div className="stat-value" style={{ color: 'white', fontSize: '28px', fontWeight: '800', marginBottom: '5px' }}>PHP {selectedMonthANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div className="stat-subtext" style={{ color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>{selectedMonthKey ? formatMonthKey(selectedMonthKey) : 'Select Month'}</div>
                 </div>
 
                 <div
                     className="stat-card animate-spring delay-4"
-                    style={{ borderLeft: '4px solid #0055b8', cursor: 'pointer', transition: 'transform 0.2s', backgroundColor: '#f0f7ff' }}
+                    style={{
+                        background: darkMode ? 'linear-gradient(145deg, #1e293b, #0f172a)' : 'linear-gradient(145deg, #ffffff, #f1f5f9)',
+                        border: 'none',
+                        boxShadow: darkMode ? '0 10px 15px -3px rgba(0, 0, 0, 0.3)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                        cursor: 'pointer',
+                        transition: 'transform 0.2s',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center'
+                    }}
                     onClick={() => setShowCalendarModal(true)}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                 >
                     <div className="stat-header">
-                        <div className="stat-label" style={{ color: '#0055b8' }}>Tools</div>
+                        <div className="stat-label" style={{ color: '#395998', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Tools</div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                        <span style={{ fontSize: '32px' }}>📅</span>
+                        <div style={{ background: 'rgba(57, 89, 152, 0.1)', padding: '10px', borderRadius: '12px' }}>
+                            <span style={{ fontSize: '24px' }}>📅</span>
+                        </div>
                         <div>
-                            <div className="stat-value" style={{ fontSize: '18px', marginBottom: '0' }}>Calendar</div>
-                            <div className="stat-subtext">Schedule & Actions</div>
+                            <div className="stat-value" style={{ fontSize: '18px', marginBottom: '2px', color: darkMode ? '#FFFDFE' : '#2c3e50' }}>Calendar</div>
+                            <div className="stat-subtext" style={{ fontSize: '12px' }}>Schedule & Actions</div>
                         </div>
                     </div>
                 </div>
 
                 {/* BOTTOM ROW */}
-                <div className="stat-card orange animate-spring delay-5">
-                    <div className="stat-header"><div className="stat-label">Submitted</div></div>
-                    <div className="stat-value">{stats.submitted}</div>
-                    <div className="stat-subtext">Applications</div>
+                <div className="stat-card orange animate-spring delay-5" style={{
+                    background: darkMode ? 'linear-gradient(145deg, #1e293b, #0f172a)' : 'linear-gradient(145deg, #ffffff, #f1f5f9)',
+                    border: 'none',
+                    boxShadow: darkMode ? '0 10px 15px -3px rgba(0, 0, 0, 0.3)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
+                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: '#f59e0b' }}>📝</div>
+                    <div className="stat-header"><div className="stat-label" style={{ color: darkMode ? '#94a3b8' : '#64748b', fontSize: '14px', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: '600' }}>Submitted</div></div>
+                    <div className="stat-value" style={{ color: darkMode ? '#FFFDFE' : '#1e293b', fontSize: '28px', fontWeight: '800', margin: '10px 0' }}>{stats.submitted}</div>
+                    <div className="stat-subtext" style={{ color: darkMode ? '#94a3b8' : '#64748b', fontSize: '13px' }}>Applications</div>
                 </div>
 
-                <div className="stat-card purple animate-spring delay-1">
-                    <div className="stat-header"><div className="stat-label">Issued</div></div>
-                    <div className="stat-value">{stats.issued}</div>
-                    <div className="stat-subtext">{stats.submitted ? ((stats.issued / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
+                <div className="stat-card purple animate-spring delay-1" style={{
+                    background: darkMode ? 'linear-gradient(145deg, #1e293b, #0f172a)' : 'linear-gradient(145deg, #ffffff, #f1f5f9)',
+                    border: 'none',
+                    boxShadow: darkMode ? '0 10px 15px -3px rgba(0, 0, 0, 0.3)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
+                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: '#22c55e' }}>✓</div>
+                    <div className="stat-header"><div className="stat-label" style={{ color: darkMode ? '#94a3b8' : '#64748b', fontSize: '14px', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: '600' }}>Issued</div></div>
+                    <div className="stat-value" style={{ color: darkMode ? '#FFFDFE' : '#1e293b', fontSize: '28px', fontWeight: '800', margin: '10px 0' }}>{stats.issued}</div>
+                    <div className="stat-subtext" style={{ color: '#22c55e', fontSize: '13px' }}>{stats.submitted ? ((stats.issued / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
                 </div>
 
-                <div className="stat-card teal animate-spring delay-2">
-                    <div className="stat-header"><div className="stat-label">Pending</div></div>
-                    <div className="stat-value">{stats.pending}</div>
-                    <div className="stat-subtext">Awaiting Action</div>
+                <div className="stat-card teal animate-spring delay-2" style={{
+                    background: darkMode ? 'linear-gradient(145deg, #1e293b, #0f172a)' : 'linear-gradient(145deg, #ffffff, #f1f5f9)',
+                    border: 'none',
+                    boxShadow: darkMode ? '0 10px 15px -3px rgba(0, 0, 0, 0.3)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
+                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: '#eab308' }}>⏱</div>
+                    <div className="stat-header"><div className="stat-label" style={{ color: darkMode ? '#94a3b8' : '#64748b', fontSize: '14px', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: '600' }}>Pending</div></div>
+                    <div className="stat-value" style={{ color: darkMode ? '#FFFDFE' : '#1e293b', fontSize: '28px', fontWeight: '800', margin: '10px 0' }}>{stats.pending}</div>
+                    <div className="stat-subtext" style={{ color: '#eab308', fontSize: '13px' }}>Awaiting Action</div>
                 </div>
 
-                <div className="stat-card red animate-spring delay-3">
-                    <div className="stat-header"><div className="stat-label">Declined</div></div>
-                    <div className="stat-value">{stats.declined}</div>
-                    <div className="stat-subtext">{stats.submitted ? ((stats.declined / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
+                <div className="stat-card red animate-spring delay-3" style={{
+                    background: darkMode ? 'linear-gradient(145deg, #1e293b, #0f172a)' : 'linear-gradient(145deg, #ffffff, #f1f5f9)',
+                    border: 'none',
+                    boxShadow: darkMode ? '0 10px 15px -3px rgba(0, 0, 0, 0.3)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
+                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: '#ef4444' }}>✕</div>
+                    <div className="stat-header"><div className="stat-label" style={{ color: darkMode ? '#94a3b8' : '#64748b', fontSize: '14px', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: '600' }}>Declined</div></div>
+                    <div className="stat-value" style={{ color: darkMode ? '#FFFDFE' : '#1e293b', fontSize: '28px', fontWeight: '800', margin: '10px 0' }}>{stats.declined}</div>
+                    <div className="stat-subtext" style={{ color: '#ef4444', fontSize: '13px' }}>{stats.submitted ? ((stats.declined / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
                 </div>
             </div>
 
             <div className="charts-grid">
-                <div className="chart-container animate-spring delay-4">
-                    <div className="chart-title">Status Distribution</div>
+                <div className="chart-container animate-spring delay-4" style={{
+                    background: darkMode ? '#1e293b' : 'white',
+                    borderRadius: '16px',
+                    padding: '24px',
+                    boxShadow: darkMode ? '0 4px 6px -1px rgba(0, 0, 0, 0.3)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    border: darkMode ? '1px solid #334155' : '1px solid #e2e8f0'
+                }}>
+                    <div className="chart-title" style={{ color: darkMode ? '#e2e8f0' : '#1e293b', fontSize: '18px', fontWeight: '700', marginBottom: '20px' }}>Status Distribution</div>
                     <div className="chart-wrapper">
-                        <Doughnut data={statusData} options={{ responsive: true, maintainAspectRatio: false }} />
+                        <Doughnut data={statusData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: darkMode ? '#94a3b8' : '#64748b', font: { family: "'Inter', sans-serif" } } } } }} />
                     </div>
                 </div>
-                <div className="chart-container animate-spring delay-5">
-                    <div className="chart-title">Most Availed Policies</div>
+                <div className="chart-container animate-spring delay-5" style={{
+                    background: darkMode ? '#1e293b' : 'white',
+                    borderRadius: '16px',
+                    padding: '24px',
+                    boxShadow: darkMode ? '0 4px 6px -1px rgba(0, 0, 0, 0.3)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    border: darkMode ? '1px solid #334155' : '1px solid #e2e8f0'
+                }}>
+                    <div className="chart-title" style={{ color: darkMode ? '#e2e8f0' : '#1e293b', fontSize: '18px', fontWeight: '700', marginBottom: '20px' }}>Most Availed Policies</div>
                     <div className="chart-wrapper">
                         {/* UPDATED: Applied new options to remove grid and decimals */}
-                        <Bar data={policyData} options={barChartOptions} />
+                        <Bar data={policyData} options={{
+                            ...barChartOptions,
+                            plugins: { legend: { display: false }, tooltip: { backgroundColor: darkMode ? '#0f172a' : 'rgba(0,0,0,0.8)', titleColor: '#fff', bodyColor: '#fff' } },
+                            scales: {
+                                ...barChartOptions.scales,
+                                x: { ...barChartOptions.scales.x, ticks: { color: darkMode ? '#94a3b8' : '#64748b' } },
+                                y: { ...barChartOptions.scales.y, ticks: { ...barChartOptions.scales.y.ticks, color: darkMode ? '#94a3b8' : '#64748b' } }
+                            }
+                        }} />
                     </div>
                 </div>
             </div>
 
-            <div className="content-container animate-spring delay-1">
-                <div style={{ marginBottom: '20px', borderBottom: '2px solid #f1f1f1', paddingBottom: '15px' }}>
-                    <h2 style={{ fontSize: '20px', margin: 0 }}>Serial Number Usage</h2>
+            <div className="content-container animate-spring delay-1" style={{
+                background: darkMode ? '#1e293b' : 'white',
+                borderRadius: '16px',
+                padding: '24px',
+                marginTop: '30px',
+                boxShadow: darkMode ? '0 4px 6px -1px rgba(0, 0, 0, 0.3)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                border: darkMode ? 'none' : '1px solid #e2e8f0'
+            }}>
+                <div style={{ marginBottom: '20px' }}>
+                    <h2 style={{ fontSize: '20px', margin: 0, color: darkMode ? '#FFFDFE' : '#1e293b', fontWeight: '700' }}>Serial Number Usage</h2>
                 </div>
                 <div>
                     {/* PAGINATED TABLE */}
