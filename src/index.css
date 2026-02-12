@@ -162,7 +162,20 @@ body.dark-mode .ap-layout .sidebar-item:hover {
 
 .dark-mode td {
     border-bottom: 1px solid #222 !important;
-    color: #e2e8f0;
+    color: #e2e8f0 !important;
+}
+
+.dark-mode tbody tr {
+    background-color: #111 !important;
+    color: #e2e8f0 !important;
+}
+
+.dark-mode tbody tr:nth-child(even) {
+    background-color: #1a1a1a !important;
+}
+
+.dark-mode tbody tr:hover {
+    background-color: #252525 !important;
 }
 
 /* Buttons */

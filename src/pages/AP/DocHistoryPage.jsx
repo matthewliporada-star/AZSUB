@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext';
 import api from '../../services/api';
 
 const DocHistoryPage = () => {
-    const { monitoringData, loadMonitoringData, currentUser } = useApp();
+    const { monitoringData, loadMonitoringData, currentUser, darkMode } = useApp();
     const [statusFilter, setStatusFilter] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -62,9 +62,24 @@ const DocHistoryPage = () => {
     // Get status styling
     const getStatusStyle = (status) => {
         const styles = {
-            'Pending': { color: '#856404', bg: '#fff3cd', border: '#ffc107', icon: '⏱' },
-            'Issued': { color: '#155724', bg: '#d4edda', border: '#28a745', icon: '✓' },
-            'Declined': { color: '#721c24', bg: '#f8d7da', border: '#dc3545', icon: '✕' }
+            'Pending': {
+                color: darkMode ? '#000' : '#856404',
+                bg: darkMode ? '#FBD045' : '#fff3cd',
+                border: darkMode ? '#FBD045' : '#ffc107',
+                icon: '⏱'
+            },
+            'Issued': {
+                color: darkMode ? '#FFFDFE' : '#155724',
+                bg: darkMode ? '#395998' : '#d4edda',
+                border: darkMode ? '#395998' : '#28a745',
+                icon: '✓'
+            },
+            'Declined': {
+                color: darkMode ? '#FFFDFE' : '#721c24',
+                bg: darkMode ? '#E1942D' : '#f8d7da',
+                border: darkMode ? '#E1942D' : '#dc3545',
+                icon: '✕'
+            }
         };
         return styles[status] || styles['Pending'];
     };
@@ -82,8 +97,8 @@ const DocHistoryPage = () => {
             <div style={{ marginBottom: '20px', borderBottom: '2px solid #f1f1f1', paddingBottom: '15px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px' }}>
                     <div>
-                        <h2 style={{ margin: '0 0 8px 0' }}>Document Submission History</h2>
-                        <p style={{ margin: 0, fontSize: '14px', color: '#6c757d' }}>
+                        <h2 style={{ margin: '0 0 8px 0', color: darkMode ? '#FFFDFE' : 'inherit' }}>Document Submission History</h2>
+                        <p style={{ margin: 0, fontSize: '14px', color: darkMode ? '#cbd5e1' : '#6c757d' }}>
                             Review and manage all document submissions
                         </p>
                     </div>
@@ -96,13 +111,15 @@ const DocHistoryPage = () => {
                             style={{
                                 padding: '10px 15px',
                                 borderRadius: '8px',
-                                border: '2px solid #e9ecef',
+                                border: darkMode ? '2px solid #395998' : '2px solid #e9ecef',
                                 width: '280px',
                                 fontSize: '14px',
-                                transition: 'all 0.3s'
+                                transition: 'all 0.3s',
+                                background: darkMode ? '#1f2937' : 'white',
+                                color: darkMode ? '#FFFDFE' : '#333'
                             }}
-                            onFocus={(e) => e.target.style.borderColor = '#0055b8'}
-                            onBlur={(e) => e.target.style.borderColor = '#e9ecef'}
+                            onFocus={(e) => e.target.style.borderColor = '#395998'}
+                            onBlur={(e) => e.target.style.borderColor = darkMode ? '#395998' : '#e9ecef'}
                         />
                         <select
                             value={statusFilter}
@@ -110,12 +127,12 @@ const DocHistoryPage = () => {
                             style={{
                                 padding: '10px 15px',
                                 borderRadius: '8px',
-                                border: '2px solid #e9ecef',
+                                border: darkMode ? '2px solid #444' : '2px solid #e9ecef',
                                 fontSize: '14px',
                                 fontWeight: '600',
-                                color: '#495057',
+                                color: darkMode ? '#e2e8f0' : '#495057',
                                 cursor: 'pointer',
-                                background: 'white',
+                                background: darkMode ? '#2a2a2a' : 'white',
                                 minWidth: '160px'
                             }}
                         >
@@ -132,14 +149,14 @@ const DocHistoryPage = () => {
                     <div style={{
                         textAlign: 'center',
                         padding: '80px 20px',
-                        color: '#6c757d',
-                        background: '#f8f9fa',
+                        color: darkMode ? '#cbd5e1' : '#6c757d',
+                        background: darkMode ? '#1f2937' : '#f8f9fa',
                         borderRadius: '12px',
-                        border: '2px dashed #dee2e6'
+                        border: darkMode ? '2px dashed #E1942D' : '2px dashed #dee2e6'
                     }}>
                         <div style={{ fontSize: '48px', marginBottom: '15px' }}>📄</div>
-                        <h3 style={{ color: '#495057', marginBottom: '8px' }}>No submissions found</h3>
-                        <p style={{ margin: 0, fontSize: '14px' }}>
+                        <h3 style={{ color: darkMode ? '#FFFDFE' : '#495057', marginBottom: '8px' }}>No submissions found</h3>
+                        <p style={{ margin: 0, fontSize: '14px', color: darkMode ? '#cbd5e1' : 'inherit' }}>
                             {searchTerm || statusFilter !== 'All'
                                 ? 'Try adjusting your filters or search terms'
                                 : 'Document submissions will appear here once created'}
@@ -153,12 +170,12 @@ const DocHistoryPage = () => {
 
                                 return (
                                     <div key={item.id} style={{
-                                        background: 'white',
-                                        border: '2px solid #e9ecef',
+                                        background: darkMode ? '#1a1a1a' : 'white',
+                                        border: darkMode ? '2px solid #333' : '2px solid #e9ecef',
                                         borderRadius: '12px',
                                         padding: '24px',
                                         transition: 'all 0.3s',
-                                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                                        boxShadow: darkMode ? '0 4px 12px rgba(0,0,0,0.3)' : '0 2px 4px rgba(0,0,0,0.05)',
                                         borderLeft: `5px solid ${statusStyle.border}`
                                     }}
                                         onMouseEnter={(e) => {
@@ -182,7 +199,7 @@ const DocHistoryPage = () => {
                                                 <div style={{
                                                     fontSize: '20px',
                                                     fontWeight: '700',
-                                                    color: '#2c3e50',
+                                                    color: darkMode ? '#e2e8f0' : '#2c3e50',
                                                     marginBottom: '6px'
                                                 }}>
                                                     {item.client_name || `${item.client_first_name} ${item.client_last_name}`}
@@ -192,8 +209,8 @@ const DocHistoryPage = () => {
                                                     alignItems: 'center',
                                                     gap: '8px',
                                                     fontSize: '13px',
-                                                    color: '#6c757d',
-                                                    background: '#f8f9fa',
+                                                    color: darkMode ? '#cbd5e1' : '#6c757d',
+                                                    background: darkMode ? '#374151' : '#f8f9fa',
                                                     padding: '4px 12px',
                                                     borderRadius: '6px',
                                                     fontWeight: '500'
@@ -227,13 +244,13 @@ const DocHistoryPage = () => {
                                             marginBottom: item.status === 'Pending' ? '20px' : '0'
                                         }}>
                                             <div>
-                                                <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '6px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Serial Number</div>
+                                                <div style={{ fontSize: '12px', color: darkMode ? '#cbd5e1' : '#6c757d', marginBottom: '6px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Serial Number</div>
                                                 <div style={{
                                                     fontFamily: 'monospace',
                                                     fontWeight: '700',
                                                     fontSize: '15px',
-                                                    color: '#003781',
-                                                    background: '#e3f2fd',
+                                                    color: darkMode ? '#FFFDFE' : '#003781',
+                                                    background: darkMode ? '#395998' : '#e3f2fd',
                                                     padding: '8px 12px',
                                                     borderRadius: '6px',
                                                     display: 'inline-block'
@@ -242,12 +259,12 @@ const DocHistoryPage = () => {
                                                 </div>
                                             </div>
                                             <div>
-                                                <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '6px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Policy Type</div>
-                                                <div style={{ fontWeight: '600', fontSize: '15px', color: '#495057' }}>{item.policy_type}</div>
+                                                <div style={{ fontSize: '12px', color: darkMode ? '#cbd5e1' : '#6c757d', marginBottom: '6px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Policy Type</div>
+                                                <div style={{ fontWeight: '600', fontSize: '15px', color: darkMode ? '#FFFDFE' : '#495057' }}>{item.policy_type}</div>
                                             </div>
                                             <div>
-                                                <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '6px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Submission Date</div>
-                                                <div style={{ fontSize: '14px', color: '#495057' }}>
+                                                <div style={{ fontSize: '12px', color: darkMode ? '#cbd5e1' : '#6c757d', marginBottom: '6px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Submission Date</div>
+                                                <div style={{ fontSize: '14px', color: darkMode ? '#FFFDFE' : '#495057' }}>
                                                     {new Date(item.created_at).toLocaleDateString('en-US', {
                                                         year: 'numeric',
                                                         month: 'long',
@@ -256,24 +273,24 @@ const DocHistoryPage = () => {
                                                 </div>
                                             </div>
                                             <div>
-                                                <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '6px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Agency</div>
-                                                <div style={{ fontSize: '14px', color: '#495057', fontWeight: '500' }}>{item.agency || 'N/A'}</div>
+                                                <div style={{ fontSize: '12px', color: darkMode ? '#cbd5e1' : '#6c757d', marginBottom: '6px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Agency</div>
+                                                <div style={{ fontSize: '14px', color: darkMode ? '#FFFDFE' : '#495057', fontWeight: '500' }}>{item.agency || 'N/A'}</div>
                                             </div>
                                             <div>
-                                                <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '6px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Form Type</div>
+                                                <div style={{ fontSize: '12px', color: darkMode ? '#cbd5e1' : '#6c757d', marginBottom: '6px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Form Type</div>
                                                 <div style={{
                                                     fontSize: '14px',
                                                     fontWeight: '700',
-                                                    color: '#0055b8',
-                                                    background: '#e3f2fd',
+                                                    color: darkMode ? '#FFFDFE' : '#0055b8',
+                                                    background: darkMode ? '#395998' : '#e3f2fd',
                                                     padding: '4px 10px',
                                                     borderRadius: '6px',
                                                     display: 'inline-block'
                                                 }}>{item.form_type}</div>
                                             </div>
                                             <div>
-                                                <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '6px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Payment Mode</div>
-                                                <div style={{ fontSize: '14px', color: '#495057' }}>{item.mode_of_payment || 'N/A'}</div>
+                                                <div style={{ fontSize: '12px', color: darkMode ? '#cbd5e1' : '#6c757d', marginBottom: '6px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Payment Mode</div>
+                                                <div style={{ fontSize: '14px', color: darkMode ? '#FFFDFE' : '#495057' }}>{item.mode_of_payment || 'N/A'}</div>
                                             </div>
                                         </div>
 
@@ -361,10 +378,10 @@ const DocHistoryPage = () => {
                                 alignItems: 'center',
                                 marginTop: '30px',
                                 padding: '20px',
-                                background: '#f8f9fa',
+                                background: darkMode ? '#1f2937' : '#f8f9fa',
                                 borderRadius: '10px'
                             }}>
-                                <div style={{ fontSize: '14px', color: '#6c757d', fontWeight: 500 }}>
+                                <div style={{ fontSize: '14px', color: darkMode ? '#cbd5e1' : '#6c757d', fontWeight: 500 }}>
                                     Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, submissions.length)} of {submissions.length} submissions
                                 </div>
 
@@ -374,15 +391,19 @@ const DocHistoryPage = () => {
                                         disabled={currentPage === 1}
                                         style={{
                                             padding: '10px 20px',
-                                            backgroundColor: currentPage === 1 ? '#e9ecef' : '#0055b8',
-                                            color: currentPage === 1 ? '#adb5bd' : 'white',
-                                            border: 'none',
+                                            backgroundColor: currentPage === 1 ? (darkMode ? '#2a2a2a' : '#e9ecef') : '#395998',
+                                            color: currentPage === 1 ? (darkMode ? '#666' : '#adb5bd') : '#FFFDFE',
+                                            border: darkMode ? '1px solid #444' : 'none',
                                             borderRadius: '8px',
                                             cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
                                             fontWeight: 600,
                                             fontSize: '14px',
                                             transition: 'all 0.3s',
-                                            boxShadow: currentPage === 1 ? 'none' : '0 2px 4px rgba(0,85,184,0.2)'
+                                            boxShadow: currentPage === 1 ? 'none' : '0 2px 4px rgba(0,85,184,0.2)',
+                                            width: '140px',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
                                         }}
                                         onMouseEnter={(e) => {
                                             if (currentPage !== 1) {
@@ -402,12 +423,12 @@ const DocHistoryPage = () => {
 
                                     <div style={{
                                         padding: '10px 20px',
-                                        background: 'white',
+                                        background: darkMode ? '#1a1a1a' : 'white',
                                         borderRadius: '8px',
                                         fontSize: '14px',
                                         fontWeight: '700',
-                                        color: '#0055b8',
-                                        border: '2px solid #0055b8',
+                                        color: darkMode ? '#395998' : '#0055b8',
+                                        border: darkMode ? '2px solid #395998' : '2px solid #0055b8',
                                         minWidth: '120px',
                                         textAlign: 'center'
                                     }}>
@@ -419,15 +440,19 @@ const DocHistoryPage = () => {
                                         disabled={currentPage === totalPages}
                                         style={{
                                             padding: '10px 20px',
-                                            backgroundColor: currentPage === totalPages ? '#e9ecef' : '#0055b8',
-                                            color: currentPage === totalPages ? '#adb5bd' : 'white',
-                                            border: 'none',
+                                            backgroundColor: currentPage === totalPages ? (darkMode ? '#2a2a2a' : '#e9ecef') : '#395998',
+                                            color: currentPage === totalPages ? (darkMode ? '#666' : '#adb5bd') : '#FFFDFE',
+                                            border: darkMode ? '1px solid #444' : 'none',
                                             borderRadius: '8px',
                                             cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
                                             fontWeight: 600,
                                             fontSize: '14px',
                                             transition: 'all 0.3s',
-                                            boxShadow: currentPage === totalPages ? 'none' : '0 2px 4px rgba(0,85,184,0.2)'
+                                            boxShadow: currentPage === totalPages ? 'none' : '0 2px 4px rgba(0,85,184,0.2)',
+                                            width: '140px',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
                                         }}
                                         onMouseEnter={(e) => {
                                             if (currentPage !== totalPages) {

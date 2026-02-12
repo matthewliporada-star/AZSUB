@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 
 const SerialHistoryPage = () => {
-    const { monitoringData, loadMonitoringData, currentUser } = useApp();
+    const { monitoringData, loadMonitoringData, currentUser, darkMode } = useApp();
     const [searchTerm, setSearchTerm] = useState('');
 
     // --- PAGINATION STATE ---
@@ -41,10 +41,10 @@ const SerialHistoryPage = () => {
     // Get status badge styling
     const getStatusBadge = (item) => {
         if (item.form_type) {
-            return { text: 'Submitted', color: '#28a745', bg: '#d4edda' };
+            return { text: 'Submitted', color: darkMode ? '#FFFDFE' : '#28a745', bg: darkMode ? '#395998' : '#d4edda' };
         }
         // [UPDATE] Changed text from 'Pending Docs' to 'Serial Generated'
-        return { text: 'Serial Generated', color: '#856404', bg: '#fff3cd' };
+        return { text: 'Serial Generated', color: darkMode ? '#000' : '#856404', bg: darkMode ? '#FBD045' : '#fff3cd' };
     };
 
     return (
@@ -52,8 +52,8 @@ const SerialHistoryPage = () => {
             <div style={{ marginBottom: '20px', borderBottom: '2px solid #f1f1f1', paddingBottom: '15px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
                     <div>
-                        <h2 style={{ margin: '0 0 5px 0' }}>Serial Request History</h2>
-                        <p style={{ margin: 0, fontSize: '14px', color: '#6c757d' }}>
+                        <h2 style={{ margin: '0 0 5px 0', color: darkMode ? '#FFFDFE' : 'inherit' }}>Serial Request History</h2>
+                        <p style={{ margin: 0, fontSize: '14px', color: darkMode ? '#cbd5e1' : '#6c757d' }}>
                             Track all serial number requests and their submission status
                         </p>
                     </div>
@@ -67,10 +67,12 @@ const SerialHistoryPage = () => {
                                 style={{
                                     padding: '10px 15px 10px 40px',
                                     borderRadius: '8px',
-                                    border: '2px solid #e9ecef',
+                                    border: darkMode ? '2px solid #395998' : '2px solid #e9ecef',
                                     width: '280px',
                                     fontSize: '14px',
-                                    transition: 'all 0.3s'
+                                    transition: 'all 0.3s',
+                                    background: darkMode ? '#1f2937' : 'white',
+                                    color: darkMode ? '#FFFDFE' : '#333'
                                 }}
                                 onFocus={(e) => e.target.style.borderColor = '#0055b8'}
                                 onBlur={(e) => e.target.style.borderColor = '#e9ecef'}
@@ -94,14 +96,14 @@ const SerialHistoryPage = () => {
                     <div style={{
                         textAlign: 'center',
                         padding: '80px 20px',
-                        color: '#6c757d',
-                        background: '#f8f9fa',
+                        color: darkMode ? '#cbd5e1' : '#6c757d',
+                        background: darkMode ? '#1f2937' : '#f8f9fa',
                         borderRadius: '12px',
-                        border: '2px dashed #dee2e6'
+                        border: darkMode ? '2px dashed #E1942D' : '2px dashed #dee2e6'
                     }}>
                         <div style={{ fontSize: '48px', marginBottom: '15px' }}>📋</div>
-                        <h3 style={{ color: '#495057', marginBottom: '8px' }}>No serial requests found</h3>
-                        <p style={{ margin: 0, fontSize: '14px' }}>
+                        <h3 style={{ color: darkMode ? '#FFFDFE' : '#495057', marginBottom: '8px' }}>No serial requests found</h3>
+                        <p style={{ margin: 0, fontSize: '14px', color: darkMode ? '#cbd5e1' : 'inherit' }}>
                             {searchTerm ? 'Try adjusting your search terms' : 'Serial requests will appear here once created'}
                         </p>
                     </div>
@@ -127,9 +129,9 @@ const SerialHistoryPage = () => {
                                                     <div style={{
                                                         fontFamily: 'monospace',
                                                         fontWeight: 700,
-                                                        color: '#003781',
+                                                        color: darkMode ? '#FFFDFE' : '#003781',
                                                         fontSize: '15px',
-                                                        background: '#e3f2fd',
+                                                        background: darkMode ? '#395998' : '#e3f2fd',
                                                         padding: '6px 10px',
                                                         borderRadius: '6px',
                                                         display: 'inline-block'
@@ -138,17 +140,17 @@ const SerialHistoryPage = () => {
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div style={{ fontWeight: 600, color: '#2c3e50', marginBottom: '2px' }}>
+                                                    <div style={{ fontWeight: 600, color: darkMode ? '#FFFDFE' : '#2c3e50', marginBottom: '2px' }}>
                                                         {item.client_name || `${item.client_first_name} ${item.client_last_name}`}
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div style={{ color: '#495057' }}>
+                                                    <div style={{ color: darkMode ? '#FFFDFE' : '#495057' }}>
                                                         {item.policy_type}
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div style={{ fontSize: '14px', color: '#6c757d' }}>
+                                                    <div style={{ fontSize: '14px', color: darkMode ? '#cbd5e1' : '#6c757d' }}>
                                                         {new Date(item.created_at).toLocaleDateString('en-US', {
                                                             year: 'numeric',
                                                             month: 'short',
@@ -190,10 +192,10 @@ const SerialHistoryPage = () => {
                                 alignItems: 'center',
                                 marginTop: '30px',
                                 padding: '20px',
-                                background: '#f8f9fa',
+                                background: darkMode ? '#2a2a2a' : '#f8f9fa',
                                 borderRadius: '10px'
                             }}>
-                                <div style={{ fontSize: '14px', color: '#6c757d', fontWeight: 500 }}>
+                                <div style={{ fontSize: '14px', color: darkMode ? '#999' : '#6c757d', fontWeight: 500 }}>
                                     Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredItems.length)} of {filteredItems.length} requests
                                 </div>
 
@@ -203,15 +205,19 @@ const SerialHistoryPage = () => {
                                         disabled={currentPage === 1}
                                         style={{
                                             padding: '10px 20px',
-                                            backgroundColor: currentPage === 1 ? '#e9ecef' : '#0055b8',
-                                            color: currentPage === 1 ? '#adb5bd' : 'white',
-                                            border: 'none',
+                                            backgroundColor: currentPage === 1 ? (darkMode ? '#2a2a2a' : '#e9ecef') : '#395998',
+                                            color: currentPage === 1 ? (darkMode ? '#666' : '#adb5bd') : '#FFFDFE',
+                                            border: darkMode ? '1px solid #444' : 'none',
                                             borderRadius: '8px',
                                             cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
                                             fontWeight: 600,
                                             fontSize: '14px',
                                             transition: 'all 0.3s',
-                                            boxShadow: currentPage === 1 ? 'none' : '0 2px 4px rgba(0,85,184,0.2)'
+                                            boxShadow: currentPage === 1 ? 'none' : '0 2px 4px rgba(0,85,184,0.2)',
+                                            width: '140px',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
                                         }}
                                         onMouseEnter={(e) => {
                                             if (currentPage !== 1) {
@@ -221,7 +227,7 @@ const SerialHistoryPage = () => {
                                         }}
                                         onMouseLeave={(e) => {
                                             if (currentPage !== 1) {
-                                                e.target.style.backgroundColor = '#0055b8';
+                                                e.target.style.backgroundColor = '#395998';
                                                 e.target.style.transform = 'translateY(0)';
                                             }
                                         }}
@@ -231,14 +237,17 @@ const SerialHistoryPage = () => {
 
                                     <div style={{
                                         padding: '10px 20px',
-                                        background: 'white',
+                                        background: darkMode ? '#1a1a1a' : 'white',
                                         borderRadius: '8px',
                                         fontSize: '14px',
                                         fontWeight: '700',
-                                        color: '#0055b8',
-                                        border: '2px solid #0055b8',
-                                        minWidth: '120px',
-                                        textAlign: 'center'
+                                        color: darkMode ? '#395998' : '#0055b8',
+                                        border: darkMode ? '2px solid #395998' : '2px solid #0055b8',
+                                        textAlign: 'center',
+                                        width: '140px',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
                                     }}>
                                         Page {currentPage} of {totalPages}
                                     </div>
@@ -248,15 +257,19 @@ const SerialHistoryPage = () => {
                                         disabled={currentPage === totalPages}
                                         style={{
                                             padding: '10px 20px',
-                                            backgroundColor: currentPage === totalPages ? '#e9ecef' : '#0055b8',
-                                            color: currentPage === totalPages ? '#adb5bd' : 'white',
-                                            border: 'none',
+                                            backgroundColor: currentPage === totalPages ? (darkMode ? '#2a2a2a' : '#e9ecef') : '#395998',
+                                            color: currentPage === totalPages ? (darkMode ? '#666' : '#adb5bd') : '#FFFDFE',
+                                            border: darkMode ? '1px solid #444' : 'none',
                                             borderRadius: '8px',
                                             cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
                                             fontWeight: 600,
                                             fontSize: '14px',
                                             transition: 'all 0.3s',
-                                            boxShadow: currentPage === totalPages ? 'none' : '0 2px 4px rgba(0,85,184,0.2)'
+                                            boxShadow: currentPage === totalPages ? 'none' : '0 2px 4px rgba(0,85,184,0.2)',
+                                            width: '140px',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
                                         }}
                                         onMouseEnter={(e) => {
                                             if (currentPage !== totalPages) {
@@ -266,7 +279,7 @@ const SerialHistoryPage = () => {
                                         }}
                                         onMouseLeave={(e) => {
                                             if (currentPage !== totalPages) {
-                                                e.target.style.backgroundColor = '#0055b8';
+                                                e.target.style.backgroundColor = '#395998';
                                                 e.target.style.transform = 'translateY(0)';
                                             }
                                         }}

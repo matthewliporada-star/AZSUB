@@ -6,7 +6,7 @@ import api from '../../services/api';
 
 const ClientsPage = () => {
     // Alias customers to clients for consistency
-    const { customers: clients, loadCustomers: loadClients } = useApp();
+    const { customers: clients, loadCustomers: loadClients, darkMode } = useApp();
     const [searchQuery, setSearchQuery] = useState('');
     const [groupedPolicies, setGroupedPolicies] = useState({});
     const [isLoading, setIsLoading] = useState(false);
@@ -179,12 +179,12 @@ const ClientsPage = () => {
     // --- STYLES ---
     const styles = {
         card: {
-            background: 'white',
+            background: darkMode ? '#1a1a1a' : 'white',
             borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+            boxShadow: darkMode ? '0 4px 12px rgba(0,0,0,0.3)' : '0 4px 12px rgba(0,0,0,0.08)',
             padding: '25px',
             margin: '20px',
-            border: '1px solid #e0e0e0'
+            border: darkMode ? '1px solid #333' : '1px solid #e0e0e0'
         },
         headerRow: {
             display: 'flex',
@@ -197,7 +197,7 @@ const ClientsPage = () => {
         title: {
             fontSize: '22px',
             fontWeight: '700',
-            color: '#2c3e50',
+            color: darkMode ? '#FFFDFE' : '#2c3e50',
             margin: 0,
             whiteSpace: 'nowrap'
         },
@@ -222,7 +222,8 @@ const ClientsPage = () => {
             display: 'flex', gap: '10px', marginBottom: '20px'
         },
         searchInput: {
-            flex: 1, padding: '12px 15px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '14px'
+            flex: 1, padding: '12px 15px', borderRadius: '6px', border: darkMode ? '1px solid #395998' : '1px solid #ddd', fontSize: '14px',
+            background: darkMode ? '#1f2937' : 'white', color: darkMode ? '#FFFDFE' : '#333'
         },
         searchBtn: {
             backgroundColor: '#003266', color: 'white', border: 'none', padding: '10px 25px',
@@ -230,13 +231,13 @@ const ClientsPage = () => {
         },
         monthContainer: {
             marginBottom: '30px',
-            border: '1px solid #e0e0e0',
+            border: darkMode ? '1px solid #333' : '1px solid #e0e0e0',
             borderRadius: '8px',
             overflow: 'hidden',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.03)'
+            boxShadow: darkMode ? '0 2px 5px rgba(0,0,0,0.2)' : '0 2px 5px rgba(0,0,0,0.03)'
         },
         monthHeader: {
-            backgroundColor: '#004481',
+            backgroundColor: darkMode ? '#395998' : '#004481',
             color: 'white',
             padding: '15px 20px',
             display: 'flex',
@@ -252,16 +253,18 @@ const ClientsPage = () => {
         },
         badgeTotal: { backgroundColor: 'rgba(255,255,255,0.2)', color: 'white' },
         badgeDue: { backgroundColor: '#ecd266', color: '#333' },
-        
+
         table: {
             width: '100%', borderCollapse: 'collapse', fontSize: '14px'
         },
         th: {
-            textAlign: 'left', padding: '14px 20px', borderBottom: '1px solid #eee', color: '#666',
-            backgroundColor: '#f8f9fa', fontWeight: '600'
+            textAlign: 'left', padding: '14px 20px', borderBottom: darkMode ? '1px solid #444' : '1px solid #eee',
+            color: darkMode ? '#FBD045' : '#666',
+            backgroundColor: darkMode ? '#1f2937' : '#f8f9fa', fontWeight: '600'
         },
         td: {
-            padding: '14px 20px', borderBottom: '1px solid #eee', verticalAlign: 'middle', color: '#333'
+            padding: '14px 20px', borderBottom: darkMode ? '1px solid #333' : '1px solid #eee',
+            verticalAlign: 'middle', color: darkMode ? '#FFFDFE' : '#333'
         },
         viewBtn: {
             backgroundColor: '#007bff', color: 'white', border: 'none', padding: '6px 14px',
@@ -281,7 +284,7 @@ const ClientsPage = () => {
         <div style={styles.card}>
             <div style={styles.headerRow}>
                 <h2 style={styles.title}>Client Payment Board</h2>
-                
+
                 <div style={styles.controls}>
                     <label style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', whiteSpace: 'nowrap', fontWeight: '500' }}>
                         <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
@@ -301,9 +304,9 @@ const ClientsPage = () => {
                     <select
                         value={selectedYear}
                         onChange={(e) => setSelectedYear(e.target.value)}
-                        style={{ 
-                            padding: '8px 12px', 
-                            borderRadius: '6px', 
+                        style={{
+                            padding: '8px 12px',
+                            borderRadius: '6px',
                             border: '1px solid #ced4da',
                             cursor: 'pointer',
                             fontSize: '13px'
@@ -326,10 +329,10 @@ const ClientsPage = () => {
                 <button style={styles.searchBtn}>SEARCH</button>
             </div>
 
-            {isLoading ? <div style={{textAlign:'center', padding: '40px', color: '#666'}}>Loading Payment Data...</div> : Object.keys(groupedPolicies).length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '60px', color: '#888', background: '#f9f9f9', borderRadius: '8px' }}>
-                    <h3>No scheduled payments found.</h3>
-                    <p>Try changing the year filter or ensure policies have an "Issued" status.</p>
+            {isLoading ? <div style={{ textAlign: 'center', padding: '40px', color: darkMode ? '#cbd5e1' : '#666' }}>Loading Payment Data...</div> : Object.keys(groupedPolicies).length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '60px', color: darkMode ? '#cbd5e1' : '#888', background: darkMode ? '#1f2937' : '#f9f9f9', borderRadius: '8px', border: darkMode ? '2px dashed #E1942D' : 'none' }}>
+                    <h3 style={{ color: darkMode ? '#FFFDFE' : 'inherit' }}>No scheduled payments found.</h3>
+                    <p style={{ color: darkMode ? '#cbd5e1' : 'inherit' }}>Try changing the year filter or ensure policies have an "Issued" status.</p>
                 </div>
             ) : (
                 Object.entries(groupedPolicies)
@@ -345,21 +348,21 @@ const ClientsPage = () => {
                                     <div>
                                         <span style={{ ...styles.badge, ...styles.badgeTotal }}>Total: {items.length}</span>
                                         {overdueCount > 0 && (
-                                            <span style={{ ...styles.badge, backgroundColor: '#dc3545', color: 'white' }}>Overdue: {overdueCount}</span>
+                                            <span style={{ ...styles.badge, backgroundColor: '#E1942D', color: 'white' }}>Overdue: {overdueCount}</span>
                                         )}
                                         <span style={{ ...styles.badge, ...styles.badgeDue }}>Due: {items.length - overdueCount}</span>
                                     </div>
                                 </div>
 
-                                <div style={{overflowX: 'auto'}}>
+                                <div style={{ overflowX: 'auto' }}>
                                     <table style={styles.table}>
                                         <thead>
                                             <tr>
-                                                <th style={{...styles.th, width: '25%'}}>Client Name</th>
-                                                <th style={{...styles.th, width: '15%'}}>Policy Type</th>
-                                                <th style={{...styles.th, width: '15%'}}>Due Date</th>
-                                                <th style={{...styles.th, width: '15%'}}>Premium</th>
-                                                <th style={{...styles.th, width: '10%'}}>Status</th>
+                                                <th style={{ ...styles.th, width: '25%' }}>Client Name</th>
+                                                <th style={{ ...styles.th, width: '15%' }}>Policy Type</th>
+                                                <th style={{ ...styles.th, width: '15%' }}>Due Date</th>
+                                                <th style={{ ...styles.th, width: '15%' }}>Premium</th>
+                                                <th style={{ ...styles.th, width: '10%' }}>Status</th>
                                                 <th style={{ ...styles.th, textAlign: 'center', width: '10%' }}>View</th>
                                                 <th style={{ ...styles.th, textAlign: 'center', width: '10%' }}>Action</th>
                                             </tr>
@@ -373,16 +376,16 @@ const ClientsPage = () => {
                                                 return (
                                                     <tr key={p.id || idx}>
                                                         <td style={styles.td}>
-                                                            <div style={{fontWeight: 'bold', color: '#2c3e50'}}>{p.clientName}</div>
-                                                            <div style={{ fontSize: '11px', color: '#888' }}>{p.clientEmail}</div>
+                                                            <div style={{ fontWeight: 'bold', color: darkMode ? '#FFFDFE' : '#2c3e50' }}>{p.clientName}</div>
+                                                            <div style={{ fontSize: '11px', color: darkMode ? '#cbd5e1' : '#888' }}>{p.clientEmail}</div>
                                                         </td>
                                                         <td style={styles.td}>{p.policy_type}</td>
                                                         <td style={styles.td}>{displayDate}</td>
                                                         <td style={styles.td}>PHP {parseFloat(p.premium_paid).toLocaleString()}</td>
                                                         <td style={styles.td}>
-                                                            {isOver ? 
-                                                                <span style={{color:'#dc3545', fontWeight:'bold', background: '#ffebeb', padding: '2px 8px', borderRadius: '4px', fontSize: '12px'}}>OVERDUE</span> : 
-                                                                <span style={{color:'#f39c12', fontWeight:'bold'}}>Upcoming</span>
+                                                            {isOver ?
+                                                                <span style={{ color: '#fff', fontWeight: 'bold', background: '#E1942D', padding: '4px 10px', borderRadius: '4px', fontSize: '12px' }}>OVERDUE</span> :
+                                                                <span style={{ color: darkMode ? '#FBD045' : '#f39c12', fontWeight: 'bold' }}>Upcoming</span>
                                                             }
                                                         </td>
                                                         <td style={{ ...styles.td, textAlign: 'center' }}>
@@ -421,25 +424,25 @@ const ClientsPage = () => {
                 }}>
                     <div className="modal-content" style={{
                         maxWidth: '600px', width: '100%', margin: '20px',
-                        maxHeight: '90vh', overflowY: 'auto', backgroundColor: 'white',
+                        maxHeight: '90vh', overflowY: 'auto', backgroundColor: darkMode ? '#1a1a1a' : 'white',
                         borderRadius: '12px', padding: '0', position: 'relative'
                     }} onClick={(e) => e.stopPropagation()}>
-                        
-                        <div style={{padding: '20px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                            <h2 style={{margin: 0, fontSize: '20px', color: '#003266'}}>Policy Details</h2>
-                            <span onClick={() => setShowDetailsModal(false)} style={{cursor: 'pointer', fontSize: '24px', color: '#999'}}>&times;</span>
+
+                        <div style={{ padding: '20px', borderBottom: darkMode ? '1px solid #333' : '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h2 style={{ margin: 0, fontSize: '20px', color: darkMode ? '#e2e8f0' : '#003266' }}>Policy Details</h2>
+                            <span onClick={() => setShowDetailsModal(false)} style={{ cursor: 'pointer', fontSize: '24px', color: '#999' }}>&times;</span>
                         </div>
 
-                        <div style={{padding: '20px'}}>
+                        <div style={{ padding: '20px' }}>
                             {/* 1. KEY INFO GRID */}
                             <div style={{
                                 display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px',
-                                backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '8px', border: '1px solid #dee2e6'
+                                backgroundColor: darkMode ? '#2a2a2a' : '#f8f9fa', padding: '20px', borderRadius: '8px', border: darkMode ? '1px solid #444' : '1px solid #dee2e6'
                             }}>
-                                <div style={{ gridColumn: '1 / -1', borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '5px' }}>
-                                    <small style={{ color: '#666', fontWeight: 600 }}>Client Name</small>
-                                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#2c3e50' }}>{selectedPolicy.clientName}</div>
-                                    <small style={{ color: '#888' }}>{selectedPolicy.clientEmail}</small>
+                                <div style={{ gridColumn: '1 / -1', borderBottom: darkMode ? '1px solid #444' : '1px solid #eee', paddingBottom: '10px', marginBottom: '5px' }}>
+                                    <small style={{ color: darkMode ? '#999' : '#666', fontWeight: 600 }}>Client Name</small>
+                                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: darkMode ? '#e2e8f0' : '#2c3e50' }}>{selectedPolicy.clientName}</div>
+                                    <small style={{ color: darkMode ? '#999' : '#888' }}>{selectedPolicy.clientEmail}</small>
                                 </div>
 
                                 <div>
@@ -450,7 +453,7 @@ const ClientsPage = () => {
                                     <small style={{ color: '#666', fontWeight: 600 }}>Current Status</small>
                                     <div>
                                         <span className={`status-badge status-${selectedPolicy.status ? selectedPolicy.status.toLowerCase() : 'pending'}`}
-                                            style={{padding: '4px 10px', borderRadius: '12px', background: '#e9ecef', fontSize: '12px', fontWeight: 'bold'}}>
+                                            style={{ padding: '4px 10px', borderRadius: '12px', background: '#e9ecef', fontSize: '12px', fontWeight: 'bold' }}>
                                             {selectedPolicy.status || 'Pending'}
                                         </span>
                                     </div>
@@ -542,9 +545,9 @@ const ClientsPage = () => {
             {/* CONFIRM MODAL */}
             {showConfirmModal && ReactDOM.createPortal(
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 10001 }}>
-                    <div style={{ background: 'white', padding: '30px', borderRadius: '12px', width: '400px', textAlign: 'center', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}>
-                        <h3 style={{marginTop: 0, color: '#333'}}>Confirm Payment</h3>
-                        <p style={{color: '#666', marginBottom: '25px'}}>Are you sure you want to mark this policy as paid? This will advance the due date.</p>
+                    <div style={{ background: darkMode ? '#1a1a1a' : 'white', padding: '30px', borderRadius: '12px', width: '400px', textAlign: 'center', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}>
+                        <h3 style={{ marginTop: 0, color: darkMode ? '#e2e8f0' : '#333' }}>Confirm Payment</h3>
+                        <p style={{ color: darkMode ? '#999' : '#666', marginBottom: '25px' }}>Are you sure you want to mark this policy as paid? This will advance the due date.</p>
                         <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
                             <button onClick={cancelPayment} style={{ padding: '10px 24px', backgroundColor: '#f1f1f1', color: '#333', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Cancel</button>
                             <button onClick={confirmPayment} style={{ padding: '10px 24px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Confirm</button>

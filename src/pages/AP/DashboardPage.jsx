@@ -7,7 +7,7 @@ import { Doughnut, Bar } from 'react-chartjs-2';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const DashboardPage = () => {
-    const { monitoringData, loadMonitoringData } = useApp();
+    const { monitoringData, loadMonitoringData, darkMode } = useApp();
     const navigate = useNavigate();
 
     // --- DASHBOARD STATS STATE ---
@@ -381,9 +381,9 @@ const DashboardPage = () => {
                                 disabled={currentPage === 1}
                                 style={{
                                     padding: '8px 16px',
-                                    backgroundColor: currentPage === 1 ? '#e9ecef' : '#0055b8',
-                                    color: currentPage === 1 ? '#adb5bd' : 'white',
-                                    border: 'none',
+                                    backgroundColor: currentPage === 1 ? (darkMode ? '#2a2a2a' : '#e9ecef') : '#0055b8',
+                                    color: currentPage === 1 ? (darkMode ? '#666' : '#adb5bd') : 'white',
+                                    border: darkMode ? '1px solid #444' : 'none',
                                     borderRadius: '4px',
                                     cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
                                     fontWeight: 600,
@@ -393,7 +393,7 @@ const DashboardPage = () => {
                                 Previous
                             </button>
 
-                            <span style={{ fontSize: '13px', fontWeight: '600', color: '#495057' }}>
+                            <span style={{ fontSize: '13px', fontWeight: '600', color: darkMode ? '#e2e8f0' : '#495057' }}>
                                 Page {currentPage} of {totalPages}
                             </span>
 
@@ -402,9 +402,9 @@ const DashboardPage = () => {
                                 disabled={currentPage === totalPages}
                                 style={{
                                     padding: '8px 16px',
-                                    backgroundColor: currentPage === totalPages ? '#e9ecef' : '#0055b8',
-                                    color: currentPage === totalPages ? '#adb5bd' : 'white',
-                                    border: 'none',
+                                    backgroundColor: currentPage === totalPages ? (darkMode ? '#2a2a2a' : '#e9ecef') : '#0055b8',
+                                    color: currentPage === totalPages ? (darkMode ? '#666' : '#adb5bd') : 'white',
+                                    border: darkMode ? '1px solid #444' : 'none',
                                     borderRadius: '4px',
                                     cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
                                     fontWeight: 600,

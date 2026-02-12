@@ -69,8 +69,7 @@
     text-align: center;
     cursor: pointer;
     transition: opacity 0.2s;
-    text-decoration: underline;
-    text-underline-offset: 4px;
+    text-decoration: none;
 }
 
 
@@ -93,8 +92,8 @@
     font-weight: 500;
     border-radius: 8px;
     margin-bottom: 16px;
-    margin-bottom: 16px;
     background: transparent;
+    text-decoration: none;
 }
 
 
@@ -2091,4 +2090,178 @@
     border-radius: 12px;
     animation: skeletonPulse 1.5s ease-in-out infinite;
     display: block;
+}
+
+/* --- DARK MODE STATUS BADGES --- */
+body.dark-mode .ap-layout .status-badge.status-pending {
+    background: #ffc107 !important;
+    color: #000 !important;
+    font-weight: 700;
+}
+
+body.dark-mode .ap-layout .status-badge.status-issued {
+    background: #28a745 !important;
+    color: #fff !important;
+    font-weight: 700;
+}
+
+body.dark-mode .ap-layout .status-badge.status-declined {
+    background: #dc3545 !important;
+    color: #fff !important;
+    font-weight: 700;
+}
+
+/* --- DARK MODE CLIENT PAYMENT BOARD --- */
+/* Main card background */
+body.dark-mode .ap-layout>div>div:has(h2:contains("Client Payment Board")),
+body.dark-mode .ap-layout>div[style*="background: white"] {
+    background: #1a1a1a !important;
+    border-color: #333 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Title */
+body.dark-mode .ap-layout h2[style*="color: #2c3e50"] {
+    color: #e2e8f0 !important;
+}
+
+/* Search input */
+body.dark-mode .ap-layout input[type="text"][placeholder*="Search"] {
+    background: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .ap-layout input[type="text"][placeholder*="Search"]::placeholder {
+    color: #888 !important;
+}
+
+/* Select dropdown */
+body.dark-mode .ap-layout select {
+    background: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #e2e8f0 !important;
+}
+
+/* Month container borders */
+body.dark-mode .ap-layout>div>div>div[style*="border: 1px solid #e0e0e0"] {
+    border-color: #333 !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Month headers - keep the blue but darken slightly */
+body.dark-mode .ap-layout>div>div>div>div[style*="backgroundColor: #004481"] {
+    background-color: #003366 !important;
+}
+
+/* Table headers */
+body.dark-mode .ap-layout th[style*="backgroundColor: #f8f9fa"] {
+    background-color: #2a2a2a !important;
+    color: #FFBD42 !important;
+    border-bottom-color: #444 !important;
+}
+
+/* Table cells */
+body.dark-mode .ap-layout td[style*="color: #333"] {
+    color: #e2e8f0 !important;
+    border-bottom-color: #333 !important;
+}
+
+/* Client name in table */
+body.dark-mode .ap-layout td div[style*="color: #2c3e50"] {
+    color: #e2e8f0 !important;
+}
+
+/* Email text */
+body.dark-mode .ap-layout td div[style*="color: #888"] {
+    color: #999 !important;
+}
+
+/* No data message */
+body.dark-mode .ap-layout>div>div[style*="background: #f9f9f9"] {
+    background: #2a2a2a !important;
+    color: #999 !important;
+}
+
+/* Loading message */
+body.dark-mode .ap-layout>div>div[style*="color: #666"] {
+    color: #999 !important;
+}
+
+/* Modal backgrounds */
+body.dark-mode .modal-content[style*="backgroundColor: white"] {
+    background-color: #1a1a1a !important;
+}
+
+/* Modal headers */
+body.dark-mode .modal-content h2[style*="color: #003266"],
+body.dark-mode .modal-content h3 {
+    color: #e2e8f0 !important;
+}
+
+/* Modal grid backgrounds */
+body.dark-mode .modal-content>div>div[style*="backgroundColor: #f8f9fa"] {
+    background-color: #2a2a2a !important;
+    border-color: #444 !important;
+}
+
+/* Modal small text */
+body.dark-mode .modal-content small[style*="color: #666"] {
+    color: #999 !important;
+}
+
+/* Modal date boxes */
+body.dark-mode .modal-content>div>div>div[style*="background: #e3f2fd"] {
+    background: #1e3a5f !important;
+}
+
+body.dark-mode .modal-content>div>div>div[style*="background: #d4edda"] {
+    background: #1e4d2b !important;
+}
+
+body.dark-mode .modal-content>div>div>div[style*="background: #fff3cd"] {
+    background: #4d3d1a !important;
+}
+
+/* Modal table */
+body.dark-mode .modal-content table {
+    background: #1a1a1a !important;
+}
+
+body.dark-mode .modal-content thead[style*="backgroundColor: #f8f9fa"] {
+    background-color: #2a2a2a !important;
+}
+
+body.dark-mode .modal-content th[style*="borderBottom"] {
+    border-bottom-color: #444 !important;
+    color: #FFBD42 !important;
+}
+
+body.dark-mode .modal-content td {
+    color: #e2e8f0 !important;
+    border-bottom-color: #333 !important;
+}
+
+/* Modal list items */
+body.dark-mode .modal-content li[style*="backgroundColor: #fff"] {
+    background-color: #2a2a2a !important;
+    border-color: #444 !important;
+}
+
+/* Modal links */
+body.dark-mode .modal-content a[style*="color: #007bff"] {
+    color: #4da3ff !important;
+}
+
+/* Confirm modal */
+body.dark-mode div[style*="background: white"][style*="padding: 30px"] {
+    background: #1a1a1a !important;
+}
+
+body.dark-mode div[style*="background: white"][style*="padding: 30px"] h3 {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode div[style*="background: white"][style*="padding: 30px"] p {
+    color: #999 !important;
 }

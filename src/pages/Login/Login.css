@@ -258,10 +258,6 @@ body.dark-mode .login-right-panel {
   box-shadow: 0 12px 30px rgba(255, 189, 66, 0.05);
 }
 
-body.dark-mode .logo {
-  /* Optional: Brighten logo if needed, or rely on image */
-}
-
 body.dark-mode .description {
   color: #94a3b8;
 }
