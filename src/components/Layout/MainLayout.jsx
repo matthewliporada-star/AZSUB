@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
@@ -18,11 +19,14 @@ const MainLayout = ({ children }) => {
     if (isAP) layoutClass = 'ap-layout';
     else if (isAL) layoutClass = 'al-layout';
 
+    // Sidebar State
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+
     return (
         <div className={`app-layout-wrapper ${layoutClass}`}>
-            <Sidebar />
-            <div className="main-content">
-                <TopBar />
+            <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+            <div className={`main-content ${sidebarOpen ? '' : 'expanded'}`}>
+                <TopBar sidebarOpen={sidebarOpen} />
                 <div className="container">
                     {children}
                 </div>

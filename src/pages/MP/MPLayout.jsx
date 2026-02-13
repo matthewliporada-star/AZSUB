@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import './MP_Styles.css';
-import sidebarLogo from '../../assets/logo1.png';
+// [CHANGE] Import the new logo
+import sidebarLogo from '../../assets/White logo.png';
 import topLogo from '../../assets/2.png';
 
 const MPLayout = ({ children, title = 'Dashboard' }) => {

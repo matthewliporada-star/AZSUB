@@ -1,116 +1,212 @@
 /* Scoped Styles for AP */
 /* --- SIDEBAR STYLES --- */
+/* --- SIDEBAR STYLES (MATCHING MP) --- */
 .ap-layout * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-
 .ap-layout {
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
     background: #f5f7fa;
     min-height: 100vh;
     color: #2c3e50;
-}
-
-
-.ap-layout {
     display: flex;
     width: 100%;
-    min-height: 100vh;
+    flex-direction: row;
+    overflow-x: hidden;
 }
 
-
 .ap-layout .sidebar {
-    width: 280px;
-    background: linear-gradient(180deg, #003781 0%, #002557 100%);
-    color: white;
+    width: 260px;
+    background: #003266;
+    /* MP Primary Color */
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #e5e5e5;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+    height: 100vh;
+    z-index: 100;
+    flex-shrink: 0;
     position: fixed;
     left: 0;
     top: 0;
-    bottom: 0;
-    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+    transition: width 0.3s ease;
+}
+
+/* SIDEBAR TOGGLE BUTTON */
+/* SIDEBAR TOGGLE BUTTON */
+.ap-layout .sidebar-toggle {
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    max-width: 30px !important;
+    max-height: 30px !important;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #003266;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 102;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    color: #003266;
+    font-size: 12px;
+    /* Reduced icon size for better proportion */
+    pointer-events: auto;
+    flex-shrink: 0;
+    padding: 0;
+}
+
+
+.ap-layout .sidebar-toggle:hover {
+    background: #003266;
+    color: white;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.ap-layout .sidebar.collapsed .sidebar-toggle {
+    right: -15px;
+    left: auto;
+    background: #003266;
+    color: white;
+    border-color: #003266;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+    visibility: visible;
+    opacity: 1;
+    display: flex;
+}
+
+/* DARK MODE: Sidebar Toggle */
+body.dark-mode .ap-layout .sidebar-toggle {
+    background: #fbbf24 !important;
+    border-color: #fbbf24 !important;
+    color: #1a1a1a !important;
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    max-width: 30px !important;
+    max-height: 30px !important;
+    flex-shrink: 0 !important;
+    padding: 0 !important;
+}
+
+body.dark-mode .ap-layout .sidebar-toggle:hover {
+    background: #f59e0b !important;
+    border-color: #f59e0b !important;
+    color: #1a1a1a !important;
+    transform: translateY(-50%) scale(1.1);
+}
+
+body.dark-mode .ap-layout .sidebar.collapsed .sidebar-toggle {
+    background: #fbbf24 !important;
+    border-color: #fbbf24 !important;
+    color: #1a1a1a !important;
+}
+
+/* COLLAPSED SIDEBAR */
+.ap-layout .sidebar.collapsed {
+    width: 0;
+    padding: 0;
+    overflow: visible;
+}
+
+.ap-layout .sidebar.collapsed .sidebar-header,
+.ap-layout .sidebar.collapsed .sidebar-menu,
+.ap-layout .sidebar.collapsed .sidebar-footer {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* SIDEBAR HEADER */
+.ap-layout .sidebar-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+    margin-bottom: 20px;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.ap-layout .sidebar-logo-img {
+    max-width: 180px;
+    /* Increased from 140px to ensure full visibility */
+    width: 80%;
+    /* Responsive width */
+    height: auto;
+    transition: all 0.3s ease;
+    display: block;
+    /* Ensure it behaves as block for centering */
+}
+
+.ap-layout .sidebar-logo-img.collapsed {
+    max-width: 40px;
+}
+
+.ap-layout .sidebar-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: white;
+    text-decoration: none;
+}
+
+/* MENU */
+.ap-layout .sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
     display: flex;
     flex-direction: column;
-}
-
-
-.ap-layout .sidebar-header {
-    padding: 24px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-
-.ap-layout .sidebar-logo {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    color: white;
-    text-align: center;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-
-.ap-layout .sidebar-logo:hover {
-    opacity: 0.8;
-    color: #ffc107;
-    text-decoration: none;
-}
-
-
-.ap-layout .sidebar-logo {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    color: white;
-    text-align: center;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    text-decoration: none;
-}
-
-
-.ap-layout .sidebar-menu {
-    flex: 1;
-    padding: 20px 12px;
+    height: 100%;
+    transition: opacity 0.3s ease;
     overflow-y: auto;
+    flex: 1;
 }
-
 
 .ap-layout .sidebar-item {
-    padding: 14px 16px;
-    color: rgba(255, 255, 255, 0.8);
+    padding: 14px 15px;
+    margin-bottom: 10px;
     cursor: pointer;
-    transition: all 0.2s;
+    font-size: 16px;
+    font-weight: 500;
+    color: white;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 17px;
-    font-weight: 500;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    background: transparent;
+    transition: all 0.25s ease;
     text-decoration: none;
+    background: transparent;
 }
-
 
 .ap-layout .sidebar-item:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: #0052a3;
+    /* MP Secondary Color */
     color: white;
-    transform: translateX(4px);
+    transform: translateX(5px);
 }
-
 
 .ap-layout .sidebar-item.active {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    font-weight: 600;
-    border-left: 3px solid #ffc107;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fbbf24;
+    /* Gold text */
+    border-left: none;
+    font-weight: 700;
 }
-
 
 .ap-layout .sidebar-icon {
     width: 20px;
@@ -120,12 +216,13 @@
     justify-content: center;
 }
 
-
+/* SIDEBAR FOOTER */
 .ap-layout .sidebar-footer {
-    padding: 20px;
+    margin-top: auto;
+    padding-top: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    transition: opacity 0.3s ease;
 }
-
 
 .ap-layout .logout-btn {
     width: 100%;
@@ -144,49 +241,61 @@
     gap: 10px;
 }
 
-
 .ap-layout .logout-btn:hover {
     background: #c0392b;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
 }
 
-
 /* --- MAIN CONTENT STYLES --- */
 .ap-layout .main-content {
+    margin-left: 260px;
+    padding: 90px 40px 30px 40px;
     flex: 1;
-    margin-left: 280px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
     min-height: 100vh;
+    overflow-y: auto;
+    transition: margin-left 0.3s ease, padding 0.3s ease;
+    display: block;
+    width: calc(100% - 260px);
     margin-top: 0 !important;
-    padding-top: 0 !important;
+    padding-top: 90px !important;
 }
 
+.ap-layout .main-content.expanded {
+    margin-left: 0 !important;
+    width: 100%;
+}
 
 .ap-layout .top-bar {
-    background: #003781;
+    background: transparent;
     height: 72px;
+    /* Keep existing height */
     padding: 0 40px;
     display: flex;
     align-items: center;
-    border-bottom: 3px solid #0055b8;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-bottom: none;
+    box-shadow: none;
     position: fixed;
     top: 0;
     right: 0;
-    left: 280px;
-    z-index: 900;
+    left: 260px;
+    z-index: 99;
     width: auto;
+    transition: left 0.3s ease;
+    color: #333;
 }
 
+.ap-layout .main-content.expanded .top-bar {
+    left: 0;
+}
 
 .ap-layout .top-bar-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    position: relative;
+    /* Essential for absolute centering */
 }
 
 
@@ -194,25 +303,26 @@
     font-size: 20px;
     font-weight: 700;
     letter-spacing: 0.5px;
-    color: white;
+    color: #003266;
+    /* Match MP Title Color */
     text-transform: uppercase;
 }
 
-
 .ap-layout .logo {
-    color: white;
+    color: #003266;
     font-size: 24px;
     font-weight: 600;
     letter-spacing: 0.5px;
 }
 
-
 .ap-layout .connection-indicator {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: white;
+    color: #64748b;
+    /* Slate color for light bg */
     font-size: 14px;
+    font-weight: 500;
 }
 
 
@@ -329,7 +439,7 @@
 }
 
 
-.ap-layout input,
+.ap-layout input:not([type="radio"]):not([type="checkbox"]),
 .ap-layout .ap-layout select,
 .ap-layout .ap-layout textarea {
     padding: 10px 14px;
@@ -357,6 +467,16 @@
     cursor: not-allowed;
 }
 
+
+
+.ap-layout input[type="radio"],
+.ap-layout input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: #0055b8;
+}
 
 /* --- QUESTIONNAIRE STYLES --- */
 .ap-layout .question-container {
@@ -1348,7 +1468,8 @@
 
 .ap-layout .calendar-day-name {
     font-weight: 600;
-    color: #6c757d;
+    color: #495057;
+    /* Darker gray for better visibility */
     padding: 8px;
     font-size: 13px;
 }
@@ -1366,6 +1487,8 @@
     flex-direction: column;
     align-items: flex-start;
     overflow: hidden;
+    color: #2c3e50;
+    /* Explicit dark color for text */
 }
 
 
@@ -1507,6 +1630,69 @@
 
 .ap-layout .todo-item:last-child {
     border-bottom: none;
+}
+
+/* --- DARK MODE CALENDAR STYLES --- */
+body.dark-mode .ap-layout .calendar-container,
+body.dark-mode .ap-layout .summary-widget {
+    background: #1a1a1a !important;
+    border-color: #333 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .ap-layout .calendar-title,
+body.dark-mode .ap-layout .widget-title {
+    color: #e2e8f0 !important;
+    border-bottom-color: #333 !important;
+}
+
+body.dark-mode .ap-layout .calendar-day-name {
+    color: #a0aec0 !important;
+}
+
+body.dark-mode .ap-layout .calendar-day {
+    background: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .ap-layout .calendar-day:hover {
+    background: #333 !important;
+    border-color: #fbbf24 !important;
+}
+
+body.dark-mode .ap-layout .calendar-day.empty {
+    background: #222 !important;
+    border-color: transparent !important;
+}
+
+body.dark-mode .ap-layout .day-number {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .ap-layout .calendar-day.today {
+    background: #1e3a5f !important;
+    border-color: #fbbf24 !important;
+    color: #fbbf24 !important;
+}
+
+body.dark-mode .ap-layout .calendar-controls button {
+    color: #fbbf24 !important;
+    border-color: #444 !important;
+}
+
+body.dark-mode .ap-layout .calendar-controls button:hover {
+    background: #333 !important;
+}
+
+body.dark-mode .ap-layout .todo-item {
+    border-bottom-color: #333 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .ap-layout .day-note-preview {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    color: #e2e8f0 !important;
 }
 
 
@@ -2189,8 +2375,17 @@ body.dark-mode .ap-layout>div>div[style*="color: #666"] {
 }
 
 /* Modal backgrounds */
-body.dark-mode .modal-content[style*="backgroundColor: white"] {
+/* Modal backgrounds */
+body.dark-mode .ap-layout .modal-content,
+body.dark-mode .modal-content {
     background-color: #1a1a1a !important;
+    border-color: #333 !important;
+}
+
+body.dark-mode .ap-layout .modal-body,
+body.dark-mode .modal-body {
+    background-color: #1a1a1a !important;
+    color: #e2e8f0 !important;
 }
 
 /* Modal headers */
@@ -2267,8 +2462,8 @@ body.dark-mode div[style*="background: white"][style*="padding: 30px"] p {
 }
 
 
-/* --- MODERN SERIAL TABLE STYLES --- */
-.ap-layout .serial-table {
+/* --- MODERN SERIAL TABLE STYLES (Dark Mode Only) --- */
+body.dark-mode .ap-layout .serial-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
@@ -2276,19 +2471,19 @@ body.dark-mode div[style*="background: white"][style*="padding: 30px"] p {
     margin-top: 10px;
 }
 
-.ap-layout .serial-table th,
-.ap-layout .serial-table td {
+body.dark-mode .ap-layout .serial-table th,
+body.dark-mode .ap-layout .serial-table td {
     border: none !important;
     padding: 16px 20px;
     text-align: left;
     vertical-align: middle;
 }
 
-.ap-layout .serial-table thead tr {
+body.dark-mode .ap-layout .serial-table thead tr {
     background: transparent !important;
 }
 
-.ap-layout .serial-table thead th {
+body.dark-mode .ap-layout .serial-table thead th {
     background-color: transparent !important;
     color: #94a3b8 !important;
     font-weight: 600;
@@ -2298,26 +2493,26 @@ body.dark-mode div[style*="background: white"][style*="padding: 30px"] p {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
-.ap-layout .serial-table tbody tr {
+body.dark-mode .ap-layout .serial-table tbody tr {
     transition: background-color 0.2s ease;
     background-color: transparent !important;
 }
 
-.ap-layout .serial-table tbody tr:hover {
+body.dark-mode .ap-layout .serial-table tbody tr:hover {
     background-color: rgba(255, 255, 255, 0.03) !important;
 }
 
-.ap-layout .serial-table td {
+body.dark-mode .ap-layout .serial-table td {
     color: #e2e8f0;
     font-size: 14px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.02) !important;
 }
 
-.ap-layout .serial-table tbody tr:last-child td {
+body.dark-mode .ap-layout .serial-table tbody tr:last-child td {
     border-bottom: none !important;
 }
 
-.ap-layout .serial-table td .status-badge {
+body.dark-mode .ap-layout .serial-table td .status-badge {
     box-shadow: none;
     font-size: 11px;
     letter-spacing: 0.5px;

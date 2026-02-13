@@ -1,9 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
-// [CHANGE] Import the logo
-import logo1 from '../../assets/logo1.png';
+// [CHANGE] Import the new logo
+import logo1 from '../../assets/White logo.png';
 
-const Sidebar = () => {
+const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
     const location = useLocation();
     const { userRole, loading } = useApp();
 
@@ -126,28 +126,32 @@ const Sidebar = () => {
     ];
 
     if (loading) {
-        return <div className="sidebar" style={{ backgroundColor: '#fff', borderRight: '1px solid #eaecf0' }}></div>;
+        return <div className={`sidebar ${sidebarOpen ? '' : 'collapsed'}`} style={{ backgroundColor: '#fff', borderRight: '1px solid #eaecf0' }}></div>;
     }
 
     // Select menu items based on user role
     const menuItems = userRole === 'AL' ? alMenuItems : apMenuItems;
 
     return (
-        <div className="sidebar">
+        <aside className={`sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
+            {setSidebarOpen && (
+                <button
+                    className="sidebar-toggle"
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                    title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+                >
+                    <i className={`fa-solid ${sidebarOpen ? 'fa-chevron-left' : 'fa-chevron-right'}`}></i>
+                </button>
+            )}
+
             <div className="sidebar-header">
-                <Link to="/home" className="sidebar-logo" title="Go to Home">
-                    {/* [CHANGE] Replaced Text with Image */}
+                <div className="sidebar-logo">
                     <img
                         src={logo1}
                         alt="Caelum"
-                        style={{
-                            height: '45px',
-                            display: 'block',
-                            margin: '0 auto',
-                            objectFit: 'contain'
-                        }}
+                        className={`sidebar-logo-img ${sidebarOpen ? '' : 'collapsed'}`}
                     />
-                </Link>
+                </div>
             </div>
             <div className="sidebar-menu">
                 {menuItems.map((item) => (
@@ -155,13 +159,14 @@ const Sidebar = () => {
                         key={item.path}
                         to={item.path}
                         className={`sidebar-item ${location.pathname === item.path ? 'active' : ''}`}
+                        title={!sidebarOpen ? item.label : ''}
                     >
                         <div className="sidebar-icon">{item.icon}</div>
-                        <span>{item.label}</span>
+                        {sidebarOpen && <span>{item.label}</span>}
                     </Link>
                 ))}
             </div>
-        </div>
+        </aside>
     );
 };
 
