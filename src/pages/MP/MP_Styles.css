@@ -919,6 +919,127 @@ body.dark-mode .mp-sidebar {
     gap: 8px;
 }
 
+/* --- MP MODAL SUMMARY CARD & DARK MODE --- */
+.mp-modal-summary-card {
+    background: #f8fafc;
+}
+
+.summary-metric-label {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.summary-metric-value {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.summary-metric-value.text-dark {
+    color: #0f172a;
+}
+
+.summary-metric-value.text-success {
+    color: #28a745;
+}
+
+.summary-metric-value.text-primary {
+    color: #0055b8;
+}
+
+.summary-metric-value.text-warning {
+    color: #f39c12;
+}
+
+.mp-modal-section-title {
+    color: #0f172a;
+}
+
+/* Dark Mode Overrides for MP Modal */
+body.dark-mode .mp-modal-content {
+    background-color: #1a1a1a !important;
+    border: 1px solid #333 !important;
+}
+
+body.dark-mode .mp-modal-summary-card {
+    background-color: #252525 !important;
+    border: 1px solid #333 !important;
+}
+
+body.dark-mode .summary-metric-label {
+    color: #a0aec0 !important;
+}
+
+body.dark-mode .summary-metric-value.text-dark {
+    color: #ffffff !important;
+}
+
+body.dark-mode .mp-modal-section-title {
+    color: #e2e8f0 !important;
+}
+
+
+
+/* --- MP MODAL COMPONENTS --- */
+.mp-modal-highlight-box {
+    background: #e3f2fd;
+    padding: 8px 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mp-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Dark Mode Overrides for MP Modal Components */
+body.dark-mode .mp-modal-highlight-box {
+    background: #003781 !important;
+    color: white !important;
+}
+
+body.dark-mode .mp-modal-highlight-box span {
+    color: white !important;
+}
+
+body.dark-mode .mp-modal-footer {
+    border-color: #333 !important;
+}
+
+body.dark-mode .percentage-bar {
+    background: #333 !important;
+}
+
+body.dark-mode .policy-table th {
+    background: #252525 !important;
+    color: #e2e8f0 !important;
+    border-color: #333 !important;
+}
+
+body.dark-mode .policy-table td {
+    border-color: #333 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .policy-table tbody tr {
+    background: #1a1a1a !important;
+    box-shadow: none !important;
+}
+
+body.dark-mode .policy-table tbody tr:hover {
+    background: #252525 !important;
+}
+
+body.dark-mode .category-badge.system {
+    background: #1e3a8a !important;
+    color: #93c5fd !important;
+}
+
 /* --- PERFORMANCE TABLE --- */
 .mp-layout .performance-table {
     width: 100%;
@@ -2904,7 +3025,85 @@ body.dark-mode .clear-filter-btn {
 }
 
 body.dark-mode .clear-filter-btn:hover {
-    background-color: #c82333 !important;
-    color: #ffffff !important;
     box-shadow: 0 0 10px rgba(220, 53, 69, 0.5) !important;
+}
+
+/* --- DARK MODE STATUS badges --- */
+body.dark-mode .status-performing,
+body.dark-mode .performing-level,
+body.dark-mode .breakdown-item.performing {
+    background: rgba(21, 87, 36, 0.6) !important;
+    color: #d4edda !important;
+    border-color: #155724 !important;
+}
+
+body.dark-mode .status-average,
+body.dark-mode .average-level,
+body.dark-mode .breakdown-item.average {
+    background: rgba(133, 100, 4, 0.6) !important;
+    color: #fff3cd !important;
+    border-color: #856404 !important;
+}
+
+body.dark-mode .status-needs-improvement,
+body.dark-mode .needs-improvement-level,
+body.dark-mode .breakdown-item.needs-improvement {
+    background: rgba(114, 28, 36, 0.6) !important;
+    color: #f8d7da !important;
+    border-color: #721c24 !important;
+}
+
+body.dark-mode .activity-dot.active {
+    background: #28a745 !important;
+    box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.5) !important;
+}
+
+body.dark-mode .activity-dot.inactive {
+    background: #dc3545 !important;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.5) !important;
+}
+
+/* --- STAT TRENDS --- */
+.stat-trend {
+    font-size: 13px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.stat-trend.up {
+    color: #28a745;
+}
+
+.stat-trend.down {
+    color: #dc3545;
+}
+
+.stat-trend.stable {
+    color: #6c757d;
+}
+
+/* Rank Badge Text - Always dark on colored metallic backgrounds */
+.rank-badge {
+    color: #0f172a !important;
+}
+
+/* --- DARK MODE HEADER --- */
+body.dark-mode .mp-layout .mp-header {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .mp-layout .mp-user-profile-btn {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .mp-layout .mp-user-profile-btn:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode .mp-layout .mp-user-avatar {
+    color: #e2e8f0 !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
 }

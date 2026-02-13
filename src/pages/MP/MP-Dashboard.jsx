@@ -933,41 +933,40 @@ const MPDashboard = () => {
                                 </button>
                             </div>
                             <div className="mp-modal-body">
-                                <div style={{
-                                    background: '#f8fafc',
+                                <div className="mp-modal-summary-card" style={{
                                     padding: '20px',
                                     borderRadius: '12px',
                                     marginBottom: '20px'
                                 }}>
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
                                         <div>
-                                            <div style={{ fontSize: '12px', color: '#64748b' }}>Total APs</div>
-                                            <div style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a' }}>
+                                            <div className="summary-metric-label">Total APs</div>
+                                            <div className="summary-metric-value text-dark">
                                                 {selectedAL.totalAPs}
                                             </div>
                                         </div>
                                         <div>
-                                            <div style={{ fontSize: '12px', color: '#64748b' }}>Active APs</div>
-                                            <div style={{ fontSize: '24px', fontWeight: '700', color: '#28a745' }}>
+                                            <div className="summary-metric-label">Active APs</div>
+                                            <div className="summary-metric-value text-success">
                                                 {selectedAL.activeAPs}
                                             </div>
                                         </div>
                                         <div>
-                                            <div style={{ fontSize: '12px', color: '#64748b' }}>Monthly ANP</div>
-                                            <div style={{ fontSize: '24px', fontWeight: '700', color: '#0055b8' }}>
+                                            <div className="summary-metric-label">Monthly ANP</div>
+                                            <div className="summary-metric-value text-primary">
                                                 PHP {selectedAL.monthlyANP.toLocaleString()}
                                             </div>
                                         </div>
                                         <div>
-                                            <div style={{ fontSize: '12px', color: '#64748b' }}>Monthly Cases</div>
-                                            <div style={{ fontSize: '24px', fontWeight: '700', color: '#f39c12' }}>
+                                            <div className="summary-metric-label">Monthly Cases</div>
+                                            <div className="summary-metric-value text-warning">
                                                 {selectedAL.monthlyCases}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <h4 style={{ marginBottom: '16px', color: '#0f172a' }}>Agency Partners List</h4>
+                                <h4 className="mp-modal-section-title" style={{ marginBottom: '16px' }}>Agency Partners List</h4>
                                 <table className="performance-table">
                                     <thead>
                                         <tr>
@@ -1115,15 +1114,8 @@ const MPDashboard = () => {
 
                                             <div>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                                    <h3 style={{ margin: 0, color: '#0f172a' }}>Monthly Trend - {appliedFilters.year}</h3>
-                                                    <div style={{
-                                                        background: '#e3f2fd',
-                                                        padding: '8px 16px',
-                                                        borderRadius: '8px',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '8px'
-                                                    }}>
+                                                    <h3 className="mp-modal-section-title" style={{ margin: 0 }}>Monthly Trend - {appliedFilters.year}</h3>
+                                                    <div className="mp-modal-highlight-box">
                                                         <span style={{ fontSize: '12px', color: '#0055b8', fontWeight: '600' }}>Total Cases:</span>
                                                         <span style={{ fontSize: '18px', fontWeight: '700', color: '#003781' }}>
                                                             {policyDetailsData.totalCases}
@@ -1167,30 +1159,30 @@ const MPDashboard = () => {
                                     </div>
                                 )}
 
-                                <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', marginBottom: '20px' }}>
-                                    <h4 style={{ marginBottom: '16px', color: '#0f172a' }}>Policy Statistics - {selectedMonthYear}</h4>
+                                <div className="mp-modal-summary-card" style={{ marginBottom: '20px', padding: '20px', borderRadius: '12px' }}>
+                                    <h4 className="mp-modal-section-title" style={{ marginBottom: '16px' }}>Policy Statistics - {selectedMonthYear}</h4>
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
                                         <div>
-                                            <div style={{ fontSize: '12px', color: '#64748b' }}>Total Policies</div>
-                                            <div style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a' }}>
+                                            <div className="summary-metric-label">Total Policies</div>
+                                            <div className="summary-metric-value text-dark">
                                                 {selectedAL.totalCases}
                                             </div>
                                         </div>
                                         <div>
-                                            <div style={{ fontSize: '12px', color: '#64748b' }}>Current Month</div>
-                                            <div style={{ fontSize: '24px', fontWeight: '700', color: '#28a745' }}>
+                                            <div className="summary-metric-label">Current Month</div>
+                                            <div className="summary-metric-value text-success">
                                                 {selectedAL.monthlyCases}
                                             </div>
                                         </div>
                                         <div>
-                                            <div style={{ fontSize: '12px', color: '#64748b' }}>Monthly ANP</div>
-                                            <div style={{ fontSize: '24px', fontWeight: '700', color: '#0055b8' }}>
+                                            <div className="summary-metric-label">Monthly ANP</div>
+                                            <div className="summary-metric-value text-primary">
                                                 PHP {selectedAL.monthlyANP.toLocaleString()}
                                             </div>
                                         </div>
                                         <div>
-                                            <div style={{ fontSize: '12px', color: '#64748b' }}>Most Availed</div>
-                                            <div style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a' }}>
+                                            <div className="summary-metric-label">Most Availed</div>
+                                            <div style={{ fontSize: '16px', fontWeight: '700' }} className="text-dark">
                                                 {policyDetailsData && policyDetailsData.policyDistribution && policyDetailsData.policyDistribution.length > 0
                                                     ? policyDetailsData.policyDistribution[0].policy_name
                                                     : 'N/A'}
@@ -1199,7 +1191,7 @@ const MPDashboard = () => {
                                     </div>
                                 </div>
 
-                                <h4 style={{ marginBottom: '16px', color: '#0f172a' }}>Policy Breakdown</h4>
+                                <h4 className="mp-modal-section-title" style={{ marginBottom: '16px' }}>Policy Breakdown</h4>
                                 <table className="policy-table">
                                     <thead>
                                         <tr>
@@ -1251,7 +1243,7 @@ const MPDashboard = () => {
                                     </tbody>
                                 </table>
 
-                                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
+                                <div className="mp-modal-footer">
                                     <button
                                         onClick={() => setShowPolicyModal(false)}
                                         className="clear-filter-btn"

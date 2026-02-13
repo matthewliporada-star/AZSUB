@@ -510,15 +510,11 @@ const PerformanceDashboardPage = () => {
                 }}>
                     <div className="chart-container animate-spring delay-5" style={{ border: 'none', boxShadow: 'none', background: 'transparent' }}>
                         <div className="chart-title" style={{ paddingLeft: '0', fontSize: '16px', marginBottom: '16px' }}>Team Efficiency (Issued)</div>
-                        <div className="chart-wrapper" style={{
+                        <div className="chart-wrapper chart-card-bg" style={{
                             position: 'relative',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            background: '#fff',
-                            borderRadius: '24px',
-                            padding: '32px',
-                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
                             height: '350px'
                         }}>
                             <Doughnut
@@ -531,20 +527,16 @@ const PerformanceDashboardPage = () => {
                                 }}
                             />
                             <div style={{ position: 'absolute', pointerEvents: 'none', textAlign: 'center' }}>
-                                <div style={{ fontSize: '28px', fontWeight: '800', color: '#2c3e50' }}>{teamStats.totalIssued}</div>
-                                <div style={{ fontSize: '11px', color: '#7f8c8d' }}>Issued</div>
+                                <div className="chart-center-val" style={{ fontSize: '28px', fontWeight: '800' }}>{teamStats.totalIssued}</div>
+                                <div className="chart-center-label" style={{ fontSize: '11px' }}>Issued</div>
                             </div>
                         </div>
                     </div>
 
                     <div className="chart-container animate-spring delay-1" style={{ border: 'none', boxShadow: 'none', background: 'transparent' }}>
                         <div className="chart-title" style={{ paddingLeft: '0', fontSize: '16px', marginBottom: '16px' }}>Policy Distribution</div>
-                        <div className="chart-wrapper" style={{
-                            height: '350px',
-                            background: '#fff',
-                            borderRadius: '24px',
-                            padding: '32px',
-                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+                        <div className="chart-wrapper chart-card-bg" style={{
+                            height: '350px'
                         }}>
                             <Bar
                                 data={policyChartData}
@@ -574,21 +566,11 @@ const PerformanceDashboardPage = () => {
                 </div>
 
                 {/* AP Performance Table */}
-                <div className="animate-spring delay-2" style={{
-                    marginTop: '32px',
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    border: '1px solid #e9ecef'
-                }}>
-                    <div style={{
-                        background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
-                        borderBottom: '2px solid #e9ecef',
-                        padding: '24px 28px'
-                    }}>
+                <div className="animate-spring delay-2 ap-performance-section">
+                    <div className="ap-table-header">
                         <h3 style={{
                             fontSize: '20px',
                             fontWeight: '700',
-                            color: '#0f172a',
                             marginBottom: '6px',
                             letterSpacing: '-0.3px'
                         }}>
@@ -596,45 +578,28 @@ const PerformanceDashboardPage = () => {
                         </h3>
                         <p style={{
                             fontSize: '13px',
-                            color: '#64748b',
                             margin: '0 0 16px 0',
-                            fontWeight: '500'
+                            fontWeight: '500',
+                            opacity: 0.8
                         }}>
                             Individual agent metrics and rankings
                         </p>
 
                         {/* Search Bar */}
                         <div style={{ position: 'relative', maxWidth: '320px' }}>
-                            <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}>🔍</span>
+                            <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>🔍</span>
                             <input
                                 type="text"
+                                className="ap-search-input"
                                 placeholder="Search AP..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                style={{
-                                    padding: '10px 16px 10px 36px',
-                                    borderRadius: '8px',
-                                    border: '1px solid #e2e8f0',
-                                    fontSize: '14px',
-                                    width: '100%',
-                                    outline: 'none',
-                                    transition: 'all 0.2s',
-                                    backgroundColor: '#f8fafc'
-                                }}
-                                onFocus={(e) => {
-                                    e.target.style.borderColor = '#0055b8';
-                                    e.target.style.backgroundColor = '#fff';
-                                }}
-                                onBlur={(e) => {
-                                    e.target.style.borderColor = '#e2e8f0';
-                                    e.target.style.backgroundColor = '#f8fafc';
-                                }}
                             />
                         </div>
                     </div>
                     <div style={{ padding: 0 }}>
                         <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                            <table className="al-performance-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                                 <thead>
                                     <tr style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #efefef' }}>
                                         {[
@@ -676,17 +641,11 @@ const PerformanceDashboardPage = () => {
                                         filteredData.map((ap, idx) => (
                                             <tr
                                                 key={ap.apName}
-                                                style={{
-                                                    borderBottom: '1px solid #f1f1f1',
-                                                    backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa',
-                                                    transition: 'background-color 0.2s'
-                                                }}
-                                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f1f8ff'}
-                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = idx % 2 === 0 ? '#fff' : '#fafafa'}
+                                                className="ap-table-row"
                                             >
-                                                <td style={{ padding: '16px 20px', fontWeight: '600', color: '#2c3e50' }}>{ap.apName}</td>
-                                                <td style={{ padding: '16px 20px', color: '#2c3e50', fontWeight: '500' }}>₱ {ap.totalANP.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                                <td style={{ padding: '16px 20px', color: '#7f8c8d' }}>₱ {ap.monthlyANP.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                <td className="ap-text-primary" style={{ padding: '16px 20px', fontWeight: '600' }}>{ap.apName}</td>
+                                                <td className="ap-text-primary" style={{ padding: '16px 20px', fontWeight: '500' }}>₱ {ap.totalANP.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                <td className="ap-text-secondary" style={{ padding: '16px 20px' }}>₱ {ap.monthlyANP.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                                 <td style={{ padding: '16px 20px' }}>{ap.totalSubmissions}</td>
                                                 <td style={{ padding: '16px 20px' }}>
                                                     <span style={{ padding: '4px 10px', borderRadius: '20px', backgroundColor: '#e8f5e9', color: '#2e7d32', fontSize: '12px', fontWeight: '600' }}>

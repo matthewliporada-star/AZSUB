@@ -314,99 +314,92 @@ const DashboardPage = () => {
             </div>
 
             {/* Serial Number Usage - Container Layout */}
-            <div style={{ marginTop: '32px' }}>
-                <div style={{
-                    marginBottom: '20px',
-                    paddingBottom: '12px',
-                    borderBottom: '2px solid #e9ecef'
-                }}>
-                    <h2 style={{
+            <div className="ap-performance-section animate-spring delay-1">
+                <div className="ap-table-header">
+                    <h3 style={{
                         fontSize: '20px',
                         fontWeight: '700',
-                        color: '#2c3e50',
+                        color: 'inherit',
                         margin: 0
-                    }}>Serial Number Usage</h2>
+                    }}>Serial Number Usage</h3>
                 </div>
-                <div className="animate-spring delay-1" style={{
-                    backgroundColor: '#fff',
-                    borderRadius: '8px',
-                    padding: '20px',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-                }}>
-                    <table className="serial-table">
-                        <thead>
-                            <tr>
-                                <th>Serial</th>
-                                <th>Policy</th>
-                                <th>Client</th>
-                                <th>Submitted</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentItems.length > 0 ? (
-                                currentItems.map(item => (
-                                    <tr key={item.id}>
-                                        <td style={{ fontFamily: 'monospace', fontWeight: 600 }}>{item.serial_number}</td>
-                                        <td>{item.policy_type}</td>
-                                        <td>{item.client_name || `${item.client_first_name} ${item.client_last_name}`}</td>
-                                        <td>{new Date(item.created_at).toLocaleDateString()}</td>
-                                        <td>
-                                            <span className={`status-badge status-${item.status.toLowerCase()}`}>
-                                                {item.status}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: '#666' }}>No serial usage data found.</td>
+                <div style={{ padding: 0 }}>
+                    <div style={{ padding: '20px' }}>
+                        <table className="serial-table al-performance-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '2px solid #e9ecef' }}>
+                                    <th style={{ padding: '12px', textAlign: 'left' }}>Serial</th>
+                                    <th style={{ padding: '12px', textAlign: 'left' }}>Policy</th>
+                                    <th style={{ padding: '12px', textAlign: 'left' }}>Client</th>
+                                    <th style={{ padding: '12px', textAlign: 'left' }}>Submitted</th>
+                                    <th style={{ padding: '12px', textAlign: 'left' }}>Status</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {currentItems.length > 0 ? (
+                                    currentItems.map(item => (
+                                        <tr key={item.id} className="ap-table-row">
+                                            <td className="ap-text-primary" style={{ padding: '12px', fontFamily: 'monospace', fontWeight: 600 }}>{item.serial_number}</td>
+                                            <td className="ap-text-primary" style={{ padding: '12px' }}>{item.policy_type}</td>
+                                            <td className="ap-text-primary" style={{ padding: '12px' }}>{item.client_name || `${item.client_first_name} ${item.client_last_name}`}</td>
+                                            <td className="ap-text-secondary" style={{ padding: '12px' }}>{new Date(item.created_at).toLocaleDateString()}</td>
+                                            <td style={{ padding: '12px' }}>
+                                                <span className={`status-badge status-${item.status.toLowerCase()}`}>
+                                                    {item.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: '#666' }}>No serial usage data found.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
 
-                    {totalPages > 1 && (
-                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px', gap: '15px' }}>
-                            <button
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
-                                style={{
-                                    padding: '8px 16px',
-                                    backgroundColor: currentPage === 1 ? '#e9ecef' : '#0055b8',
-                                    color: currentPage === 1 ? '#adb5bd' : 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                                    fontWeight: 600,
-                                    fontSize: '13px'
-                                }}
-                            >
-                                Previous
-                            </button>
+                        {totalPages > 1 && (
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px', gap: '15px' }}>
+                                <button
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    style={{
+                                        padding: '8px 16px',
+                                        backgroundColor: currentPage === 1 ? '#e9ecef' : '#0055b8',
+                                        color: currentPage === 1 ? '#adb5bd' : 'white',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                                        fontWeight: 600,
+                                        fontSize: '13px'
+                                    }}
+                                >
+                                    Previous
+                                </button>
 
-                            <span style={{ fontSize: '13px', fontWeight: '600', color: '#495057' }}>
-                                Page {currentPage} of {totalPages}
-                            </span>
+                                <span style={{ fontSize: '13px', fontWeight: '600', color: '#495057' }}>
+                                    Page {currentPage} of {totalPages}
+                                </span>
 
-                            <button
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                                style={{
-                                    padding: '8px 16px',
-                                    backgroundColor: currentPage === totalPages ? '#e9ecef' : '#0055b8',
-                                    color: currentPage === totalPages ? '#adb5bd' : 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                                    fontWeight: 600,
-                                    fontSize: '13px'
-                                }}
-                            >
-                                Next
-                            </button>
-                        </div>
-                    )}
+                                <button
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    style={{
+                                        padding: '8px 16px',
+                                        backgroundColor: currentPage === totalPages ? '#e9ecef' : '#0055b8',
+                                        color: currentPage === totalPages ? '#adb5bd' : 'white',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                                        fontWeight: 600,
+                                        fontSize: '13px'
+                                    }}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
