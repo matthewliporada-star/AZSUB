@@ -10,6 +10,10 @@ function Login() {
   const navigate = useNavigate();
   const { setUserRole, setCurrentUser, darkMode, toggleDarkMode } = useApp();
 
+  // --- Cooldown States ---
+  const [attempts, setAttempts] = useState(0);
+  const [cooldown, setCooldown] = useState(0);
+
   useEffect(() => {
     document.body.classList.add("login-page");
     return () => {
@@ -17,13 +21,39 @@ function Login() {
     };
   }, []);
 
+  // --- Cooldown Timer Logic ---
+  useEffect(() => {
+    let timer;
+    if (cooldown > 0) {
+      timer = setInterval(() => {
+        setCooldown((prev) => prev - 1);
+      }, 1000);
+    } else if (cooldown === 0 && attempts >= 5) {
+      setAttempts(0); // Reset attempts after timer ends
+    }
+    return () => clearInterval(timer);
+  }, [cooldown, attempts]);
+
   const [identifier, setIdentifier] = useState(""); // email or username
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // New state for password visibility
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+
+  // Helper to handle failed attempts
+  const handleFailure = (msg) => {
+    const newCount = attempts + 1;
+    setAttempts(newCount);
+    if (newCount >= 5) {
+      setCooldown(300);
+      setError("Too many failed attempts. Please wait 5 mins.");
+    } else {
+      setError(`${msg} (Attempt ${newCount}/5)`);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (cooldown > 0) return; // Prevent submission during cooldown
     setError("");
 
     let email = identifier;
@@ -37,7 +67,7 @@ function Login() {
         .single();
 
       if (fetchError || !data?.email) {
-        setError("Username not found");
+        handleFailure("Username not found");
         return;
       }
 
@@ -51,15 +81,18 @@ function Login() {
     });
 
     if (signInError) {
-      setError(signInError.message);
+      handleFailure(signInError.message);
       return;
     }
 
     const user = data.user;
     if (!user) {
-      setError("Login failed. Try again.");
+      handleFailure("Login failed. Try again.");
       return;
     }
+
+    // Success! Reset attempts
+    setAttempts(0);
 
     // Fetch the latest account_type from profiles table
     const { data: profileData, error: profileError } = await supabase
@@ -88,10 +121,8 @@ function Login() {
 
     const accountType = profileData.account_type?.toLowerCase();
 
-    // Set user role in context
     setUserRole(accountType?.toUpperCase());
 
-    // Set current user with real data from database
     setCurrentUser({
       id: profileData.id,
       username: profileData.username,
@@ -174,6 +205,7 @@ function Login() {
                 placeholder="Enter your username or email"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
+                disabled={cooldown > 0}
                 required
               />
             </div>
@@ -187,6 +219,7 @@ function Login() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={cooldown > 0}
                   required
                 />
                 <button
@@ -196,7 +229,6 @@ function Login() {
                   aria-label="Toggle password visibility"
                 >
                   {showPassword ? (
-                    /* Eye Off Icon (Hide) */
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
                       <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
@@ -204,7 +236,6 @@ function Login() {
                       <line x1="2" y1="2" x2="22" y2="22" />
                     </svg>
                   ) : (
-                    /* Eye Icon (Show) */
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
                       <circle cx="12" cy="12" r="3" />
@@ -216,8 +247,12 @@ function Login() {
 
             {error && <p className="error-text">{error}</p>}
 
-            <button type="submit" className="signin-button">
-              SIGN IN
+            <button 
+              type="submit" 
+              className="signin-button" 
+              disabled={cooldown > 0}
+            >
+              {cooldown > 0 ? `COLDOWN : ${cooldown}s` : "SIGN IN"}
             </button>
           </form>
         </div>
