@@ -9,10 +9,7 @@
 /* Fullscreen background + center */
 .login-page {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top right, #395998 0%, transparent 30%),
-    radial-gradient(circle at bottom left, #395998 0%, transparent 30%),
-    #ffffff;
+  background: #f0f4f8;
 }
 
 /* Center entire layout */
@@ -241,7 +238,7 @@ body.dark-mode .login-dark-mode-toggle {
 }
 
 body.dark-mode .login-page {
-  background: radial-gradient(circle at top right, #1a1a1a 0%, #000 90%);
+  background: #000000;
 }
 
 body.dark-mode .login-left-panel h2 {
@@ -308,4 +305,23 @@ body.dark-mode .error-text {
   background-color: #3f1816;
   border-left: 4px solid #e74c3c;
   color: #ffcccc;
+}
+
+/* FIX: Input text visibility in dark mode */
+body.dark-mode .form-input {
+  color: #ffffff !important;
+  background-color: #1a1a1a !important;
+  caret-color: #ffffff !important;
+}
+
+/* FIX: Autofill specific styles for dark mode */
+body.dark-mode input:-webkit-autofill,
+body.dark-mode input:-webkit-autofill:hover,
+body.dark-mode input:-webkit-autofill:focus,
+body.dark-mode input:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0px 1000px #1a1a1a inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+  color: #ffffff !important;
+  caret-color: #ffffff !important;
 }
