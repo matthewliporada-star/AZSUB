@@ -4,7 +4,19 @@ import api from '../../services/api';
 import { calculateANP } from '../../utils/calculations';
 
 const MonitoringPage = () => {
-    const { loadMonitoringData, currentUser } = useApp();
+    const { loadMonitoringData, currentUser, darkMode } = useApp();
+
+    // Theme values
+    const themes = {
+        bg: darkMode ? '#161B22' : '#ffffff',
+        inputBg: darkMode ? '#0d1117' : '#ffffff',
+        inputBorder: darkMode ? '#30363d' : '#d0d5dd',
+        inputReadOnly: darkMode ? '#161b22' : '#f9fafb',
+        textPrimary: darkMode ? '#e2e8f0' : '#101828',
+        textSecondary: darkMode ? '#94a3b8' : '#344054',
+        borderSubtle: darkMode ? 'rgba(255, 255, 255, 0.1)' : '#eaecf0',
+        title: darkMode ? '#FFFDFE' : '#101828'
+    };
 
     // --- 1. POLICIES STATE ---
     const [policies, setPolicies] = useState([]);
@@ -186,9 +198,9 @@ const MonitoringPage = () => {
     };
 
     return (
-        <div className="content-container" style={{ maxWidth: '1400px' }}>
-            <div style={{ paddingBottom: '16px', borderBottom: '1px solid #eaecf0', marginBottom: '24px' }}>
-                <h2 style={{ fontSize: '18px', margin: 0, fontWeight: '700', color: '#101828', letterSpacing: '-0.02em' }}>Solution Provider Monitoring</h2>
+        <div className="content-container animate-spring" style={{ maxWidth: '1400px', background: themes.bg }}>
+            <div style={{ paddingBottom: '16px', borderBottom: `1px solid ${themes.borderSubtle}`, marginBottom: '24px' }}>
+                <h2 style={{ fontSize: '18px', margin: 0, fontWeight: '700', color: themes.title, letterSpacing: '-0.02em' }}>Solution Provider Monitoring</h2>
             </div>
             <div>
                 {message && (
@@ -196,9 +208,15 @@ const MonitoringPage = () => {
                         padding: '10px 16px',
                         marginBottom: '20px',
                         borderRadius: '8px',
-                        backgroundColor: messageType === 'success' ? '#ecfdf5' : '#fef2f2',
-                        color: messageType === 'success' ? '#047857' : '#b91c1c',
-                        border: `1px solid ${messageType === 'success' ? '#a7f3d0' : '#fecaca'}`,
+                        backgroundColor: messageType === 'success'
+                            ? (darkMode ? 'rgba(16, 185, 129, 0.1)' : '#ecfdf5')
+                            : (darkMode ? 'rgba(239, 68, 68, 0.1)' : '#fef2f2'),
+                        color: messageType === 'success'
+                            ? (darkMode ? '#34d399' : '#047857')
+                            : (darkMode ? '#f87171' : '#b91c1c'),
+                        border: `1px solid ${messageType === 'success'
+                            ? (darkMode ? 'rgba(16, 185, 129, 0.2)' : '#a7f3d0')
+                            : (darkMode ? 'rgba(239, 68, 68, 0.2)' : '#fecaca')}`,
                         fontSize: '13px',
                         fontWeight: '500',
                         display: 'flex',
@@ -219,8 +237,8 @@ const MonitoringPage = () => {
                     }}>
                         {/* Row 1 */}
                         <div className="form-group">
-                            <label style={{ fontSize: '12px', fontWeight: '600', color: '#344054', marginBottom: '6px', display: 'block' }}>Agency</label>
-                            <select name="agency" value={formData.agency} onChange={handleChange} style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d0d5dd', boxShadow: '0 1px 2px rgba(16,24,40,0.05)', fontSize: '14px', color: '#101828' }}>
+                            <label style={{ fontSize: '12px', fontWeight: '600', color: themes.textSecondary, marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Agency</label>
+                            <select name="agency" value={formData.agency} onChange={handleChange} className="monitoring-select" style={{ width: '100%' }}>
                                 <option value="Caelum">Caelum</option>
                                 <option value="Shepard One">Shepard One</option>
                                 <option value="Others">Others</option>
@@ -228,32 +246,33 @@ const MonitoringPage = () => {
                         </div>
 
                         <div className="form-group">
-                            <label style={{ fontSize: '12px', fontWeight: '600', color: '#344054', marginBottom: '6px', display: 'block' }}>Submission Type</label>
-                            <select name="submissionType" value={formData.submissionType} onChange={handleChange} style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d0d5dd', boxShadow: '0 1px 2px rgba(16,24,40,0.05)', fontSize: '14px', color: '#101828' }}>
+                            <label style={{ fontSize: '12px', fontWeight: '600', color: themes.textSecondary, marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Submission Type</label>
+                            <select name="submissionType" value={formData.submissionType} onChange={handleChange} className="monitoring-select" style={{ width: '100%' }}>
                                 <option value="New Business">New Business</option>
                                 <option value="Renewal">Renewal</option>
                             </select>
                         </div>
 
                         <div className="form-group">
-                            <label style={{ fontSize: '12px', fontWeight: '600', color: '#344054', marginBottom: '6px', display: 'block' }}>Intermediary Name</label>
-                            <input name="intermediaryName" value={formData.intermediaryName} onChange={handleChange} required readOnly style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d0d5dd', boxShadow: '0 1px 2px rgba(16,24,40,0.05)', fontSize: '14px', color: '#667085', backgroundColor: '#f9fafb', cursor: 'not-allowed' }} />
+                            <label style={{ fontSize: '12px', fontWeight: '600', color: themes.textSecondary, marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Intermediary Name</label>
+                            <input name="intermediaryName" value={formData.intermediaryName} onChange={handleChange} required readOnly className="monitoring-input readonly" style={{ width: '100%', cursor: 'not-allowed' }} />
                         </div>
 
                         {/* Row 2 */}
                         <div className="form-group">
-                            <label style={{ fontSize: '12px', fontWeight: '600', color: '#344054', marginBottom: '6px', display: 'block' }}>Intermediary Email</label>
-                            <input type="email" name="intermediaryEmail" value={formData.intermediaryEmail} onChange={handleChange} required readOnly style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d0d5dd', boxShadow: '0 1px 2px rgba(16,24,40,0.05)', fontSize: '14px', color: '#667085', backgroundColor: '#f9fafb', cursor: 'not-allowed' }} />
+                            <label style={{ fontSize: '12px', fontWeight: '600', color: themes.textSecondary, marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Intermediary Email</label>
+                            <input type="email" name="intermediaryEmail" value={formData.intermediaryEmail} onChange={handleChange} required readOnly className="monitoring-input readonly" style={{ width: '100%', cursor: 'not-allowed' }} />
                         </div>
 
                         <div className="form-group">
-                            <label style={{ fontSize: '12px', fontWeight: '600', color: '#344054', marginBottom: '6px', display: 'block' }}>Policy Type</label>
+                            <label style={{ fontSize: '12px', fontWeight: '600', color: themes.textSecondary, marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Policy Type</label>
                             <select
                                 name="policyType"
                                 value={formData.policyType}
                                 onChange={handleChange}
                                 disabled={submitting || loadingPolicies}
-                                style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d0d5dd', boxShadow: '0 1px 2px rgba(16,24,40,0.05)', fontSize: '14px', color: '#101828' }}
+                                className="monitoring-select"
+                                style={{ width: '100%' }}
                             >
                                 {loadingPolicies ? (
                                     <option>Loading policies...</option>
@@ -261,7 +280,7 @@ const MonitoringPage = () => {
                                     <option>No active policies available</option>
                                 ) : (
                                     policies.map(policy => (
-                                        <option key={policy.policy_id} value={policy.policy_name}>
+                                        <option key={policy.policy_id} value={policy.policy_name} style={{ background: themes.inputBg, color: themes.textPrimary }}>
                                             {policy.policy_name} ({policy.request_type?.toLowerCase() === 'manual' ? 'Manual' : 'System'})
                                         </option>
                                     ))
@@ -270,11 +289,11 @@ const MonitoringPage = () => {
                         </div>
 
                         <div className="form-group">
-                            <label style={{ fontSize: '12px', fontWeight: '600', color: '#344054', marginBottom: '6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <label style={{ fontSize: '12px', fontWeight: '600', color: themes.textSecondary, marginBottom: '6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                                 Serial Number
                                 {isManualPolicy ?
-                                    <span style={{ fontSize: '10px', background: '#F2F4F7', color: '#344054', padding: '2px 8px', borderRadius: '12px', fontWeight: '500', border: '1px solid #D0D5DD' }}>Manual</span> :
-                                    <span style={{ fontSize: '10px', background: '#EFF8FF', color: '#175CD3', padding: '2px 8px', borderRadius: '12px', fontWeight: '500', border: '1px solid #B2DDFF' }}>Auto</span>
+                                    <span style={{ fontSize: '10px', background: darkMode ? '#1e293b' : '#F2F4F7', color: darkMode ? '#94a3b8' : '#344054', padding: '2px 8px', borderRadius: '12px', fontWeight: '500', border: darkMode ? '1px solid #334155' : '1px solid #D0D5DD' }}>Manual</span> :
+                                    <span style={{ fontSize: '10px', background: darkMode ? 'rgba(59, 130, 246, 0.1)' : '#EFF8FF', color: darkMode ? '#60a5fa' : '#175CD3', padding: '2px 8px', borderRadius: '12px', fontWeight: '500', border: darkMode ? '1px solid rgba(59, 130, 246, 0.2)' : '1px solid #B2DDFF' }}>Auto</span>
                                 }
                             </label>
                             <input
@@ -283,38 +302,35 @@ const MonitoringPage = () => {
                                 onChange={handleManualSerialChange}
                                 readOnly={!isManualPolicy}
                                 placeholder={isManualPolicy ? "Enter Serial" : "System Assigned"}
+                                className={`monitoring-input ${!isManualPolicy ? 'readonly' : ''}`}
                                 style={{
-                                    width: '100%', padding: '8px 12px', borderRadius: '6px',
-                                    border: isManualPolicy ? '1px solid #d0d5dd' : '1px solid #eaecf0',
-                                    backgroundColor: isManualPolicy ? '#fff' : '#f9fafb',
-                                    boxShadow: isManualPolicy ? '0 1px 2px rgba(16,24,40,0.05)' : 'none',
-                                    fontSize: '14px', color: serialNumber ? '#101828' : '#667085',
-                                    fontFamily: 'monospace', fontWeight: '500',
-                                    cursor: isManualPolicy ? 'text' : 'not-allowed'
+                                    width: '100%',
+                                    fontFamily: 'monospace',
+                                    fontWeight: '500'
                                 }}
                             />
                         </div>
 
                         {/* Row 3 */}
                         <div className="form-group">
-                            <label style={{ fontSize: '12px', fontWeight: '600', color: '#344054', marginBottom: '6px', display: 'block' }}>Client First Name</label>
-                            <input name="clientFirstName" value={formData.clientFirstName} onChange={handleChange} required style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d0d5dd', boxShadow: '0 1px 2px rgba(16,24,40,0.05)', fontSize: '14px', color: '#101828' }} />
+                            <label style={{ fontSize: '12px', fontWeight: '600', color: themes.textSecondary, marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Client First Name</label>
+                            <input name="clientFirstName" value={formData.clientFirstName} onChange={handleChange} required className="monitoring-input" style={{ width: '100%' }} />
                         </div>
 
                         <div className="form-group">
-                            <label style={{ fontSize: '12px', fontWeight: '600', color: '#344054', marginBottom: '6px', display: 'block' }}>Client Last Name</label>
-                            <input name="clientLastName" value={formData.clientLastName} onChange={handleChange} required style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d0d5dd', boxShadow: '0 1px 2px rgba(16,24,40,0.05)', fontSize: '14px', color: '#101828' }} />
+                            <label style={{ fontSize: '12px', fontWeight: '600', color: themes.textSecondary, marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Client Last Name</label>
+                            <input name="clientLastName" value={formData.clientLastName} onChange={handleChange} required className="monitoring-input" style={{ width: '100%' }} />
                         </div>
 
                         <div className="form-group">
-                            <label style={{ fontSize: '12px', fontWeight: '600', color: '#344054', marginBottom: '6px', display: 'block' }}>Client Email</label>
-                            <input type="email" name="clientEmail" value={formData.clientEmail} onChange={handleChange} required style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d0d5dd', boxShadow: '0 1px 2px rgba(16,24,40,0.05)', fontSize: '14px', color: '#101828' }} />
+                            <label style={{ fontSize: '12px', fontWeight: '600', color: themes.textSecondary, marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Client Email</label>
+                            <input type="email" name="clientEmail" value={formData.clientEmail} onChange={handleChange} required className="monitoring-input" style={{ width: '100%' }} />
                         </div>
 
                         {/* Row 4 */}
                         <div className="form-group">
-                            <label style={{ fontSize: '12px', fontWeight: '600', color: '#344054', marginBottom: '6px', display: 'block' }}>Mode of Payment</label>
-                            <select name="modeOfPayment" value={formData.modeOfPayment} onChange={handleChange} style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d0d5dd', boxShadow: '0 1px 2px rgba(16,24,40,0.05)', fontSize: '14px', color: '#101828' }}>
+                            <label style={{ fontSize: '12px', fontWeight: '600', color: themes.textSecondary, marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Mode of Payment</label>
+                            <select name="modeOfPayment" value={formData.modeOfPayment} onChange={handleChange} className="monitoring-select" style={{ width: '100%' }}>
                                 <option value="Annual">Annual</option>
                                 <option value="Semi-Annual">Semi-Annual</option>
                                 <option value="Quarterly">Quarterly</option>
@@ -323,7 +339,7 @@ const MonitoringPage = () => {
                         </div>
 
                         <div className="form-group">
-                            <label style={{ fontSize: '12px', fontWeight: '600', color: '#344054', marginBottom: '6px', display: 'block' }}>Premium Paid (PHP)</label>
+                            <label style={{ fontSize: '12px', fontWeight: '600', color: themes.textSecondary, marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Premium Paid (PHP)</label>
                             <input
                                 type="number"
                                 name="premiumPaid"
@@ -331,21 +347,23 @@ const MonitoringPage = () => {
                                 onChange={handleChange}
                                 placeholder="0.00"
                                 required
-                                style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d0d5dd', boxShadow: '0 1px 2px rgba(16,24,40,0.05)', fontSize: '14px', color: '#101828' }}
+                                className="monitoring-input"
+                                style={{ width: '100%' }}
                             />
                         </div>
 
                         <div className="form-group">
-                            <label style={{ fontSize: '12px', fontWeight: '600', color: '#344054', marginBottom: '6px', display: 'block' }}>ANP (Auto)</label>
+                            <label style={{ fontSize: '12px', fontWeight: '600', color: themes.textSecondary, marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>ANP (Auto)</label>
                             <input
                                 type="text"
                                 name="anp"
                                 value={formData.anp}
                                 readOnly
+                                className="monitoring-input readonly"
                                 style={{
-                                    width: '100%', padding: '8px 12px', borderRadius: '6px',
-                                    border: '1px solid #eaecf0', backgroundColor: '#f9fafb',
-                                    fontSize: '14px', color: '#101828', fontWeight: '600'
+                                    width: '100%',
+                                    fontWeight: '600',
+                                    boxShadow: 'none'
                                 }}
                                 placeholder="0.00"
                             />
@@ -353,15 +371,15 @@ const MonitoringPage = () => {
 
                         {/* Row 5 */}
                         <div className="form-group">
-                            <label style={{ fontSize: '12px', fontWeight: '600', color: '#344054', marginBottom: '6px', display: 'block' }}>Policy Date</label>
-                            <input type="date" name="policyDate" value={formData.policyDate} onChange={handleChange} required style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d0d5dd', boxShadow: '0 1px 2px rgba(16,24,40,0.05)', fontSize: '14px', color: '#101828' }} />
+                            <label style={{ fontSize: '12px', fontWeight: '600', color: themes.textSecondary, marginBottom: '6px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Policy Date</label>
+                            <input type="date" name="policyDate" value={formData.policyDate} onChange={handleChange} required className="monitoring-input" style={{ width: '100%' }} />
                         </div>
                     </div>
 
                     <div style={{
                         marginTop: '24px',
                         paddingTop: '16px',
-                        borderTop: '1px solid #eaecf0',
+                        borderTop: `1px solid ${themes.borderSubtle}`,
                         display: 'flex',
                         justifyContent: 'flex-end'
                     }}>

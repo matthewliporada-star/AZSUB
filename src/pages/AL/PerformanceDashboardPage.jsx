@@ -7,7 +7,7 @@ import { Bar, Doughnut } from 'react-chartjs-2';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const PerformanceDashboardPage = () => {
-    const { userRole, currentUser, performanceData, loadPerformanceData, loading } = useApp();
+    const { userRole, currentUser, performanceData, loadPerformanceData, loading, darkMode } = useApp();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: 'totalANP', direction: 'desc' });
@@ -114,7 +114,7 @@ const PerformanceDashboardPage = () => {
         labels: ['Issued', 'Pending', 'Declined'],
         datasets: [{
             data: [teamStats.totalIssued, teamStats.totalPending, teamStats.totalDeclined],
-            backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+            backgroundColor: ['#28a745', '#334155', '#dc3545']
         }]
     };
 
@@ -124,7 +124,7 @@ const PerformanceDashboardPage = () => {
         datasets: [{
             label: 'Policies Issued',
             data: Object.values(teamStats.policyDistribution || {}),
-            backgroundColor: ['#e67e22', '#3498db', '#9b59b6', '#1abc9c', '#e74c3c', '#f39c12', '#2ecc71'],
+            backgroundColor: ['#e67e22', '#3498db', '#9b59b6', '#1abc9c', '#e74c3c', '#3b82f6', '#2ecc71'],
             borderRadius: 6
         }]
     };
@@ -220,7 +220,7 @@ const PerformanceDashboardPage = () => {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: 'rgba(0,0,0,0.6)',
+                background: 'rgba(0, 0, 0, 0.8)',
                 backdropFilter: 'blur(4px)',
                 display: 'flex',
                 alignItems: 'center',
@@ -229,7 +229,7 @@ const PerformanceDashboardPage = () => {
                 padding: '20px'
             }} onClick={() => setShowStatModal(false)}>
                 <div style={{
-                    backgroundColor: '#fff',
+                    background: darkMode ? '#1e293b' : '#fff',
                     borderRadius: '24px',
                     maxWidth: '900px',
                     width: '95%',
@@ -245,13 +245,13 @@ const PerformanceDashboardPage = () => {
                         alignItems: 'start'
                     }}>
                         <div>
-                            <h3 style={{ margin: 0, color: '#0f172a', fontSize: '24px', fontWeight: '800', letterSpacing: '-0.5px' }}>{info.title}</h3>
-                            <p style={{ margin: '8px 0 0 0', color: '#64748b', fontSize: '15px' }}>{info.description}</p>
+                            <h3 style={{ margin: 0, color: darkMode ? '#f1f5f9' : '#0f172a', fontSize: '24px', fontWeight: '800', letterSpacing: '-0.5px' }}>{info.title}</h3>
+                            <p style={{ margin: '8px 0 0 0', color: darkMode ? '#94a3b8' : '#64748b', fontSize: '15px' }}>{info.description}</p>
                         </div>
                         <button
                             onClick={() => setShowStatModal(false)}
                             style={{
-                                background: '#f1f5f9',
+                                background: darkMode ? '#334155' : '#f1f5f9',
                                 border: 'none',
                                 borderRadius: '8px',
                                 padding: '8px 16px',
@@ -262,7 +262,7 @@ const PerformanceDashboardPage = () => {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 cursor: 'pointer',
-                                color: '#64748b',
+                                color: darkMode ? '#94a3b8' : '#64748b',
                                 transition: 'all 0.2s ease',
                                 fontSize: '12px',
                                 fontWeight: '600',
@@ -288,7 +288,7 @@ const PerformanceDashboardPage = () => {
                             padding: '32px',
                             borderRadius: '20px',
                             marginBottom: '32px',
-                            color: '#fff',
+                            color: darkMode ? '#e2e8f0' : '#1e293b',
                             boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
                         }}>
                             <div style={{ fontSize: '14px', opacity: 0.8, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>Current Value</div>
@@ -304,10 +304,11 @@ const PerformanceDashboardPage = () => {
                                             ...anpChartData,
                                             datasets: [{
                                                 ...anpChartData.datasets[0],
-                                                backgroundColor: '#3b82f6',
-                                                borderRadius: 8,
-                                                barThickness: 'flex',
-                                                maxBarThickness: 40
+                                                backgroundColor: darkMode ? '#f39c12' : '#fff',
+                                                border: darkMode ? '1px solid #334155' : '1px solid #eee',
+                                                borderRight: darkMode ? '5px solid #3b82f6' : '5px solid #0056b3',
+                                                borderRadius: '15px',
+                                                barThickness: 40
                                             }]
                                         }}
                                         options={{
@@ -337,11 +338,11 @@ const PerformanceDashboardPage = () => {
                                     display: 'flex',
                                     justifyContent: 'space-between',
                                     padding: '12px',
-                                    backgroundColor: '#f8fafc',
+                                    background: darkMode ? '#0f172a' : '#f8fafc',
                                     borderRadius: '8px'
                                 }}>
-                                    <span style={{ color: '#64748b', fontSize: '14px' }}>{detail.label}</span>
-                                    <span style={{ color: '#0f172a', fontWeight: '600', fontSize: '14px' }}>{detail.value}</span>
+                                    <span style={{ color: darkMode ? '#94a3b8' : '#64748b', fontSize: '14px' }}>{detail.label}</span>
+                                    <span style={{ color: darkMode ? '#f1f5f9' : '#0f172a', fontWeight: '600', fontSize: '14px' }}>{detail.value}</span>
                                 </div>
                             ))}
                         </div>
@@ -375,8 +376,8 @@ const PerformanceDashboardPage = () => {
             <div className="container" style={{
                 padding: '32px',
                 borderRadius: '16px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                backgroundColor: '#fff'
+                backgroundColor: darkMode ? '#161B22' : '#fff',
+                border: darkMode ? '1px solid #334155' : 'none'
             }}>
                 {/* Page Header */}
                 <div style={{ marginBottom: '24px' }}>
@@ -406,9 +407,9 @@ const PerformanceDashboardPage = () => {
                     <div
                         className="stat-card animate-spring delay-1"
                         style={{
-                            borderLeft: '4px solid #f39c12',
-                            backgroundColor: '#fff',
-                            boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+                            borderLeft: '4px solid #3b82f6',
+                            color: darkMode ? '#f1f5f9' : '#1e293b',
+                            boxShadow: darkMode ? '0 4px 15px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,0,0,0.05)',
                             cursor: 'pointer',
                             transition: 'transform 0.2s ease, box-shadow 0.2s ease'
                         }}
@@ -422,17 +423,17 @@ const PerformanceDashboardPage = () => {
                             e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.05)';
                         }}
                     >
-                        <div className="stat-header"><div className="stat-label">Total Team ANP</div></div>
-                        <div className="stat-value" style={{ color: '#2c3e50' }}>PHP {teamStats.totalTeamANP.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                        <div className="stat-header"><div className="stat-label" style={{ color: darkMode ? '#94a3b8' : '#64748b' }}>Total Team ANP</div></div>
+                        <div className="stat-value" style={{ color: darkMode ? '#fff' : '#2c3e50' }}>PHP {teamStats.totalTeamANP.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                         <div className="stat-subtext">All-time team production</div>
                     </div>
 
                     <div
                         className="stat-card animate-spring delay-2"
                         style={{
-                            borderLeft: '4px solid #28a745',
-                            backgroundColor: '#fff',
-                            boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+                            borderLeft: darkMode ? '4px solid #22c55e' : '4px solid #28a745',
+                            color: darkMode ? '#f1f5f9' : '#1e293b',
+                            boxShadow: darkMode ? '0 4px 15px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,0,0,0.05)',
                             cursor: 'pointer',
                             transition: 'transform 0.2s ease, box-shadow 0.2s ease'
                         }}
@@ -446,17 +447,17 @@ const PerformanceDashboardPage = () => {
                             e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.05)';
                         }}
                     >
-                        <div className="stat-header"><div className="stat-label">Monthly Team ANP</div></div>
-                        <div className="stat-value" style={{ color: '#28a745' }}>PHP {teamStats.totalMonthlyANP.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                        <div className="stat-header"><div className="stat-label" style={{ color: darkMode ? '#94a3b8' : '#64748b' }}>Monthly Team ANP</div></div>
+                        <div className="stat-value" style={{ color: '#22c55e' }}>PHP {teamStats.totalMonthlyANP.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                         <div className="stat-subtext">Current month intake</div>
                     </div>
 
                     <div
                         className="stat-card animate-spring delay-3"
                         style={{
-                            borderLeft: '4px solid #0055b8',
-                            backgroundColor: '#fff',
-                            boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+                            borderLeft: darkMode ? '4px solid #60a5fa' : '4px solid #0055b8',
+                            color: darkMode ? '#f1f5f9' : '#1e293b',
+                            boxShadow: darkMode ? '0 4px 15px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,0,0,0.05)',
                             cursor: 'pointer',
                             transition: 'transform 0.2s ease, box-shadow 0.2s ease'
                         }}
@@ -470,17 +471,17 @@ const PerformanceDashboardPage = () => {
                             e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.05)';
                         }}
                     >
-                        <div className="stat-header"><div className="stat-label">Avg Case Size</div></div>
-                        <div className="stat-value" style={{ color: '#0055b8' }}>PHP {avgCaseSize.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+                        <div className="stat-header"><div className="stat-label" style={{ color: darkMode ? '#94a3b8' : '#64748b' }}>Avg Case Size</div></div>
+                        <div className="stat-value" style={{ color: darkMode ? '#60a5fa' : '#0055b8' }}>PHP {avgCaseSize.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
                         <div className="stat-subtext">Per issued policy</div>
                     </div>
 
                     <div
                         className="stat-card animate-spring delay-4"
                         style={{
-                            borderLeft: '4px solid #9b59b6',
-                            backgroundColor: '#fff',
-                            boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+                            borderLeft: darkMode ? '4px solid #c084fc' : '4px solid #9b59b6',
+                            color: darkMode ? '#f1f5f9' : '#1e293b',
+                            boxShadow: darkMode ? '0 4px 15px rgba(0,0,0,0.3)' : '0 2px 10px rgba(0,0,0,0.05)',
                             cursor: 'pointer',
                             transition: 'transform 0.2s ease, box-shadow 0.2s ease'
                         }}
@@ -494,8 +495,8 @@ const PerformanceDashboardPage = () => {
                             e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.05)';
                         }}
                     >
-                        <div className="stat-header"><div className="stat-label">Active Agents</div></div>
-                        <div className="stat-value" style={{ color: '#9b59b6' }}>{activeAgents} <span style={{ fontSize: '14px', color: '#777' }}>/ {performanceByAP.length}</span></div>
+                        <div className="stat-header"><div className="stat-label" style={{ color: darkMode ? '#94a3b8' : '#64748b' }}>Active Agents</div></div>
+                        <div className="stat-value" style={{ color: darkMode ? '#c084fc' : '#9b59b6' }}>{activeAgents} <span style={{ fontSize: '14px', color: darkMode ? '#94a3b8' : '#777' }}>/ {performanceByAP.length}</span></div>
                         <div className="stat-subtext">{((activeAgents / performanceByAP.length) * 100).toFixed(0)}% Activation Rate</div>
                     </div>
                 </div>
@@ -621,7 +622,7 @@ const PerformanceDashboardPage = () => {
                                                     textTransform: 'uppercase',
                                                     letterSpacing: '0.5px',
                                                     fontWeight: '600',
-                                                    color: '#7f8c8d',
+                                                    color: darkMode ? '#94a3b8' : '#64748b',
                                                     cursor: 'pointer',
                                                     userSelect: 'none'
                                                 }}
@@ -671,7 +672,7 @@ const PerformanceDashboardPage = () => {
                                                                 height: '100%',
                                                                 borderRadius: '3px',
                                                                 width: `${Math.min(ap.conversionRate, 100)}%`,
-                                                                backgroundColor: parseFloat(ap.conversionRate) >= 50 ? '#2ecc71' : '#f39c12'
+                                                                backgroundColor: parseFloat(ap.conversionRate) >= 50 ? '#2ecc71' : '#334155'
                                                             }} />
                                                         </div>
                                                         <span style={{ fontSize: '12px', fontWeight: '600', color: '#555' }}>

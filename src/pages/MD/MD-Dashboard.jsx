@@ -15,8 +15,8 @@ const Dashboard = () => {
     <div className={`page create ${darkMode ? 'dark-mode' : ''}`} style={{
       minHeight: '100vh',
       padding: '20px',
-      background: darkMode ? '#000' : '#fff',
-      color: darkMode ? '#FFBD42' : '#333'
+      background: darkMode ? '#161B22' : '#fff',
+      color: darkMode ? '#f1f5f9' : '#333'
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Welcome MD</h2>
@@ -27,7 +27,7 @@ const Dashboard = () => {
             border: 'none',
             cursor: 'pointer',
             fontSize: '24px',
-            color: darkMode ? '#FFBD42' : '#64748b'
+            color: darkMode ? '#e2e8f0' : '#64748b'
           }}
         >
           <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>

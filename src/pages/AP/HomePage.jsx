@@ -128,7 +128,7 @@ const HomePage = () => {
                     <div className="summary-widget">
                         <div className="widget-title">My Efficiency</div>
                         <ul className="todo-list">
-                            <li className="todo-item"><span style={{ color: '#e67e22' }}>●</span> {pending} Pending Applications</li>
+                            <li className="todo-item"><span style={{ color: '#3b82f6' }}>●</span> {pending} Pending Applications</li>
                             <li className="todo-item"><span style={{ color: '#0055b8' }}>●</span> {recent} New Submissions (3 days)</li>
                             <li className="todo-item"><span style={{ color: '#28a745' }}>●</span> System Operational</li>
                         </ul>
@@ -176,8 +176,8 @@ const HomePage = () => {
                                     </label>
                                     <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <input type="radio" name="dayPriority" value="mid" />
-                                        <span style={{ display: 'inline-block', width: '12px', height: '12px', background: '#ffc107', borderRadius: '50%' }}></span>
-                                        Mid (Yellow)
+                                        <span style={{ display: 'inline-block', width: '12px', height: '12px', background: '#3b82f6', borderRadius: '50%' }}></span>
+                                        Mid (Blue)
                                     </label>
                                     <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <input type="radio" name="dayPriority" value="low" />

@@ -13,12 +13,16 @@
   --light-bg: #f5f7fb;
   --border-color: #e5e5e5;
 }
+
 /* The Main Container */
 .box-card {
   background: #ffffff;
-  border: 1px solid #d1d5db; /* Defined border for the 'box' look */
-  border-radius: 8px;        /* Slightly sharper corners for a boxy feel */
-  box-shadow: 4px 4px 0px 0px #f3f4f6; /* Optional: Hard shadow for a 'neo-brutalist' box look */
+  border: 1px solid #d1d5db;
+  /* Defined border for the 'box' look */
+  border-radius: 8px;
+  /* Slightly sharper corners for a boxy feel */
+  box-shadow: 4px 4px 0px 0px #f3f4f6;
+  /* Optional: Hard shadow for a 'neo-brutalist' box look */
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -30,7 +34,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  background-color: #fafafa; /* Light grey to distinguish the 'lid' of the box */
+  background-color: #fafafa;
+  /* Light grey to distinguish the 'lid' of the box */
   border-bottom: 1px solid #d1d5db;
 }
 
@@ -45,7 +50,8 @@
   font-size: 1rem;
   font-weight: 700;
   color: #111827;
-  text-transform: uppercase; /* Adds to the 'box label' aesthetic */
+  text-transform: uppercase;
+  /* Adds to the 'box label' aesthetic */
   letter-spacing: 0.025em;
 }
 
@@ -74,6 +80,7 @@
   background: #ffffff;
   min-height: 200px;
 }
+
 /* SIDEBAR */
 .sidebar {
   width: 260px;
@@ -531,7 +538,7 @@
 }
 
 .serial-card {
-  border-left: 4px solid #f4b43c;
+  border-left: 4px solid #3b82f6;
 }
 
 .serial-icon {
@@ -544,10 +551,10 @@
   right: -5px;
   width: 20px;
   height: 20px;
-  background: #f4b43c;
+  background: #3b82f6;
   border-radius: 50%;
   border: 3px solid white;
-  box-shadow: 0 2px 6px rgba(244, 180, 60, 0.4);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
 }
 
 /* BAR CHART */

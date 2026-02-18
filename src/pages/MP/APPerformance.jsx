@@ -1,5 +1,6 @@
 // APPerformance.jsx - FINAL UPDATED VERSION
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useApp } from '../../context/AppContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { APPageSkeleton } from './MPSkeletons';
 import { useMPData } from './MPData';
@@ -11,6 +12,7 @@ import './MP_Styles.css';
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const APPerformance = () => {
+    const { darkMode } = useApp();
     const { apPerformance, loading, refreshData } = useMPData();
     const location = useLocation();
     const navigate = useNavigate();
@@ -336,8 +338,8 @@ const APPerformance = () => {
 
         return (
             <div>
-                <h3 style={{ marginBottom: '8px', color: '#0f172a' }}>{currentHistoryData.title}</h3>
-                <p style={{ marginBottom: '24px', color: '#64748b', fontSize: '14px' }}>
+                <h3 style={{ marginBottom: '8px', color: darkMode ? '#FFFFFF' : '#0f172a' }}>{currentHistoryData.title}</h3>
+                <p style={{ marginBottom: '24px', color: darkMode ? '#94A3B8' : '#64748b', fontSize: '14px' }}>
                     {selectedStat === 'avgMonthlyCases'
                         ? `Total Policies (Issued + Declined) - ${currentMonth} ${appliedFilters.year}`
                         : selectedStat === 'totalANP'
@@ -347,21 +349,22 @@ const APPerformance = () => {
                 </p>
 
                 <div style={{
-                    background: '#f8fafc',
+                    background: darkMode ? '#161B22' : '#f8fafc',
                     padding: '20px',
                     borderRadius: '12px',
-                    marginBottom: '24px'
+                    marginBottom: '24px',
+                    border: darkMode ? '1px solid var(--border-subtle-dark)' : 'none'
                 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
                         <div>
-                            <div style={{ fontSize: '12px', color: '#64748b' }}>
+                            <div style={{ fontSize: '12px', color: darkMode ? '#94A3B8' : '#64748b' }}>
                                 {selectedStat === 'totalANP' ? 'Total Cumulative ANP' : 'Current Value'}
                             </div>
-                            <div style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a' }}>
+                            <div style={{ fontSize: '24px', fontWeight: '700', color: darkMode ? '#FFFFFF' : '#0f172a' }}>
                                 {selectedStat === 'avgMonthlyCases' ? (
                                     <>
                                         {(monthlyIssuedSum + monthlyDeclinedSum).toLocaleString()}
-                                        <div style={{ fontSize: '13px', color: '#64748b', fontWeight: '500', marginTop: '4px' }}>
+                                        <div style={{ fontSize: '13px', color: darkMode ? '#94A3B8' : '#64748b', fontWeight: '500', marginTop: '4px' }}>
                                             {monthlyIssuedSum.toLocaleString()} Issued · {monthlyDeclinedSum.toLocaleString()} Declined
                                         </div>
                                     </>
@@ -371,7 +374,7 @@ const APPerformance = () => {
                             </div>
                         </div>
                         <div>
-                            <div style={{ fontSize: '12px', color: '#64748b' }}>Yearly Change</div>
+                            <div style={{ fontSize: '12px', color: darkMode ? '#94A3B8' : '#64748b' }}>Yearly Change</div>
                             <div style={{
                                 fontSize: '24px',
                                 fontWeight: '700',
@@ -591,7 +594,7 @@ const APPerformance = () => {
 
                 <div
                     className="stat-card hover-card animate-spring delay-4"
-                    style={{ borderLeft: '4px solid #f39c12', cursor: 'pointer' }}
+                    style={{ borderLeft: '4px solid #3b82f6', cursor: 'pointer' }}
                     onClick={() => handleStatCardClick('avgMonthlyCases')}
                     onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
                     onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
@@ -623,7 +626,7 @@ const APPerformance = () => {
                                             filteredAPs.filter(ap => getAPPerformanceStatus(ap.monthlyCases) === 'NEEDS IMPROVEMENT' && ap.monthlyCases > 0).length,
                                             filteredAPs.filter(ap => ap.monthlyCases === 0).length
                                         ],
-                                        backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d']
+                                        backgroundColor: ['#28a745', '#334155', '#dc3545', '#6c757d']
                                     }]
                                 }}
                                 options={{
@@ -873,30 +876,36 @@ const APPerformance = () => {
                                     </div>
 
                                     {/* Policy Statistics Row */}
-                                    <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', marginBottom: '24px' }}>
-                                        <h4 style={{ marginBottom: '16px', color: '#0f172a' }}>Policy Statistics</h4>
+                                    <div className="mp-modal-summary-card" style={{
+                                        background: darkMode ? '#252525' : '#f8fafc',
+                                        padding: '20px',
+                                        borderRadius: '12px',
+                                        marginBottom: '24px',
+                                        border: darkMode ? '1px solid var(--border-subtle-dark)' : 'none'
+                                    }}>
+                                        <h4 style={{ marginBottom: '16px', color: darkMode ? '#FFFFFF' : '#0f172a' }}>Policy Statistics</h4>
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
                                             <div>
-                                                <div style={{ fontSize: '12px', color: '#64748b' }}>Issued Policies</div>
-                                                <div style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a' }}>
+                                                <div style={{ fontSize: '12px', color: darkMode ? '#94A3B8' : '#64748b' }}>Issued Policies</div>
+                                                <div style={{ fontSize: '24px', fontWeight: '700', color: darkMode ? '#FFFFFF' : '#0f172a' }}>
                                                     {selectedAP.totalCases}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div style={{ fontSize: '12px', color: '#64748b' }}>Declined</div>
+                                                <div style={{ fontSize: '12px', color: darkMode ? '#94A3B8' : '#64748b' }}>Declined</div>
                                                 <div style={{ fontSize: '24px', fontWeight: '700', color: '#dc3545' }}>
                                                     {policyDetailsData.totalDeclined || 0}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div style={{ fontSize: '12px', color: '#64748b' }}>Monthly ANP</div>
+                                                <div style={{ fontSize: '12px', color: darkMode ? '#94A3B8' : '#64748b' }}>Monthly ANP</div>
                                                 <div style={{ fontSize: '24px', fontWeight: '700', color: '#0055b8' }}>
                                                     ₱ {selectedAP.monthlyANP.toLocaleString()}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div style={{ fontSize: '12px', color: '#64748b' }}>Most Availed</div>
-                                                <div style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a' }}>
+                                                <div style={{ fontSize: '12px', color: darkMode ? '#94A3B8' : '#64748b' }}>Most Availed</div>
+                                                <div style={{ fontSize: '16px', fontWeight: '700', color: darkMode ? '#FFFFFF' : '#0f172a' }}>
                                                     {policyDetailsData.policyDistribution.length > 0
                                                         ? policyDetailsData.policyDistribution[0].policy_name
                                                         : 'N/A'}
@@ -906,7 +915,7 @@ const APPerformance = () => {
                                     </div>
 
                                     {/* Policy Breakdown Table */}
-                                    <h4 style={{ marginBottom: '16px', color: '#0f172a' }}>Policy Breakdown</h4>
+                                    <h4 style={{ marginBottom: '16px', color: darkMode ? '#FFFFFF' : '#0f172a' }}>Policy Breakdown</h4>
                                     <div className="modal-table-responsive" style={{ marginBottom: '32px' }}>
                                         <table className="policy-table">
                                             <thead>

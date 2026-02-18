@@ -59,7 +59,7 @@ const LoginPage = () => {
                         onClick={() => handleLogin('AL')}
                         style={{
                             padding: '16px',
-                            background: 'linear-gradient(135deg, #f39c12 0%, #d35400 100%)',
+                            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
                             border: 'none',
                             borderRadius: '12px',
                             color: 'white',

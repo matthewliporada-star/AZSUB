@@ -127,7 +127,7 @@ const AdminActivityLogs = () => {
                             className="admin-dark-mode-toggle"
                             onClick={toggleDarkMode}
                             title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '15px', fontSize: '18px', color: darkMode ? '#FFBD42' : '#64748b', transition: 'color 0.3s' }}
+                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '15px', fontSize: '18px', color: darkMode ? '#e2e8f0' : '#64748b', transition: 'color 0.3s' }}
                         >
                             <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
                         </button>

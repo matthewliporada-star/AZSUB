@@ -740,7 +740,7 @@ body.dark-mode .admin-header {
 }
 
 body.dark-mode .admin-header h1 {
-    color: #FFBD42;
+    color: #e2e8f0;
 }
 
 body.dark-mode .admin-sidebar {
@@ -752,7 +752,7 @@ body.dark-mode .admin-sidebar {
 body.dark-mode .admin-sidebar-toggle {
     background: #000;
     border-color: #333;
-    color: #FFBD42;
+    color: #e2e8f0;
 }
 
 body.dark-mode .admin-sidebar-toggle:hover {
@@ -761,20 +761,19 @@ body.dark-mode .admin-sidebar-toggle:hover {
 
 /* Cards */
 body.dark-mode .admin-card {
-    background: #111;
-    border: 1px solid #222;
+    background: #161B22;
+    border: 1px solid var(--border-subtle-dark);
     border-left: 4px solid var(--primary-color);
-    /* Keep colored left border or change? */
-    color: #e2e8f0;
-    box-shadow: 0 4px 12px rgba(255, 189, 66, 0.05);
+    color: var(--text-primary-dark);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode .admin-card-number {
-    color: #FFBD42;
+    color: var(--text-primary-dark);
 }
 
 body.dark-mode .admin-card-title {
-    color: #94a3b8;
+    color: var(--text-secondary-dark);
 }
 
 /* Table */
@@ -787,7 +786,7 @@ body.dark-mode .admin-user-table {
 
 body.dark-mode .admin-user-table th {
     background: #1a1a1a;
-    color: #FFBD42;
+    color: #ffffff;
     border-bottom: 1px solid #333;
     border-right: 1px solid #333;
 }
@@ -807,7 +806,7 @@ body.dark-mode .admin-user-table tbody tr:hover {
 }
 
 body.dark-mode .container-header h2 {
-    color: #FFBD42;
+    color: #ffffff;
 }
 
 /* Buttons */
@@ -822,15 +821,15 @@ body.dark-mode .btn-secondary:hover {
 
 /* Modal */
 body.dark-mode .modal-content {
-    background: #121212;
-    border: 1px solid #333;
-    color: #e2e8f0;
+    background: #161B22;
+    border: 1px solid var(--border-subtle-dark);
+    color: var(--text-primary-dark);
 }
 
 body.dark-mode .modal-title {
-    background: #1a1a1a !important;
-    border-bottom: 1px solid #333 !important;
-    color: #FFBD42;
+    background: #161B22 !important;
+    border-bottom: 1px solid var(--border-subtle-dark) !important;
+    color: var(--text-primary-dark);
 }
 
 body.dark-mode .input-group label {

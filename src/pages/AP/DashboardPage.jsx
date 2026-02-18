@@ -172,7 +172,7 @@ const DashboardPage = () => {
         labels: ['Issued', 'Pending', 'Declined'],
         datasets: [{
             data: [stats.issued, stats.pending, stats.declined],
-            backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+            backgroundColor: ['#28a745', '#334155', '#dc3545']
         }]
     };
 
@@ -320,11 +320,11 @@ const DashboardPage = () => {
                     onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                 >
                     <div className="stat-header">
-                        <div className="stat-label" style={{ color: '#395998', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Tools</div>
+                        <div className="stat-label" style={{ color: darkMode ? '#60a5fa' : '#395998', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Tools</div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                        <div style={{ background: 'rgba(57, 89, 152, 0.1)', padding: '10px', borderRadius: '12px' }}>
-                            <span style={{ fontSize: '24px' }}>📅</span>
+                        <div style={{ background: darkMode ? 'rgba(96, 165, 250, 0.1)' : 'rgba(57, 89, 152, 0.1)', padding: '10px', borderRadius: '12px' }}>
+                            <span style={{ fontSize: '24px', filter: darkMode ? 'grayscale(1) brightness(1.5)' : 'none' }}>📅</span>
                         </div>
                         <div>
                             <div className="stat-value" style={{ fontSize: '18px', marginBottom: '2px', color: darkMode ? '#FFFDFE' : '#2c3e50' }}>Calendar</div>
@@ -341,10 +341,10 @@ const DashboardPage = () => {
                     position: 'relative',
                     overflow: 'hidden'
                 }}>
-                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: '#f59e0b' }}>📝</div>
+                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: darkMode ? '#3b82f6' : '#3b82f6' }}>📝</div>
                     <div className="stat-header"><div className="stat-label" style={{ color: darkMode ? '#94a3b8' : '#64748b', fontSize: '14px', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: '600' }}>Submitted</div></div>
                     <div className="stat-value" style={{ color: darkMode ? '#FFFDFE' : '#1e293b', fontSize: '28px', fontWeight: '800', margin: '10px 0' }}>{stats.submitted}</div>
-                    <div className="stat-subtext" style={{ color: darkMode ? '#94a3b8' : '#64748b', fontSize: '13px' }}>Applications</div>
+                    <div className="stat-subtext" style={{ color: darkMode ? '#94a3b8' : '#3b82f6', fontSize: '13px' }}>Applications</div>
                 </div>
 
                 <div className="stat-card purple animate-spring delay-1" style={{
@@ -367,10 +367,10 @@ const DashboardPage = () => {
                     position: 'relative',
                     overflow: 'hidden'
                 }}>
-                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: '#eab308' }}>⏱</div>
+                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: darkMode ? '#3b82f6' : '#3b82f6' }}>⏱</div>
                     <div className="stat-header"><div className="stat-label" style={{ color: darkMode ? '#94a3b8' : '#64748b', fontSize: '14px', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: '600' }}>Pending</div></div>
                     <div className="stat-value" style={{ color: darkMode ? '#FFFDFE' : '#1e293b', fontSize: '28px', fontWeight: '800', margin: '10px 0' }}>{stats.pending}</div>
-                    <div className="stat-subtext" style={{ color: '#eab308', fontSize: '13px' }}>Awaiting Action</div>
+                    <div className="stat-subtext" style={{ color: darkMode ? '#60a5fa' : '#3b82f6', fontSize: '13px' }}>Awaiting Action</div>
                 </div>
 
                 <div className="stat-card red animate-spring delay-3" style={{
@@ -401,11 +401,11 @@ const DashboardPage = () => {
                     </div>
                 </div>
                 <div className="chart-container animate-spring delay-5" style={{
-                    background: darkMode ? '#1e293b' : 'white',
+                    background: darkMode ? '#161B22' : 'white',
                     borderRadius: '16px',
                     padding: '24px',
                     boxShadow: darkMode ? '0 4px 6px -1px rgba(0, 0, 0, 0.3)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                    border: darkMode ? '1px solid #334155' : '1px solid #e2e8f0'
+                    border: darkMode ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid #e2e8f0'
                 }}>
                     <div className="chart-title" style={{ color: darkMode ? '#e2e8f0' : '#1e293b', fontSize: '18px', fontWeight: '700', marginBottom: '20px' }}>Most Availed Policies</div>
                     <div className="chart-wrapper">
@@ -424,12 +424,12 @@ const DashboardPage = () => {
             </div>
 
             <div className="content-container animate-spring delay-1" style={{
-                background: darkMode ? '#1e293b' : 'white',
+                background: darkMode ? '#161B22' : 'white',
                 borderRadius: '16px',
                 padding: '24px',
                 marginTop: '30px',
                 boxShadow: darkMode ? '0 4px 6px -1px rgba(0, 0, 0, 0.3)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                border: darkMode ? 'none' : '1px solid #e2e8f0'
+                border: darkMode ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid #e2e8f0'
             }}>
                 <div style={{ marginBottom: '20px' }}>
                     <h2 style={{ fontSize: '20px', margin: 0, color: darkMode ? '#FFFDFE' : '#1e293b', fontWeight: '700' }}>Serial Number Usage</h2>
@@ -599,8 +599,8 @@ const DashboardPage = () => {
                                     </label>
                                     <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <input type="radio" name="dayPriority" value="mid" />
-                                        <span style={{ display: 'inline-block', width: '12px', height: '12px', background: '#ffc107', borderRadius: '50%' }}></span>
-                                        Mid (Yellow)
+                                        <span style={{ display: 'inline-block', width: '12px', height: '12px', background: '#3b82f6', borderRadius: '50%' }}></span>
+                                        Mid (Blue)
                                     </label>
                                     <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <input type="radio" name="dayPriority" value="low" />

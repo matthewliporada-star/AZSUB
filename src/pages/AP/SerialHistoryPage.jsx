@@ -44,12 +44,12 @@ const SerialHistoryPage = () => {
             return { text: 'Submitted', color: darkMode ? '#FFFDFE' : '#28a745', bg: darkMode ? '#395998' : '#d4edda' };
         }
         // [UPDATE] Changed text from 'Pending Docs' to 'Serial Generated'
-        return { text: 'Serial Generated', color: darkMode ? '#000' : '#856404', bg: darkMode ? '#FBD045' : '#fff3cd' };
+        return { text: 'Serial Generated', color: darkMode ? '#e2e8f0' : '#1e3a8a', bg: darkMode ? '#1e293b' : '#e0f2fe' };
     };
 
     return (
         <div className="content-container">
-            <div style={{ marginBottom: '20px', borderBottom: '2px solid #f1f1f1', paddingBottom: '15px' }}>
+            <div style={{ marginBottom: '20px', paddingBottom: '15px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
                     <div>
                         <h2 style={{ margin: '0 0 5px 0', color: darkMode ? '#FFFDFE' : 'inherit' }}>Serial Request History</h2>
@@ -80,11 +80,12 @@ const SerialHistoryPage = () => {
                         </div>
                         <div style={{
                             padding: '10px 15px',
-                            background: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)',
+                            background: darkMode ? '#0055b8' : 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)',
                             borderRadius: '8px',
                             fontSize: '14px',
                             fontWeight: '600',
-                            color: '#0055b8'
+                            color: darkMode ? '#FFFDFE' : '#0055b8',
+                            boxShadow: darkMode ? '0 4px 6px -1px rgba(0, 0, 0, 0.2)' : 'none'
                         }}>
                             Total: {filteredItems.length}
                         </div>
@@ -99,7 +100,7 @@ const SerialHistoryPage = () => {
                         color: darkMode ? '#cbd5e1' : '#6c757d',
                         background: darkMode ? '#1f2937' : '#f8f9fa',
                         borderRadius: '12px',
-                        border: darkMode ? '2px dashed #E1942D' : '2px dashed #dee2e6'
+                        border: darkMode ? '2px dashed #3b82f6' : '2px dashed #dee2e6'
                     }}>
                         <div style={{ fontSize: '48px', marginBottom: '15px' }}>📋</div>
                         <h3 style={{ color: darkMode ? '#FFFDFE' : '#495057', marginBottom: '8px' }}>No serial requests found</h3>

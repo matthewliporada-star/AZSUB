@@ -25,40 +25,40 @@ body {
 
 /* --- GLOBAL DARK MODE --- */
 body.dark-mode {
-    background-color: #1a1a1a;
-    color: #e2e8f0;
+    background-color: var(--dark-bg);
+    color: var(--text-secondary-dark);
 }
 
 /* Common Layout Components in Dark Mode */
 .dark-mode .sidebar,
 .dark-mode .mp-sidebar {
-    background-color: #252525 !important;
-    border-right: 1px solid #333 !important;
+    background: var(--dark-sidebar) !important;
+    border-right: 1px solid var(--border-subtle-dark) !important;
 }
 
 .dark-mode .top-bar,
 .dark-mode .mp-header,
 body.dark-mode .al-layout .top-bar,
 body.dark-mode .ap-layout .top-bar {
-    background: #252525 !important;
-    border-bottom: 1px solid #333 !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    background: var(--dark-sidebar) !important;
+    border-bottom: 1px solid var(--border-subtle-dark) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
 }
 
 /* Top Bar Text/Icons */
 body.dark-mode .al-layout .top-bar .connection-indicator,
 body.dark-mode .ap-layout .top-bar .connection-indicator {
-    color: #e2e8f0 !important;
+    color: var(--text-secondary-dark) !important;
 }
 
 .dark-mode .main-content {
-    background-color: #1a1a1a !important;
+    background-color: var(--dark-bg) !important;
 }
 
 /* Sidebar Items Dark Mode */
 .dark-mode .sidebar-item,
 .dark-mode .mp-layout .sidebar-item {
-    color: #94a3b8;
+    color: var(--text-secondary-dark);
 }
 
 .dark-mode .sidebar-item:hover,
@@ -66,39 +66,38 @@ body.dark-mode .ap-layout .top-bar .connection-indicator {
 .dark-mode .mp-layout .sidebar-item.active,
 body.dark-mode .al-layout .sidebar-item.active,
 body.dark-mode .ap-layout .sidebar-item.active {
-    background-color: rgba(255, 189, 66, 0.15) !important;
-    color: #FFBD42 !important;
-    border-left-color: #FFBD42 !important;
+    background-color: rgba(57, 89, 152, 0.15) !important;
+    color: var(--primary-blue-dark) !important;
+    border-left-color: var(--primary-blue-dark) !important;
 }
 
 /* Sidebar Background Specifics */
 body.dark-mode .al-layout .sidebar,
 body.dark-mode .ap-layout .sidebar {
-    background: #252525 !important;
-    border-right: 1px solid #333 !important;
+    background: var(--dark-sidebar) !important;
+    border-right: 1px solid var(--border-subtle-dark) !important;
 }
 
 /* Sidebar Text */
 body.dark-mode .al-layout .sidebar-item,
 body.dark-mode .ap-layout .sidebar-item {
-    color: #94a3b8 !important;
+    color: var(--text-secondary-dark) !important;
 }
 
 body.dark-mode .al-layout .sidebar-item:hover,
 body.dark-mode .ap-layout .sidebar-item:hover {
-    color: #FFBD42 !important;
-    background: rgba(255, 189, 66, 0.15) !important;
+    color: var(--primary-blue-dark) !important;
+    background: rgba(57, 89, 152, 0.15) !important;
 }
 
 .dark-mode .sidebar-item svg,
 .dark-mode .sidebar-item i {
     color: currentColor;
-    /* Inherit gold or gray */
 }
 
 /* Active Icon styling specific to sidebar implementation */
 .dark-mode .sidebar-item.active .sidebar-icon svg {
-    stroke: #FFBD42;
+    stroke: var(--primary-blue-dark);
 }
 
 /* Cards & Containers */
@@ -106,30 +105,23 @@ body.dark-mode .ap-layout .sidebar-item:hover {
 .dark-mode .dashboard-card,
 .dark-mode .stat-card,
 .dark-mode .glass-card,
-/* Cards & Containers */
-/* STAT CARDS - GOLD */
-.dark-mode .stat-card {
-    background-color: #FFBD42 !important;
-    border: 1px solid #FFBD42 !important;
-    color: #000000 !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
-}
-
-.dark-mode .stat-card * {
-    color: #000000 !important;
-}
-
-/* Other containers become Gray */
-.dark-mode .card,
-.dark-mode .dashboard-card,
-.dark-mode .glass-card,
 .dark-mode .content-container,
 .dark-mode .chart-container,
 .dark-mode .container-body {
-    background-color: #252525 !important;
-    border: 1px solid #333 !important;
-    color: #e2e8f0 !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+    background-color: #161B22 !important;
+    border: 1px solid var(--border-subtle-dark) !important;
+    color: var(--text-primary-dark) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark-mode .stat-label,
+.dark-mode .stat-subtext {
+    color: var(--text-secondary-dark) !important;
+}
+
+/* STAT CARDS - INDIGO Blue */
+.dark-mode .stat-card {
+    border-top: 2px solid var(--primary-blue-dark) !important;
 }
 
 /* Typography */
@@ -139,7 +131,7 @@ body.dark-mode .ap-layout .sidebar-item:hover {
 .dark-mode h4,
 .dark-mode h5,
 .dark-mode h6 {
-    color: #FFBD42 !important;
+    color: var(--text-primary-dark) !important;
 }
 
 .dark-mode p,
@@ -150,32 +142,32 @@ body.dark-mode .ap-layout .sidebar-item:hover {
 
 /* Tables */
 .dark-mode table {
-    background-color: #111;
+    background-color: #161B22;
     color: #e2e8f0;
 }
 
 .dark-mode th {
-    background-color: #1a1a1a !important;
-    color: #FFBD42 !important;
+    background-color: #003266 !important;
+    color: #ffffff !important;
     border-bottom: 1px solid #333 !important;
 }
 
 .dark-mode td {
-    border-bottom: 1px solid #222 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
     color: #e2e8f0 !important;
 }
 
 .dark-mode tbody tr {
-    background-color: #111 !important;
+    background-color: #161B22 !important;
     color: #e2e8f0 !important;
 }
 
 .dark-mode tbody tr:nth-child(even) {
-    background-color: #1a1a1a !important;
+    background-color: rgba(255, 255, 255, 0.02) !important;
 }
 
 .dark-mode tbody tr:hover {
-    background-color: #252525 !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
 }
 
 /* Buttons */

@@ -1,11 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 // [CHANGE] Import the new logo
-import logo1 from '../../assets/White logo.png';
+import logoLight from '../../assets/logo1.png';
+import logoDark from '../../assets/White logo.png';
 
 const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
     const location = useLocation();
-    const { userRole, loading } = useApp();
+    const { userRole, loading, darkMode } = useApp();
 
     // AP Menu Items
     const apMenuItems = [
@@ -147,7 +148,7 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
             <div className="sidebar-header">
                 <div className="sidebar-logo">
                     <img
-                        src={logo1}
+                        src={darkMode ? logoDark : logoLight}
                         alt="Caelum"
                         className={`sidebar-logo-img ${sidebarOpen ? '' : 'collapsed'}`}
                     />

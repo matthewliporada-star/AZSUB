@@ -1,5 +1,6 @@
 // MP-Dashboard.jsx - UPDATED VERSION with clickable stat cards and history feature
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 import { Bar, Doughnut } from 'react-chartjs-2';
@@ -11,6 +12,7 @@ import './MP_Styles.css';
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const MPDashboard = () => {
+    const { darkMode } = useApp();
     const { mpStats, alPerformance, apPerformance, refreshData, loading, error } = useMPData();
 
 
@@ -314,21 +316,22 @@ const MPDashboard = () => {
 
         return (
             <div>
-                <h3 style={{ marginBottom: '8px', color: '#0f172a' }}>{currentHistoryData.title}</h3>
-                <p style={{ marginBottom: '24px', color: '#64748b', fontSize: '14px' }}>
+                <h3 style={{ marginBottom: '8px', color: darkMode ? '#FFFFFF' : '#0f172a' }}>{currentHistoryData.title}</h3>
+                <p style={{ marginBottom: '24px', color: darkMode ? '#94A3B8' : '#64748b', fontSize: '14px' }}>
                     {currentHistoryData.description} - {currentMonth} {appliedFilters.year}
                 </p>
 
                 <div className="stats-summary-card" style={{
-                    background: '#f8fafc',
+                    background: darkMode ? '#161B22' : '#f8fafc',
                     padding: '20px',
                     borderRadius: '12px',
-                    marginBottom: '24px'
+                    marginBottom: '24px',
+                    border: darkMode ? '1px solid var(--border-subtle-dark)' : 'none'
                 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
                         <div>
-                            <div className="summary-label" style={{ fontSize: '12px', color: '#64748b' }}>Current Value</div>
-                            <div className="stat-current-value" style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a' }}>
+                            <div className="summary-label" style={{ fontSize: '12px', color: darkMode ? '#94A3B8' : '#64748b' }}>Current Value</div>
+                            <div className="stat-current-value" style={{ fontSize: '24px', fontWeight: '700', color: darkMode ? '#FFFFFF' : '#0f172a' }}>
                                 {selectedStat === 'activityRatio' && `${currentHistoryData?.currentValue || 0}%`}
                                 {selectedStat === 'totalANP' && `₱ ${(currentHistoryData?.currentValue || 0).toLocaleString()}`}
                                 {selectedStat === 'monthlyANP' && `₱ ${(currentHistoryData?.currentValue || 0).toLocaleString()}`}
@@ -336,7 +339,7 @@ const MPDashboard = () => {
                                 {selectedStat === 'totalCases' && (
                                     <>
                                         {(currentHistoryData?.currentValue || 0).toLocaleString()}
-                                        <div style={{ fontSize: '13px', color: '#64748b', fontWeight: '500', marginTop: '4px' }}>
+                                        <div style={{ fontSize: '13px', color: darkMode ? '#94A3B8' : '#64748b', fontWeight: '500', marginTop: '4px' }}>
                                             {mpStats.monthlyCases?.toLocaleString() || 0} Issued · {mpStats.monthlyDeclined || 0} Declined
                                         </div>
                                     </>
@@ -346,7 +349,7 @@ const MPDashboard = () => {
                             </div>
                         </div>
                         <div>
-                            <div className="summary-label" style={{ fontSize: '12px', color: '#64748b' }}>Yearly Change</div>
+                            <div className="summary-label" style={{ fontSize: '12px', color: darkMode ? '#94A3B8' : '#64748b' }}>Yearly Change</div>
                             <div className="stat-yearly-change" style={{
                                 fontSize: '24px',
                                 fontWeight: '700',
@@ -797,8 +800,8 @@ const MPDashboard = () => {
                                         <tr key={al.id}>
                                             <td>
                                                 <div className="rank-badge" style={{
-                                                    background: index === 0 ? '#FFD700' :
-                                                        index === 1 ? '#C0C0C0' :
+                                                    background: index === 0 ? '#3b82f6' :
+                                                        index === 1 ? '#e2e8f0' :
                                                             index === 2 ? '#CD7F32' : '#f8fafc',
                                                     borderColor: index === 0 ? '#FFD700' :
                                                         index === 1 ? '#C0C0C0' :
@@ -934,9 +937,11 @@ const MPDashboard = () => {
                             </div>
                             <div className="mp-modal-body">
                                 <div className="mp-modal-summary-card" style={{
+                                    background: darkMode ? '#252525' : '#f8fafc',
                                     padding: '20px',
                                     borderRadius: '12px',
-                                    marginBottom: '20px'
+                                    marginBottom: '20px',
+                                    border: darkMode ? '1px solid var(--border-subtle-dark)' : 'none'
                                 }}>
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
                                         <div>
@@ -1159,7 +1164,13 @@ const MPDashboard = () => {
                                     </div>
                                 )}
 
-                                <div className="mp-modal-summary-card" style={{ marginBottom: '20px', padding: '20px', borderRadius: '12px' }}>
+                                <div className="mp-modal-summary-card" style={{
+                                    background: darkMode ? '#252525' : '#f8fafc',
+                                    marginBottom: '20px',
+                                    padding: '20px',
+                                    borderRadius: '12px',
+                                    border: darkMode ? '1px solid var(--border-subtle-dark)' : 'none'
+                                }}>
                                     <h4 className="mp-modal-section-title" style={{ marginBottom: '16px' }}>Policy Statistics - {selectedMonthYear}</h4>
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
                                         <div>

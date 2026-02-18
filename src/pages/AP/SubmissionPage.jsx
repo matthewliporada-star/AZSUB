@@ -1,8 +1,9 @@
-// - Updated to render Dynamic Requirements
 import { useState } from 'react';
+import { useApp } from '../../context/AppContext';
 import api from '../../services/api';
 
 const SubmissionPage = () => {
+    const { darkMode } = useApp();
     // --- STATE MANAGEMENT ---
     const [formData, setFormData] = useState({
         serialNumber: '', formType: '', policyType: '',
@@ -73,64 +74,64 @@ const SubmissionPage = () => {
         return 'VUL';
     };
 
-const handleSerialBlur = async () => {
-    if (!formData.serialNumber) return;
+    const handleSerialBlur = async () => {
+        if (!formData.serialNumber) return;
 
-    try {
-        setLoading(true);
-        setMessage('Fetching serial details...');
-        setMessageType('info');
-        setGeneratedPdfUrl(null);
+        try {
+            setLoading(true);
+            setMessage('Fetching serial details...');
+            setMessageType('info');
+            setGeneratedPdfUrl(null);
 
-        const response = await api.getSerialDetails(formData.serialNumber);
+            const response = await api.getSerialDetails(formData.serialNumber);
 
-        if (response.success) {
-            const data = response.data;
-            const detectedCategory = getCategoryFromPolicy(data.policyType);
+            if (response.success) {
+                const data = response.data;
+                const detectedCategory = getCategoryFromPolicy(data.policyType);
 
-            setFormData(prev => ({
-                ...prev,
-                policyType: data.policyType || '',
-                modeOfPayment: data.modeOfPayment || '',
-                policyDate: data.policyDate || '',
-                clientFirstName: data.clientFirstName || '',
-                clientLastName: data.clientLastName || '',
-                formType: detectedCategory
-            }));
+                setFormData(prev => ({
+                    ...prev,
+                    policyType: data.policyType || '',
+                    modeOfPayment: data.modeOfPayment || '',
+                    policyDate: data.policyDate || '',
+                    clientFirstName: data.clientFirstName || '',
+                    clientLastName: data.clientLastName || '',
+                    formType: detectedCategory
+                }));
 
-            if (data.requirements && Array.isArray(data.requirements) && data.requirements.length > 0) {
-                setDynamicRequirements(data.requirements);
+                if (data.requirements && Array.isArray(data.requirements) && data.requirements.length > 0) {
+                    setDynamicRequirements(data.requirements);
+                } else {
+                    setDynamicRequirements([]);
+                }
+
+                setMessage(`Serial found! Identified as ${detectedCategory} Application.`);
+                setMessageType('success');
             } else {
+                // --- THE ERROR MESSAGE IS SET HERE ---
+                // This captures the message from the backend (e.g., "Serial is already ISSUED")
+                setMessage(response.message || 'Serial Number not found.');
+                setMessageType('error');
+
+                // Clear the form to reset the UI and hide the requirement sections
+                setFormData(prev => ({
+                    ...prev,
+                    formType: '',
+                    policyType: '',
+                    clientFirstName: '',
+                    clientLastName: ''
+                }));
                 setDynamicRequirements([]);
             }
-
-            setMessage(`Serial found! Identified as ${detectedCategory} Application.`);
-            setMessageType('success');
-        } else {
-            // --- THE ERROR MESSAGE IS SET HERE ---
-            // This captures the message from the backend (e.g., "Serial is already ISSUED")
-            setMessage(response.message || 'Serial Number not found.');
+        } catch (error) {
+            console.error(error);
+            // Fallback if the server is down or has a different error
+            setMessage(error.response?.data?.message || 'Error connecting to server.');
             setMessageType('error');
-            
-            // Clear the form to reset the UI and hide the requirement sections
-            setFormData(prev => ({ 
-                ...prev, 
-                formType: '', 
-                policyType: '', 
-                clientFirstName: '', 
-                clientLastName: '' 
-            }));
-            setDynamicRequirements([]);
+        } finally {
+            setLoading(false);
         }
-    } catch (error) {
-        console.error(error);
-        // Fallback if the server is down or has a different error
-        setMessage(error.response?.data?.message || 'Error connecting to server.');
-        setMessageType('error');
-    } finally {
-        setLoading(false);
-    }
-};
+    };
 
     const handleTextChange = (e) => {
         const { name, value } = e.target;
@@ -332,36 +333,54 @@ const handleSerialBlur = async () => {
     const showMedicalSection = formData.formType && (formData.formType !== 'VUL' || !isGAE);
 
     return (
-        <div className="content-container">
-            <div style={{ marginBottom: '20px', borderBottom: '2px solid #f1f1f1', paddingBottom: '15px' }}>
-                <h2 style={{ fontSize: '20px', margin: 0 }}>Document Submission</h2>
+        <div className="content-container animate-spring">
+            <div style={{ marginBottom: '24px', borderBottom: `1px solid ${darkMode ? 'rgba(255, 255, 255, 0.1)' : '#eaecf0'}`, paddingBottom: '16px' }}>
+                <h2 style={{ fontSize: '22px', margin: 0, fontWeight: '700', color: darkMode ? '#FFFDFE' : '#101828' }}>Document Submission</h2>
             </div>
             <div>
                 {message && (
-    <div className={`alert ${messageType === 'success' ? 'alert-success' : 'alert-error'}`}
-        style={{
-            padding: '10px', 
-            marginBottom: '15px', 
-            borderRadius: '4px',
-            backgroundColor: messageType === 'success' ? '#d4edda' : '#f8d7da',
-            color: messageType === 'success' ? '#155724' : '#721c24'
-        }}>
-        {message}
-    </div>
-)}
+                    <div className={`alert ${messageType === 'success' ? 'alert-success' : 'alert-error'}`}
+                        style={{
+                            padding: '12px 16px',
+                            marginBottom: '20px',
+                            borderRadius: '8px',
+                            fontWeight: '500'
+                        }}>
+                        {message}
+                    </div>
+                )}
                 {generatedPdfUrl && (
-                    <div style={{ padding: '15px', backgroundColor: '#e8f4fd', borderRadius: '6px', marginBottom: '20px', border: '1px solid #b8daff', textAlign: 'center' }}>
-                        <h4 style={{ margin: '0 0 10px 0', color: '#004085' }}>Application Generated Successfully!</h4>
+                    <div style={{
+                        padding: '20px',
+                        backgroundColor: darkMode ? 'rgba(16, 185, 129, 0.1)' : '#e8f4fd',
+                        borderRadius: '12px',
+                        marginBottom: '24px',
+                        border: `1px solid ${darkMode ? 'rgba(16, 185, 129, 0.2)' : '#b8daff'}`,
+                        textAlign: 'center'
+                    }}>
+                        <h4 style={{ margin: '0 0 12px 0', color: darkMode ? '#10b981' : '#004085', fontWeight: '700' }}>Application Generated Successfully!</h4>
                         <a href={generatedPdfUrl} target="_blank" rel="noopener noreferrer"
-                            style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#007bff', color: 'white', textDecoration: 'none', borderRadius: '5px', fontWeight: 'bold' }}>
-                            📄 View Final Submitted PDF
+                            style={{
+                                display: 'inline-block',
+                                padding: '12px 24px',
+                                backgroundColor: '#10b981',
+                                color: 'white',
+                                textDecoration: 'none',
+                                borderRadius: '8px',
+                                fontWeight: '700',
+                                transition: 'all 0.3s'
+                            }}
+                            onMouseEnter={(e) => { e.target.style.backgroundColor = '#059669'; e.target.style.transform = 'translateY(-2px)'; }}
+                            onMouseLeave={(e) => { e.target.style.backgroundColor = '#10b981'; e.target.style.transform = 'translateY(0)'; }}
+                        >
+                            📄 VIEW FINAL SUBMITTED PDF
                         </a>
                     </div>
                 )}
 
-                <div className="form-grid">
+                <div className="submission-section form-grid">
                     <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                        <label>Serial Number <span className="required">*</span></label>
+                        <label style={{ color: darkMode ? '#94a3b8' : '#475467' }}>Serial Number <span className="required">*</span></label>
                         <div style={{ display: 'flex', gap: '10px' }}>
                             <input
                                 type="text"
@@ -369,49 +388,47 @@ const handleSerialBlur = async () => {
                                 value={formData.serialNumber}
                                 onChange={handleTextChange}
                                 onBlur={handleSerialBlur}
+                                className="monitoring-input"
                                 placeholder="Enter Serial to auto-load requirements..."
                                 required
                                 style={{ flexGrow: 1 }}
                             />
-                            <button className="btn-primary" onClick={handleSerialBlur} disabled={loading}>
-                                {loading ? 'Loading...' : 'Load'}
+                            <button className="btn-primary" onClick={handleSerialBlur} disabled={loading} style={{ height: '42px', padding: '0 24px' }}>
+                                {loading ? '...' : 'LOAD'}
                             </button>
                         </div>
                     </div>
 
                     <div className="form-group">
-                        <label>Policy Type</label>
-                        <input value={formData.policyType} readOnly style={{ backgroundColor: '#e9ecef' }} />
+                        <label style={{ color: darkMode ? '#94a3b8' : '#475467' }}>Policy Type</label>
+                        <input className="monitoring-input readonly" value={formData.policyType} readOnly />
                     </div>
 
                     <div className="form-group">
-                        <label>Form Category</label>
+                        <label style={{ color: darkMode ? '#94a3b8' : '#475467' }}>Form Category</label>
                         <input
+                            className="monitoring-input readonly"
                             value={formData.formType ? `${formData.formType} Requirements` : ''}
                             readOnly
-                            style={{ backgroundColor: '#e9ecef', fontWeight: 'bold', color: '#0055b8' }}
+                            style={{ fontWeight: 'bold' }}
                             placeholder="Auto-detected..."
                         />
                     </div>
 
                     <div className="form-group">
-                        <label>Client Name</label>
-                        <input value={`${formData.clientFirstName} ${formData.clientLastName}`} readOnly style={{ backgroundColor: '#e9ecef' }} />
+                        <label style={{ color: darkMode ? '#94a3b8' : '#475467' }}>Client Name</label>
+                        <input className="monitoring-input readonly" value={`${formData.clientFirstName} ${formData.clientLastName}`} readOnly />
                     </div>
 
                     {/* --- VUL GAE DROPDOWN --- */}
                     {formData.formType === 'VUL' && (
                         <div className="form-group">
-                            <label style={{ color: '#856404' }}>VUL Underwriting Option</label>
+                            <label style={{ color: darkMode ? '#3b82f6' : '#0055b8', fontWeight: '700' }}>VUL Underwriting Option</label>
                             <select
                                 value={isGAE ? 'GAE' : 'Non-GAE'}
                                 onChange={(e) => setIsGAE(e.target.value === 'GAE')}
-                                style={{
-                                    backgroundColor: '#fff3cd',
-                                    borderColor: '#ffeeba',
-                                    color: '#856404',
-                                    fontWeight: 'bold'
-                                }}
+                                className="monitoring-select"
+                                style={{ fontWeight: 'bold' }}
                             >
                                 <option value="Non-GAE">Non-GAE (Standard)</option>
                                 <option value="GAE">GAE (Guaranteed Offer)</option>
@@ -421,18 +438,7 @@ const handleSerialBlur = async () => {
 
                     {/* --- VSP TOGGLE & BUTTON --- */}
                     {formData.formType && (
-                        <div className="form-group" style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            gap: '15px',
-                            marginTop: 'auto',
-                            padding: '15px',
-                            backgroundColor: '#e3f2fd',
-                            borderRadius: '4px',
-                            border: '1px solid #b3d7ff'
-                        }}>
+                        <div className="vsp-panel" style={{ alignSelf: 'end' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <input
                                     type="checkbox"
@@ -441,30 +447,30 @@ const handleSerialBlur = async () => {
                                     onChange={(e) => setIsVSP(e.target.checked)}
                                     style={{ width: '18px', height: '18px', cursor: 'pointer', margin: 0 }}
                                 />
-                                <label htmlFor="vsp-toggle" style={{ marginBottom: 0, cursor: 'pointer', fontWeight: 'bold', color: '#004085' }}>
+                                <label htmlFor="vsp-toggle" style={{ marginBottom: 0, cursor: 'pointer', fontWeight: 'bold', color: darkMode ? '#e2e8f0' : '#004085' }}>
                                     Virtual Selling Process (VSP)
                                 </label>
                             </div>
 
-                            {/* --- SEND ATTESTATION BUTTON --- */}
                             {isVSP && (
                                 <button
                                     type="button"
                                     onClick={handleSendAttestation}
                                     disabled={loading || !formData.serialNumber}
                                     style={{
-                                        padding: '8px 16px',
-                                        backgroundColor: '#0055b8',
+                                        padding: '10px 20px',
+                                        backgroundColor: '#3b82f6',
                                         color: 'white',
                                         border: 'none',
-                                        borderRadius: '4px',
+                                        borderRadius: '8px',
                                         fontSize: '13px',
+                                        fontWeight: '600',
                                         cursor: loading ? 'not-allowed' : 'pointer',
                                         display: 'flex',
                                         alignItems: 'center',
                                         gap: '8px',
                                         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                        transition: 'background-color 0.2s'
+                                        transition: 'all 0.2s'
                                     }}
                                 >
                                     📧 Send Attestation Email
@@ -476,43 +482,43 @@ const handleSerialBlur = async () => {
 
                 {/* --- MEDICAL SECTION --- */}
                 {showMedicalSection && (
-                    <div className="medical-section" style={{ marginTop: '25px', backgroundColor: '#fff', padding: '15px', border: '1px solid #ddd', borderRadius: '8px' }}>
-                        <h3 style={{ color: '#c0392b', borderBottom: '2px solid #eee', paddingBottom: '10px', marginTop: 0 }}>
+                    <div className="medical-section" style={{ marginTop: '24px' }}>
+                        <h3 className="section-title" style={{ paddingBottom: '12px', marginTop: 0, fontWeight: '700', fontSize: '18px', color: darkMode ? '#e2e8f0' : '#101828' }}>
                             Medical & Personal Declaration
                         </h3>
                         <div className="form-grid">
                             <div className="form-group">
-                                <label>Height (cm/ft)</label>
-                                <input type="text" name="height" value={formData.medical.height} onChange={handleMedicalChange} placeholder="e.g. 175cm" />
+                                <label style={{ color: darkMode ? '#94a3b8' : '#475467' }}>Height (cm/ft)</label>
+                                <input className="monitoring-input" type="text" name="height" value={formData.medical.height} onChange={handleMedicalChange} placeholder="e.g. 175cm" />
                             </div>
                             <div className="form-group">
-                                <label>Weight (kg/lbs)</label>
-                                <input type="text" name="weight" value={formData.medical.weight} onChange={handleMedicalChange} placeholder="e.g. 70kg" />
+                                <label style={{ color: darkMode ? '#94a3b8' : '#475467' }}>Weight (kg/lbs)</label>
+                                <input className="monitoring-input" type="text" name="weight" value={formData.medical.weight} onChange={handleMedicalChange} placeholder="e.g. 70kg" />
                             </div>
                             <div className="form-group">
-                                <label>Diagnosed with critical illness?</label>
-                                <select name="diagnosed" value={formData.medical.diagnosed} onChange={handleMedicalChange}>
+                                <label style={{ color: darkMode ? '#94a3b8' : '#475467' }}>Diagnosed with critical illness?</label>
+                                <select className="monitoring-select" name="diagnosed" value={formData.medical.diagnosed} onChange={handleMedicalChange}>
                                     <option value="No">No</option>
                                     <option value="Yes">Yes</option>
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label>Hospitalized in last 2 years?</label>
-                                <select name="hospitalized" value={formData.medical.hospitalized} onChange={handleMedicalChange}>
+                                <label style={{ color: darkMode ? '#94a3b8' : '#475467' }}>Hospitalized in last 2 years?</label>
+                                <select className="monitoring-select" name="hospitalized" value={formData.medical.hospitalized} onChange={handleMedicalChange}>
                                     <option value="No">No</option>
                                     <option value="Yes">Yes</option>
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label>Smoker?</label>
-                                <select name="smoker" value={formData.medical.smoker} onChange={handleMedicalChange}>
+                                <label style={{ color: darkMode ? '#94a3b8' : '#475467' }}>Smoker?</label>
+                                <select className="monitoring-select" name="smoker" value={formData.medical.smoker} onChange={handleMedicalChange}>
                                     <option value="No">No</option>
                                     <option value="Yes">Yes</option>
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label>Alcohol consumer?</label>
-                                <select name="alcohol" value={formData.medical.alcohol} onChange={handleMedicalChange}>
+                                <label style={{ color: darkMode ? '#94a3b8' : '#475467' }}>Alcohol consumer?</label>
+                                <select className="monitoring-select" name="alcohol" value={formData.medical.alcohol} onChange={handleMedicalChange}>
                                     <option value="No">No</option>
                                     <option value="Yes">Yes</option>
                                 </select>
@@ -521,15 +527,15 @@ const handleSerialBlur = async () => {
                     </div>
                 )}
 
-                <hr style={{ margin: '25px 0', border: '0', borderTop: '1px solid #eee' }} />
+                <hr style={{ margin: '32px 0', border: '0', borderTop: `1px solid ${darkMode ? 'rgba(255, 255, 255, 0.1)' : '#eee'}` }} />
 
                 {formData.formType && (
-                    <div className="file-upload-section">
-                        <h3>
+                    <div className="submission-section" style={{ marginTop: '24px' }}>
+                        <h3 className="section-title" style={{ paddingBottom: '12px', marginTop: 0, fontWeight: '700', fontSize: '18px', color: darkMode ? '#e2e8f0' : '#101828' }}>
                             Requirements for {formData.formType}
                             {isGAE && ' (GAE)'}
                             {isVSP && ' (VSP)'}
-                            <span style={{ fontSize: '0.6em', color: '#666', marginLeft: '10px', fontWeight: 'normal' }}>
+                            <span style={{ fontSize: '0.6em', color: darkMode ? '#94a3b8' : '#667085', marginLeft: '10px', fontWeight: 'normal' }}>
                                 (Based on {formData.policyType})
                             </span>
                         </h3>
@@ -540,13 +546,11 @@ const handleSerialBlur = async () => {
                                 const hasFiles = uploadedFiles.length > 0;
 
                                 return (
-                                    <div key={req.id} style={{
-                                        padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '6px', border: '1px solid #dee2e6'
-                                    }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: hasFiles ? '10px' : '0' }}>
-                                            <div style={{ fontWeight: 600, color: '#333' }}>
+                                    <div key={req.id} className="file-slot">
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: hasFiles ? '12px' : '0' }}>
+                                            <div className="file-label" style={{ fontWeight: 600 }}>
                                                 {req.label}
-                                                {req.required && <span style={{ color: 'red', marginLeft: '4px' }}>*</span>}
+                                                {req.required && <span style={{ color: '#ef4444', marginLeft: '4px' }}>*</span>}
                                             </div>
                                             <div>
                                                 <input
@@ -560,10 +564,10 @@ const handleSerialBlur = async () => {
                                                 <label
                                                     htmlFor={`file-${req.id}`}
                                                     style={{
-                                                        backgroundColor: hasFiles ? '#28a745' : '#007bff',
-                                                        color: 'white', padding: '6px 12px',
-                                                        borderRadius: '4px', cursor: 'pointer', fontSize: '13px', display: 'inline-block',
-                                                        marginBottom: 0, transition: 'background 0.3s'
+                                                        backgroundColor: hasFiles ? '#10b981' : '#3b82f6',
+                                                        color: 'white', padding: '8px 16px',
+                                                        borderRadius: '8px', cursor: 'pointer', fontSize: '13px', display: 'inline-block',
+                                                        fontWeight: '600', marginBottom: 0, transition: 'all 0.2s'
                                                     }}
                                                 >
                                                     {hasFiles ? '+ Add More' : 'Upload File'}
@@ -600,22 +604,48 @@ const handleSerialBlur = async () => {
                     </div>
                 )}
 
-                <div className="btn-group" style={{ marginTop: '30px', display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                <div className="btn-group" style={{ marginTop: '30px', display: 'flex', gap: '15px', justifyContent: 'flex-end' }}>
                     <button
                         type="button"
                         onClick={handlePreview}
                         disabled={loading || !formData.formType}
-                        style={{ padding: '10px 20px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                        style={{
+                            padding: '12px 28px',
+                            background: darkMode ? '#312e81' : '#1e3a8a',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '10px',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            transition: 'all 0.3s ease',
+                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        }}
+                        onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.2)'; }}
+                        onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'; }}
                     >
-                        Preview Summary
+                        PREVIEW SUMMARY
                     </button>
 
                     <button
-                        className="btn-success"
                         onClick={handleSubmit}
                         disabled={loading || !formData.formType}
+                        style={{
+                            padding: '12px 28px',
+                            background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '10px',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            transition: 'all 0.3s ease',
+                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        }}
+                        onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.2)'; }}
+                        onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'; }}
                     >
-                        {loading ? 'Submitting...' : 'Submit Application'}
+                        {loading ? 'Submitting...' : 'SUBMIT APPLICATION'}
                     </button>
                 </div>
             </div>
@@ -624,21 +654,23 @@ const handleSerialBlur = async () => {
             {showPreview && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-                    backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+                    backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+                    backdropFilter: 'blur(4px)'
                 }}>
                     <div style={{
-                        backgroundColor: 'white', width: '80%', height: '90%', borderRadius: '8px',
-                        display: 'flex', flexDirection: 'column', overflow: 'hidden'
+                        backgroundColor: darkMode ? '#161B22' : 'white', width: '85%', height: '90%', borderRadius: '16px',
+                        display: 'flex', flexDirection: 'column', overflow: 'hidden', border: darkMode ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
                     }}>
-                        <div style={{ padding: '15px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h3 style={{ margin: 0 }}>Preview Application Summary</h3>
-                            <button onClick={closePreview} style={{ border: 'none', background: 'transparent', fontSize: '20px', cursor: 'pointer' }}>&times;</button>
+                        <div style={{ padding: '20px 24px', borderBottom: `1px solid ${darkMode ? 'rgba(255, 255, 255, 0.1)' : '#eaecf0'}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h3 style={{ margin: 0, color: darkMode ? '#FFFDFE' : '#101828', fontWeight: '700' }}>Preview Application Summary</h3>
+                            <button onClick={closePreview} style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer', color: darkMode ? '#94a3b8' : '#667085' }}>&times;</button>
                         </div>
-                        <div style={{ flexGrow: 1, backgroundColor: '#f0f0f0' }}>
+                        <div style={{ flexGrow: 1, backgroundColor: darkMode ? '#0d1117' : '#f0f0f0' }}>
                             <iframe src={previewBlobUrl} width="100%" height="100%" title="PDF Preview" style={{ border: 'none' }} />
                         </div>
-                        <div style={{ padding: '15px', borderTop: '1px solid #eee', textAlign: 'right' }}>
-                            <button onClick={closePreview} style={{ padding: '8px 20px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Close Preview</button>
+                        <div style={{ padding: '16px 24px', borderTop: `1px solid ${darkMode ? 'rgba(255, 255, 255, 0.1)' : '#eaecf0'}`, textAlign: 'right' }}>
+                            <button onClick={closePreview} className="btn-secondary" style={{ padding: '10px 24px', borderRadius: '8px', fontWeight: '600' }}>Close Preview</button>
                         </div>
                     </div>
                 </div>

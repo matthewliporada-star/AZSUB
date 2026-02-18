@@ -153,7 +153,7 @@ const AdminDashboard = () => {
               className="admin-dark-mode-toggle"
               onClick={toggleDarkMode}
               title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '15px', fontSize: '18px', color: darkMode ? '#FFBD42' : '#64748b', transition: 'color 0.3s' }}
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '15px', fontSize: '18px', color: darkMode ? '#e2e8f0' : '#64748b', transition: 'color 0.3s' }}
             >
               <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
             </button>
@@ -242,13 +242,13 @@ const AdminDashboard = () => {
                   <h2 className="admin-card-number">{newSerialNumbers}</h2>
                   <p style={{ fontSize: "12px", color: "#999", marginTop: "5px", marginBottom: "10px" }}>Last 7 days</p>
                   <div className="bar-chart">
-                    <div className="bar" style={{ height: "60%", backgroundColor: "#f4b43c" }}></div>
-                    <div className="bar" style={{ height: "75%", backgroundColor: "#f4b43c" }}></div>
-                    <div className="bar" style={{ height: "45%", backgroundColor: "#f4b43c" }}></div>
-                    <div className="bar" style={{ height: "90%", backgroundColor: "#f4b43c" }}></div>
-                    <div className="bar" style={{ height: "55%", backgroundColor: "#f4b43c" }}></div>
-                    <div className="bar" style={{ height: "70%", backgroundColor: "#f4b43c" }}></div>
-                    <div className="bar" style={{ height: "85%", backgroundColor: "#f4b43c" }}></div>
+                    <div className="bar" style={{ height: "60%", backgroundColor: darkMode ? "#3b82f6" : "#f4b43c" }}></div>
+                    <div className="bar" style={{ height: "75%", backgroundColor: darkMode ? "#3b82f6" : "#f4b43c" }}></div>
+                    <div className="bar" style={{ height: "45%", backgroundColor: darkMode ? "#3b82f6" : "#f4b43c" }}></div>
+                    <div className="bar" style={{ height: "90%", backgroundColor: darkMode ? "#3b82f6" : "#f4b43c" }}></div>
+                    <div className="bar" style={{ height: "55%", backgroundColor: darkMode ? "#3b82f6" : "#f4b43c" }}></div>
+                    <div className="bar" style={{ height: "70%", backgroundColor: darkMode ? "#3b82f6" : "#f4b43c" }}></div>
+                    <div className="bar" style={{ height: "85%", backgroundColor: darkMode ? "#3b82f6" : "#f4b43c" }}></div>
                   </div>
                 </div>
               </div>

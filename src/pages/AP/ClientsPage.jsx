@@ -252,14 +252,14 @@ const ClientsPage = () => {
             display: 'inline-block'
         },
         badgeTotal: { backgroundColor: 'rgba(255,255,255,0.2)', color: 'white' },
-        badgeDue: { backgroundColor: '#ecd266', color: '#333' },
+        badgeDue: { backgroundColor: '#3b82f6', color: 'white' },
 
         table: {
             width: '100%', borderCollapse: 'collapse', fontSize: '14px'
         },
         th: {
             textAlign: 'left', padding: '14px 20px', borderBottom: darkMode ? '1px solid #444' : '1px solid #eee',
-            color: darkMode ? '#FBD045' : '#666',
+            color: darkMode ? '#3b82f6' : '#666',
             backgroundColor: darkMode ? '#1f2937' : '#f8f9fa', fontWeight: '600'
         },
         td: {
@@ -276,7 +276,7 @@ const ClientsPage = () => {
             width: '100px'
         },
         statusUpcoming: {
-            color: '#f39c12', fontWeight: 'bold', fontSize: '13px'
+            color: '#3b82f6', fontWeight: 'bold', fontSize: '13px'
         }
     };
 
@@ -330,7 +330,7 @@ const ClientsPage = () => {
             </div>
 
             {isLoading ? <div style={{ textAlign: 'center', padding: '40px', color: darkMode ? '#cbd5e1' : '#666' }}>Loading Payment Data...</div> : Object.keys(groupedPolicies).length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '60px', color: darkMode ? '#cbd5e1' : '#888', background: darkMode ? '#1f2937' : '#f9f9f9', borderRadius: '8px', border: darkMode ? '2px dashed #E1942D' : 'none' }}>
+                <div style={{ textAlign: 'center', padding: '60px', color: darkMode ? '#cbd5e1' : '#888', background: darkMode ? '#1f2937' : '#f9f9f9', borderRadius: '8px', border: darkMode ? '2px dashed #3b82f6' : 'none' }}>
                     <h3 style={{ color: darkMode ? '#FFFDFE' : 'inherit' }}>No scheduled payments found.</h3>
                     <p style={{ color: darkMode ? '#cbd5e1' : 'inherit' }}>Try changing the year filter or ensure policies have an "Issued" status.</p>
                 </div>
@@ -348,7 +348,7 @@ const ClientsPage = () => {
                                     <div>
                                         <span style={{ ...styles.badge, ...styles.badgeTotal }}>Total: {items.length}</span>
                                         {overdueCount > 0 && (
-                                            <span style={{ ...styles.badge, backgroundColor: '#E1942D', color: 'white' }}>Overdue: {overdueCount}</span>
+                                            <span style={{ ...styles.badge, backgroundColor: '#dc3545', color: 'white' }}>Overdue: {overdueCount}</span>
                                         )}
                                         <span style={{ ...styles.badge, ...styles.badgeDue }}>Due: {items.length - overdueCount}</span>
                                     </div>
@@ -384,8 +384,8 @@ const ClientsPage = () => {
                                                         <td style={styles.td}>PHP {parseFloat(p.premium_paid).toLocaleString()}</td>
                                                         <td style={styles.td}>
                                                             {isOver ?
-                                                                <span style={{ color: '#fff', fontWeight: 'bold', background: '#E1942D', padding: '4px 10px', borderRadius: '4px', fontSize: '12px' }}>OVERDUE</span> :
-                                                                <span style={{ color: darkMode ? '#FBD045' : '#f39c12', fontWeight: 'bold' }}>Upcoming</span>
+                                                                <span style={{ color: '#fff', fontWeight: 'bold', background: '#dc3545', padding: '4px 10px', borderRadius: '4px', fontSize: '12px' }}>OVERDUE</span> :
+                                                                <span style={{ color: '#3b82f6', fontWeight: 'bold' }}>Upcoming</span>
                                                             }
                                                         </td>
                                                         <td style={{ ...styles.td, textAlign: 'center' }}>
@@ -474,9 +474,9 @@ const ClientsPage = () => {
                                     <small style={{ color: '#155724', fontWeight: 700 }}>Issued On</small>
                                     <div style={{ fontSize: '13px' }}>{selectedPolicy.status === 'Issued' ? (selectedPolicy.date_issued ? new Date(selectedPolicy.date_issued).toLocaleDateString() : 'N/A') : '-'}</div>
                                 </div>
-                                <div style={{ padding: '10px', background: '#fff3cd', borderRadius: '6px' }}>
-                                    <small style={{ color: '#856404', fontWeight: 700 }}>Next Due</small>
-                                    <div style={{ fontSize: '13px', fontWeight: 'bold' }}>{selectedPolicy.next_payment_date ? new Date(selectedPolicy.next_payment_date).toLocaleDateString() : 'N/A'}</div>
+                                <div style={{ padding: '10px', background: darkMode ? '#1e293b' : '#fff3cd', borderRadius: '6px' }}>
+                                    <small style={{ color: darkMode ? '#3b82f6' : '#856404', fontWeight: 700 }}>Next Due</small>
+                                    <div style={{ fontSize: '13px', fontWeight: 'bold', color: darkMode ? '#e2e8f0' : '#495057' }}>{selectedPolicy.next_payment_date ? new Date(selectedPolicy.next_payment_date).toLocaleDateString() : 'N/A'}</div>
                                 </div>
                             </div>
 

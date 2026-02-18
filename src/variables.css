@@ -2,7 +2,7 @@
     /* Colors */
     --primary-color: #003781;
     --secondary-color: #0055b8;
-    --accent-color: #ffc107;
+    --accent-color: #3b82f6;
     --success-color: #28a745;
     --danger-color: #e74c3c;
     --warning-color: #e67e22;
@@ -35,4 +35,15 @@
     /* Typography */
     --font-family-base: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-family-heading: 'Poppins', sans-serif;
+
+    /* --- SLATE & INDIGO DARK MODE PALETTE --- */
+    --dark-bg: #0B0E14;
+    --dark-surface: #161B22;
+    --dark-sidebar: #0F1219;
+    --primary-blue-dark: #395998;
+    --text-primary-dark: #FFFFFF;
+    --text-secondary-dark: #94A3B8;
+    --border-subtle-dark: rgba(30, 41, 59, 0.5);
+    --success-emerald: #10B981;
+    --error-rose: #F43F5E;
 }

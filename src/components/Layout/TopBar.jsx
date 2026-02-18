@@ -4,7 +4,8 @@ import { useApp } from '../../context/AppContext';
 import supabase from '../../config/supabaseClient';
 import './TopBar.css';
 
-import topLogo from '../../assets/2.png';
+import logoLight from '../../assets/2.png';
+import logoDark from '../../assets/White logo.png';
 
 const TopBar = ({ sidebarOpen = true }) => {
     const { isConnected, currentUser, darkMode, toggleDarkMode } = useApp();
@@ -42,7 +43,7 @@ const TopBar = ({ sidebarOpen = true }) => {
                 <div className="center-section" style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
                     {!sidebarOpen && (
                         <img
-                            src={topLogo}
+                            src={darkMode ? logoDark : logoLight}
                             alt="Caelum"
                             style={{ height: '50px', width: 'auto', transition: 'all 0.3s ease' }}
                         />
@@ -57,7 +58,6 @@ const TopBar = ({ sidebarOpen = true }) => {
                             background: 'transparent',
                             border: 'none',
                             cursor: 'pointer',
-                            color: darkMode ? '#FFBD42' : '#64748b',
                             fontSize: '18px',
                             marginRight: '10px',
                             transition: 'color 0.3s ease'
@@ -81,7 +81,7 @@ const TopBar = ({ sidebarOpen = true }) => {
                                 </div>
                                 <div className="profile-info" style={{ textAlign: 'left' }}>
                                     <div className="profile-name" style={{ fontWeight: '600', fontSize: '0.9rem' }}>{displayUser.name || displayUser.username}</div>
-                                    <div className="profile-role" style={{ fontSize: '0.75rem', opacity: 0.8 }}>{displayUser.role}</div>
+                                    <div className="profile-role" style={{ fontSize: '0.75rem' }}>{displayUser.role}</div>
                                 </div>
                             </div>
 

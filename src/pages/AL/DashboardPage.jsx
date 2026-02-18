@@ -7,7 +7,7 @@ import { Doughnut, Bar } from 'react-chartjs-2';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const DashboardPage = () => {
-    const { monitoringData, loadMonitoringData, currentUser } = useApp();
+    const { monitoringData, loadMonitoringData, currentUser, darkMode } = useApp();
     const navigate = useNavigate();
 
     // --- DASHBOARD STATS STATE ---
@@ -180,7 +180,7 @@ const DashboardPage = () => {
         labels: ['Issued', 'Pending', 'Declined'],
         datasets: [{
             data: [stats.issued, stats.pending, stats.declined],
-            backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+            backgroundColor: ['#28a745', '#334155', '#dc3545']
         }]
     };
 
@@ -232,16 +232,28 @@ const DashboardPage = () => {
                     <div className="stat-subtext">This Month</div>
                 </div>
 
-                <div className="stat-card purple animate-spring delay-3">
-                    <div className="stat-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div className="stat-label">Historical ANP</div>
+                <div className="stat-card purple animate-spring delay-3" style={{
+                    background: darkMode ? '#161B22' : '#fff',
+                    border: darkMode ? '1px solid var(--border-subtle-dark)' : '1px solid #e2e8f0',
+                    boxShadow: darkMode ? '0 10px 15px -3px rgba(0, 0, 0, 0.3)' : '0 4px 12px rgba(0, 0, 0, 0.08)',
+                    color: darkMode ? 'white' : '#1e293b'
+                }}>
+                    <div className="stat-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
+                        <div className="stat-label" style={{ whiteSpace: 'nowrap', color: darkMode ? 'rgba(255,255,255,0.9)' : '#64748b', fontSize: '14px', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: '600' }}>Historical ANP</div>
                         <select
                             value={selectedMonthKey}
                             onChange={(e) => setSelectedMonthKey(e.target.value)}
                             style={{
-                                padding: '2px 6px', fontSize: '11px', borderRadius: '4px',
-                                border: '1px solid rgba(0,0,0,0.1)', backgroundColor: 'rgba(255,255,255,0.2)',
-                                cursor: 'pointer', color: 'inherit', outline: 'none'
+                                padding: '4px 12px',
+                                fontSize: '12px',
+                                borderRadius: '20px',
+                                border: darkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid #cbd5e1',
+                                backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : '#f1f5f9',
+                                color: darkMode ? 'white' : '#1e293b',
+                                cursor: 'pointer',
+                                outline: 'none',
+                                fontWeight: '600',
+                                backdropFilter: 'blur(5px)'
                             }}
                         >
                             {sortedMonthKeys.length > 0 ? (
@@ -251,13 +263,19 @@ const DashboardPage = () => {
                             )}
                         </select>
                     </div>
-                    <div className="stat-value">PHP {selectedMonthANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                    <div className="stat-subtext">{selectedMonthKey ? formatMonthKey(selectedMonthKey) : 'Select Month'}</div>
+                    <div className="stat-value" style={{ color: darkMode ? 'white' : '#1e293b', fontSize: '28px', fontWeight: '800', marginBottom: '5px' }}>PHP {selectedMonthANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div className="stat-subtext" style={{ color: darkMode ? 'rgba(255,255,255,0.7)' : '#64748b', fontSize: '13px' }}>{selectedMonthKey ? formatMonthKey(selectedMonthKey) : 'Select Month'}</div>
                 </div>
 
                 <div
                     className="stat-card animate-spring delay-4"
-                    style={{ borderLeft: '4px solid #0055b8', cursor: 'pointer', transition: 'transform 0.2s', backgroundColor: '#f0f7ff' }}
+                    style={{
+                        borderLeft: '4px solid #0055b8',
+                        cursor: 'pointer',
+                        transition: 'transform 0.2s',
+                        backgroundColor: darkMode ? '#f39c12' : '#fff',
+                        color: 'white'
+                    }}
                     onClick={() => setShowCalendarModal(true)}
                 >
                     <div className="stat-header">
@@ -327,12 +345,12 @@ const DashboardPage = () => {
                     <div style={{ padding: '20px' }}>
                         <table className="serial-table al-performance-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <thead>
-                                <tr style={{ borderBottom: '2px solid #e9ecef' }}>
-                                    <th style={{ padding: '12px', textAlign: 'left' }}>Serial</th>
-                                    <th style={{ padding: '12px', textAlign: 'left' }}>Policy</th>
-                                    <th style={{ padding: '12px', textAlign: 'left' }}>Client</th>
-                                    <th style={{ padding: '12px', textAlign: 'left' }}>Submitted</th>
-                                    <th style={{ padding: '12px', textAlign: 'left' }}>Status</th>
+                                <tr style={{ borderBottom: darkMode ? '1px solid rgba(255, 255, 255, 0.1)' : '2px solid #e9ecef' }}>
+                                    <th style={{ padding: '12px', textAlign: 'left', color: darkMode ? '#94a3b8' : 'inherit' }}>Serial</th>
+                                    <th style={{ padding: '12px', textAlign: 'left', color: darkMode ? '#94a3b8' : 'inherit' }}>Policy</th>
+                                    <th style={{ padding: '12px', textAlign: 'left', color: darkMode ? '#94a3b8' : 'inherit' }}>Client</th>
+                                    <th style={{ padding: '12px', textAlign: 'left', color: darkMode ? '#94a3b8' : 'inherit' }}>Submitted</th>
+                                    <th style={{ padding: '12px', textAlign: 'left', color: darkMode ? '#94a3b8' : 'inherit' }}>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -377,7 +395,7 @@ const DashboardPage = () => {
                                     Previous
                                 </button>
 
-                                <span style={{ fontSize: '13px', fontWeight: '600', color: '#495057' }}>
+                                <span style={{ fontSize: '13px', fontWeight: '600', color: darkMode ? '#e2e8f0' : '#495057' }}>
                                     Page {currentPage} of {totalPages}
                                 </span>
 
@@ -478,8 +496,8 @@ const DashboardPage = () => {
                                     </label>
                                     <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <input type="radio" name="dayPriority" value="mid" />
-                                        <span style={{ display: 'inline-block', width: '12px', height: '12px', background: '#ffc107', borderRadius: '50%' }}></span>
-                                        Mid (Yellow)
+                                        <span style={{ display: 'inline-block', width: '12px', height: '12px', background: '#3b82f6', borderRadius: '50%' }}></span>
+                                        Mid (Blue)
                                     </label>
                                     <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <input type="radio" name="dayPriority" value="low" />
