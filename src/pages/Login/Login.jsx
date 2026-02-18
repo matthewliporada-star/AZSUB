@@ -39,15 +39,25 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
+  // Allowed chars: letters, digits, @, ., _, -, + (covers both usernames and emails)
+  const ALLOWED_IDENTIFIER_CHARS = /^[a-zA-Z0-9@._\-+]*$/;
+
+  const handleIdentifierChange = (e) => {
+    const val = e.target.value;
+    if (ALLOWED_IDENTIFIER_CHARS.test(val)) {
+      setIdentifier(val);
+    }
+  };
+
   // Helper to handle failed attempts
-  const handleFailure = (msg) => {
+  const handleFailure = () => {
     const newCount = attempts + 1;
     setAttempts(newCount);
     if (newCount >= 5) {
       setCooldown(300);
-      setError("Too many failed attempts. Please wait 5 mins.");
+      setError("Too many failed attempts. Please wait 5 minutes before trying again.");
     } else {
-      setError(`${msg} (Attempt ${newCount}/5)`);
+      setError(`Username or password is incorrect. (Attempt ${newCount}/5)`);
     }
   };
 
@@ -67,7 +77,7 @@ function Login() {
         .single();
 
       if (fetchError || !data?.email) {
-        handleFailure("Username not found");
+        handleFailure();
         return;
       }
 
@@ -81,7 +91,7 @@ function Login() {
     });
 
     if (signInError) {
-      handleFailure(signInError.message);
+      handleFailure();
       return;
     }
 
@@ -204,7 +214,7 @@ function Login() {
                 className="form-input"
                 placeholder="Enter your username or email"
                 value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+                onChange={handleIdentifierChange}
                 disabled={cooldown > 0}
                 required
               />
@@ -247,12 +257,12 @@ function Login() {
 
             {error && <p className="error-text">{error}</p>}
 
-            <button 
-              type="submit" 
-              className="signin-button" 
+            <button
+              type="submit"
+              className="signin-button"
               disabled={cooldown > 0}
             >
-              {cooldown > 0 ? `COLDOWN : ${cooldown}s` : "SIGN IN"}
+              {cooldown > 0 ? `COOLDOWN: ${cooldown}s` : "SIGN IN"}
             </button>
           </form>
         </div>
