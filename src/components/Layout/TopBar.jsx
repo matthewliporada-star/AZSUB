@@ -13,8 +13,8 @@ const TopBar = ({ sidebarOpen = true }) => {
     const navigate = useNavigate();
     const [showDropdown, setShowDropdown] = useState(false);
 
-    // Check if on AP or AL pages
-    const isDashboardPage = location.pathname.startsWith('/ap') || location.pathname.startsWith('/al');
+    // Check if on AP, AL, or Admin pages
+    const isDashboardPage = location.pathname.startsWith('/ap') || location.pathname.startsWith('/al') || location.pathname.startsWith('/admin');
 
     const handleLogout = async () => {
         try {

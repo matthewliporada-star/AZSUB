@@ -3,15 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import supabase from "../../config/supabaseClient";
 import "./Style/Profile.css";
-import LogoImage from "../../assets/logo1.png";
 
 const AdminProfile = () => {
   const navigate = useNavigate();
-  const { darkMode, toggleDarkMode } = useApp();
+  const { darkMode } = useApp();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -135,187 +132,140 @@ const AdminProfile = () => {
     }
   };
 
-  const logout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
-  };
-
   return (
-    <div className="admin-container">
-      {/* SIDEBAR */}
-      <aside className={`admin-sidebar ${sidebarOpen ? "" : "collapsed"}`}>
-        <button className="admin-sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-          <i className="fa-solid fa-bars"></i>
-        </button>
-        <div className="admin-sidebar-logo">
-          <img src={LogoImage} alt="Logo" className="admin-logo-img" />
-        </div>
-        <ul className="admin-sidebar-menu">
-          <li onClick={() => navigate("/admin/dashboard")}>
-            <i className="fa-solid fa-chart-line"></i> {sidebarOpen && <span>Dashboard</span>}
-          </li>
-          <li onClick={() => navigate("/admin/ManageUsers")}>
-            <i className="fa-solid fa-users"></i> {sidebarOpen && <span>Manage Users</span>}
-          </li>
-          <li onClick={() => navigate("/admin/policies")}>
-            <i className="fa-solid fa-file-contract"></i> {sidebarOpen && <span>Policies</span>}
-          </li>
-        </ul>
-      </aside>
-
-      {/* HEADER */}
-      <header className={`admin-header ${sidebarOpen ? "" : "expanded"}`}>
-        <div className="admin-header-content">
-          <h1>Admin Profile</h1>
-          <div className="admin-header-user">
-            <button
-              className="admin-dark-mode-toggle"
-              onClick={toggleDarkMode}
-              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '15px', fontSize: '18px', color: darkMode ? '#e2e8f0' : '#64748b', transition: 'color 0.3s' }}
-            >
-              <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
-            </button>
-            <button className="admin-user-profile-btn" onClick={() => setShowProfileMenu(!showProfileMenu)}>
-              <div className="admin-user-avatar">
-                <span className="admin-avatar-initials">
-                  {profile?.last_name?.charAt(0).toUpperCase() || "A"}
-                </span>
-              </div>
-              <span>{profile?.last_name || "Admin"} - Admin</span>
-            </button>
-            {showProfileMenu && (
-              <div className="admin-profile-dropdown">
-                <a onClick={() => navigate("/admin/Profile")} className="admin-dropdown-item">
-                  <i className="fa-solid fa-user"></i> Profile
-                </a>
-                <a onClick={() => { setIsPasswordModalOpen(true); setShowProfileMenu(false); }} className="admin-dropdown-item">
-                  <i className="fa-solid fa-lock"></i> Change Password
-                </a>
-                <hr className="admin-dropdown-divider" />
-                <a onClick={logout} className="admin-dropdown-item admin-logout-item">
-                  <i className="fa-solid fa-right-from-bracket"></i> Logout
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
+    <div className="dashboard-content" style={{ padding: '40px 50px' }}>
       {/* MAIN CONTENT */}
-      <main className={`admin-main-content ${sidebarOpen ? "" : "expanded"}`}>
-        <div className="profile-card">
-          <div className="profile-header">
-            <h2>Personal Information</h2>
-            <button className="update-btn" onClick={() => setIsModalOpen(true)}>
-              Update Info
+      <div className="profile-card" style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '30px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+        <div className="profile-header" style={{ borderBottom: '1px solid #eee', paddingBottom: '20px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div className="profile-avatar-large" style={{ width: '80px', height: '80px', background: '#0f172a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '32px', fontWeight: 'bold' }}>
+              {profile?.last_name?.charAt(0).toUpperCase() || "A"}
+            </div>
+            <div>
+              <h2 style={{ margin: 0, color: '#333' }}>{profile?.first_name} {profile?.last_name}</h2>
+              <p style={{ margin: 0, color: '#777' }}>Administrator Account</p>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button className="update-btn" onClick={() => setIsPasswordModalOpen(true)} style={{ background: '#475569', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: '500' }}>
+              Change Password
+            </button>
+            <button className="update-btn" onClick={() => setIsModalOpen(true)} style={{ background: '#2563eb', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: '500' }}>
+              <i className="fa-solid fa-pen-to-square" style={{ marginRight: '8px' }}></i> Update Info
             </button>
           </div>
-
-          <table className="profile-table">
-            <tbody>
-              <tr><td><strong>Last Name:</strong></td><td>{profile?.last_name || "N/A"}</td></tr>
-              <tr><td><strong>First Name:</strong></td><td>{profile?.first_name || "N/A"}</td></tr>
-              <tr><td><strong>Middle Name/Suffix:</strong></td><td>{profile?.Middle || "N/A"}</td></tr>
-              <tr><td><strong>Gender:</strong></td><td>{profile?.gender || "N/A"}</td></tr>
-              <tr><td><strong>Birthday:</strong></td><td>{profile?.birthday || "N/A"}</td></tr>
-              <tr><td><strong>Email:</strong></td><td>{profile?.email || "N/A"}</td></tr>
-              <tr><td><strong>Contact:</strong></td><td>{profile?.contact_number || "N/A"}</td></tr>
-              <tr><td><strong>Address:</strong></td><td>{profile?.Address || "N/A"}</td></tr>
-              <tr><td><strong>Civil Status:</strong></td><td>{profile?.civil_status || "N/A"}</td></tr>
-            </tbody>
-          </table>
         </div>
 
-        {/* PROFILE UPDATE MODAL */}
-        {isModalOpen && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <div className="modal-title" style={{ padding: '22px 35px', borderBottom: '1px solid var(--border-color)', background: '#f7f9fc' }}>Update Profile Information</div>
-              <form onSubmit={handleUpdate} className="profile-form modal-form">
-                <div className="form-grid">
-                  <input type="text" placeholder="First Name" value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })} />
-                  <input type="text" placeholder="Last Name" value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })} />
-                  <input type="text" placeholder="Middle Name" value={formData.Middle} onChange={(e) => setFormData({ ...formData, Middle: e.target.value })} />
+        <table className="profile-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <tbody>
+            {[
+              { label: "Last Name", value: profile?.last_name },
+              { label: "First Name", value: profile?.first_name },
+              { label: "Middle Name/Suffix", value: profile?.Middle },
+              { label: "Gender", value: profile?.gender },
+              { label: "Birthday", value: profile?.birthday },
+              { label: "Email", value: profile?.email },
+              { label: "Contact", value: profile?.contact_number },
+              { label: "Address", value: profile?.Address },
+              { label: "Civil Status", value: profile?.civil_status }
+            ].map((row, idx) => (
+              <tr key={idx} style={{ borderBottom: '1px solid #f8f9fa' }}>
+                <td style={{ padding: '16px', width: '30%', color: '#64748b', fontWeight: '500' }}>{row.label}</td>
+                <td style={{ padding: '16px', color: '#333', fontWeight: '600' }}>{row.value || "N/A"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-                  <select value={formData.gender} onChange={(e) => setFormData({ ...formData, gender: e.target.value })}>
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                  </select>
+      {/* PROFILE UPDATE MODAL */}
+      {isModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-title" style={{ padding: '22px 35px', borderBottom: '1px solid var(--border-color)', background: '#f7f9fc' }}>Update Profile Information</div>
+            <form onSubmit={handleUpdate} className="profile-form modal-form">
+              <div className="form-grid">
+                <input type="text" placeholder="First Name" value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })} />
+                <input type="text" placeholder="Last Name" value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })} />
+                <input type="text" placeholder="Middle Name" value={formData.Middle} onChange={(e) => setFormData({ ...formData, Middle: e.target.value })} />
 
-                  <input type="date" value={formData.birthday} onChange={(e) => setFormData({ ...formData, birthday: e.target.value })} />
-                  <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
-                  <input type="text" placeholder="Contact Number" value={formData.contact_number} onChange={(e) => setFormData({ ...formData, contact_number: e.target.value })} />
-                  <input type="text" placeholder="Address" value={formData.Address} onChange={(e) => setFormData({ ...formData, Address: e.target.value })} />
+                <select value={formData.gender} onChange={(e) => setFormData({ ...formData, gender: e.target.value })}>
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
 
-                  <select value={formData.civil_status} onChange={(e) => setFormData({ ...formData, civil_status: e.target.value })}>
-                    <option value="">Select Civil Status</option>
-                    <option value="Single">Single</option>
-                    <option value="Married">Married</option>
-                    <option value="Widowed">Widowed</option>
-                    <option value="Divorced">Divorced</option>
-                    <option value="Annulled">Annulled</option>
-                  </select>
-                </div>
-                <div className="modal-buttons" style={{ padding: '18px 35px', borderTop: '1px solid var(--border-color)', background: '#f7f9fc' }}>
-                  <button type="button" className="modal-close" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                  <button type="submit" className="modal-submit">Save Changes</button>
-                </div>
-              </form>
-            </div>
+                <input type="date" value={formData.birthday} onChange={(e) => setFormData({ ...formData, birthday: e.target.value })} />
+                <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                <input type="text" placeholder="Contact Number" value={formData.contact_number} onChange={(e) => setFormData({ ...formData, contact_number: e.target.value })} />
+                <input type="text" placeholder="Address" value={formData.Address} onChange={(e) => setFormData({ ...formData, Address: e.target.value })} />
+
+                <select value={formData.civil_status} onChange={(e) => setFormData({ ...formData, civil_status: e.target.value })}>
+                  <option value="">Select Civil Status</option>
+                  <option value="Single">Single</option>
+                  <option value="Married">Married</option>
+                  <option value="Widowed">Widowed</option>
+                  <option value="Divorced">Divorced</option>
+                  <option value="Annulled">Annulled</option>
+                </select>
+              </div>
+              <div className="modal-buttons" style={{ padding: '18px 35px', borderTop: '1px solid var(--border-color)', background: '#f7f9fc' }}>
+                <button type="button" className="modal-close" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                <button type="submit" className="modal-submit">Save Changes</button>
+              </div>
+            </form>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* CHANGE PASSWORD MODAL */}
-        {isPasswordModalOpen && (
-          <div className="modal-overlay">
-            <div className="modal-content password-modal">
-              <div className="modal-title" style={{ padding: '22px 35px', borderBottom: '1px solid var(--border-color)', background: '#f7f9fc' }}>Change Password</div>
-              <form onSubmit={handleChangePassword} className="modal-form">
-                <p className="modal-subtitle" style={{ padding: '20px 35px 0 35px', marginBottom: '15px' }}>Verify your current password to update security.</p>
-                <div className="password-form-stack">
-                  <div className="input-group">
-                    <label>Old Password</label>
-                    <input
-                      type="password"
-                      placeholder="Current password"
-                      required
-                      value={passwordData.oldPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
-                    />
-                  </div>
-                  <hr className="password-divider" />
-                  <div className="input-group">
-                    <label>New Password</label>
-                    <input
-                      type="password"
-                      placeholder="Minimum 6 characters"
-                      required
-                      value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                    />
-                  </div>
-                  <div className="input-group">
-                    <label>Confirm New Password</label>
-                    <input
-                      type="password"
-                      placeholder="Confirm new password"
-                      required
-                      value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                    />
-                  </div>
+      {/* CHANGE PASSWORD MODAL */}
+      {isPasswordModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content password-modal">
+            <div className="modal-title" style={{ padding: '22px 35px', borderBottom: '1px solid var(--border-color)', background: '#f7f9fc' }}>Change Password</div>
+            <form onSubmit={handleChangePassword} className="modal-form">
+              <p className="modal-subtitle" style={{ padding: '20px 35px 0 35px', marginBottom: '15px' }}>Verify your current password to update security.</p>
+              <div className="password-form-stack">
+                <div className="input-group">
+                  <label>Old Password</label>
+                  <input
+                    type="password"
+                    placeholder="Current password"
+                    required
+                    value={passwordData.oldPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
+                  />
                 </div>
-                <div className="modal-buttons" style={{ padding: '18px 35px', borderTop: '1px solid var(--border-color)', background: '#f7f9fc' }}>
-                  <button type="button" className="modal-close" onClick={() => setIsPasswordModalOpen(false)}>Cancel</button>
-                  <button type="submit" className="modal-submit">Update Password</button>
+                <hr className="password-divider" />
+                <div className="input-group">
+                  <label>New Password</label>
+                  <input
+                    type="password"
+                    placeholder="Minimum 6 characters"
+                    required
+                    value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                  />
                 </div>
-              </form>
-            </div>
+                <div className="input-group">
+                  <label>Confirm New Password</label>
+                  <input
+                    type="password"
+                    placeholder="Confirm new password"
+                    required
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="modal-buttons" style={{ padding: '18px 35px', borderTop: '1px solid var(--border-color)', background: '#f7f9fc' }}>
+                <button type="button" className="modal-close" onClick={() => setIsPasswordModalOpen(false)}>Cancel</button>
+                <button type="submit" className="modal-submit">Update Password</button>
+              </div>
+            </form>
           </div>
-        )}
-      </main>
+        </div>
+      )}
     </div>
   );
 };

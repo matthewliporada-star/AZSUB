@@ -4,17 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import supabase from "../../config/supabaseClient";
 import { logActivity } from "../../utils/logActivity";
-import "./Style/AdminLayout.css";
 import "./Style/Policies.css";
-import LogoImage from "../../assets/logo1.png";
 import { toTitleCase } from "../../utils/textUtils";
 
 const AdminPolicies = () => {
     const navigate = useNavigate();
-    const { darkMode, toggleDarkMode } = useApp();
+    const { darkMode } = useApp();
     const [user, setUser] = useState(null);
-    const [showProfileMenu, setShowProfileMenu] = useState(false);
-    const [sidebarOpen, setSidebarOpen] = useState(true);
     const [viewArchived, setViewArchived] = useState(false);
 
     // Policies Data
@@ -219,259 +215,256 @@ const AdminPolicies = () => {
         viewArchived ? !policy.active_status : policy.active_status
     );
 
-    const logout = async () => {
-        await supabase.auth.signOut();
-        navigate("/");
-    };
-
     return (
-        <div className="admin-container">
-            <aside className={`admin-sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
-                <button className="admin-sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-                    <i className="fa-solid fa-bars"></i>
-                </button>
-                <div className="admin-sidebar-logo">
-                    <img src={LogoImage} alt="Logo" className="admin-logo-img" />
+        <div className="dashboard-content" style={{ padding: '40px 50px' }}>
+            {/* Header Row */}
+            <div className="header-row" style={{ marginBottom: "24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                    <h1 className="title" style={{ fontSize: "28px", fontWeight: "700", color: "#333", marginBottom: "4px" }}>Policy Management</h1>
+                    <p className="subtitle" style={{ color: "#666" }}>Manage system policies and requirements</p>
                 </div>
-                <ul className="admin-sidebar-menu">
-                    <li onClick={() => navigate("/admin/dashboard")}><i className="fa-solid fa-chart-line"></i> {sidebarOpen && <span>Dashboard</span>}</li>
-                    <li onClick={() => navigate("/admin/ManageUsers")}><i className="fa-solid fa-users"></i> {sidebarOpen && <span>Manage Users</span>}</li>
-                    <li className="active"><i className="fa-solid fa-file-shield"></i> {sidebarOpen && <span>Policies</span>}</li>
-                    <li onClick={() => navigate("/admin/activity-logs")}>
-                        <i className="fa-solid fa-list-ul"></i> {sidebarOpen && <span>Activity Logs</span>}
-                    </li>
-                </ul>
-            </aside>
-
-            <header className={`admin-header ${sidebarOpen ? '' : 'expanded'}`}>
-                <div className="admin-header-content">
-                    <h1>Admin Dashboard</h1>
-                    <div className="admin-header-user">
-                        <button
-                            className="admin-dark-mode-toggle"
-                            onClick={toggleDarkMode}
-                            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '15px', fontSize: '18px', color: darkMode ? '#e2e8f0' : '#64748b', transition: 'color 0.3s' }}
-                        >
-                            <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
-                        </button>
-                        <button className="admin-user-profile-btn" onClick={() => setShowProfileMenu(!showProfileMenu)}>
-                            <div className="admin-user-avatar">
-                                <i className="fa-solid fa-user"></i>
-                            </div>
-                            <span>{user?.user_metadata?.last_name || "User"} - Admin</span>
-                        </button>
-                        {showProfileMenu && (
-                            <div className="admin-profile-dropdown">
-                                <a onClick={() => navigate("/admin/Profile")} className="admin-dropdown-item"><i className="fa-solid fa-user"></i> Profile</a>
-                                <a onClick={logout} className="admin-dropdown-item admin-logout-item"><i className="fa-solid fa-right-from-bracket"></i> Logout</a>
-                            </div>
-                        )}
-                    </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button className="add-policy-btn" onClick={() => setViewArchived(!viewArchived)} style={{
+                        backgroundColor: viewArchived ? '#475569' : '#003266',
+                        color: 'white',
+                        border: 'none',
+                        padding: '10px 16px',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontWeight: '500'
+                    }}>
+                        <i className={`fa-solid ${viewArchived ? 'fa-list-check' : 'fa-box-archive'}`}></i>
+                        {viewArchived ? " View Active" : " View Archived"}
+                    </button>
+                    <button className="add-policy-btn" onClick={openAddModal} style={{
+                        backgroundColor: '#2563eb',
+                        color: 'white',
+                        border: 'none',
+                        padding: '10px 16px',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontWeight: '600',
+                        boxShadow: "0 4px 6px -1px rgba(37, 99, 235, 0.2)"
+                    }}>
+                        <i className="fa-solid fa-plus"></i> Add New Policy
+                    </button>
                 </div>
-            </header>
+            </div>
 
-            <main className={`admin-main-content ${sidebarOpen ? '' : 'expanded'}`}>
-                <div className="policies-container">
-                    <div className="policies-header">
-                        <h2 className="policies-title">Policy Management</h2>
-                        <div style={{ display: 'flex', gap: '10px' }}>
-                            <button className="add-policy-btn" onClick={() => setViewArchived(!viewArchived)} style={{ backgroundColor: '#003266' }}>
-                                <i className={`fa-solid ${viewArchived ? 'fa-list-check' : 'fa-box-archive'}`}></i>
-                                {viewArchived ? " View Active" : " View Archived"}
-                            </button>
-                            <button className="add-policy-btn" onClick={openAddModal}>
-                                <i className="fa-solid fa-plus"></i> Add New Policy
-                            </button>
-                        </div>
-                    </div>
+            {loading ? <p className="loader">Loading policies...</p> : (
+                <div className="content-container animate-spring delay-2" style={{
+                    background: "white",
+                    borderRadius: "16px",
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                    padding: "24px",
+                    border: "1px solid rgba(0,0,0,0.05)"
+                }}>
+                    <div className="table-container">
+                        <table className="policies-table" style={{ width: "100%", borderCollapse: "collapse" }}>
+                            <thead>
+                                <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
+                                    <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Policy Name</th>
+                                    <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Form Type</th>
+                                    <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Requirements</th>
+                                    <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Request Type</th>
+                                    <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Status</th>
+                                    <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredPolicies.map((policy) => (
+                                    <tr key={policy.policy_id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                                        <td style={{ padding: "16px 12px", fontWeight: "500", color: "#1e293b" }}>{policy.policy_name}</td>
+                                        <td style={{ padding: "16px 12px" }}>
+                                            <span className="policy-type-badge" style={{
+                                                backgroundColor: "#f1f5f9",
+                                                color: "#475569",
+                                                padding: "4px 8px",
+                                                borderRadius: "4px",
+                                                fontSize: "12px",
+                                                fontWeight: "600"
+                                            }}>{policy.form_type || 'N/A'}</span>
+                                        </td>
+                                        <td style={{ padding: "16px 12px" }}>
+                                            <small style={{ color: '#666', background: "#f8fafc", padding: "4px 8px", borderRadius: "20px", border: "1px solid #e2e8f0" }}>
+                                                {policy.requirements?.length || 0} files required
+                                            </small>
+                                        </td>
+                                        <td style={{ padding: "16px 12px", color: "#475569" }}>{toTitleCase(policy.request_type) || '-'}</td>
+                                        <td style={{ padding: "16px 12px" }}>
+                                            <span className={`status-badge ${policy.active_status ? 'status-active' : 'status-inactive'}`} style={{
+                                                padding: "4px 10px",
+                                                borderRadius: "20px",
+                                                fontSize: "12px",
+                                                fontWeight: "500",
+                                                backgroundColor: policy.active_status ? '#dcfce7' : '#f1f5f9',
+                                                color: policy.active_status ? '#166534' : '#64748b'
+                                            }}>
+                                                {policy.active_status ? 'Active' : 'Archived'}
+                                            </span>
+                                        </td>
 
-                    {loading ? <p className="loader">Loading policies...</p> : (
-                        <div className="table-container">
-                            <table className="policies-table">
-                                <thead>
-                                    <tr>
-                                        <th>Policy Name</th>
-                                        <th>Form Type</th>
-                                        <th>Requirements</th>
-                                        <th>Request Type</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
+                                        {/* --- UPDATED ACTIONS COLUMN (TEXT + COLORS) --- */}
+                                        <td style={{ padding: "16px 12px" }}>
+                                            <div className="policy-actions" style={{ display: 'flex', gap: '8px' }}>
+                                                <button
+                                                    onClick={() => openConfirmModal(policy)}
+                                                    style={{
+                                                        backgroundColor: policy.active_status ? '#fff1f2' : '#f0fdf4', // Red for Archive, Green for Restore
+                                                        color: policy.active_status ? '#be123c' : '#15803d',
+                                                        border: `1px solid ${policy.active_status ? '#fecdd3' : '#bbf7d0'}`,
+                                                        padding: '6px 12px',
+                                                        borderRadius: '6px',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '6px',
+                                                        fontSize: '12px',
+                                                        fontWeight: '600'
+                                                    }}
+                                                >
+                                                    <i className={`fa-solid ${policy.active_status ? 'fa-box-archive' : 'fa-rotate-left'}`}></i>
+                                                    {policy.active_status ? "Archive" : "Restore"}
+                                                </button>
+
+                                                <button
+                                                    onClick={() => openEditModal(policy)}
+                                                    style={{
+                                                        backgroundColor: '#eff6ff',
+                                                        color: '#2563eb',
+                                                        border: '1px solid #bfdbfe',
+                                                        padding: '6px 12px',
+                                                        borderRadius: '6px',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '6px',
+                                                        fontSize: '12px',
+                                                        fontWeight: '600'
+                                                    }}
+                                                >
+                                                    <i className="fa-solid fa-pen"></i>
+                                                    Edit
+                                                </button>
+                                            </div>
+                                        </td>
+                                        {/* ------------------------------------------- */}
+
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredPolicies.map((policy) => (
-                                        <tr key={policy.policy_id}>
-                                            <td>{policy.policy_name}</td>
-                                            <td><span className="policy-type-badge">{policy.form_type || 'N/A'}</span></td>
-                                            <td>
-                                                <small style={{ color: '#666' }}>
-                                                    {policy.requirements?.length || 0} files required
-                                                </small>
-                                            </td>
-                                            <td>{toTitleCase(policy.request_type) || '-'}</td>
-                                            <td>
-                                                <span className={`status-badge ${policy.active_status ? 'status-active' : 'status-inactive'}`}>
-                                                    {policy.active_status ? 'Active' : 'Archived'}
-                                                </span>
-                                            </td>
-
-                                            {/* --- UPDATED ACTIONS COLUMN (TEXT + COLORS) --- */}
-                                            <td>
-                                                <div className="policy-actions" style={{ display: 'flex', gap: '8px' }}>
-                                                    <button
-                                                        onClick={() => openConfirmModal(policy)}
-                                                        style={{
-                                                            backgroundColor: policy.active_status ? '#dc3545' : '#28a745', // Red for Archive, Green for Restore
-                                                            color: 'white',
-                                                            border: 'none',
-                                                            padding: '6px 12px',
-                                                            borderRadius: '4px',
-                                                            cursor: 'pointer',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: '6px',
-                                                            fontSize: '13px',
-                                                            fontWeight: '500'
-                                                        }}
-                                                    >
-                                                        <i className={`fa-solid ${policy.active_status ? 'fa-box-archive' : 'fa-rotate-left'}`}></i>
-                                                        {policy.active_status ? "Archive" : "Restore"}
-                                                    </button>
-
-                                                    <button
-                                                        onClick={() => openEditModal(policy)}
-                                                        style={{
-                                                            backgroundColor: '#007bff', // Blue for Edit
-                                                            color: 'white',
-                                                            border: 'none',
-                                                            padding: '6px 12px',
-                                                            borderRadius: '4px',
-                                                            cursor: 'pointer',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: '6px',
-                                                            fontSize: '13px',
-                                                            fontWeight: '500'
-                                                        }}
-                                                    >
-                                                        <i className="fa-solid fa-pen"></i>
-                                                        Edit
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            {/* ------------------------------------------- */}
-
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+            )}
 
-                {/* ADD/EDIT MODAL */}
-                {showModal && (
-                    <div className="modal-overlay">
-                        <div className="modal-content" style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
-                            <div className="modal-title">{isEditing ? "Edit Policy" : "Add New Policy"}</div>
-                            <form onSubmit={handleSubmit} style={{ flex: 1, overflowY: 'auto', paddingRight: '5px' }}>
-                                <div className="modal-form">
+            {/* ADD/EDIT MODAL */}
+            {showModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content" style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+                        <div className="modal-title">{isEditing ? "Edit Policy" : "Add New Policy"}</div>
+                        <form onSubmit={handleSubmit} style={{ flex: 1, overflowY: 'auto', paddingRight: '5px' }}>
+                            <div className="modal-form">
+                                <div className="input-group">
+                                    <label>Policy Name</label>
+                                    <input name="policy_name" value={formData.policy_name} onChange={handleChange} required />
+                                </div>
+                                <div className="name-row">
                                     <div className="input-group">
-                                        <label>Policy Name</label>
-                                        <input name="policy_name" value={formData.policy_name} onChange={handleChange} required />
-                                    </div>
-                                    <div className="name-row">
-                                        <div className="input-group">
-                                            <label>Request Type</label>
-                                            <select name="request_type" value={formData.request_type} onChange={handleChange}>
-                                                <option value="Manual">Manual</option>
-                                                <option value="System">System</option>
-                                            </select>
-                                        </div>
-                                        <div className="input-group">
-                                            <label>Form Type</label>
-                                            <select name="form_type" value={formData.form_type} onChange={handleChange} required>
-                                                <option value="VUL">VUL</option>
-                                                <option value="IHP">IHP</option>
-                                                <option value="TRAD">TRAD</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div className="input-group">
-                                        <label>Agency</label>
-                                        <select name="agency" value={formData.agency} onChange={handleChange}>
-                                            <option value="">-- No Agency --</option>
-                                            {agencies.map(a => <option key={a.agency_id} value={a.agency_id}>{a.name}</option>)}
+                                        <label>Request Type</label>
+                                        <select name="request_type" value={formData.request_type} onChange={handleChange}>
+                                            <option value="Manual">Manual</option>
+                                            <option value="System">System</option>
                                         </select>
                                     </div>
+                                    <div className="input-group">
+                                        <label>Form Type</label>
+                                        <select name="form_type" value={formData.form_type} onChange={handleChange} required>
+                                            <option value="VUL">VUL</option>
+                                            <option value="IHP">IHP</option>
+                                            <option value="TRAD">TRAD</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="input-group">
+                                    <label>Agency</label>
+                                    <select name="agency" value={formData.agency} onChange={handleChange}>
+                                        <option value="">-- No Agency --</option>
+                                        {agencies.map(a => <option key={a.agency_id} value={a.agency_id}>{a.name}</option>)}
+                                    </select>
+                                </div>
 
-                                    {/* REQUIREMENTS BUILDER */}
-                                    <div className="input-group" style={{ marginTop: '15px', borderTop: '1px solid #eee', paddingTop: '15px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                                            <label style={{ margin: 0 }}>Document Requirements</label>
-                                            <button type="button" onClick={addRequirement} style={{ fontSize: '12px', padding: '4px 8px', cursor: 'pointer', background: '#e3f2fd', color: '#0055b8', border: '1px solid #b3d7ff', borderRadius: '4px' }}>
-                                                + Add File Slot
-                                            </button>
-                                        </div>
-
-                                        {requirements.length === 0 && <p style={{ fontSize: '12px', color: '#999', fontStyle: 'italic' }}>No specific documents defined. (Will use defaults)</p>}
-
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                            {requirements.map((req, idx) => (
-                                                <div key={idx} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Document Name (e.g. Valid ID)"
-                                                        value={req.label}
-                                                        onChange={(e) => updateRequirement(idx, 'label', e.target.value)}
-                                                        required
-                                                        style={{ flex: 1, padding: '6px', fontSize: '13px' }}
-                                                    />
-                                                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', cursor: 'pointer', margin: 0 }}>
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={req.required}
-                                                            onChange={(e) => updateRequirement(idx, 'required', e.target.checked)}
-                                                        />
-                                                        Req?
-                                                    </label>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeRequirement(idx)}
-                                                        style={{ background: '#ffebeb', color: '#dc3545', border: '1px solid #ffc9c9', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer' }}
-                                                    >
-                                                        &times;
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
+                                {/* REQUIREMENTS BUILDER */}
+                                <div className="input-group" style={{ marginTop: '15px', borderTop: '1px solid #eee', paddingTop: '15px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                        <label style={{ margin: 0 }}>Document Requirements</label>
+                                        <button type="button" onClick={addRequirement} style={{ fontSize: '12px', padding: '4px 8px', cursor: 'pointer', background: '#e3f2fd', color: '#0055b8', border: '1px solid #b3d7ff', borderRadius: '4px' }}>
+                                            + Add File Slot
+                                        </button>
                                     </div>
 
-                                </div>
-                                <div className="modal-buttons" style={{ marginTop: '20px' }}>
-                                    <button type="button" className="modal-close" onClick={() => setShowModal(false)}>Cancel</button>
-                                    <button type="submit" className="modal-submit" disabled={submitting}>Save Policy</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                )}
+                                    {requirements.length === 0 && <p style={{ fontSize: '12px', color: '#999', fontStyle: 'italic' }}>No specific documents defined. (Will use defaults)</p>}
 
-                {/* CONFIRM MODAL */}
-                {showConfirmModal && policyToToggle && (
-                    <div className="modal-overlay">
-                        <div className="modal-content" style={{ maxWidth: '400px' }}>
-                            <div className="modal-title">Confirm Action</div>
-                            <p style={{ textAlign: 'center', margin: '20px 0' }}>Are you sure you want to <strong>{policyToToggle.active_status ? 'archive' : 'restore'}</strong> "{policyToToggle.policy_name}"?</p>
-                            <div className="modal-buttons">
-                                <button type="button" className="modal-close" onClick={() => setShowConfirmModal(false)}>Cancel</button>
-                                <button type="button" className="modal-submit" onClick={confirmToggleStatus}>Confirm</button>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        {requirements.map((req, idx) => (
+                                            <div key={idx} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Document Name (e.g. Valid ID)"
+                                                    value={req.label}
+                                                    onChange={(e) => updateRequirement(idx, 'label', e.target.value)}
+                                                    required
+                                                    style={{ flex: 1, padding: '6px', fontSize: '13px' }}
+                                                />
+                                                <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', cursor: 'pointer', margin: 0 }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={req.required}
+                                                        onChange={(e) => updateRequirement(idx, 'required', e.target.checked)}
+                                                    />
+                                                    Req?
+                                                </label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeRequirement(idx)}
+                                                    style={{ background: '#ffebeb', color: '#dc3545', border: '1px solid #ffc9c9', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer' }}
+                                                >
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
                             </div>
+                            <div className="modal-buttons" style={{ marginTop: '20px' }}>
+                                <button type="button" className="modal-close" onClick={() => setShowModal(false)}>Cancel</button>
+                                <button type="submit" className="modal-submit" disabled={submitting}>Save Policy</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* CONFIRM MODAL */}
+            {showConfirmModal && policyToToggle && (
+                <div className="modal-overlay">
+                    <div className="modal-content" style={{ maxWidth: '400px' }}>
+                        <div className="modal-title">Confirm Action</div>
+                        <p style={{ textAlign: 'center', margin: '20px 0' }}>Are you sure you want to <strong>{policyToToggle.active_status ? 'archive' : 'restore'}</strong> "{policyToToggle.policy_name}"?</p>
+                        <div className="modal-buttons">
+                            <button type="button" className="modal-close" onClick={() => setShowConfirmModal(false)}>Cancel</button>
+                            <button type="button" className="modal-submit" onClick={confirmToggleStatus}>Confirm</button>
                         </div>
                     </div>
-                )}
-            </main>
+                </div>
+            )}
         </div>
     );
 };

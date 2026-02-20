@@ -825,3 +825,88 @@
   font-weight: 700;
   color: var(--primary-color);
 }
+
+/* ================= DARK MODE OVERRIDES FOR ACTIVITY LOG ================= */
+body.dark-mode .activity-log-timeline {
+  border-left-color: #30363d;
+}
+
+body.dark-mode .activity-item::before {
+  background: #0d1117;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px #30363d;
+}
+
+body.dark-mode .activity-content {
+  background: #161b22;
+  /* Slightly lighter than bg */
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+}
+
+body.dark-mode .activity-header {
+  color: #8b949e;
+}
+
+body.dark-mode .activity-action {
+  color: #58a6ff;
+}
+
+body.dark-mode .activity-date {
+  color: #8b949e;
+}
+
+/* ================= GENERAL DARK MODE OVERRIDES ================= */
+body.dark-mode .dashboard-container {
+  background: #0d1117;
+  color: #c9d1d9;
+}
+
+body.dark-mode .box-card,
+body.dark-mode .content-container {
+  background: #161b22;
+  border-color: #30363d;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .box-header {
+  background: #161b22;
+  border-bottom-color: #30363d;
+}
+
+body.dark-mode .box-title {
+  color: #c9d1d9;
+}
+
+body.dark-mode .box-body {
+  background: #161b22;
+  color: #c9d1d9;
+}
+
+body.dark-mode .dashboard-header {
+  background: #161b22;
+  color: #c9d1d9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .dashboard-header h1 {
+  color: #c9d1d9;
+}
+
+body.dark-mode .user-profile-btn {
+  color: #c9d1d9;
+}
+
+body.dark-mode .user-profile-btn:hover {
+  background: rgba(56, 139, 253, 0.1);
+}
+
+body.dark-mode .user-avatar {
+  background: rgba(56, 139, 253, 0.15);
+  border-color: rgba(56, 139, 253, 0.3);
+}
+
+body.dark-mode .avatar-initials,
+body.dark-mode .user-avatar i {
+  color: #58a6ff;
+}

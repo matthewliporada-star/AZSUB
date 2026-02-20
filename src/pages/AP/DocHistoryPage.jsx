@@ -6,6 +6,7 @@ const DocHistoryPage = () => {
     const { monitoringData, loadMonitoringData, currentUser, darkMode } = useApp();
     const [statusFilter, setStatusFilter] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
+    const [pendingSearchTerm, setPendingSearchTerm] = useState('');
 
     // --- PAGINATION STATE ---
     const [currentPage, setCurrentPage] = useState(1);
@@ -27,7 +28,7 @@ const DocHistoryPage = () => {
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
             const name = (item.client_name || item.client_first_name || '').toLowerCase();
-            const serial = (item.serial_number || '').toLowerCase();
+            const serial = String(item.serial_number || '').toLowerCase();
             const policy = (item.policy_type || '').toLowerCase();
             matchesSearch = name.includes(term) || serial.includes(term) || policy.includes(term);
         }
@@ -103,24 +104,109 @@ const DocHistoryPage = () => {
                         </p>
                     </div>
                     <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-                        <input
-                            type="text"
-                            placeholder="Search client, serial, or policy..."
-                            value={searchTerm}
-                            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                            className="monitoring-input"
-                            style={{
-                                width: '300px',
-                                background: darkMode ? '#0d1117' : 'white'
-                            }}
-                        />
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <input
+                                type="text"
+                                placeholder="Search client, serial, or policy..."
+                                value={pendingSearchTerm}
+                                onChange={(e) => setPendingSearchTerm(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        setSearchTerm(pendingSearchTerm);
+                                        setCurrentPage(1);
+                                    }
+                                }}
+                                style={{
+                                    padding: '9px 14px',
+                                    borderRadius: '8px 0 0 8px',
+                                    border: darkMode ? '2px solid #395998' : '2px solid #d0d5dd',
+                                    borderRight: 'none',
+                                    width: '240px',
+                                    fontSize: '14px',
+                                    transition: 'border-color 0.3s',
+                                    background: darkMode ? '#0d1117' : 'white',
+                                    color: darkMode ? '#FFFDFE' : '#333',
+                                    height: '40px',
+                                    boxSizing: 'border-box'
+                                }}
+                                onFocus={(e) => {
+                                    e.target.style.borderColor = '#395998';
+                                    e.target.parentElement.querySelector('button').style.borderColor = '#395998';
+                                }}
+                                onBlur={(e) => {
+                                    e.target.style.borderColor = darkMode ? '#395998' : '#d0d5dd';
+                                    e.target.parentElement.querySelector('button').style.borderColor = darkMode ? '#395998' : '#d0d5dd';
+                                }}
+                            />
+                            <button
+                                onClick={() => { setSearchTerm(pendingSearchTerm); setCurrentPage(1); }}
+                                style={{
+                                    padding: '0 16px',
+                                    background: '#395998',
+                                    color: '#FFFDFE',
+                                    border: '2px solid #395998',
+                                    borderRadius: '0 8px 8px 0',
+                                    fontSize: '13px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    height: '40px',
+                                    boxSizing: 'border-box',
+                                    whiteSpace: 'nowrap'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#2d4a80';
+                                    e.currentTarget.style.borderColor = '#2d4a80';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = '#395998';
+                                    e.currentTarget.style.borderColor = '#395998';
+                                }}
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                                Search
+                            </button>
+                        </div>
+                        {searchTerm && (
+                            <button
+                                onClick={() => { setPendingSearchTerm(''); setSearchTerm(''); setCurrentPage(1); }}
+                                style={{
+                                    padding: '0 14px',
+                                    background: darkMode ? '#374151' : '#f3f4f6',
+                                    color: darkMode ? '#e2e8f0' : '#6b7280',
+                                    border: darkMode ? '1px solid #4b5563' : '1px solid #d1d5db',
+                                    borderRadius: '8px',
+                                    fontSize: '13px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    height: '40px',
+                                    boxSizing: 'border-box'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = darkMode ? '#4b5563' : '#e5e7eb';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = darkMode ? '#374151' : '#f3f4f6';
+                                }}
+                            >
+                                ✕ Clear
+                            </button>
+                        )}
                         <select
                             value={statusFilter}
                             onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
                             className="monitoring-select"
                             style={{
                                 fontWeight: '600',
-                                minWidth: '180px'
+                                minWidth: '180px',
+                                height: '40px'
                             }}
                         >
                             <option value="All">All Statuses ({statusCounts.All})</option>
@@ -148,17 +234,22 @@ const DocHistoryPage = () => {
                     </div>
                 ) : (
                     <>
-                        <div style={{ display: 'grid', gap: '20px' }}>
+                        <div style={{ display: 'grid', gap: '16px' }}>
                             {currentItems.map(item => {
                                 const statusStyle = getStatusStyle(item.status || 'Pending');
+                                const status = item.status || 'Pending';
 
                                 return (
                                     <div
                                         key={item.id}
                                         className="history-card"
-                                        style={{ borderLeft: `5px solid ${statusStyle.border}` }}
+                                        style={{
+                                            borderLeft: 'none',
+                                            overflow: 'hidden',
+                                            position: 'relative'
+                                        }}
                                         onMouseEnter={(e) => {
-                                            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.1)';
+                                            e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)';
                                             e.currentTarget.style.transform = 'translateY(-2px)';
                                         }}
                                         onMouseLeave={(e) => {
@@ -166,143 +257,239 @@ const DocHistoryPage = () => {
                                             e.currentTarget.style.transform = 'translateY(0)';
                                         }}
                                     >
-                                        {/* Header: Name & Status */}
-                                        <div className="history-card-header">
-                                            <div>
+                                        {/* Card Header — Name, Date, Status all in one row */}
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            marginBottom: '16px',
+                                            paddingBottom: '14px',
+                                            borderBottom: `1px solid ${darkMode ? 'rgba(255,255,255,0.06)' : '#f0f0f0'}`
+                                        }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                                                {/* Avatar circle */}
                                                 <div style={{
-                                                    fontSize: '20px',
+                                                    width: '42px',
+                                                    height: '42px',
+                                                    borderRadius: '50%',
+                                                    background: darkMode ? '#395998' : '#e8eef6',
+                                                    color: darkMode ? '#FFFDFE' : '#395998',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontSize: '16px',
                                                     fontWeight: '700',
-                                                    color: darkMode ? '#e2e8f0' : '#2c3e50',
-                                                    marginBottom: '6px'
+                                                    flexShrink: 0
                                                 }}>
-                                                    {item.client_name || `${item.client_first_name} ${item.client_last_name}`}
+                                                    {(item.client_name || item.client_first_name || '?')[0].toUpperCase()}
                                                 </div>
-                                                <div className="history-tag">
-                                                    📄 Document Submission
+                                                <div>
+                                                    <div style={{
+                                                        fontSize: '16px',
+                                                        fontWeight: '700',
+                                                        color: darkMode ? '#e2e8f0' : '#1a1a2e',
+                                                        lineHeight: 1.3
+                                                    }}>
+                                                        {item.client_name || `${item.client_first_name} ${item.client_last_name}`}
+                                                    </div>
+                                                    <div style={{
+                                                        fontSize: '12px',
+                                                        color: darkMode ? '#64748b' : '#8f9bb3',
+                                                        marginTop: '2px'
+                                                    }}>
+                                                        {new Date(item.created_at).toLocaleDateString('en-US', {
+                                                            year: 'numeric',
+                                                            month: 'short',
+                                                            day: 'numeric'
+                                                        })}
+                                                    </div>
                                                 </div>
                                             </div>
                                             <span style={{
                                                 display: 'inline-flex',
                                                 alignItems: 'center',
-                                                gap: '8px',
-                                                padding: '8px 18px',
-                                                borderRadius: '20px',
-                                                fontSize: '13px',
+                                                gap: '6px',
+                                                padding: '6px 14px',
+                                                borderRadius: '6px',
+                                                fontSize: '12px',
                                                 fontWeight: '700',
                                                 color: statusStyle.color,
                                                 background: statusStyle.bg,
-                                                border: `2px solid ${statusStyle.border}`,
                                                 textTransform: 'uppercase',
                                                 letterSpacing: '0.5px'
                                             }}>
-                                                {statusStyle.icon} {item.status || 'Pending'}
+                                                {statusStyle.icon} {status}
                                             </span>
                                         </div>
 
-                                        {/* Body: Information Grid */}
-                                        <div className="history-info-grid" style={{ marginBottom: item.status === 'Pending' ? '20px' : '0' }}>
-                                            <div>
-                                                <div className="history-label" style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Serial Number</div>
-                                                <div className="history-serial-tag">
-                                                    {item.serial_number}
-                                                </div>
+                                        {/* Info Row — compact horizontal layout */}
+                                        <div style={{
+                                            display: 'grid',
+                                            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                                            gap: '12px',
+                                            marginBottom: status === 'Pending' ? '16px' : '0'
+                                        }}>
+                                            <div style={{
+                                                padding: '10px 14px',
+                                                background: darkMode ? 'rgba(255,255,255,0.03)' : '#f8fafc',
+                                                borderRadius: '8px'
+                                            }}>
+                                                <div style={{
+                                                    fontSize: '10px',
+                                                    fontWeight: '700',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.5px',
+                                                    color: darkMode ? '#64748b' : '#8f9bb3',
+                                                    marginBottom: '4px'
+                                                }}>Serial Number</div>
+                                                <div style={{
+                                                    fontFamily: 'monospace',
+                                                    fontWeight: '700',
+                                                    fontSize: '14px',
+                                                    color: darkMode ? '#60a5fa' : '#395998'
+                                                }}>{item.serial_number}</div>
                                             </div>
-                                            <div>
-                                                <div className="history-label" style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Policy Type</div>
-                                                <div className="history-value" style={{ fontWeight: '700', fontSize: '15px' }}>{item.policy_type}</div>
+                                            <div style={{
+                                                padding: '10px 14px',
+                                                background: darkMode ? 'rgba(255,255,255,0.03)' : '#f8fafc',
+                                                borderRadius: '8px'
+                                            }}>
+                                                <div style={{
+                                                    fontSize: '10px',
+                                                    fontWeight: '700',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.5px',
+                                                    color: darkMode ? '#64748b' : '#8f9bb3',
+                                                    marginBottom: '4px'
+                                                }}>Policy Type</div>
+                                                <div style={{
+                                                    fontWeight: '600',
+                                                    fontSize: '13px',
+                                                    color: darkMode ? '#e2e8f0' : '#1a1a2e'
+                                                }}>{item.policy_type}</div>
                                             </div>
-                                            <div>
-                                                <div className="history-label" style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Submission Date</div>
-                                                <div className="history-value" style={{ fontSize: '14px' }}>
-                                                    {new Date(item.created_at).toLocaleDateString('en-US', {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric'
-                                                    })}
-                                                </div>
+                                            <div style={{
+                                                padding: '10px 14px',
+                                                background: darkMode ? 'rgba(255,255,255,0.03)' : '#f8fafc',
+                                                borderRadius: '8px'
+                                            }}>
+                                                <div style={{
+                                                    fontSize: '10px',
+                                                    fontWeight: '700',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.5px',
+                                                    color: darkMode ? '#64748b' : '#8f9bb3',
+                                                    marginBottom: '4px'
+                                                }}>Agency</div>
+                                                <div style={{
+                                                    fontWeight: '600',
+                                                    fontSize: '13px',
+                                                    color: darkMode ? '#e2e8f0' : '#1a1a2e'
+                                                }}>{item.agency || 'N/A'}</div>
                                             </div>
-                                            <div>
-                                                <div className="history-label" style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Agency</div>
-                                                <div className="history-value" style={{ fontSize: '14px', fontWeight: '600' }}>{item.agency || 'N/A'}</div>
+                                            <div style={{
+                                                padding: '10px 14px',
+                                                background: darkMode ? 'rgba(255,255,255,0.03)' : '#f8fafc',
+                                                borderRadius: '8px'
+                                            }}>
+                                                <div style={{
+                                                    fontSize: '10px',
+                                                    fontWeight: '700',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.5px',
+                                                    color: darkMode ? '#64748b' : '#8f9bb3',
+                                                    marginBottom: '4px'
+                                                }}>Form Type</div>
+                                                <div style={{
+                                                    fontWeight: '600',
+                                                    fontSize: '13px',
+                                                    color: darkMode ? '#e2e8f0' : '#1a1a2e'
+                                                }}>{item.form_type}</div>
                                             </div>
-                                            <div>
-                                                <div className="history-label" style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Form Type</div>
-                                                <div className="history-serial-tag" style={{ fontSize: '13px', padding: '4px 10px' }}>{item.form_type}</div>
-                                            </div>
-                                            <div>
-                                                <div className="history-label" style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Payment Mode</div>
-                                                <div className="history-value" style={{ fontSize: '14px' }}>{item.mode_of_payment || 'N/A'}</div>
+                                            <div style={{
+                                                padding: '10px 14px',
+                                                background: darkMode ? 'rgba(255,255,255,0.03)' : '#f8fafc',
+                                                borderRadius: '8px'
+                                            }}>
+                                                <div style={{
+                                                    fontSize: '10px',
+                                                    fontWeight: '700',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.5px',
+                                                    color: darkMode ? '#64748b' : '#8f9bb3',
+                                                    marginBottom: '4px'
+                                                }}>Payment Mode</div>
+                                                <div style={{
+                                                    fontWeight: '600',
+                                                    fontSize: '13px',
+                                                    color: darkMode ? '#e2e8f0' : '#1a1a2e'
+                                                }}>{item.mode_of_payment || 'N/A'}</div>
                                             </div>
                                         </div>
 
-                                        {/* Action Buttons (Only for Pending) */}
-                                        {item.status === 'Pending' && (
+                                        {/* Action Buttons (Only for Pending) — flat design */}
+                                        {status === 'Pending' && (
                                             <div style={{
                                                 display: 'flex',
-                                                gap: '12px',
-                                                marginTop: '20px',
-                                                paddingTop: '20px',
-                                                borderTop: `1px solid ${darkMode ? 'rgba(255, 255, 255, 0.1)' : '#f8f9fa'}`
+                                                gap: '10px',
+                                                paddingTop: '14px',
+                                                borderTop: `1px solid ${darkMode ? 'rgba(255,255,255,0.06)' : '#f0f0f0'}`
                                             }}>
                                                 <button
                                                     onClick={() => updateStatus(item.id, 'Issued')}
                                                     style={{
                                                         flex: 1,
-                                                        padding: '12px 24px',
-                                                        background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                                                        padding: '10px 20px',
+                                                        background: '#16a34a',
                                                         color: 'white',
                                                         border: 'none',
                                                         borderRadius: '8px',
-                                                        fontSize: '14px',
+                                                        fontSize: '13px',
                                                         fontWeight: '700',
                                                         cursor: 'pointer',
-                                                        transition: 'all 0.3s',
-                                                        boxShadow: '0 4px 12px rgba(40, 167, 69, 0.3)',
+                                                        transition: 'all 0.2s',
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
-                                                        gap: '8px'
+                                                        gap: '6px'
                                                     }}
                                                     onMouseEnter={(e) => {
-                                                        e.target.style.transform = 'translateY(-2px)';
-                                                        e.target.style.boxShadow = '0 6px 16px rgba(40, 167, 69, 0.4)';
+                                                        e.currentTarget.style.background = '#15803d';
                                                     }}
                                                     onMouseLeave={(e) => {
-                                                        e.target.style.transform = 'translateY(0)';
-                                                        e.target.style.boxShadow = '0 4px 12px rgba(40, 167, 69, 0.3)';
+                                                        e.currentTarget.style.background = '#16a34a';
                                                     }}
                                                 >
-                                                    <span style={{ fontSize: '18px' }}>✓</span> Issue Policy
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                                                    Issue Policy
                                                 </button>
                                                 <button
                                                     onClick={() => updateStatus(item.id, 'Declined')}
                                                     style={{
                                                         flex: 1,
-                                                        padding: '12px 24px',
-                                                        background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                                                        padding: '10px 20px',
+                                                        background: '#dc2626',
                                                         color: 'white',
                                                         border: 'none',
                                                         borderRadius: '8px',
-                                                        fontSize: '14px',
+                                                        fontSize: '13px',
                                                         fontWeight: '700',
                                                         cursor: 'pointer',
-                                                        transition: 'all 0.3s',
-                                                        boxShadow: '0 4px 12px rgba(220, 53, 69, 0.3)',
+                                                        transition: 'all 0.2s',
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
-                                                        gap: '8px'
+                                                        gap: '6px'
                                                     }}
                                                     onMouseEnter={(e) => {
-                                                        e.target.style.transform = 'translateY(-2px)';
-                                                        e.target.style.boxShadow = '0 6px 16px rgba(220, 53, 69, 0.4)';
+                                                        e.currentTarget.style.background = '#b91c1c';
                                                     }}
                                                     onMouseLeave={(e) => {
-                                                        e.target.style.transform = 'translateY(0)';
-                                                        e.target.style.boxShadow = '0 4px 12px rgba(220, 53, 69, 0.3)';
+                                                        e.currentTarget.style.background = '#dc2626';
                                                     }}
                                                 >
-                                                    <span style={{ fontSize: '18px' }}>✕</span> Decline
+                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                                                    Decline
                                                 </button>
                                             </div>
                                         )}

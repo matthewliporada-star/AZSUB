@@ -329,176 +329,108 @@ const ManageUsers = () => {
   };
 
   return (
-    <div className="admin-container">
-      {/* SIDEBAR */}
-      <aside className={`admin-sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
-        <button className="admin-sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-          <i className="fa-solid fa-bars"></i>
-        </button>
-        <div className="admin-sidebar-logo">
-          <img src={LogoImage} alt="Logo" className="admin-logo-img" />
+    <div className="dashboard-content" style={{ padding: '40px 50px' }}>
+      <div className="header-row">
+        <div>
+          <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#333" }}>Manage Users</h1>
+          <p style={{ color: "#777" }}>Create, update, and manage user accounts</p>
         </div>
-        <ul className="admin-sidebar-menu">
-          <li onClick={() => navigate("/admin/dashboard")}>
-            <i className="fa-solid fa-chart-line"></i> {sidebarOpen && <span>Dashboard</span>}
-          </li>
-          <li className="active">
-            <i className="fa-solid fa-users"></i> {sidebarOpen && <span>Manage Users</span>}
-          </li>
-          <li onClick={() => navigate("/admin/policies")}>
-            <i className="fa-solid fa-file-shield"></i> {sidebarOpen && <span>Policies</span>}
-          </li>
-          <li onClick={() => navigate("/admin/activity-logs")}>
-            <i className="fa-solid fa-list-ul"></i> {sidebarOpen && <span>Activity Logs</span>}
-          </li>
-        </ul>
-      </aside>
-
-      {/* HEADER */}
-      <header className={`admin-header ${sidebarOpen ? '' : 'expanded'}`}>
-        <div className="admin-header-content">
-          <h1>Admin Dashboard</h1>
-          <div className="admin-header-user">
-            <button
-              className="admin-dark-mode-toggle"
-              onClick={toggleDarkMode}
-              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '15px', fontSize: '18px', color: darkMode ? '#e2e8f0' : '#64748b', transition: 'color 0.3s' }}
-            >
-              <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
-            </button>
-            <button className="admin-user-profile-btn" onClick={() => setShowProfileMenu(!showProfileMenu)}>
-              <div className="admin-user-avatar">
-                {user?.user_metadata?.last_name ? (
-                  <span className="admin-avatar-initials">{user.user_metadata.last_name.charAt(0).toUpperCase()}</span>
-                ) : <i className="fa-solid fa-user"></i>}
-              </div>
-              <span>{user?.user_metadata?.last_name || "User"} - Admin</span>
-            </button>
-            {showProfileMenu && (
-              <div className="admin-profile-dropdown">
-                <button onClick={() => navigate("/admin/Profile")} className="admin-dropdown-item">
-                  <i className="fa-solid fa-user"></i> Profile
-                </button>
-                <button onClick={() => navigate("/admin/SerialNumber")} className="admin-dropdown-item">
-                  <i className="fa-solid fa-barcode"></i> Serial Numbers
-                </button>
-                <hr className="admin-dropdown-divider" />
-                <button
-                  onClick={async () => { await supabase.auth.signOut(); navigate("/"); }}
-                  className="admin-dropdown-item admin-logout-item">
-                  <i className="fa-solid fa-right-from-bracket"></i> Logout
-                </button>
-              </div>
-            )}
-          </div>
+        <div className="header-actions">
+          <button
+            className="btn-secondary"
+            onClick={() => setShowInactive(!showInactive)}
+          >
+            {showInactive ? "View Active Users" : "View Inactive Users"}
+          </button>
+          <button className="add-btn" onClick={openAddModal}>
+            + Add User
+          </button>
         </div>
-      </header>
+      </div>
 
-      {/* MAIN CONTENT */}
-      <main className={`main-content ${sidebarOpen ? "" : "expanded"}`}>
-        <div className="header-row">
-          <div>
-            <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#333" }}>Manage Users</h1>
-            <p style={{ color: "#777" }}>Create, update, and manage user accounts</p>
-          </div>
-          <div className="header-actions">
-            <button
-              className="btn-secondary"
-              onClick={() => setShowInactive(!showInactive)}
-            >
-              {showInactive ? "View Active Users" : "View Inactive Users"}
-            </button>
-            <button className="add-btn" onClick={openAddModal}>
-              + Add User
-            </button>
-          </div>
+      {/* ROLE STATISTICS CARDS */}
+      <div className="role-cards-grid">
+        <div className="role-card animate-spring delay-1">
+          <h3>AGENCY LEADERS (AL)</h3>
+          <div className="count">{roleCounts.AL}</div>
         </div>
-
-        {/* ROLE STATISTICS CARDS */}
-        <div className="role-cards-grid">
-          <div className="role-card animate-spring delay-1">
-            <h3>AGENCY LEADERS (AL)</h3>
-            <div className="count">{roleCounts.AL}</div>
-          </div>
-          <div className="role-card animate-spring delay-2">
-            <h3>AGENCY PARTNERS (AP)</h3>
-            <div className="count">{roleCounts.AP}</div>
-          </div>
-          <div className="role-card animate-spring delay-3">
-            <h3>MANAGING DIRECTORS (MD)</h3>
-            <div className="count">{roleCounts.MD}</div>
-          </div>
-          <div className="role-card animate-spring delay-4">
-            <h3>MANAGEMENT PARTNERS (MP)</h3>
-            <div className="count">{roleCounts.MP}</div>
-          </div>
-          <div className="role-card animate-spring delay-5">
-            <h3>ADMINS</h3>
-            <div className="count">{roleCounts.ADMIN}</div>
-          </div>
+        <div className="role-card animate-spring delay-2">
+          <h3>AGENCY PARTNERS (AP)</h3>
+          <div className="count">{roleCounts.AP}</div>
         </div>
+        <div className="role-card animate-spring delay-3">
+          <h3>MANAGING DIRECTORS (MD)</h3>
+          <div className="count">{roleCounts.MD}</div>
+        </div>
+        <div className="role-card animate-spring delay-4">
+          <h3>MANAGEMENT PARTNERS (MP)</h3>
+          <div className="count">{roleCounts.MP}</div>
+        </div>
+        <div className="role-card animate-spring delay-5">
+          <h3>ADMINS</h3>
+          <div className="count">{roleCounts.ADMIN}</div>
+        </div>
+      </div>
 
-        {/* USERS TABLE CONTAINER */}
-        <div className="content-container animate-spring delay-1">
-          <div className="container-header">
-            <h2>User Database ({showInactive ? "Inactive" : "Active"})</h2>
-          </div>
-          <div className="container-body">
-            <table className="user-table">
-              <thead>
+      {/* USERS TABLE CONTAINER */}
+      <div className="content-container animate-spring delay-1">
+        <div className="container-header">
+          <h2>User Database ({showInactive ? "Inactive" : "Active"})</h2>
+        </div>
+        <div className="container-body">
+          <table className="user-table">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th style={{ textAlign: "center" }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.length === 0 ? (
                 <tr>
-                  <th>No.</th>
-                  <th>Last Name</th>
-                  <th>First Name</th>
-                  <th>Position</th>
-                  <th>Status</th>
-                  <th style={{ textAlign: "center" }}>Action</th>
+                  <td colSpan="6" style={{ textAlign: "center", padding: "20px", color: "#666" }}>
+                    No {showInactive ? "inactive" : "active"} users found.
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.length === 0 ? (
-                  <tr>
-                    <td colSpan="6" style={{ textAlign: "center", padding: "20px", color: "#666" }}>
-                      No {showInactive ? "inactive" : "active"} users found.
+              ) : (
+                filteredUsers.map((u, index) => (
+                  <tr key={u.id}>
+                    <td>{index + 1}</td>
+                    <td>{u.last_name}</td>
+                    <td>{u.first_name}</td>
+                    <td><span style={{ fontWeight: "600" }}>{u.account_type}</span></td>
+                    <td>
+                      <span className={`status-badge ${u.status === "Active" ? "active" : "inactive"}`}>
+                        {u.status || "Active"}
+                      </span>
+                    </td>
+                    <td className="action-cell">
+                      <button className="btn-view" onClick={() => openViewModal(u)} title="View Details">
+                        <i className="fa-solid fa-eye"></i> View
+                      </button>
+                      <button className="btn-update" onClick={() => openEditModal(u)} title="Edit User">
+                        <i className="fa-solid fa-pen"></i> Update
+                      </button>
+                      <button
+                        className="btn-delete"
+                        onClick={() => toggleUserStatus(u)}
+                        title={u.status === "Active" ? "Deactivate" : "Activate"}
+                        style={{ backgroundColor: u.status === "Active" ? "var(--danger-color)" : "var(--success-color)" }}
+                      >
+                        <i className={`fa-solid ${u.status === "Active" ? "fa-ban" : "fa-check"}`}></i> {u.status === "Active" ? "Deactivate" : "Activate"}
+                      </button>
                     </td>
                   </tr>
-                ) : (
-                  filteredUsers.map((u, index) => (
-                    <tr key={u.id}>
-                      <td>{index + 1}</td>
-                      <td>{u.last_name}</td>
-                      <td>{u.first_name}</td>
-                      <td><span style={{ fontWeight: "600" }}>{u.account_type}</span></td>
-                      <td>
-                        <span className={`status-badge ${u.status === "Active" ? "active" : "inactive"}`}>
-                          {u.status || "Active"}
-                        </span>
-                      </td>
-                      <td className="action-cell">
-                        <button className="btn-view" onClick={() => openViewModal(u)} title="View Details">
-                          <i className="fa-solid fa-eye"></i> View
-                        </button>
-                        <button className="btn-update" onClick={() => openEditModal(u)} title="Edit User">
-                          <i className="fa-solid fa-pen"></i> Update
-                        </button>
-                        <button
-                          className="btn-delete"
-                          onClick={() => toggleUserStatus(u)}
-                          title={u.status === "Active" ? "Deactivate" : "Activate"}
-                          style={{ backgroundColor: u.status === "Active" ? "var(--danger-color)" : "var(--success-color)" }}
-                        >
-                          <i className={`fa-solid ${u.status === "Active" ? "fa-ban" : "fa-check"}`}></i> {u.status === "Active" ? "Deactivate" : "Activate"}
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
-      </main>
+      </div>
 
       {/* Add/Edit Modal */}
       {showAddModal && (

@@ -36,6 +36,12 @@
     transition: width 0.3s ease;
 }
 
+/* DARK MODE: Sidebar */
+body.dark-mode .ap-layout .sidebar {
+    background: #0d1117 !important;
+    border-right: 1px solid #30363d !important;
+}
+
 /* SIDEBAR TOGGLE BUTTON */
 /* SIDEBAR TOGGLE BUTTON */
 .ap-layout .sidebar-toggle {

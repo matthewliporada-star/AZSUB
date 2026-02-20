@@ -57,6 +57,7 @@
   font-size: 20px;
   color: #333;
 }
+
 .view-btn {
   background-color: var(--primary-color);
   color: #FAFAFA;
@@ -68,6 +69,7 @@
   font-weight: 500;
   transition: all 0.3s ease;
 }
+
 .import-btn {
   background-color: var(--primary-color);
   color: #FAFAFA;
@@ -85,65 +87,67 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 50, 102, 0.2);
 }
+
 /* Container styling */
 .pagination-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    margin-top: 30px;
-    padding-bottom: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 30px;
+  padding-bottom: 40px;
 }
 
 /* Arrow buttons styling */
 .pagination-arrow-btn {
-    background-color: #ffffff;
-    border: 1px solid #e0e4ec;
-    color: #003266; /* Matching your theme blue */
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 14px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: #ffffff;
+  border: 1px solid #e0e4ec;
+  color: #003266;
+  /* Matching your theme blue */
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .pagination-arrow-btn:hover:not(:disabled) {
-    background-color: #f8f9fa;
-    border-color: #003266;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #f8f9fa;
+  border-color: #003266;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .pagination-arrow-btn:disabled {
-    background-color: #f5f5f5;
-    color: #bdc3c7;
-    border-color: #eee;
-    cursor: not-allowed;
-    box-shadow: none;
+  background-color: #f5f5f5;
+  color: #bdc3c7;
+  border-color: #eee;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Text styling */
 .pagination-info {
-    display: flex;
-    gap: 5px;
-    font-size: 14px;
-    color: #4a5568;
-    font-weight: 500;
-    padding: 0 10px;
+  display: flex;
+  gap: 5px;
+  font-size: 14px;
+  color: #4a5568;
+  font-weight: 500;
+  padding: 0 10px;
 }
 
 .current-page-text {
-    color: #003266;
-    font-weight: 700;
+  color: #003266;
+  font-weight: 700;
 }
 
 .total-pages-text {
-    color: #718096;
+  color: #718096;
 }
 
 /* ================= MODAL STYLES ================= */
@@ -260,7 +264,8 @@
 /* ================= CARD GRID ================= */
 .admin-cards-grids {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Forces exactly 4 columns in one line */
+  grid-template-columns: repeat(4, 1fr);
+  /* Forces exactly 4 columns in one line */
   gap: 15px;
   margin-bottom: 25px;
   width: 100%;
@@ -353,6 +358,111 @@
 
 /* ================= ANIMATION ================= */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= DARK MODE OVERRIDES ================= */
+body.dark-mode .admin-cards-grids {
+  background: #0d1117;
+}
+
+body.dark-mode .admin-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .admin-card p {
+  color: #8b949e;
+}
+
+body.dark-mode .admin-card h2 {
+  color: #58a6ff;
+}
+
+body.dark-mode .admin-card.used {
+  background: linear-gradient(135deg, #1f2937, #111827);
+  border: 1px solid #374151;
+}
+
+body.dark-mode .admin-card.used h2,
+body.dark-mode .admin-card.used p {
+  color: #e5e7eb;
+}
+
+body.dark-mode .serial-table {
+  background: #161b22;
+  box-shadow: none;
+}
+
+body.dark-mode .serial-table th {
+  background: #21262d;
+  color: #c9d1d9;
+  border-color: #30363d;
+}
+
+body.dark-mode .serial-table td {
+  color: #c9d1d9;
+  border-color: #30363d;
+}
+
+body.dark-mode .serial-table tbody tr:nth-child(even) {
+  background: #0d1117;
+}
+
+body.dark-mode .serial-table tbody tr:hover {
+  background: #21262d;
+}
+
+body.dark-mode .table-header h3 {
+  color: #c9d1d9;
+}
+
+body.dark-mode .pagination-arrow-btn {
+  background: #21262d;
+  border-color: #30363d;
+  color: #c9d1d9;
+}
+
+body.dark-mode .pagination-arrow-btn:hover:not(:disabled) {
+  background: #30363d;
+  border-color: #58a6ff;
+}
+
+body.dark-mode .current-page-text {
+  color: #58a6ff;
+}
+
+body.dark-mode .total-pages-text {
+  color: #8b949e;
+}
+
+body.dark-mode .modal {
+  background: #161b22;
+  border: 1px solid #30363d;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .modal h2 {
+  color: #c9d1d9;
+}
+
+body.dark-mode .modal input,
+body.dark-mode .modal select {
+  background: #0d1117;
+  border-color: #30363d;
+  color: #c9d1d9;
+}
+
+body.dark-mode .cancel-btn {
+  background: #21262d;
+  color: #c9d1d9;
 }

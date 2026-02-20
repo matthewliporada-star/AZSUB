@@ -2,18 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import supabase from "../../config/supabaseClient";
-import "./Style/AdminLayout.css";
 import "./Style/Dashboard.css"; // Reuse dashboard styles for container
-import LogoImage from "../../assets/logo1.png";
 
 const AdminActivityLogs = () => {
     const navigate = useNavigate();
-    const { darkMode, toggleDarkMode } = useApp();
+    const { darkMode } = useApp();
     const [user, setUser] = useState(null);
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [showProfileMenu, setShowProfileMenu] = useState(false);
 
     useEffect(() => {
         checkAdmin();
@@ -76,11 +72,6 @@ const AdminActivityLogs = () => {
         return new Date(dateString).toLocaleDateString("en-US", options);
     };
 
-    const logout = async () => {
-        await supabase.auth.signOut();
-        navigate("/");
-    };
-
     const getActionLabel = (action) => {
         const labels = {
             'POLICY_CREATE': 'Policy Created',
@@ -93,136 +84,98 @@ const AdminActivityLogs = () => {
     };
 
     return (
-        <div className="admin-container">
-            {/* SIDEBAR */}
-            <aside className={`admin-sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
-                <button className="admin-sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-                    <i className="fa-solid fa-bars"></i>
-                </button>
-                <div className="admin-sidebar-logo">
-                    <img src={LogoImage} alt="Logo" className="admin-logo-img" />
+        <div className="dashboard-content" style={{ padding: '40px 50px' }}>
+            <div className="header-row" style={{ marginBottom: "24px" }}>
+                <div>
+                    <h1 className="title" style={{ fontSize: "28px", fontWeight: "700", color: "#333" }}>Activity Logs</h1>
+                    <p className="subtitle" style={{ color: "#666" }}>Track system changes and user actions</p>
                 </div>
-                <ul className="admin-sidebar-menu">
-                    <li onClick={() => navigate("/admin/dashboard")}>
-                        <i className="fa-solid fa-chart-line"></i> {sidebarOpen && <span>Dashboard</span>}
-                    </li>
-                    <li onClick={() => navigate("/admin/ManageUsers")}>
-                        <i className="fa-solid fa-users"></i> {sidebarOpen && <span>Manage Users</span>}
-                    </li>
-                    <li onClick={() => navigate("/admin/policies")}>
-                        <i className="fa-solid fa-file-shield"></i> {sidebarOpen && <span>Policies</span>}
-                    </li>
-                    <li className="active">
-                        <i className="fa-solid fa-list-ul"></i> {sidebarOpen && <span>Activity Logs</span>}
-                    </li>
-                </ul>
-            </aside>
+            </div>
 
-            {/* HEADER */}
-            <header className={`admin-header ${sidebarOpen ? '' : 'expanded'}`}>
-                <div className="admin-header-content">
-                    <h1>Admin Dashboard</h1>
-                    <div className="admin-header-user">
-                        <button
-                            className="admin-dark-mode-toggle"
-                            onClick={toggleDarkMode}
-                            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '15px', fontSize: '18px', color: darkMode ? '#e2e8f0' : '#64748b', transition: 'color 0.3s' }}
-                        >
-                            <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
-                        </button>
-                        <button className="admin-user-profile-btn" onClick={() => setShowProfileMenu(!showProfileMenu)}>
-                            <div className="admin-user-avatar">
-                                <i className="fa-solid fa-user"></i>
-                            </div>
-                            <span>{user?.user_metadata?.last_name || "User"} - Admin</span>
-                        </button>
-                        {showProfileMenu && (
-                            <div className="admin-profile-dropdown">
-                                <a onClick={() => navigate("/admin/Profile")} className="admin-dropdown-item"><i className="fa-solid fa-user"></i> Profile</a>
-                                <a onClick={logout} className="admin-dropdown-item admin-logout-item"><i className="fa-solid fa-right-from-bracket"></i> Logout</a>
-                            </div>
-                        )}
-                    </div>
+            <div className="content-container animate-spring delay-2" style={{
+                background: "white",
+                borderRadius: "16px",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                padding: "24px",
+                border: "1px solid rgba(0,0,0,0.05)"
+            }}>
+                <div className="container-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                    <h2 style={{ fontSize: "18px", fontWeight: "600", color: "#333", margin: 0 }}>System Activities (Last 100)</h2>
+                    <button className="btn-secondary" onClick={fetchLogs} title="Refresh Logs" style={{
+                        background: "white",
+                        border: "1px solid #e2e8f0",
+                        padding: "8px 12px",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        color: "#64748b",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        fontSize: "13px",
+                        fontWeight: "500"
+                    }}>
+                        <i className="fa-solid fa-rotate-right"></i> Refresh
+                    </button>
                 </div>
-            </header>
-
-            {/* MAIN CONTENT */}
-            <main className={`admin-main-content ${sidebarOpen ? '' : 'expanded'}`}>
-                <div className="header-row">
-                    <div>
-                        <h1 className="title">Activity Logs</h1>
-                        <p className="subtitle">Track system changes and user actions</p>
-                    </div>
+                <div className="container-body" style={{ padding: 0 }}>
+                    <table className="admin-user-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead>
+                            <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                                <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '13px', color: '#64748b', fontWeight: "600" }}>Date & Time</th>
+                                <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '13px', color: '#64748b', fontWeight: "600" }}>User</th>
+                                <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '13px', color: '#64748b', fontWeight: "600" }}>Action</th>
+                                <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '13px', color: '#64748b', fontWeight: "600" }}>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr><td colSpan="4" style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>Loading...</td></tr>
+                            ) : logs.length === 0 ? (
+                                <tr><td colSpan="4" style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No logs found.</td></tr>
+                            ) : (
+                                logs.map((log) => (
+                                    <tr key={log.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                        <td style={{ padding: '16px 20px', whiteSpace: 'nowrap', color: '#444', fontSize: '14px' }}>
+                                            {formatDate(log.created_at)}
+                                        </td>
+                                        <td style={{ padding: '16px 20px', color: '#444' }}>
+                                            {log.profiles ? (
+                                                <div>
+                                                    <div style={{ fontWeight: '600', color: '#1e293b' }}>{log.profiles.first_name} {log.profiles.last_name}</div>
+                                                    <div style={{ fontSize: '11px', color: '#64748b' }}>{log.profiles.account_type}</div>
+                                                </div>
+                                            ) : <span style={{ color: '#999', fontStyle: 'italic' }}>System/Unknown</span>}
+                                        </td>
+                                        <td style={{ padding: '16px 20px' }}>
+                                            <span
+                                                style={{
+                                                    padding: '4px 10px',
+                                                    borderRadius: '20px',
+                                                    fontSize: '12px',
+                                                    fontWeight: '500',
+                                                    backgroundColor:
+                                                        log.action?.includes('CREATE') ? '#f0fdf4' :
+                                                            log.action?.includes('UPDATE') || log.action?.includes('CHANGE') ? '#eff6ff' :
+                                                                log.action?.includes('DELETE') ? '#fff1f2' : '#f8fafc',
+                                                    color:
+                                                        log.action?.includes('CREATE') ? '#15803d' :
+                                                            log.action?.includes('UPDATE') || log.action?.includes('CHANGE') ? '#2563eb' :
+                                                                log.action?.includes('DELETE') ? '#be123c' : '#475569'
+                                                }}
+                                            >
+                                                {getActionLabel(log.action)}
+                                            </span>
+                                        </td>
+                                        <td style={{ padding: '16px 20px', color: '#475569', fontSize: '14px' }}>
+                                            {log.details}
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
                 </div>
-
-                <div className="content-container">
-                    <div className="container-header">
-                        <h2>System Activities (Last 100)</h2>
-                        <button className="btn-secondary" onClick={fetchLogs} title="Refresh Logs">
-                            <i className="fa-solid fa-rotate-right"></i> Refresh
-                        </button>
-                    </div>
-                    <div className="container-body" style={{ padding: 0 }}>
-                        <table className="admin-user-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-                            <thead>
-                                <tr style={{ background: '#003266', borderBottom: '1px solid #003266' }}>
-                                    <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '13px', color: '#ffffff' }}>Date & Time</th>
-                                    <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '13px', color: '#ffffff' }}>User</th>
-                                    <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '13px', color: '#ffffff' }}>Action</th>
-                                    <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '13px', color: '#ffffff' }}>Details</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr><td colSpan="4" style={{ padding: '20px', textAlign: 'center' }}>Loading...</td></tr>
-                                ) : logs.length === 0 ? (
-                                    <tr><td colSpan="4" style={{ padding: '20px', textAlign: 'center' }}>No logs found.</td></tr>
-                                ) : (
-                                    logs.map((log) => (
-                                        <tr key={log.id} style={{ borderBottom: '1px solid #eee' }}>
-                                            <td style={{ padding: '12px 20px', whiteSpace: 'nowrap', color: '#444' }}>
-                                                {formatDate(log.created_at)}
-                                            </td>
-                                            <td style={{ padding: '12px 20px', color: '#444' }}>
-                                                {log.profiles ? (
-                                                    <div>
-                                                        <div style={{ fontWeight: '600' }}>{log.profiles.first_name} {log.profiles.last_name}</div>
-                                                        <div style={{ fontSize: '11px', color: '#888' }}>{log.profiles.account_type}</div>
-                                                    </div>
-                                                ) : <span style={{ color: '#999', fontStyle: 'italic' }}>System/Unknown</span>}
-                                            </td>
-                                            <td style={{ padding: '12px 20px' }}>
-                                                <span
-                                                    style={{
-                                                        padding: '4px 8px',
-                                                        borderRadius: '4px',
-                                                        fontSize: '11px',
-                                                        fontWeight: '600',
-                                                        backgroundColor:
-                                                            log.action?.includes('CREATE') ? '#e6fffa' :
-                                                                log.action?.includes('UPDATE') || log.action?.includes('CHANGE') ? '#ebf8ff' :
-                                                                    log.action?.includes('DELETE') ? '#fff5f5' : '#f0f0f0',
-                                                        color:
-                                                            log.action?.includes('CREATE') ? '#234e52' :
-                                                                log.action?.includes('UPDATE') || log.action?.includes('CHANGE') ? '#2c5282' :
-                                                                    log.action?.includes('DELETE') ? '#c53030' : '#444'
-                                                    }}
-                                                >
-                                                    {getActionLabel(log.action)}
-                                                </span>
-                                            </td>
-                                            <td style={{ padding: '12px 20px', color: '#555' }}>
-                                                {log.details}
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </main>
+            </div>
         </div>
     );
 };

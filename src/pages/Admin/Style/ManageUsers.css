@@ -417,3 +417,111 @@ select:focus {
   border-radius: 0;
   border-top: none;
 }
+
+/* ================= DARK MODE OVERRIDES ================= */
+body.dark-mode .dashboard-container {
+  background: #0d1117;
+}
+
+body.dark-mode .content-container,
+body.dark-mode .role-card,
+body.dark-mode .table-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .container-header {
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+}
+
+body.dark-mode .container-header h2 {
+  color: #c9d1d9;
+}
+
+body.dark-mode .role-card h3 {
+  color: #8b949e;
+}
+
+body.dark-mode .role-card .count {
+  color: #58a6ff;
+}
+
+body.dark-mode .user-table {
+  background: #161b22;
+}
+
+body.dark-mode .user-table th {
+  background: #21262d;
+  color: #c9d1d9;
+  border-color: #30363d;
+}
+
+body.dark-mode .user-table td {
+  color: #c9d1d9;
+  border-color: #30363d;
+}
+
+body.dark-mode .user-table tbody tr:hover {
+  background: #21262d;
+}
+
+body.dark-mode .user-table tbody tr:nth-child(even) {
+  background: #0d1117;
+}
+
+body.dark-mode label {
+  color: #8b949e;
+}
+
+body.dark-mode input,
+body.dark-mode select {
+  background: #0d1117;
+  border-color: #30363d;
+  color: #c9d1d9;
+}
+
+body.dark-mode input::placeholder {
+  color: #6e7681;
+}
+
+body.dark-mode input:focus,
+body.dark-mode select:focus {
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.15);
+  background: #0d1117;
+}
+
+/* Modal Dark Mode */
+body.dark-mode .modal-content,
+body.dark-mode .confirm-modal {
+  background: #161b22;
+  border: 1px solid #30363d;
+}
+
+body.dark-mode .modal-title {
+  background: #161b22;
+  border-bottom-color: #30363d;
+  color: #c9d1d9;
+}
+
+body.dark-mode .modal-buttons,
+body.dark-mode .confirm-content {
+  background: #161b22;
+  border-top-color: #30363d;
+}
+
+body.dark-mode .modal-close {
+  background: #21262d;
+  border-color: #30363d;
+  color: #c9d1d9;
+}
+
+body.dark-mode .confirm-content p {
+  color: #8b949e;
+}
+
+body.dark-mode .policy-name-highlight {
+  color: #58a6ff;
+}

@@ -188,7 +188,7 @@
     background: #fff;
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     max-width: 900px;
     margin: 20px auto;
 }
@@ -220,7 +220,8 @@
 }
 
 /* BUTTONS */
-.update-btn, .save-btn {
+.update-btn,
+.save-btn {
     background-color: var(--primary-color);
     color: white;
     padding: 10px 24px;
@@ -231,7 +232,8 @@
     transition: all 0.3s ease;
 }
 
-.update-btn:hover, .save-btn:hover {
+.update-btn:hover,
+.save-btn:hover {
     background-color: var(--secondary-color);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 50, 102, 0.2);
@@ -255,7 +257,10 @@
 /* MODAL OVERLAY & CONTENT */
 .modal-overlay {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
@@ -270,7 +275,7 @@
     border-radius: 12px;
     width: 95%;
     max-width: 650px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .modal-content h3 {
@@ -289,7 +294,7 @@
     gap: 15px;
 }
 
-.form-grid input, 
+.form-grid input,
 .form-grid select {
     padding: 12px;
     border: 1px solid var(--border-color);
@@ -299,7 +304,7 @@
     transition: all 0.3s ease;
 }
 
-.form-grid input:focus, 
+.form-grid input:focus,
 .form-grid select:focus {
     border-color: var(--accent-color);
     box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.1);
@@ -356,12 +361,67 @@
 }
 
 /* RESPONSIVE */
-@media (max-width: 768px) {
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .admin-header {
-        padding: 12px 20px;
-    }
+.admin-header {
+    padding: 12px 20px;
+}
+
+
+/* ================= DARK MODE OVERRIDES ================= */
+body.dark-mode .admin-container {
+    background: #0d1117;
+}
+
+body.dark-mode .profile-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .profile-header {
+    border-bottom-color: #30363d;
+}
+
+body.dark-mode .profile-table td {
+    border-bottom-color: #30363d;
+    color: #c9d1d9;
+}
+
+body.dark-mode .profile-table td strong {
+    color: #58a6ff;
+}
+
+body.dark-mode .cancel-btn {
+    background: #21262d;
+    color: #c9d1d9;
+}
+
+/* Modal Dark Mode */
+body.dark-mode .modal-content {
+    background: #161b22;
+    border: 1px solid #30363d;
+}
+
+body.dark-mode .modal-content h3 {
+    color: #c9d1d9;
+    border-bottom-color: #30363d;
+}
+
+body.dark-mode .form-grid input,
+body.dark-mode .form-grid select,
+body.dark-mode .input-group input {
+    background: #0d1117;
+    border-color: #30363d;
+    color: #c9d1d9;
+}
+
+body.dark-mode .input-group label {
+    color: #8b949e;
+}
+
+body.dark-mode .modal-subtitle {
+    color: #8b949e;
+}
+
+body.dark-mode .password-divider {
+    border-top-color: #30363d;
 }

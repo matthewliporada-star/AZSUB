@@ -53,12 +53,13 @@ function App() {
           <Route path="/ap/doc-history" element={<MainLayout><DocHistoryPage /></MainLayout>} />
 
           {/* Admin Routes */}
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/ManageUsers" element={<ManageUsers />} />
-          <Route path="/admin/SerialNumber" element={<AdminSerialNumber />} />
-          <Route path="/admin/policies" element={<AdminPolicies />} />
-          <Route path="/admin/profile" element={<AdminProfile />} />
-          <Route path="/admin/activity-logs" element={<AdminActivityLogs />} />
+          {/* Admin Routes */}
+          <Route path="/admin/dashboard" element={<MainLayout><AdminDashboard /></MainLayout>} />
+          <Route path="/admin/ManageUsers" element={<MainLayout><ManageUsers /></MainLayout>} />
+          <Route path="/admin/SerialNumber" element={<MainLayout><AdminSerialNumber /></MainLayout>} />
+          <Route path="/admin/policies" element={<MainLayout><AdminPolicies /></MainLayout>} />
+          <Route path="/admin/profile" element={<MainLayout><AdminProfile /></MainLayout>} />
+          <Route path="/admin/activity-logs" element={<MainLayout><AdminActivityLogs /></MainLayout>} />
 
           {/* AL Routes - Same as AP plus Team Performance */}
           <Route path="/al/dashboard" element={<MainLayout><ALDashboard /></MainLayout>} />

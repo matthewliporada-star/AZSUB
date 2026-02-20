@@ -2,20 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import supabase from "../../config/supabaseClient";
-import "./Style/AdminLayout.css";
 import "./Style/SerialNumber.css";
-import LogoImage from "../../assets/logo1.png";
-
 
 const AdminSerialNumber = () => {
   const navigate = useNavigate();
-  const { darkMode, toggleDarkMode } = useApp();
+  const { darkMode } = useApp();
 
   const [totalUsers, setTotalUsers] = useState(0);
   const [serial_numbers, setserial_numbers] = useState([]);
   const [user, setUser] = useState(null);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
   // ===== CARD COUNTS =====
@@ -191,163 +186,109 @@ const AdminSerialNumber = () => {
     setSelectedSerial(serial);
     setShowViewModal(true);
   }
-  /* ================= LOGOUT ================= */
-  const logout = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
-  };
 
   return (
-
-    <div className="admin-container">
-      <aside className={`admin-sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
-        <button
-          className="admin-sidebar-toggle"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-        >
-          <i className={`fa-solid ${sidebarOpen ? 'fa-bars' : 'fa-bars'}`}></i>
-        </button>
-        <div className="admin-sidebar-logo">
-          <img src={LogoImage} alt="Logo" className="admin-logo-img" />
+    <div className="dashboard-content" style={{ padding: '40px 50px' }}>
+      {/* Header Row */}
+      <div className="header-row" style={{ marginBottom: '24px' }}>
+        <div>
+          <h1 className="title" style={{ fontSize: "28px", fontWeight: "700", color: "#333" }}>Serial Numbers</h1>
+          <p className="subtitle" style={{ color: "#777" }}>Manage and track all serial numbers</p>
         </div>
-        <ul className="admin-sidebar-menu">
-          <li onClick={() => navigate("/admin/dashboard")}>
-            <i className="fa-solid fa-chart-line"></i> {sidebarOpen && <span>Dashboard</span>}
-          </li>
-          <li onClick={() => navigate("/admin/ManageUsers")}>
-            <i className="fa-solid fa-users"></i> {sidebarOpen && <span>Manage Users</span>}
-          </li>
-          <li className="active" onClick={() => navigate("/admin/SerialNumber")}>
-            <i className="fa-solid fa-barcode"></i> {sidebarOpen && <span>Serial Numbers</span>}
-          </li>
-          <li onClick={() => navigate("/admin/policies")}>
-            <i className="fa-solid fa-file-shield"></i> {sidebarOpen && <span>Policies</span>}
-          </li>
-          <li onClick={() => navigate("/admin/activity-logs")}>
-            <i className="fa-solid fa-list-ul"></i> {sidebarOpen && <span>Activity Logs</span>}
-          </li>
-        </ul>
-      </aside>
+      </div>
 
-      {/* Header */}
-      <header className={`admin-header ${sidebarOpen ? '' : 'expanded'}`}>
-        <div className="admin-header-content">
-          <h1>Admin Dashboard</h1>
-          <div className="admin-header-user">
-            <button
-              className="admin-dark-mode-toggle"
-              onClick={toggleDarkMode}
-              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '15px', fontSize: '18px', color: darkMode ? '#e2e8f0' : '#64748b', transition: 'color 0.3s' }}
-            >
-              <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
-            </button>
-            <button
-              className="admin-user-profile-btn"
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-            >
-              <div className="admin-user-avatar">
-                {user?.user_metadata?.last_name ? (
-                  <span className="admin-avatar-initials">
-                    {user.user_metadata.last_name.charAt(0).toUpperCase()}
-                  </span>
-                ) : (
-                  <i className="fa-solid fa-user"></i>
-                )}
-              </div>
-              <span>{user?.user_metadata?.last_name || "User"} - Admin</span>
-            </button>
-            {showProfileMenu && (
-              <div className="admin-profile-dropdown">
-                <a onClick={() => navigate("/admin/SerialNumber")} className="admin-dropdown-item">
-                  <i className="fa-solid fa-barcode"></i> Serial Numbers
-                </a>
-                <a onClick={() => navigate("/admin/Profile")} className="admin-dropdown-item">
-                  <i className="fa-solid fa-user"></i> Profile
-                </a>
-                <a href="#" className="admin-dropdown-item">
-                  <i className="fa-solid fa-lock"></i> Change Password
-                </a>
-                <hr className="admin-dropdown-divider" />
-                <a onClick={logout} className="admin-dropdown-item admin-logout-item">
-                  <i className="fa-solid fa-right-from-bracket"></i> Logout
-                </a>
-              </div>
-            )}
-          </div>
+      {/* ================= CARDS ================= */}
+      <div className="admin-cards-grid" style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(4, 1fr)",
+        gap: "20px",
+        marginBottom: "30px"
+      }}>
+        <div className="card admin-card stats-card" style={{ background: "white", padding: "20px", borderRadius: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
+          <p style={{ color: "#64748b", fontSize: "14px", fontWeight: "600", marginBottom: "5px" }}>Total Serial Numbers</p>
+          <h2 style={{ fontSize: "28px", fontWeight: "700", color: "#0f172a", margin: 0 }}>{totalUsers}</h2>
         </div>
-      </header>
-
-      <main className={`admin-main-content ${sidebarOpen ? '' : 'expanded'}`}>
-
-        {/* ================= CARDS ================= */}
-        <div className="admin-cards-grids">
-          <div className="admin-card">
-            <p>Total Serial Numbers</p>
-            <h2>{totalUsers}</h2>
-          </div>
-          <div className="admin-card">
-            <p>Unused (Default)</p>
-            <h2>{unusedDefault}</h2>
-          </div>
-          <div className="admin-card">
-            <p>Unused (Allianz Well)</p>
-            <h2>{unusedAllianz}</h2>
-          </div>
-          <div className="admin-card used">
-            <p>Used Serials</p>
-            <h2>{usedSerials}</h2>
-          </div>
+        <div className="card admin-card stats-card" style={{ background: "white", padding: "20px", borderRadius: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
+          <p style={{ color: "#64748b", fontSize: "14px", fontWeight: "600", marginBottom: "5px" }}>Unused (Default)</p>
+          <h2 style={{ fontSize: "28px", fontWeight: "700", color: "#0f172a", margin: 0 }}>{unusedDefault}</h2>
         </div>
+        <div className="card admin-card stats-card" style={{ background: "white", padding: "20px", borderRadius: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
+          <p style={{ color: "#64748b", fontSize: "14px", fontWeight: "600", marginBottom: "5px" }}>Unused (Allianz Well)</p>
+          <h2 style={{ fontSize: "28px", fontWeight: "700", color: "#0f172a", margin: 0 }}>{unusedAllianz}</h2>
+        </div>
+        <div className="card admin-card stats-card used" style={{ background: "white", padding: "20px", borderRadius: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
+          <p style={{ color: "#64748b", fontSize: "14px", fontWeight: "600", marginBottom: "5px" }}>Used Serials</p>
+          <h2 style={{ fontSize: "28px", fontWeight: "700", color: "#0f172a", margin: 0 }}>{usedSerials}</h2>
+        </div>
+      </div>
 
-        {/* ================= TABLE ================= */}
-        <div className="table-header">
-          <h3>Serial Numbers</h3>
-          <button className="import-btn" onClick={() => setShowImportModal(true)}>
-            Import CSV
+      {/* ================= TABLE ================= */}
+      <div className="content-container animate-spring delay-2" style={{
+        background: "white",
+        borderRadius: "16px",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+        padding: "24px",
+        border: "1px solid rgba(0,0,0,0.05)"
+      }}>
+        <div className="table-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+          <div>
+            {/* ================= FILTER CONTROLS ================= */}
+            <div className="filter-button-group" style={{ display: "flex", gap: "8px" }}>
+              {["All", "Default", "Allianz Well", "Manual"].map((type) => (
+                <button
+                  key={type}
+                  className={`filter-btn ${filterType === type ? "active" : ""}`}
+                  onClick={() => {
+                    setFilterType(type);
+                    setCurrentPage(1);
+                  }}
+                  style={{
+                    padding: "8px 16px",
+                    cursor: "pointer",
+                    borderRadius: "6px",
+                    border: "1px solid #e2e8f0",
+                    backgroundColor: filterType === type ? "#0f172a" : "#fff",
+                    color: filterType === type ? "#fff" : "#64748b",
+                    fontSize: "13px",
+                    fontWeight: "500",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  {type === "All" ? "Show All" : type}
+                </button>
+              ))}
+            </div>
+          </div>
+          <button className="import-btn" onClick={() => setShowImportModal(true)} style={{
+            backgroundColor: "#2563eb",
+            color: "white",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontWeight: "600",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            boxShadow: "0 4px 6px -1px rgba(37, 99, 235, 0.2)"
+          }}>
+            <i className="fa-solid fa-file-csv"></i> Import CSV
           </button>
         </div>
 
-        {/* ================= FILTER CONTROLS ================= */}
-        {/* Removed redundant nested divs and reduced bottom margin */}
-        <div className="filter-button-group" style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
-          {["All", "Default", "Allianz Well", "Manual"].map((type) => (
-            <button
-              key={type}
-              className={`filter-btn ${filterType === type ? "active" : ""}`}
-              onClick={() => {
-                setFilterType(type);
-                setCurrentPage(1);
-              }}
-              style={{
-                padding: "8px 16px",
-                cursor: "pointer",
-                borderRadius: "4px",
-                border: "1px solid #ddd",
-                backgroundColor: filterType === type ? "#003266" : "#fff",
-                color: filterType === type ? "#fff" : "#333",
-                fontWeight: filterType === type ? "600" : "normal",
-                transition: "all 0.3s ease",
-                boxShadow: filterType === type ? "0 2px 4px rgba(0,0,0,0.1)" : "none"
-              }}
-            >
-              {type === "All" ? "Show All" : type}
-            </button>
-          ))}
-        </div>
         <div className="table-container">
-          <table className="serial-table">
+          <table className="serial-table" style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr>
-                <th>#</th>
-                <th>Serial Number</th>
-                <th>Confirm</th>
-                <th>Issued</th>
-                <th>Response ID</th>
-                <th>Serial Type</th>
-                <th>Date</th>
-                <th>Action</th>
+              <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
+                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>#</th>
+                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Serial Number</th>
+                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Confirm</th>
+                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Issued</th>
+                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Response ID</th>
+                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Serial Type</th>
+                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Date</th>
+                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -393,21 +334,37 @@ const AdminSerialNumber = () => {
                 }
 
                 return currentRecords.map((item, index) => (
-                  <tr key={item.serial_id || index}>
+                  <tr key={item.serial_id || index} style={{ borderBottom: "1px solid #f1f5f9" }}>
                     {/* We use firstIndex + index + 1 so that Page 2 starts at 17, 18, etc. */}
-                    <td>{firstIndex + index + 1}</td>
-                    <td>{item.serial_number}</td>
-                    <td>{item.is_issued ? "Yes" : "-"}</td>
-                    <td>{item.Confirm ? "Yes" : "-"}</td>
-                    <td>{item.ResponseID || "-"}</td>
-                    <td>
-                      <span className={`type-badge ${item.serial_type?.replace(/\s+/g, '-').toLowerCase()}`}>
+                    <td style={{ padding: "16px 12px", color: "#475569", fontSize: "14px" }}>{firstIndex + index + 1}</td>
+                    <td style={{ padding: "16px 12px", color: "#1e293b", fontWeight: "500", fontSize: "14px" }}>{item.serial_number}</td>
+                    <td style={{ padding: "16px 12px", color: "#475569", fontSize: "14px" }}>{item.is_issued ? "Yes" : "-"}</td>
+                    <td style={{ padding: "16px 12px", color: "#475569", fontSize: "14px" }}>{item.Confirm ? "Yes" : "-"}</td>
+                    <td style={{ padding: "16px 12px", color: "#475569", fontSize: "14px" }}>{item.ResponseID || "-"}</td>
+                    <td style={{ padding: "16px 12px" }}>
+                      <span className={`type-badge ${item.serial_type?.replace(/\s+/g, '-').toLowerCase()}`} style={{
+                        padding: "4px 10px",
+                        borderRadius: "20px",
+                        fontSize: "12px",
+                        fontWeight: "500",
+                        backgroundColor: item.serial_type === 'Default' ? '#e0f2fe' : '#f0fdf4',
+                        color: item.serial_type === 'Default' ? '#0369a1' : '#15803d'
+                      }}>
                         {item.serial_type}
                       </span>
                     </td>
-                    <td>{new Date(item.date).toLocaleString()}</td>
-                    <td>
-                      <button className="view-btn" onClick={() => handleView(item)}>
+                    <td style={{ padding: "16px 12px", color: "#475569", fontSize: "14px" }}>{new Date(item.date).toLocaleString()}</td>
+                    <td style={{ padding: "16px 12px" }}>
+                      <button className="view-btn" onClick={() => handleView(item)} style={{
+                        backgroundColor: 'transparent',
+                        color: '#3b82f6',
+                        border: '1px solid #3b82f6',
+                        padding: '6px 12px',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}>
                         View
                       </button>
                     </td>
@@ -418,139 +375,131 @@ const AdminSerialNumber = () => {
           </table>
         </div>
         {/* ================= PAGINATION CONTROLS ================= */}
-        <div className="pagination-wrapper">
-          {/* Previous Button */}
+        <div className="pagination-wrapper" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "20px" }}>
           <button
             className="pagination-arrow-btn"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            style={{
+              border: "none",
+              background: "transparent",
+              cursor: currentPage === 1 ? "not-allowed" : "pointer",
+              color: currentPage === 1 ? "#cbd5e1" : "#64748b",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              fontSize: "14px"
+            }}
           >
-            <i className="fa-solid fa-chevron-left">Back</i>
+            <i className="fa-solid fa-chevron-left"></i> Previous
           </button>
 
-          <div className="pagination-info">
-            <span className="current-page-text">Page {currentPage}</span>
-            <span className="total-pages-text">of {Math.ceil(
+          <div className="pagination-info" style={{ fontSize: "14px", color: "#64748b" }}>
+            <span className="current-page-text" style={{ fontWeight: "600", color: "#0f172a" }}>{currentPage}</span>
+            <span className="total-pages-text"> of {Math.ceil(
               serial_numbers.filter(i => filterType === "All" || i.serial_type === filterType).length / 16
             ) || 1}</span>
           </div>
 
-          {/* Next Button */}
           <button
             className="pagination-arrow-btn"
             disabled={currentPage >= Math.ceil(
               serial_numbers.filter(i => filterType === "All" || i.serial_type === filterType).length / 16
             )}
             onClick={() => setCurrentPage(prev => prev + 1)}
+            style={{
+              border: "none",
+              background: "transparent",
+              cursor: currentPage >= Math.ceil(serial_numbers.length / 10) ? "not-allowed" : "pointer",
+              color: currentPage >= Math.ceil(serial_numbers.length / 10) ? "#cbd5e1" : "#64748b",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              fontSize: "14px"
+            }}
           >
-            {/* This adds the arrow icon */}
-            <i className="fa-solid fa-chevron-right">Next</i>
+            Next <i className="fa-solid fa-chevron-right"></i>
           </button>
         </div>
-        {/* ================= MODAL ================= */}
-        {showViewModal && selectedSerial && (
-          <div className="modal-overlay">
-            <div className="modal" style={{ width: "450px" }}> {/* Slightly wider for better table fit */}
-              <h2>Serial Tracking</h2>
-              <div style={{ marginBottom: "15px", fontSize: "14px", lineHeight: "1.6" }}>
-                <p><strong>Serial Number:</strong> {selectedSerial.serial_number}</p>
-                <p><strong>Serial Type:</strong> {selectedSerial.serial_type}</p>
-                <p><strong>Requested by:</strong> {selectedSerial.ResponseID || "Not yet taken"}</p>
-                <p><strong>Request Date:</strong> {new Date(selectedSerial.date).toLocaleDateString()}</p>
-              </div>
-              <hr style={{ border: "0.5px solid #eee", margin: "15px 0" }} />
-              <h3 style={{ fontSize: "16px", marginBottom: "10px" }}>Tracking Status</h3>
-              <ul style={{ listStyle: "none", paddingLeft: 0, fontSize: "14px" }}>
-                <li style={{ marginBottom: "8px" }}>
-                  <span style={{ color: "var(--success-color)", marginRight: "10px" }}>●</span>
-                  <strong>Serial Created:</strong> {new Date(selectedSerial.date).toLocaleString()}
-                </li>
-                <li style={{ marginBottom: "8px" }}>
-                  <span style={{ color: selectedSerial.is_issued ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>
-                  <strong>Serial confirm:</strong> {selectedSerial.is_issued ? "Confirmed" : "In Progress"}
-                </li>
-                <li style={{ marginBottom: "8px" }}>
-                  <span style={{ color: selectedSerial.ResponseID ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>
-                  <strong>Serial Issued:</strong> {selectedSerial.ResponseID ? "Completed" : "Pending"}
-                </li>
-              </ul>
-              <hr style={{ border: "0.5px solid #eee", margin: "15px 0" }} />
-              <h3 style={{ fontSize: "16px", marginBottom: "10px" }}>Submitted File</h3>
-              <table className="serial-table" style={{ fontSize: "13px" }}>
-                <thead>
-                  <tr>
-                    <th style={{ textAlign: "left" }}>File Name</th>
-                    <th style={{ textAlign: "right" }}>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td style={{ textAlign: "left" }}>
-                      <i className="fa-solid fa-file-pdf" style={{ color: "#e74c3c", marginRight: "8px" }}></i>
-                      {`Attachment_${selectedSerial.serial_number}.pdf`}
-                    </td>
-                    <td style={{ textAlign: "right" }}>
-                      <button className="view-btn" style={{ padding: "4px 8px", fontSize: "11px", cursor: "pointer" }}>
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div className="modal-buttons" style={{ marginTop: "20px" }}>
-                <button className="cancel-btn" onClick={() => setShowViewModal(false)}>
-                  Close
-                </button>
-              </div>
+      </div>
+
+      {/* ================= MODAL ================= */}
+      {showViewModal && selectedSerial && (
+        <div className="modal-overlay">
+          <div className="modal" style={{ width: "450px" }}> {/* Slightly wider for better table fit */}
+            <h2>Serial Tracking</h2>
+            <div style={{ marginBottom: "15px", fontSize: "14px", lineHeight: "1.6" }}>
+              <p><strong>Serial Number:</strong> {selectedSerial.serial_number}</p>
+              <p><strong>Serial Type:</strong> {selectedSerial.serial_type}</p>
+              <p><strong>Requested by:</strong> {selectedSerial.ResponseID || "Not yet taken"}</p>
+              <p><strong>Request Date:</strong> {new Date(selectedSerial.date).toLocaleDateString()}</p>
+            </div>
+            <hr style={{ border: "0.5px solid #eee", margin: "15px 0" }} />
+            <h3 style={{ fontSize: "16px", marginBottom: "10px" }}>Tracking Status</h3>
+            <ul style={{ listStyle: "none", paddingLeft: 0, fontSize: "14px" }}>
+              <li style={{ marginBottom: "8px" }}>
+                <span style={{ color: "var(--success-color)", marginRight: "10px" }}>●</span>
+                <strong>Serial Created:</strong> {new Date(selectedSerial.date).toLocaleString()}
+              </li>
+              <li style={{ marginBottom: "8px" }}>
+                <span style={{ color: selectedSerial.is_issued ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>
+                <strong>Serial confirm:</strong> {selectedSerial.is_issued ? "Confirmed" : "In Progress"}
+              </li>
+              <li style={{ marginBottom: "8px" }}>
+                <span style={{ color: selectedSerial.ResponseID ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>
+                <strong>Serial Issued:</strong> {selectedSerial.ResponseID ? "Completed" : "Pending"}
+              </li>
+            </ul>
+            <div className="modal-buttons" style={{ marginTop: "20px" }}>
+              <button className="cancel-btn" onClick={() => setShowViewModal(false)}>
+                Close
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {showImportModal && (
-          <div className="modal-overlay">
-            <div className="modal">
-              <h2>Import CSV</h2>
+      {showImportModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>Import CSV</h2>
 
-              <input
-                type="file"
-                accept=".csv"
-                onChange={(e) => setSelectedFile(e.target.files[0])}
-              />
+            <input
+              type="file"
+              accept=".csv"
+              onChange={(e) => setSelectedFile(e.target.files[0])}
+            />
 
-              <label>Serial Type</label>
-              <select
-                value={serial_type}
-                onChange={(e) => setserial_type(e.target.value)}
-                className="file-type-select"
+            <label>Serial Type</label>
+            <select
+              value={serial_type}
+              onChange={(e) => setserial_type(e.target.value)}
+              className="file-type-select"
+            >
+              <option value="Default">Default</option>
+              <option value="Allianz Well">Allianz Well</option>
+            </select>
+
+            <div className="modal-buttons">
+              <button
+                className="cancel-btn"
+                onClick={() => setShowImportModal(false)}
               >
-                <option value="Default">Default</option>
-                <option value="Allianz Well">Allianz Well</option>
-              </select>
-
-              <div className="modal-buttons">
-                <button
-                  className="cancel-btn"
-                  onClick={() => setShowImportModal(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="submit-btn"
-                  onClick={handleSubmit}
-                  disabled={uploading}
-                >
-                  {uploading ? "Uploading..." : "Submit"}
-                </button>
-              </div>
+                Cancel
+              </button>
+              <button
+                className="submit-btn"
+                onClick={handleSubmit}
+                disabled={uploading}
+              >
+                {uploading ? "Uploading..." : "Submit"}
+              </button>
             </div>
           </div>
-        )}
-
-      </main>
+        </div>
+      )}
     </div>
   );
 };
-
-
 
 export default AdminSerialNumber;

@@ -6,6 +6,7 @@ import TopBar from './TopBar';
 // Import Scoped Styles
 import '../../pages/AP/AP_Styles.css';
 import '../../pages/AL/AL_Styles.css';
+import '../../pages/Admin/Style/AdminGlobal.css';
 
 const MainLayout = ({ children }) => {
     const location = useLocation();
@@ -13,11 +14,13 @@ const MainLayout = ({ children }) => {
     // Determine the section based on path for scoping CSS
     const isAP = location.pathname.startsWith('/ap');
     const isAL = location.pathname.startsWith('/al');
+    const isAdmin = location.pathname.startsWith('/admin');
 
     // Specific wrapper class
     let layoutClass = 'default-layout';
     if (isAP) layoutClass = 'ap-layout';
     else if (isAL) layoutClass = 'al-layout';
+    else if (isAdmin) layoutClass = 'admin-layout';
 
     // Sidebar State
     const [sidebarOpen, setSidebarOpen] = useState(true);
