@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useApp } from '../../context/AppContext';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 
@@ -9,6 +10,7 @@ import '../../pages/AL/AL_Styles.css';
 import '../../pages/Admin/Style/AdminGlobal.css';
 
 const MainLayout = ({ children }) => {
+    const { userRole } = useApp();
     const location = useLocation();
 
     // Determine the section based on path for scoping CSS
@@ -16,11 +18,11 @@ const MainLayout = ({ children }) => {
     const isAL = location.pathname.startsWith('/al');
     const isAdmin = location.pathname.startsWith('/admin');
 
-    // Specific wrapper class
+    // Specific wrapper class - Fallback to userRole if no path prefix
     let layoutClass = 'default-layout';
-    if (isAP) layoutClass = 'ap-layout';
-    else if (isAL) layoutClass = 'al-layout';
-    else if (isAdmin) layoutClass = 'admin-layout';
+    if (isAP || userRole === 'AP') layoutClass = 'ap-layout';
+    else if (isAL || userRole === 'AL') layoutClass = 'al-layout';
+    else if (isAdmin || userRole === 'ADMIN') layoutClass = 'admin-layout';
 
     // Sidebar State
     const [sidebarOpen, setSidebarOpen] = useState(true);

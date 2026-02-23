@@ -86,20 +86,9 @@ const TopBar = ({ sidebarOpen = true }) => {
                             </div>
 
                             {showDropdown && (
-                                <div className="profile-dropdown" style={{
-                                    position: 'absolute',
-                                    top: '100%',
-                                    right: 0,
-                                    marginTop: '10px',
-                                    background: 'white',
-                                    padding: '10px',
-                                    borderRadius: '8px',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                    minWidth: '150px',
-                                    zIndex: 1000
-                                }}>
-                                    <div className="dropdown-item" style={{ padding: '8px 12px', cursor: 'pointer', borderRadius: '4px' }} onClick={() => console.log('Profile clicked')}>Profile</div>
-                                    <div className="dropdown-item" style={{ padding: '8px 12px', cursor: 'pointer', borderRadius: '4px', color: 'red' }} onClick={handleLogout}>Logout</div>
+                                <div className="profile-dropdown">
+                                    <div className="dropdown-item" onClick={() => navigate('/profile')}>Profile</div>
+                                    <div className="dropdown-item logout-item" onClick={handleLogout}>Logout</div>
                                 </div>
                             )}
                         </div>

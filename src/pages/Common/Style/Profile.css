@@ -1,0 +1,550 @@
+/* =========================================
+   PROFILE PAGE - Main Content Styles
+   Matches the reference screenshot exactly
+   ========================================= */
+
+/* Override main-content when profile page is active */
+body.page-profile .main-content {
+    background-color: #f5f7fa !important;
+}
+
+body.dark-mode.page-profile .main-content {
+    background-color: #0d1117 !important;
+}
+
+/* PAGE WRAPPER - Fills the complete main-content area */
+.profile-page-content {
+    min-height: 100%;
+    width: 100%;
+    padding: 32px 40px;
+    box-sizing: border-box;
+}
+
+/* =========================================
+   PROFILE CARD
+   ========================================= */
+.profile-card {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #eaecf0;
+    overflow: hidden;
+}
+
+/* =========================================
+   CARD HEADER: Avatar + Name + Buttons
+   ========================================= */
+.profile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 32px;
+    border-bottom: 1px solid #eaecf0;
+}
+
+.profile-header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Large circular avatar */
+.profile-avatar-large {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background-color: #003266;
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: -1px;
+}
+
+/* Name */
+.user-text-container h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #101828;
+    margin: 0 0 6px 0;
+    line-height: 1.2;
+}
+
+/* Role Badge */
+.badge-admin {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #175CD3;
+    background: #EFF8FF;
+    border: 1px solid #B2DDFF;
+    padding: 2px 10px;
+    border-radius: 99px;
+}
+
+/* Action Buttons */
+.profile-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-security {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #344054;
+    background: #ffffff;
+    border: 1.5px solid #d0d5dd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-security:hover {
+    border-color: #98a2b3;
+    background: #f9fafb;
+}
+
+.btn-update {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    background: #003266;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-update:hover {
+    background: #0052a3;
+}
+
+/* =========================================
+   INFO GRID: Two-column section layout
+   ========================================= */
+.profile-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 28px 32px;
+    gap: 0;
+}
+
+.info-section {
+    padding-right: 40px;
+}
+
+.info-section+.info-section {
+    padding-right: 0;
+    padding-left: 40px;
+    border-left: 1px solid #eaecf0;
+}
+
+.info-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #344054;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 20px;
+    padding-bottom: 0;
+}
+
+.info-section-title::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 14px;
+    background: #003266;
+    border-radius: 2px;
+}
+
+.info-group-stack {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 32px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.info-item.full-width {
+    grid-column: span 2;
+}
+
+.info-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #98a2b3;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.info-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: #101828;
+}
+
+/* =========================================
+   MODAL OVERLAY
+   ========================================= */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 700px;
+    overflow: hidden;
+}
+
+/* Modal Header */
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 22px 28px;
+    background: #f8fafc;
+    border-bottom: 1px solid #eaecf0;
+    position: relative;
+}
+
+.modal-header-icon {
+    width: 44px;
+    height: 44px;
+    background: #EFF8FF;
+    color: #003266;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.modal-header-text h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #101828;
+}
+
+.modal-subtitle {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: #667085;
+}
+
+.close-btn {
+    position: absolute;
+    right: 18px;
+    top: 16px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #98a2b3;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: #344054;
+}
+
+/* Modal Body */
+.modal-body {
+    padding: 24px 28px;
+}
+
+/* Form Grid - 3 columns */
+.form-grid-layout {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.input-box.full-width {
+    grid-column: span 3;
+}
+
+.input-box label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #344054;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.input-box input,
+.input-box select {
+    width: 100%;
+    padding: 10px 12px;
+    background: #ffffff;
+    border: 1.5px solid #d0d5dd;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #101828;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.input-box input:focus,
+.input-box select:focus {
+    outline: none;
+    border-color: #003266;
+    box-shadow: 0 0 0 3px rgba(0, 50, 102, 0.1);
+}
+
+/* Password form */
+.password-form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #344054;
+    margin-bottom: 6px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper i {
+    position: absolute;
+    left: 12px;
+    color: #98a2b3;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    background: #ffffff;
+    border: 1.5px solid #d0d5dd;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #101828;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.input-wrapper input:focus {
+    outline: none;
+    border-color: #003266;
+    box-shadow: 0 0 0 3px rgba(0, 50, 102, 0.1);
+}
+
+.password-divider-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: #98a2b3;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.password-divider-text::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #eaecf0;
+}
+
+/* Modal Footer */
+.modal-actions-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 28px;
+    background: #f8fafc;
+    border-top: 1px solid #eaecf0;
+}
+
+.btn-cancel {
+    padding: 9px 18px;
+    background: #ffffff;
+    border: 1.5px solid #d0d5dd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #344054;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #f9fafb;
+}
+
+.btn-save-security {
+    padding: 9px 20px;
+    background: #003266;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-save-security:hover {
+    background: #0052a3;
+}
+
+
+/* =========================================
+   DARK MODE
+   ========================================= */
+.dark-mode .profile-page-content {
+    background-color: #0d1117;
+}
+
+.dark-mode .profile-card {
+    background: #161b22;
+    border-color: #30363d;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .profile-header {
+    border-bottom-color: #30363d;
+}
+
+.dark-mode .user-text-container h2 {
+    color: #f0f6fc;
+}
+
+.dark-mode .badge-admin {
+    background: rgba(56, 139, 253, 0.1);
+    color: #58a6ff;
+    border-color: rgba(56, 139, 253, 0.3);
+}
+
+.dark-mode .btn-security {
+    background: #1e293b;
+    border-color: #334155;
+    color: #c9d1d9;
+}
+
+.dark-mode .btn-security:hover {
+    background: #334155;
+}
+
+.dark-mode .info-section+.info-section {
+    border-left-color: #30363d;
+}
+
+.dark-mode .info-section-title {
+    color: #8b949e;
+}
+
+.dark-mode .info-label {
+    color: #6e7681;
+}
+
+.dark-mode .info-value {
+    color: #e6edf3;
+}
+
+/* Dark Mode Modals */
+.dark-mode .modal-card {
+    background: #161b22;
+}
+
+.dark-mode .modal-header,
+.dark-mode .modal-actions-footer {
+    background: #1e2936;
+    border-color: #30363d;
+}
+
+.dark-mode .modal-header-icon {
+    background: rgba(56, 139, 253, 0.1);
+    color: #58a6ff;
+}
+
+.dark-mode .modal-header-text h3 {
+    color: #e6edf3;
+}
+
+.dark-mode .modal-subtitle {
+    color: #8b949e;
+}
+
+.dark-mode .input-box label,
+.dark-mode .input-group label {
+    color: #8b949e;
+}
+
+.dark-mode .input-box input,
+.dark-mode .input-box select,
+.dark-mode .input-wrapper input {
+    background: #0d1117;
+    border-color: #30363d;
+    color: #e6edf3;
+}
+
+.dark-mode .input-box input:focus,
+.dark-mode .input-box select:focus,
+.dark-mode .input-wrapper input:focus {
+    border-color: #58a6ff;
+    box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.15);
+}
+
+.dark-mode .btn-cancel {
+    background: #161b22;
+    border-color: #30363d;
+    color: #8b949e;
+}
+
+.dark-mode .btn-cancel:hover {
+    background: #30363d;
+    color: #e6edf3;
+}
+
+.dark-mode .password-divider-text {
+    color: #6e7681;
+}
+
+.dark-mode .password-divider-text::after {
+    background: #30363d;
+}

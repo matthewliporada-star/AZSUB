@@ -735,8 +735,8 @@ body.dark-mode .al-layout .sidebar {
 
 /* Dark Mode Overrides for Cards (Dark Blue Theme) */
 body.dark-mode .al-layout .stat-card {
-    background: #f39c12 !important;
-    border: 1px solid var(--border-subtle-dark) !important;
+    background: #1e293b !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
     color: var(--text-primary-dark) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }
@@ -751,8 +751,8 @@ body.dark-mode .al-layout .stat-card.orange,
 body.dark-mode .al-layout .stat-card.purple,
 body.dark-mode .al-layout .stat-card.red,
 body.dark-mode .al-layout .stat-card.teal {
-    border-color: var(--border-subtle-dark) !important;
-    background: #f39c12 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    background: #1e293b !important;
 }
 
 body.dark-mode .al-layout .stat-label {
@@ -2082,40 +2082,39 @@ body.dark-mode .al-layout p {
 
 /* Stat Cards - Slate & Indigo Surface */
 body.dark-mode .al-layout .stat-card {
-    background: var(--dark-surface) !important;
-    border: 1px solid var(--border-subtle-dark) !important;
-    border-top: 3px solid var(--primary-blue-dark) !important;
+    background: #1e293b !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-top: 3px solid #3b82f6 !important;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2) !important;
-    color: var(--text-primary-dark) !important;
+    color: #f1f5f9 !important;
 }
 
 body.dark-mode .al-layout .stat-card:hover {
-    background: #1a1f2e !important;
-    /* Slightly lighter on hover */
+    background: #263347 !important;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3) !important;
     transform: translateY(-4px);
 }
 
 body.dark-mode .al-layout .stat-label {
-    color: var(--text-secondary-dark) !important;
+    color: #94a3b8 !important;
     font-weight: 500 !important;
     letter-spacing: 0.5px !important;
 }
 
 body.dark-mode .al-layout .stat-value {
-    color: var(--text-primary-dark) !important;
+    color: #f1f5f9 !important;
     font-weight: 800 !important;
 }
 
 body.dark-mode .al-layout .stat-subtext {
-    color: var(--text-secondary-dark) !important;
+    color: #94a3b8 !important;
     opacity: 0.8 !important;
 }
 
 /* Chart Containers */
 body.dark-mode .al-layout .chart-container {
-    background-color: var(--dark-surface) !important;
-    border: 1px solid var(--border-subtle-dark) !important;
+    background-color: #1e293b !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: 16px !important;
 }
 

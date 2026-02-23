@@ -19,8 +19,10 @@ import AdminDashboard from './pages/Admin/Admin-Dashboard';
 import ManageUsers from './pages/Admin/ManageUsers';
 import AdminSerialNumber from './pages/Admin/Admin-SerialNumber';
 import AdminPolicies from './pages/Admin/Admin-Policies';
-import AdminProfile from './pages/Admin/Admin-Profile';
 import AdminActivityLogs from './pages/Admin/Admin-ActivityLogs';
+
+// Common Pages
+import ProfilePage from './pages/Common/ProfilePage';
 
 // AL Pages
 import ALDashboard from './pages/AL/DashboardPage';
@@ -58,8 +60,8 @@ function App() {
           <Route path="/admin/ManageUsers" element={<MainLayout><ManageUsers /></MainLayout>} />
           <Route path="/admin/SerialNumber" element={<MainLayout><AdminSerialNumber /></MainLayout>} />
           <Route path="/admin/policies" element={<MainLayout><AdminPolicies /></MainLayout>} />
-          <Route path="/admin/profile" element={<MainLayout><AdminProfile /></MainLayout>} />
           <Route path="/admin/activity-logs" element={<MainLayout><AdminActivityLogs /></MainLayout>} />
+          <Route path="/profile" element={<MainLayout><ProfilePage /></MainLayout>} />
 
           {/* AL Routes - Same as AP plus Team Performance */}
           <Route path="/al/dashboard" element={<MainLayout><ALDashboard /></MainLayout>} />

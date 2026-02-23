@@ -175,14 +175,6 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
                     <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                 </svg>
             )
-        },
-        {
-            path: '/admin/profile', label: 'Profile', icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-            )
         }
     ];
 
@@ -210,7 +202,7 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
             <div className="sidebar-header" style={{ borderBottom: 'none', boxShadow: 'none' }}>
                 <div className="sidebar-logo" style={{ height: '85px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: 'none', padding: '10px 0', boxSizing: 'border-box' }}>
                     <img
-                        src={darkMode ? logoDark : logoLight}
+                        src={logoDark}
                         alt="Caelum"
                         className={`sidebar-logo-img ${sidebarOpen ? '' : 'collapsed'}`}
                         style={{

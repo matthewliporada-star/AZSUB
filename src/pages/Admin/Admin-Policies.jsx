@@ -292,7 +292,7 @@ const AdminPolicies = () => {
                                             }}>{policy.form_type || 'N/A'}</span>
                                         </td>
                                         <td style={{ padding: "16px 12px" }}>
-                                            <small style={{ color: '#666', background: "#f8fafc", padding: "4px 8px", borderRadius: "20px", border: "1px solid #e2e8f0" }}>
+                                            <small className="files-count-badge" style={{ color: '#666', background: "#f8fafc", padding: "4px 8px", borderRadius: "20px", border: "1px solid #e2e8f0" }}>
                                                 {policy.requirements?.length || 0} files required
                                             </small>
                                         </td>
@@ -314,6 +314,7 @@ const AdminPolicies = () => {
                                         <td style={{ padding: "16px 12px" }}>
                                             <div className="policy-actions" style={{ display: 'flex', gap: '8px' }}>
                                                 <button
+                                                    className={policy.active_status ? 'policy-action-archive' : 'policy-action-restore'}
                                                     onClick={() => openConfirmModal(policy)}
                                                     style={{
                                                         backgroundColor: policy.active_status ? '#fff1f2' : '#f0fdf4', // Red for Archive, Green for Restore
@@ -334,6 +335,7 @@ const AdminPolicies = () => {
                                                 </button>
 
                                                 <button
+                                                    className="policy-action-edit"
                                                     onClick={() => openEditModal(policy)}
                                                     style={{
                                                         backgroundColor: '#eff6ff',

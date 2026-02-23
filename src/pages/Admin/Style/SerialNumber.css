@@ -466,3 +466,27 @@ body.dark-mode .cancel-btn {
   background: #21262d;
   color: #c9d1d9;
 }
+
+/* ===== TYPE BADGE DARK MODE ===== */
+body.dark-mode .type-badge {
+  background-color: rgba(100, 116, 139, 0.15) !important;
+  color: #94a3b8 !important;
+}
+
+body.dark-mode .type-badge.default {
+  background-color: rgba(3, 105, 161, 0.15) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+}
+
+body.dark-mode .type-badge.allianz-well {
+  background-color: rgba(21, 128, 61, 0.15) !important;
+  color: #4ade80 !important;
+  border: 1px solid rgba(74, 222, 128, 0.25) !important;
+}
+
+body.dark-mode .type-badge.manual {
+  background-color: rgba(124, 58, 237, 0.15) !important;
+  color: #a78bfa !important;
+  border: 1px solid rgba(167, 139, 250, 0.25) !important;
+}

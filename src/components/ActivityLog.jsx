@@ -84,10 +84,13 @@ const ActivityLog = () => {
                         <span className="activity-date">{formatDate(log.created_at)}</span>
                     </div>
                     <div className="activity-content">
-                        <span className="activity-action" style={{ fontWeight: '600', color: '#003266' }}>
-                            {getActionLabel(log.action)}:
+                        <span className={`action-badge ${log.action?.includes('CREATE') ? 'action-badge-success' :
+                                log.action?.includes('UPDATE') || log.action?.includes('CHANGE') ? 'action-badge-info' :
+                                    log.action?.includes('DELETE') ? 'action-badge-danger' : 'action-badge-default'
+                            }`} style={{ marginRight: '8px' }}>
+                            {getActionLabel(log.action)}
                         </span>
-                        <span style={{ marginLeft: '5px', color: '#555' }}>
+                        <span className="text-primary">
                             {log.details}
                         </span>
                     </div>

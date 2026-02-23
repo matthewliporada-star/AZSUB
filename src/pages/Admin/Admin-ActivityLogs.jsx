@@ -129,44 +129,32 @@ const AdminActivityLogs = () => {
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr><td colSpan="4" style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>Loading...</td></tr>
+                                <tr><td colSpan="4" className="text-secondary" style={{ padding: '40px', textAlign: 'center' }}>Loading...</td></tr>
                             ) : logs.length === 0 ? (
-                                <tr><td colSpan="4" style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No logs found.</td></tr>
+                                <tr><td colSpan="4" className="text-secondary" style={{ padding: '40px', textAlign: 'center' }}>No logs found.</td></tr>
                             ) : (
                                 logs.map((log) => (
                                     <tr key={log.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                                        <td style={{ padding: '16px 20px', whiteSpace: 'nowrap', color: '#444', fontSize: '14px' }}>
+                                        <td className="text-secondary" style={{ padding: '16px 20px', whiteSpace: 'nowrap' }}>
                                             {formatDate(log.created_at)}
                                         </td>
-                                        <td style={{ padding: '16px 20px', color: '#444' }}>
+                                        <td className="text-secondary" style={{ padding: '16px 20px' }}>
                                             {log.profiles ? (
                                                 <div>
-                                                    <div style={{ fontWeight: '600', color: '#1e293b' }}>{log.profiles.first_name} {log.profiles.last_name}</div>
-                                                    <div style={{ fontSize: '11px', color: '#64748b' }}>{log.profiles.account_type}</div>
+                                                    <div style={{ fontWeight: '600' }} className="text-primary">{log.profiles.first_name} {log.profiles.last_name}</div>
+                                                    <div style={{ fontSize: '11px' }} className="text-dim">{log.profiles.account_type}</div>
                                                 </div>
-                                            ) : <span style={{ color: '#999', fontStyle: 'italic' }}>System/Unknown</span>}
+                                            ) : <span className="text-muted">System/Unknown</span>}
                                         </td>
                                         <td style={{ padding: '16px 20px' }}>
-                                            <span
-                                                style={{
-                                                    padding: '4px 10px',
-                                                    borderRadius: '20px',
-                                                    fontSize: '12px',
-                                                    fontWeight: '500',
-                                                    backgroundColor:
-                                                        log.action?.includes('CREATE') ? '#f0fdf4' :
-                                                            log.action?.includes('UPDATE') || log.action?.includes('CHANGE') ? '#eff6ff' :
-                                                                log.action?.includes('DELETE') ? '#fff1f2' : '#f8fafc',
-                                                    color:
-                                                        log.action?.includes('CREATE') ? '#15803d' :
-                                                            log.action?.includes('UPDATE') || log.action?.includes('CHANGE') ? '#2563eb' :
-                                                                log.action?.includes('DELETE') ? '#be123c' : '#475569'
-                                                }}
-                                            >
+                                            <span className={`action-badge ${log.action?.includes('CREATE') ? 'action-badge-success' :
+                                                    log.action?.includes('UPDATE') || log.action?.includes('CHANGE') ? 'action-badge-info' :
+                                                        log.action?.includes('DELETE') ? 'action-badge-danger' : 'action-badge-default'
+                                                }`}>
                                                 {getActionLabel(log.action)}
                                             </span>
                                         </td>
-                                        <td style={{ padding: '16px 20px', color: '#475569', fontSize: '14px' }}>
+                                        <td style={{ padding: '16px 20px', fontSize: '14px' }} className="text-primary">
                                             {log.details}
                                         </td>
                                     </tr>

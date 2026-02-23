@@ -1,5 +1,54 @@
+.profile-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
+    z-index: 1000;
+}
+
+.dropdown-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    color: #374151;
+    transition: all 0.2s ease;
+}
+
 .dropdown-item:hover {
     background-color: #f3f4f6;
+}
+
+.dropdown-item.logout-item {
+    color: #ef4444;
+}
+
+.dropdown-item.logout-item:hover {
+    background-color: #fef2f2;
+}
+
+/* Dark Mode Overrides */
+body.dark-mode .profile-dropdown {
+    background: #161b22;
+    border: 1px solid #30363d;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .dropdown-item {
+    color: #c9d1d9;
+}
+
+body.dark-mode .dropdown-item:hover {
+    background-color: #1f2937;
+    color: #ffffff;
+}
+
+body.dark-mode .dropdown-item.logout-item:hover {
+    background-color: rgba(239, 68, 68, 0.1);
 }
 
 body.dark-mode .profile-name {
