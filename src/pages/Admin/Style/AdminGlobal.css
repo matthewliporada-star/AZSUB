@@ -183,13 +183,13 @@
 
 /* TopBar Styling to match AP */
 .admin-layout .top-bar {
-    background: #003266;
+    background: #ffffff;
     height: 72px;
     padding: 0 40px;
     display: flex;
     align-items: center;
     border-bottom: 1px solid #eaecf0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     position: fixed;
     top: 0;
     right: 0;
@@ -197,8 +197,9 @@
     z-index: 99;
     width: auto;
     transition: left 0.3s ease;
-    color: #ffffff;
+    color: #1e293b;
 }
+
 
 
 .admin-layout .main-content.expanded .top-bar {
@@ -211,14 +212,20 @@
     align-items: center;
     width: 100%;
     position: relative;
-    color: #ffffff !important;
+    color: #1e293b !important;
 }
 
 .admin-layout .top-bar-content i,
 .admin-layout .top-bar-content .profile-name,
 .admin-layout .top-bar-content .profile-role {
-    color: #ffffff !important;
+    color: #1e293b !important;
 }
+
+.admin-layout .top-bar-content .profile-role {
+    color: #64748b !important;
+    font-size: 11px;
+}
+
 
 .admin-layout .top-bar-content .avatar-circle {
     width: 35px;
@@ -233,9 +240,10 @@
 }
 
 .admin-layout .top-bar-content .dark-mode-toggle {
-    color: #ffffff !important;
+    color: #64748b !important;
     opacity: 0.8;
 }
+
 
 .admin-layout .top-bar-content .profile-dropdown {
     background: #ffffff;
@@ -320,6 +328,11 @@ body.dark-mode .admin-layout .profile-role {
     color: #8b949e !important;
 }
 
+body.dark-mode .admin-layout .top-bar-content i {
+    color: #c9d1d9 !important;
+}
+
+
 /* --- GLOBAL MODAL & FORM STYLES --- */
 .modal-overlay {
     position: fixed;
@@ -334,17 +347,17 @@ body.dark-mode .admin-layout .profile-role {
 }
 
 .modal-content {
-    background: #ffffff;
-    border-radius: 14px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    max-width: 600px;
-    max-height: 90vh;
+    background: #fff;
+    width: 725px;
+    max-height: 87vh;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    animation: modalFadeIn 0.3s ease-out;
 }
+
+
+
 
 @keyframes modalFadeIn {
     from {

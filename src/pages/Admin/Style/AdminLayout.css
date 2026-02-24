@@ -433,16 +433,20 @@ body.dark-mode .admin-sidebar {
 .admin-card {
     background: #FAFAFA;
     border-radius: 12px;
-    padding: 35px;
+    padding: 30px;
     width: 100%;
-    min-height: 160px;
+    min-height: 200px;
     box-shadow: 0 4px 12px rgba(0, 50, 102, 0.1);
     border-left: 4px solid var(--primary-color);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 25px;
+    justify-content: center;
+    text-align: center;
+    gap: 15px;
 }
+
 
 .admin-card:hover {
     transform: translateY(-4px);
@@ -478,8 +482,9 @@ body.dark-mode .admin-sidebar {
 }
 
 .admin-card-info {
-    flex: 1;
+    width: 100%;
 }
+
 
 .admin-card-title {
     font-size: 14px;
@@ -762,19 +767,20 @@ body.dark-mode .admin-sidebar-toggle:hover {
 /* Cards */
 body.dark-mode .admin-card {
     background: #161B22;
-    border: 1px solid var(--border-subtle-dark);
-    border-left: 4px solid var(--primary-color);
-    color: var(--text-primary-dark);
+    border: 1px solid #30363d;
+    border-left: 4px solid #3b82f6;
+    color: #c9d1d9;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode .admin-card-number {
-    color: var(--text-primary-dark);
+    color: #ffffff;
 }
 
 body.dark-mode .admin-card-title {
-    color: var(--text-secondary-dark);
+    color: #8b949e;
 }
+
 
 /* Table */
 body.dark-mode .admin-user-table {

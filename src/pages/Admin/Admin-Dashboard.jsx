@@ -105,13 +105,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="dashboard-content" style={{ padding: '40px 50px' }}>
-      <div className="header-row">
-        <div>
-          <h1 className="title">Dashboard Overview</h1>
-          <p className="subtitle">Welcome back, {currentUser?.firstName || 'Admin'} 👋</p>
-
-        </div>
-      </div>
 
       {/* DASHBOARD GRID: STATS & ACTIVITY LOG */}
       <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "24px" }}>
@@ -131,17 +124,10 @@ const AdminDashboard = () => {
               <div className="admin-card-info">
                 <p className="admin-card-title">Total Users</p>
                 <h2 className="admin-card-number">{totalUsers}</h2>
-                <div className="bar-chart">
-                  <div className="bar" style={{ height: "85%", backgroundColor: "#003266" }}></div>
-                  <div className="bar" style={{ height: "70%", backgroundColor: "#0052a3" }}></div>
-                  <div className="bar" style={{ height: "90%", backgroundColor: "#003266" }}></div>
-                  <div className="bar" style={{ height: "65%", backgroundColor: "#0052a3" }}></div>
-                  <div className="bar" style={{ height: "80%", backgroundColor: "#003266" }}></div>
-                </div>
               </div>
             </div>
 
-            {/* New Serial Numbers */}
+            {/* New Serial Numbers, Bargraphdeleted */}
             <div className="admin-card admin-serial-card animate-spring delay-2">
               <div className="admin-card-icon admin-serial-icon">
                 <i className="fa-solid fa-barcode"></i>
@@ -152,15 +138,6 @@ const AdminDashboard = () => {
                 <p className="admin-card-title">New serial numbers added</p>
                 <h2 className="admin-card-number">{newSerialNumbers}</h2>
                 <p style={{ fontSize: "12px", color: "#999", marginTop: "5px", marginBottom: "10px" }}>Last 7 days</p>
-                <div className="bar-chart">
-                  <div className="bar" style={{ height: "60%", backgroundColor: darkMode ? "#3b82f6" : "#f4b43c" }}></div>
-                  <div className="bar" style={{ height: "75%", backgroundColor: darkMode ? "#3b82f6" : "#f4b43c" }}></div>
-                  <div className="bar" style={{ height: "45%", backgroundColor: darkMode ? "#3b82f6" : "#f4b43c" }}></div>
-                  <div className="bar" style={{ height: "90%", backgroundColor: darkMode ? "#3b82f6" : "#f4b43c" }}></div>
-                  <div className="bar" style={{ height: "55%", backgroundColor: darkMode ? "#3b82f6" : "#f4b43c" }}></div>
-                  <div className="bar" style={{ height: "70%", backgroundColor: darkMode ? "#3b82f6" : "#f4b43c" }}></div>
-                  <div className="bar" style={{ height: "85%", backgroundColor: darkMode ? "#3b82f6" : "#f4b43c" }}></div>
-                </div>
               </div>
             </div>
 
@@ -181,7 +158,8 @@ const AdminDashboard = () => {
             <div className="container-body" style={{ padding: 0 }}>
               <table className="admin-user-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ background: '#003266', borderBottom: '1px solid #003266' }}>
+                  <tr style={{ background: '#003266' }}>
+
                     <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '12px', color: '#ffffff' }}>No.</th>
                     <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '12px', color: '#ffffff' }}>Last Name</th>
                     <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '12px', color: '#ffffff' }}>First Name</th>
@@ -198,7 +176,8 @@ const AdminDashboard = () => {
                     </tr>
                   ) : (
                     users.map((u, index) => (
-                      <tr key={u.id} style={{ borderBottom: '1px solid #eee' }}>
+                      <tr key={u.id}>
+
                         <td style={{ padding: '12px 20px' }}>{index + 1}</td>
                         <td style={{ padding: '12px 20px' }}>{u.last_name}</td>
                         <td style={{ padding: '12px 20px' }}>{u.first_name}</td>

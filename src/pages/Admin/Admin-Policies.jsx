@@ -269,12 +269,12 @@ const AdminPolicies = () => {
                         <table className="policies-table" style={{ width: "100%", borderCollapse: "collapse" }}>
                             <thead>
                                 <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
-                                    <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Policy Name</th>
-                                    <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Form Type</th>
-                                    <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Requirements</th>
-                                    <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Request Type</th>
-                                    <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Status</th>
-                                    <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Actions</th>
+                                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Actions</th>
+                                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Policy Name</th>
+                                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Form Type</th>
+                                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Requirements</th>
+                                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Request Type</th>
+                                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Status</th>
                                 </tr>
                             </thead>
                             <tbody>

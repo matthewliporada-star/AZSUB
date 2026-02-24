@@ -215,7 +215,7 @@
 /* ===== MODAL BOX ===== */
 .modal-content {
     background: #fff;
-    width: 480px;
+    width: 725px;
     max-height: 85vh;
     /* LIMIT HEIGHT */
     border-radius: 12px;
@@ -224,6 +224,7 @@
     overflow: hidden;
     /* Important */
 }
+
 
 /* ===== HEADER ===== */
 .modal-header {

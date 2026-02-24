@@ -120,13 +120,14 @@ const AdminActivityLogs = () => {
                 <div className="container-body" style={{ padding: 0 }}>
                     <table className="admin-user-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
-                            <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                                <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '13px', color: '#64748b', fontWeight: "600" }}>Date & Time</th>
-                                <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '13px', color: '#64748b', fontWeight: "600" }}>User</th>
-                                <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '13px', color: '#64748b', fontWeight: "600" }}>Action</th>
-                                <th style={{ padding: '12px 20px', textAlign: 'left', fontSize: '13px', color: '#64748b', fontWeight: "600" }}>Details</th>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Details</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {loading ? (
                                 <tr><td colSpan="4" className="text-secondary" style={{ padding: '40px', textAlign: 'center' }}>Loading...</td></tr>
@@ -148,8 +149,8 @@ const AdminActivityLogs = () => {
                                         </td>
                                         <td style={{ padding: '16px 20px' }}>
                                             <span className={`action-badge ${log.action?.includes('CREATE') ? 'action-badge-success' :
-                                                    log.action?.includes('UPDATE') || log.action?.includes('CHANGE') ? 'action-badge-info' :
-                                                        log.action?.includes('DELETE') ? 'action-badge-danger' : 'action-badge-default'
+                                                log.action?.includes('UPDATE') || log.action?.includes('CHANGE') ? 'action-badge-info' :
+                                                    log.action?.includes('DELETE') ? 'action-badge-danger' : 'action-badge-default'
                                                 }`}>
                                                 {getActionLabel(log.action)}
                                             </span>
