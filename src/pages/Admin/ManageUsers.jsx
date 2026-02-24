@@ -135,17 +135,27 @@ const ManageUsers = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const generatePassword = () => {
-    if (!formData.lastName.trim()) {
-      setModalError("Please enter last name first");
-      return;
-    }
-    const firstTwo = formData.lastName.substring(0, 2);
-    // Simple logic: #La8080
-    const pwd = `#${firstTwo.charAt(0).toUpperCase()}${firstTwo.length > 1 ? firstTwo.charAt(1).toLowerCase() : 'x'}8080`;
-    setFormData({ ...formData, password: pwd });
-    setModalError("");
-  };
+const generatePassword = () => {
+  if (!formData.lastName.trim()) {
+    setModalError("Please enter last name first");
+    return;
+  }
+
+  // 1. Get the first two letters of the last name
+  const firstTwo = formData.lastName.trim().substring(0, 2);
+  const formattedName = `${firstTwo.charAt(0).toUpperCase()}${firstTwo.length > 1 ? firstTwo.charAt(1).toLowerCase() : 'x'}`;
+
+  // 2. Get current Month (MM) and Year (YYYY)
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+  const year = now.getFullYear();
+
+  // 3. Combine to create #Ca022026
+  const pwd = `#${formattedName}${month}${year}`;
+
+  setFormData({ ...formData, password: pwd });
+  setModalError("");
+};
 
   const closeModal = () => {
     setShowAddModal(false);
