@@ -130,6 +130,122 @@ body.dark-mode.page-profile .main-content {
 .btn-update:hover {
     background: #0052a3;
 }
+/* Make the modal wider to fit two columns */
+.wide-modal {
+    max-width: 850px !important;
+    width: 95%;
+}
+
+/* Flexbox wrapper for side-by-side */
+.modal-body-split {
+    display: flex;
+    gap: 30px;
+    padding: 20px;
+    align-items: flex-start;
+}
+
+.modal-form-inputs {
+    flex: 2; /* Takes up 2/3 of space */
+}
+
+.modal-preview-sidebar {
+    flex: 1; /* Takes up 1/3 of space */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 20px;
+    border-left: 1px solid #eee;
+}
+
+/* The Square Preview Box */
+.large-avatar-preview {
+    width: 200px;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 10px;
+    border: 3px solid #6c5ce7; /* Or your theme color */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.large-avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* This makes the image fill the square without stretching */
+}
+
+.preview-hint {
+    font-size: 0.8rem;
+    color: #666;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.file-input-custom {
+    padding: 8px;
+    border: 1px dashed #ccc;
+    width: 100%;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Responsive adjustment for mobile */
+@media (max-width: 768px) {
+    .modal-body-split {
+        flex-direction: column-reverse;
+        align-items: center;
+    }
+    .modal-preview-sidebar {
+        border-left: none;
+        border-bottom: 1px solid #eee;
+        padding: 0 0 20px 0;
+        width: 100%;
+    }
+}
+
+/* Container for the prefix and input */
+.contact-input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between +63 and the input box */
+    margin-top: 5px;
+}
+
+/* The +63 Label */
+.country-code {
+    font-weight: 700;
+    color: #2d3436;
+    font-size: 1rem;
+    background: #f1f2f6;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #dfe6e9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+}
+
+/* The actual input box */
+.phone-input {
+    flex: 1; /* Takes up the remaining width */
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.phone-input:focus {
+    border-color: #6c5ce7; /* Highlights your theme color on focus */
+}
+
+/* Optional: styling the placeholder to look like a PH number */
+.phone-input::placeholder {
+    color: #b2bec3;
+    letter-spacing: 1px;
+}
 
 /* =========================================
    INFO GRID: Two-column section layout
