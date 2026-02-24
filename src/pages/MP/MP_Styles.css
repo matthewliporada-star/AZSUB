@@ -555,7 +555,7 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
     background: #fff;
     /* Unified card background */
     border-radius: 12px;
-    padding: 20px;
+    padding: 20px 130px 20px 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     border-left: 4px solid transparent;
     /* Default, overridden by specific classes */
@@ -564,52 +564,33 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
     position: relative;
     overflow: hidden;
     color: #1e293b;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
+
 
 .mp-layout .stat-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
-/* Specific Card Colors with Neon Glow */
-.mp-layout .card-blue-dark {
-    border-left-color: #3b82f6 !important;
-    box-shadow: -5px 0 15px -3px rgba(59, 130, 246, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.mp-layout .card-green {
-    border-left-color: #4ade80 !important;
-    box-shadow: -5px 0 15px -3px rgba(74, 222, 128, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.mp-layout .card-blue-medium {
-    border-left-color: #60a5fa !important;
-    box-shadow: -5px 0 15px -3px rgba(96, 165, 250, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.mp-layout .card-orange {
-    border-left-color: #3b82f6 !important;
-    box-shadow: -5px 0 15px -3px rgba(59, 130, 246, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.mp-layout .card-purple {
-    border-left-color: #c084fc !important;
-    box-shadow: -5px 0 15px -3px rgba(192, 132, 252, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.mp-layout .card-red {
-    border-left-color: #f87171 !important;
-    box-shadow: -5px 0 15px -3px rgba(248, 113, 113, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.mp-layout .card-teal {
-    border-left-color: #2dd4bf !important;
-    box-shadow: -5px 0 15px -3px rgba(45, 212, 191, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
+/* Neutralized Card Colors for Light Mode */
+.mp-layout .card-blue-dark,
+.mp-layout .card-green,
+.mp-layout .card-blue-medium,
+.mp-layout .card-orange,
+.mp-layout .card-purple,
+.mp-layout .card-red,
+.mp-layout .card-teal,
 .mp-layout .card-dark {
-    border-left-color: #94a3b8 !important;
-    box-shadow: -5px 0 15px -3px rgba(148, 163, 184, 0.6), 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-left-color: #dee2e6 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.mp-layout .stat-card:hover {
+    border-left-color: var(--mp-primary-color) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 .mp-layout .stat-header {
@@ -642,16 +623,33 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
     /* Lighter gray for dark background */
 }
 
+/* Sparkline Container */
+.mp-layout .sparkline-container {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100px;
+    height: 40px;
+    opacity: 0.8;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+}
+
+
 /* Dark Mode Overrides for Cards (Dark Blue Theme) */
 body.dark-mode .mp-layout .stat-card {
-    background: #f39c12;
-    border: 1px solid var(--border-subtle-dark) !important;
-    color: var(--text-primary-dark) !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    background: #1c2b3e;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #f1f5f9 !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
 body.dark-mode .mp-layout .stat-card:hover {
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    background: #24354a;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
 }
 
 body.dark-mode .mp-layout .card-blue-dark,
@@ -660,27 +658,26 @@ body.dark-mode .mp-layout .card-blue-medium,
 body.dark-mode .mp-layout .card-orange,
 body.dark-mode .mp-layout .card-purple,
 body.dark-mode .mp-layout .card-red,
-body.dark-mode .mp-layout .card-blue-dark,
 body.dark-mode .mp-layout .card-teal,
 body.dark-mode .mp-layout .card-dark {
     border-left-color: transparent !important;
-    background: #f39c12;
-    box-shadow: none;
+    background: #1c2b3e;
 }
 
 body.dark-mode .mp-layout .stat-label {
-    color: var(--text-secondary-dark) !important;
-    font-weight: 700;
+    color: #94a3b8 !important;
+    font-weight: 600;
 }
 
 body.dark-mode .mp-layout .stat-value {
-    color: var(--text-primary-dark) !important;
+    color: #ffffff !important;
     font-weight: 800;
 }
 
 body.dark-mode .mp-layout .stat-subtext {
-    color: var(--text-secondary-dark) !important;
+    color: #64748b !important;
 }
+
 
 /* Dark Mode Overrides for Containers and Charts */
 body.dark-mode .mp-layout .chart-container {
@@ -2400,27 +2397,8 @@ body.dark-mode .category-badge.system {
     border: 1px solid #f5c6cb;
 }
 
-/* MP Dark Mode Cards */
-/* STAT CARDS - FORCE YELLOW OVERRIDE on ALL color variants */
-body.dark-mode .dashboard-grid .stat-card,
-body.dark-mode .dashboard-grid .stat-card.card-blue-dark,
-body.dark-mode .dashboard-grid .stat-card.card-green,
-body.dark-mode .dashboard-grid .stat-card.card-blue-medium,
-body.dark-mode .dashboard-grid .stat-card.card-orange {
-    background-color: #FFBD42 !important;
-    background: #FFBD42 !important;
-    /* Override gradients */
-    border: 1px solid #FFBD42 !important;
-    color: #000000 !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
-}
+/* MP Dark Mode Cards Refined */
 
-/* Ensure text inside stat cards is black */
-body.dark-mode .stat-card .stat-label,
-body.dark-mode .stat-card .stat-value,
-body.dark-mode .stat-card .stat-subtext {
-    color: #000000 !important;
-}
 
 /* CHART CONTAINERS - THEME INDIGO */
 body.dark-mode .content-container,

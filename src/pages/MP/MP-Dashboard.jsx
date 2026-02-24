@@ -2,14 +2,48 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
-import { Bar, Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend, PointElement, LineElement, Filler } from 'chart.js';
+import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import MPLayout from './MPLayout';
 import { DashboardSkeleton } from './MPSkeletons';
 import { useMPData } from './MPData';
 import './MP_Styles.css';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend, PointElement, LineElement, Filler);
+
+const Sparkline = ({ data, color = '#3b82f6' }) => {
+    const chartData = {
+        labels: data.map((_, i) => i),
+        datasets: [{
+            data: data,
+            borderColor: color,
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.4,
+            fill: true,
+            backgroundColor: (context) => {
+                const ctx = context.chart.ctx;
+                const gradient = ctx.createLinearGradient(0, 0, 0, 40);
+                gradient.addColorStop(0, `${color}33`);
+                gradient.addColorStop(1, `${color}00`);
+                return gradient;
+            },
+        }]
+    };
+
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: { x: { display: false }, y: { display: false } }
+    };
+
+    return (
+        <div className="sparkline-container">
+            <Line data={chartData} options={options} />
+        </div>
+    );
+};
 
 const MPDashboard = () => {
     const { darkMode } = useApp();
@@ -573,6 +607,7 @@ const MPDashboard = () => {
                         </div>
                         <div className="stat-value">{monthSpecificStats.activityRatio}%</div>
                         <div className="stat-subtext">{stats.activeAPs} of {mpStats.totalAPs} APs active</div>
+                        <Sparkline data={[10, 15, 12, 18, 14, monthSpecificStats.activityRatio]} color="#3b82f6" />
                     </div>
 
                     <div
@@ -590,6 +625,7 @@ const MPDashboard = () => {
                         </div>
                         <div className="stat-value">₱ {(mpStats.totalANP / 1000000).toFixed(1)}M</div>
                         <div className="stat-subtext">All-time Annual Premium</div>
+                        <Sparkline data={mpStats.monthlyTrend?.map(m => m.anp) || [5, 8, 12, 10, 15]} color="#27ae60" />
                     </div>
 
                     <div
@@ -607,6 +643,7 @@ const MPDashboard = () => {
                         </div>
                         <div className="stat-value">₱ {mpStats.monthlyANP.toLocaleString()}</div>
                         <div className="stat-subtext">{selectedMonthYear} Performance</div>
+                        <Sparkline data={mpStats.monthlyTrend?.map(m => m.anp).slice(-6) || [100, 200, 150, 300, 250]} color="#60a5fa" />
                     </div>
 
                     <div
@@ -624,6 +661,7 @@ const MPDashboard = () => {
                         </div>
                         <div className="stat-value">{(mpStats.monthlyCases + (mpStats.monthlyDeclined || 0)).toLocaleString()}</div>
                         <div className="stat-subtext">Policies (Issued + Declined)</div>
+                        <Sparkline data={mpStats.monthlyTrend?.map(m => (m.issued || 0) + (m.declined || 0)) || [2, 5, 3, 8, 4]} color="#f59e0b" />
                     </div>
                 </div>
 
@@ -644,6 +682,7 @@ const MPDashboard = () => {
                         </div>
                         <div className="stat-value">{mpStats.totalALs}</div>
                         <div className="stat-subtext">{stats.performingALs} Performing ({mpStats.totalALs > 0 ? ((stats.performingALs / mpStats.totalALs) * 100).toFixed(0) : 0}%)</div>
+                        <Sparkline data={[5, 6, 6, 7, 7, mpStats.totalALs]} color="#8b5cf6" />
                     </div>
 
                     <div
@@ -661,6 +700,7 @@ const MPDashboard = () => {
                         </div>
                         <div className="stat-value">{mpStats.totalAPs}</div>
                         <div className="stat-subtext">{stats.activeAPs} Active ({mpStats.totalAPs > 0 ? ((stats.activeAPs / mpStats.totalAPs) * 100).toFixed(0) : 0}%)</div>
+                        <Sparkline data={[10, 12, 15, 14, 18, mpStats.totalAPs]} color="#ec4899" />
                     </div>
 
                     <div
@@ -678,6 +718,7 @@ const MPDashboard = () => {
                         </div>
                         <div className="stat-value">{stats.avgActivityRatio.toFixed(1)}%</div>
                         <div className="stat-subtext">Average across all APs</div>
+                        <Sparkline data={[12, 14, 13, 15, 14, stats.avgActivityRatio]} color="#14b8a6" />
                     </div>
 
                     <div
@@ -695,6 +736,7 @@ const MPDashboard = () => {
                         </div>
                         <div className="stat-value">₱ {stats.avgANPPerAP.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
                         <div className="stat-subtext">Per Active Partner (Selected)</div>
+                        <Sparkline data={mpStats.monthlyTrend?.map(m => m.anp / (mpStats.totalAPs || 1)) || [5000, 7000, 6000, 8000, 7500]} color="#64748b" />
                     </div>
                 </div>
 

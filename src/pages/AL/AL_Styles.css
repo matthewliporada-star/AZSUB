@@ -359,13 +359,13 @@ body.dark-mode .al-layout .chart-center-label {
 }
 
 .al-layout .top-bar {
-    background: #003781;
+    background: #ffffff;
     height: 72px;
     padding: 0 40px;
     display: flex;
     align-items: center;
-    border-bottom: 3px solid #0055b8;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid #eaecf0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     position: fixed;
     top: 0;
     right: 0;
@@ -381,14 +381,16 @@ body.dark-mode .al-layout .sidebar {
     border-right: 1px solid #30363d !important;
 }
 
-.al-layout .top-bar .profile-name,
-.al-layout .top-bar .profile-role,
-.al-layout .top-bar .dark-mode-toggle {
-    color: #ffffff !important;
+.al-layout .top-bar .profile-name {
+    color: #1e293b !important;
 }
 
 .al-layout .top-bar .profile-role {
-    opacity: 0.9;
+    color: #64748b !important;
+}
+
+.al-layout .top-bar .dark-mode-toggle {
+    color: #64748b !important;
 }
 
 .al-layout .top-bar-content {
@@ -402,12 +404,12 @@ body.dark-mode .al-layout .sidebar {
     font-size: 20px;
     font-weight: 700;
     letter-spacing: 0.5px;
-    color: white;
+    color: #003266;
     text-transform: uppercase;
 }
 
 .al-layout .logo {
-    color: white;
+    color: #003266;
     font-size: 24px;
     font-weight: 600;
     letter-spacing: 0.5px;
@@ -417,7 +419,7 @@ body.dark-mode .al-layout .sidebar {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: white;
+    color: #64748b;
     font-size: 14px;
 }
 
@@ -431,7 +433,28 @@ body.dark-mode .al-layout .sidebar {
 
 .al-layout .connection-dot.connected {
     background: #27ae60;
-    box-shadow: 0 0 8px rgba(39, 174, 96, 0.6);
+    box-shadow: 0 0 8px rgba(39, 174, 96, 0.4);
+}
+
+/* DARK MODE: Top Bar Override */
+body.dark-mode .al-layout .top-bar {
+    background: #0d1117 !important;
+    border-bottom: 1px solid #30363d !important;
+}
+
+body.dark-mode .al-layout .top-bar .profile-name {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .al-layout .top-bar .profile-role,
+body.dark-mode .al-layout .top-bar .dark-mode-toggle,
+body.dark-mode .al-layout .top-bar .connection-indicator {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .al-layout .top-bar-logo,
+body.dark-mode .al-layout .logo {
+    color: #ffffff !important;
 }
 
 .al-layout .container {
