@@ -369,10 +369,13 @@ const AdminPolicies = () => {
             {/* ADD/EDIT MODAL */}
             {showModal && (
                 <div className="modal-overlay">
-                    <div className="modal-content" style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+                    <div className="modal-content">
                         <div className="modal-title">{isEditing ? "Edit Policy" : "Add New Policy"}</div>
-                        <form onSubmit={handleSubmit} style={{ flex: 1, overflowY: 'auto', paddingRight: '5px' }}>
-                            <div className="modal-form">
+
+                        <form className="modal-form" onSubmit={handleSubmit}>
+
+                            <div>
+
                                 <div className="input-group">
                                     <label>Policy Name</label>
                                     <input name="policy_name" value={formData.policy_name} onChange={handleChange} required />
@@ -445,11 +448,12 @@ const AdminPolicies = () => {
                                 </div>
 
                             </div>
-                            <div className="modal-buttons" style={{ marginTop: '20px' }}>
+                            <div className="modal-buttons">
                                 <button type="button" className="modal-close" onClick={() => setShowModal(false)}>Cancel</button>
                                 <button type="submit" className="modal-submit" disabled={submitting}>Save Policy</button>
                             </div>
                         </form>
+
                     </div>
                 </div>
             )}
@@ -458,6 +462,7 @@ const AdminPolicies = () => {
             {showConfirmModal && policyToToggle && (
                 <div className="modal-overlay">
                     <div className="modal-content" style={{ maxWidth: '400px' }}>
+
                         <div className="modal-title">Confirm Action</div>
                         <p style={{ textAlign: 'center', margin: '20px 0' }}>Are you sure you want to <strong>{policyToToggle.active_status ? 'archive' : 'restore'}</strong> "{policyToToggle.policy_name}"?</p>
                         <div className="modal-buttons">

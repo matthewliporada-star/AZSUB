@@ -426,69 +426,72 @@ const AdminSerialNumber = () => {
       {/* ================= MODAL ================= */}
       {showViewModal && selectedSerial && (
         <div className="modal-overlay">
-          <div className="modal" style={{ width: "450px" }}> {/* Slightly wider for better table fit */}
-            <h2>Serial Tracking</h2>
-            <div style={{ marginBottom: "15px", fontSize: "14px", lineHeight: "1.6" }}>
-              <p><strong>Serial Number:</strong> {selectedSerial.serial_number}</p>
-              <p><strong>Serial Type:</strong> {selectedSerial.serial_type}</p>
-              <p><strong>Requested by:</strong> {selectedSerial.ResponseID || "Not yet taken"}</p>
-              <p><strong>Request Date:</strong> {new Date(selectedSerial.date).toLocaleDateString()}</p>
+          <div className="modal-content">
+            <div className="modal-title">Serial Tracking</div>
+            <div className="modal-form">
+
+              <div style={{ marginBottom: "15px", fontSize: "14px", lineHeight: "1.6" }}>
+                <p><strong>Serial Number:</strong> {selectedSerial.serial_number}</p>
+                <p><strong>Serial Type:</strong> {selectedSerial.serial_type}</p>
+                <p><strong>Requested by:</strong> {selectedSerial.ResponseID || "Not yet taken"}</p>
+                <p><strong>Request Date:</strong> {new Date(selectedSerial.date).toLocaleDateString()}</p>
+              </div>
+              <div className="hierarchy-section" style={{ borderTop: '1px solid #eee', marginTop: '15px', paddingTop: '15px' }}>
+                <h3 style={{ fontSize: "16px", marginBottom: "10px" }}>Tracking Status</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div className="hierarchy-card">
+                    <span><span style={{ color: "var(--success-color)", marginRight: "10px" }}>●</span>Serial Created</span>
+                    <span>{new Date(selectedSerial.date).toLocaleString()}</span>
+                  </div>
+                  <div className="hierarchy-card">
+                    <span><span style={{ color: selectedSerial.is_issued ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>Serial Confirm</span>
+                    <span className={`status-badge ${selectedSerial.is_issued ? 'active' : 'inactive'}`}>
+                      {selectedSerial.is_issued ? "Confirmed" : "In Progress"}
+                    </span>
+                  </div>
+                  <div className="hierarchy-card">
+                    <span><span style={{ color: selectedSerial.ResponseID ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>Serial Issued</span>
+                    <span className={`status-badge ${selectedSerial.ResponseID ? 'active' : 'inactive'}`}>
+                      {selectedSerial.ResponseID ? "Completed" : "Pending"}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <hr style={{ border: "0.5px solid #eee", margin: "15px 0" }} />
-            <h3 style={{ fontSize: "16px", marginBottom: "10px" }}>Tracking Status</h3>
-            <ul style={{ listStyle: "none", paddingLeft: 0, fontSize: "14px" }}>
-              <li style={{ marginBottom: "8px" }}>
-                <span style={{ color: "var(--success-color)", marginRight: "10px" }}>●</span>
-                <strong>Serial Created:</strong> {new Date(selectedSerial.date).toLocaleString()}
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <span style={{ color: selectedSerial.is_issued ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>
-                <strong>Serial confirm:</strong> {selectedSerial.is_issued ? "Confirmed" : "In Progress"}
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                <span style={{ color: selectedSerial.ResponseID ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>
-                <strong>Serial Issued:</strong> {selectedSerial.ResponseID ? "Completed" : "Pending"}
-              </li>
-            </ul>
-            <div className="modal-buttons" style={{ marginTop: "20px" }}>
-              <button className="cancel-btn" onClick={() => setShowViewModal(false)}>
+
+            <div className="modal-buttons">
+              <button className="modal-close" onClick={() => setShowViewModal(false)}>
                 Close
               </button>
             </div>
           </div>
+
         </div>
       )}
 
       {showImportModal && (
         <div className="modal-overlay">
-          <div className="modal">
-            <h2>Import CSV</h2>
+          <div className="modal-content">
+            <div className="modal-title">Import CSV</div>
+            <div className="modal-form">
 
-            <input
-              type="file"
-              accept=".csv"
-              onChange={(e) => setSelectedFile(e.target.files[0])}
-            />
 
-            <label>Serial Type</label>
-            <select
-              value={serial_type}
-              onChange={(e) => setserial_type(e.target.value)}
-              className="file-type-select"
-            >
-              <option value="Default">Default</option>
-              <option value="Allianz Well">Allianz Well</option>
-            </select>
+              <input
+                type="file"
+                accept=".csv"
+                onChange={(e) => setSelectedFile(e.target.files[0])}
+              />
 
+            </div>
             <div className="modal-buttons">
               <button
-                className="cancel-btn"
+                className="modal-close"
                 onClick={() => setShowImportModal(false)}
               >
                 Cancel
               </button>
               <button
-                className="submit-btn"
+                className="modal-submit"
                 onClick={handleSubmit}
                 disabled={uploading}
               >
@@ -496,6 +499,7 @@ const AdminSerialNumber = () => {
               </button>
             </div>
           </div>
+
         </div>
       )}
     </div>

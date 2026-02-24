@@ -9,13 +9,12 @@ import ActivityLog from "../../components/ActivityLog";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { darkMode, toggleDarkMode } = useApp();
+  const { darkMode, toggleDarkMode, currentUser } = useApp();
   const [totalUsers, setTotalUsers] = useState(0);
-  const [user, setUser] = useState(null);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [users, setUsers] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [newSerialNumbers, setNewSerialNumbers] = useState(0);
+
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -36,8 +35,6 @@ const AdminDashboard = () => {
         navigate("/");
         return;
       }
-
-      setUser(session.user);
       fetchTotalUsers();
       fetchUsers();
       fetchNewSerialNumbers();
@@ -45,6 +42,7 @@ const AdminDashboard = () => {
 
     checkAdmin();
   }, [navigate]);
+
 
   const fetchTotalUsers = async () => {
     try {
@@ -110,7 +108,8 @@ const AdminDashboard = () => {
       <div className="header-row">
         <div>
           <h1 className="title">Dashboard Overview</h1>
-          <p className="subtitle">Welcome back, Admin 👋</p>
+          <p className="subtitle">Welcome back, {currentUser?.firstName || 'Admin'} 👋</p>
+
         </div>
       </div>
 

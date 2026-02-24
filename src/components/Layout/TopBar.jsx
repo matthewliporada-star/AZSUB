@@ -28,10 +28,11 @@ const TopBar = ({ sidebarOpen = true }) => {
 
     // Mock user for display if not logged in
     const displayUser = currentUser || {
-        name: 'archie verania',
-        role: 'AL',
-        firstName: 'archie'
+        name: 'User',
+        role: '',
+        firstName: 'U'
     };
+
 
     return (
         <div className="top-bar">
@@ -75,10 +76,11 @@ const TopBar = ({ sidebarOpen = true }) => {
                             >
                                 <div className="profile-icon">
                                     {/* Placeholder Icon */}
-                                    <div style={{ width: '35px', height: '35px', borderRadius: '50%', background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <div className="avatar-circle">
                                         {(displayUser.firstName || displayUser.name || displayUser.username || 'U').charAt(0).toUpperCase()}
                                     </div>
                                 </div>
+
                                 <div className="profile-info" style={{ textAlign: 'left' }}>
                                     <div className="profile-name" style={{ fontWeight: '600', fontSize: '0.9rem' }}>{displayUser.name || displayUser.username}</div>
                                     <div className="profile-role" style={{ fontSize: '0.75rem' }}>{displayUser.role}</div>
@@ -88,9 +90,13 @@ const TopBar = ({ sidebarOpen = true }) => {
                             {showDropdown && (
                                 <div className="profile-dropdown">
                                     <div className="dropdown-item" onClick={() => navigate('/profile')}>Profile</div>
+                                    {location.pathname.startsWith('/admin') && (
+                                        <div className="dropdown-item" onClick={() => navigate('/admin/SerialNumber')}>Serial Number</div>
+                                    )}
                                     <div className="dropdown-item logout-item" onClick={handleLogout}>Logout</div>
                                 </div>
                             )}
+
                         </div>
                     )}
                 </div>

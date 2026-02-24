@@ -317,16 +317,7 @@ const ManageUsers = () => {
     return showInactive ? status === "Inactive" : status === "Active";
   });
 
-  const cardStyle = {
-    background: '#f8fafc',
-    padding: '12px 15px',
-    borderRadius: '10px',
-    border: '1px solid var(--border-color)',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    fontSize: '14px'
-  };
+
 
   return (
     <div className="dashboard-content" style={{ padding: '40px 50px' }}>
@@ -436,11 +427,13 @@ const ManageUsers = () => {
       {showAddModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <div className="modal-title" style={{ padding: '22px 35px', borderBottom: '1px solid var(--border-color)', background: '#f7f9fc' }}>
+            <div className="modal-title">
               {isEditMode ? "Edit User" : "Add New User"}
             </div>
 
-            <form className="modal-form" onSubmit={submitUser} style={{ flex: 1, overflowY: 'auto' }}>
+
+            <form className="modal-form" onSubmit={submitUser}>
+
               <div className="name-row">
                 <div className="input-group">
                   <label>First Name</label>
@@ -496,12 +489,13 @@ const ManageUsers = () => {
               {modalError && <p className="modal-error" style={{ color: 'var(--danger-color)', fontSize: '14px' }}>{modalError}</p>}
               {successMsg && <p className="modal-success" style={{ color: 'var(--success-color)', fontSize: '14px' }}>{successMsg}</p>}
 
-              <div className="modal-buttons" style={{ marginTop: '20px' }}>
+              <div className="modal-buttons">
                 <button type="button" className="modal-close" onClick={closeModal}>Cancel</button>
                 <button type="submit" className="modal-submit" disabled={loading}>
                   {loading ? "Processing..." : (isEditMode ? "Update" : "Create")}
                 </button>
               </div>
+
             </form>
           </div>
         </div>
@@ -511,7 +505,8 @@ const ManageUsers = () => {
       {showViewModal && selectedUser && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <div className="modal-title" style={{ padding: '22px 35px', borderBottom: '1px solid var(--border-color)', background: '#f7f9fc' }}>View User Details</div>
+            <div className="modal-title">View User Details</div>
+
             <div className="modal-form">
               <div className="name-row">
                 <div className="input-group"><label>Name</label><input type="text" value={`${selectedUser.first_name} ${selectedUser.last_name}`} readOnly /></div>
@@ -527,24 +522,26 @@ const ManageUsers = () => {
                 <h3 style={{ fontSize: '16px', marginBottom: '15px', color: 'var(--primary-color)' }}>Hierarchy</h3>
                 <div className="hierarchy-item" style={{ marginBottom: '20px' }}>
                   <label>Reports To</label>
-                  <div style={cardStyle}>
+                  <div className="hierarchy-card">
                     {viewingSupervisor ? (
                       <><span>{viewingSupervisor.first_name} {viewingSupervisor.last_name}</span><span className="status-badge active">{viewingSupervisor.account_type}</span></>
                     ) : <span style={{ color: '#999' }}>No supervisor assigned</span>}
                   </div>
                 </div>
+
                 <div className="hierarchy-item">
                   <label>Direct Reports ({viewingSubordinates.length})</label>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
                     {viewingSubordinates.map((sub, idx) => (
-                      <div key={idx} style={cardStyle}>
+                      <div key={idx} className="hierarchy-card">
                         <span>{sub.first_name} {sub.last_name}</span>
                         <span className="status-badge active" style={{ fontSize: '10px' }}>{sub.account_type}</span>
                       </div>
                     ))}
-                    {viewingSubordinates.length === 0 && <div style={cardStyle}><span style={{ color: '#999' }}>No direct reports found</span></div>}
+                    {viewingSubordinates.length === 0 && <div className="hierarchy-card"><span style={{ color: '#999' }}>No direct reports found</span></div>}
                   </div>
                 </div>
+
               </div>
             </div>
             <div className="modal-buttons">
