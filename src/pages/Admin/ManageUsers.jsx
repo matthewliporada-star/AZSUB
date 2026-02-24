@@ -130,10 +130,21 @@ const ManageUsers = () => {
     }
   }, [formData.position, showAddModal, isEditMode, selectedUser, fetchPotentialUplines]);
 
-  // -- Form Handlers --
-  const handleFormChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+// -- Form Handlers --
+const handleFormChange = (e) => {
+  const { name, value } = e.target;
+  let finalValue = value;
+
+  // Capitalize the first letter for First Name and Last Name
+  if (name === "firstName" || name === "lastName") {
+    finalValue = value.charAt(0).toUpperCase() + value.slice(1);
+  }
+
+  setFormData({ 
+    ...formData, 
+    [name]: finalValue 
+  });
+};
 
 const generatePassword = () => {
   if (!formData.lastName.trim()) {
@@ -434,82 +445,125 @@ const generatePassword = () => {
       </div>
 
       {/* Add/Edit Modal */}
-      {showAddModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-title">
-              {isEditMode ? "Edit User" : "Add New User"}
-            </div>
+{/* Add/Edit Modal */}
+{showAddModal && (
+  <div className="modal-overlay">
+    <div className="modal-content">
+      <div className="modal-title">
+        {isEditMode ? "Edit User" : "Add New User"}
+      </div>
 
-
-            <form className="modal-form" onSubmit={submitUser}>
-
-              <div className="name-row">
-                <div className="input-group">
-                  <label>First Name</label>
-                  <input type="text" name="firstName" required value={formData.firstName} onChange={handleFormChange} />
-                </div>
-                <div className="input-group">
-                  <label>Last Name</label>
-                  <input type="text" name="lastName" required value={formData.lastName} onChange={handleFormChange} />
-                </div>
-              </div>
-
-              {!isEditMode && (
-                <div className="input-group">
-                  <label>Email</label>
-                  <input type="email" name="email" required value={formData.email} onChange={handleFormChange} />
-                </div>
-              )}
-
-
-
-              <div className="password-position-row">
-                {!isEditMode && (
-                  <div className="input-group">
-                    <label>Password</label>
-                    <div className="password-input-wrapper">
-                      <input type={showPassword ? "text" : "password"} name="password" required value={formData.password} readOnly />
-                      <button type="button" className="generate-btn" onClick={generatePassword}>Generate</button>
-                    </div>
-                  </div>
-                )}
-                <div className="input-group">
-                  <label>Position</label>
-                  <select name="position" value={formData.position} onChange={handleFormChange}>
-                    <option value="ADMIN">Admin</option>
-                    <option value="MP">Managing Partner (MP)</option>
-                    <option value="AL">Agency Leader (AL)</option>
-                    <option value="AP">Agency Partner (AP)</option>
-                    <option value="MD">Managing Director (MD)</option>
-                  </select>
-                </div>
-              </div>
-
-              {(formData.position === 'AP' || formData.position === 'AL') && (
-                <div className="input-group">
-                  <label>Reports To</label>
-                  <select name="reportsTo" value={formData.reportsTo} onChange={handleFormChange}>
-                    <option value="">-- Select Supervisor --</option>
-                    {potentialUplines.map((u) => <option key={u.id} value={u.id}>{u.first_name} {u.last_name}</option>)}
-                  </select>
-                </div>
-              )}
-
-              {modalError && <p className="modal-error" style={{ color: 'var(--danger-color)', fontSize: '14px' }}>{modalError}</p>}
-              {successMsg && <p className="modal-success" style={{ color: 'var(--success-color)', fontSize: '14px' }}>{successMsg}</p>}
-
-              <div className="modal-buttons">
-                <button type="button" className="modal-close" onClick={closeModal}>Cancel</button>
-                <button type="submit" className="modal-submit" disabled={loading}>
-                  {loading ? "Processing..." : (isEditMode ? "Update" : "Create")}
-                </button>
-              </div>
-
-            </form>
+      <form className="modal-form" onSubmit={submitUser}>
+        <div className="name-row">
+          <div className="input-group">
+            <label>First Name</label>
+            <input 
+              type="text" 
+              name="firstName" 
+              placeholder="e.g. John"
+              required 
+              value={formData.firstName} 
+              onChange={handleFormChange} 
+            />
+          </div>
+          <div className="input-group">
+            <label>Last Name</label>
+            <input 
+              type="text" 
+              name="lastName" 
+              placeholder="e.g. Smith"
+              required 
+              value={formData.lastName} 
+              onChange={handleFormChange} 
+            />
           </div>
         </div>
-      )}
+
+        {!isEditMode && (
+          <div className="input-group">
+            <label>Email</label>
+            <input 
+              type="email" 
+              name="email" 
+              required 
+              value={formData.email} 
+              onChange={handleFormChange} 
+            />
+          </div>
+        )}
+
+        <div className="password-position-row">
+          {!isEditMode && (
+            <div className="input-group">
+              <label>Password</label>
+              <div className="password-input-wrapper">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  name="password" 
+                  required 
+                  value={formData.password} 
+                  readOnly 
+                />
+                <button 
+                  type="button" 
+                  className="generate-btn" 
+                  onClick={generatePassword}
+                >
+                  Generate
+                </button>
+              </div>
+            </div>
+          )}
+          
+          <div className="input-group">
+            <label>Position</label>
+            <select name="position" value={formData.position} onChange={handleFormChange}>
+              <option value="ADMIN">Admin</option>
+              <option value="MP">Managing Partner (MP)</option>
+              <option value="AL">Agency Leader (AL)</option>
+              <option value="AP">Agency Partner (AP)</option>
+              <option value="MD">Managing Director (MD)</option>
+            </select>
+          </div>
+        </div>
+
+        {(formData.position === 'AP' || formData.position === 'AL') && (
+          <div className="input-group">
+            <label>Reports To</label>
+            <select name="reportsTo" value={formData.reportsTo} onChange={handleFormChange}>
+              <option value="">-- Select Supervisor --</option>
+              {potentialUplines.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.first_name} {u.last_name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {modalError && (
+          <p className="modal-error" style={{ color: 'var(--danger-color)', fontSize: '14px' }}>
+            {modalError}
+          </p>
+        )}
+        {successMsg && (
+          <p className="modal-success" style={{ color: 'var(--success-color)', fontSize: '14px' }}>
+            {successMsg}
+          </p>
+        )}
+
+        <div className="modal-buttons">
+          <button type="button" className="modal-close" onClick={closeModal}>
+            Cancel
+          </button>
+          <button type="submit" className="modal-submit" disabled={loading}>
+            {loading ? "Processing..." : (isEditMode ? "Update" : "Create")}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
 
       {/* View Modal */}
       {showViewModal && selectedUser && (
