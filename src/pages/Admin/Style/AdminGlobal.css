@@ -215,34 +215,8 @@
     color: #1e293b !important;
 }
 
-.admin-layout .top-bar-content i,
-.admin-layout .top-bar-content .profile-name,
-.admin-layout .top-bar-content .profile-role {
-    color: #1e293b !important;
-}
+/* Profile name, role, and avatar styles are now handled globally in TopBar.css */
 
-.admin-layout .top-bar-content .profile-role {
-    color: #64748b !important;
-    font-size: 11px;
-}
-
-
-.admin-layout .top-bar-content .avatar-circle {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    background: #3b82f6;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-}
-
-.admin-layout .top-bar-content .dark-mode-toggle {
-    color: #64748b !important;
-    opacity: 0.8;
-}
 
 
 .admin-layout .top-bar-content .profile-dropdown {
@@ -320,13 +294,8 @@ body.dark-mode .admin-layout {
     color: #c9d1d9 !important;
 }
 
-body.dark-mode .admin-layout .profile-name {
-    color: #c9d1d9 !important;
-}
+/* Dark mode profile name and role are now handled in TopBar.css */
 
-body.dark-mode .admin-layout .profile-role {
-    color: #8b949e !important;
-}
 
 body.dark-mode .admin-layout .top-bar-content i {
     color: #c9d1d9 !important;

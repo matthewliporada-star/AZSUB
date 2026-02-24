@@ -155,6 +155,7 @@ export const AppProvider = ({ children }) => {
         loadFormSubmissions,
         loadCustomers,
         loadPerformanceData,
+        loadUser,
         loading,
         darkMode,
         toggleDarkMode,

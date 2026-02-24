@@ -104,10 +104,10 @@ function Login() {
     // Success! Reset attempts
     setAttempts(0);
 
-    // Fetch the latest account_type from profiles table
+    // Fetch the latest account_type and avatar_url from profiles table
     const { data: profileData, error: profileError } = await supabase
       .from("profiles")
-      .select("account_type, id, username, first_name, last_name, status")
+      .select("account_type, id, username, first_name, last_name, status, avatar_url")
       .eq("id", user.id)
       .single();
 
@@ -140,7 +140,8 @@ function Login() {
       firstName: profileData.first_name,
       lastName: profileData.last_name,
       email: user.email,
-      role: accountType?.toUpperCase()
+      role: accountType?.toUpperCase(),
+      avatarUrl: profileData.avatar_url
     });
 
     switch (accountType) {

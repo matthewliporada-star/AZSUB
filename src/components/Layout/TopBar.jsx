@@ -13,8 +13,11 @@ const TopBar = ({ sidebarOpen = true }) => {
     const navigate = useNavigate();
     const [showDropdown, setShowDropdown] = useState(false);
 
-    // Check if on AP, AL, or Admin pages
-    const isDashboardPage = location.pathname.startsWith('/ap') || location.pathname.startsWith('/al') || location.pathname.startsWith('/admin');
+    // Check if on AP, AL, Admin, or Profile pages
+    const isDashboardPage = location.pathname.startsWith('/ap') ||
+        location.pathname.startsWith('/al') ||
+        location.pathname.startsWith('/admin') ||
+        location.pathname === '/profile';
 
     const handleLogout = async () => {
         try {
@@ -72,18 +75,30 @@ const TopBar = ({ sidebarOpen = true }) => {
                             <div
                                 className="profile-trigger"
                                 onClick={() => setShowDropdown(!showDropdown)}
-                                style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
                             >
                                 <div className="profile-icon">
-                                    {/* Placeholder Icon */}
+                                    {/* Profile Avatar rendering with fallback to letter */}
                                     <div className="avatar-circle">
-                                        {(displayUser.firstName || displayUser.name || displayUser.username || 'U').charAt(0).toUpperCase()}
+                                        {displayUser.avatarUrl ? (
+                                            <img
+                                                src={displayUser.avatarUrl}
+                                                alt="Profile"
+                                                style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    objectFit: 'cover',
+                                                    borderRadius: '50%'
+                                                }}
+                                            />
+                                        ) : (
+                                            (displayUser.firstName || displayUser.name || displayUser.username || 'U').charAt(0).toUpperCase()
+                                        )}
                                     </div>
                                 </div>
 
-                                <div className="profile-info" style={{ textAlign: 'left' }}>
-                                    <div className="profile-name" style={{ fontWeight: '600', fontSize: '0.9rem' }}>{displayUser.name || displayUser.username}</div>
-                                    <div className="profile-role" style={{ fontSize: '0.75rem' }}>{displayUser.role}</div>
+                                <div className="profile-info">
+                                    <div className="profile-name">{displayUser.name || displayUser.username}</div>
+                                    <div className="profile-role">{displayUser.role}</div>
                                 </div>
                             </div>
 

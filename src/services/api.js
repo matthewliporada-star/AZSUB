@@ -115,10 +115,10 @@ export const api = {
         return { success: false, message: 'No active session' };
       }
 
-      // Fetch profile details including first_name and last_name
+      // Fetch profile details including first_name, last_name, and avatar_url
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('id, username, first_name, last_name, account_type')
+        .select('id, username, first_name, last_name, account_type, avatar_url')
         .eq('id', user.id)
         .single();
 
@@ -137,6 +137,7 @@ export const api = {
           lastName: profile.last_name,
           email: user.email,
           role: profile.account_type?.toUpperCase(), // Ensure role format matches expectations (AL, AP, etc.)
+          avatarUrl: profile.avatar_url,
           managerId: null // Add logic for manager if needed later
         }
       };
