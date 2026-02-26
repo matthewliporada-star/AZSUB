@@ -480,8 +480,16 @@ const AdminSerialNumber = () => {
                 type="file"
                 accept=".csv"
                 onChange={(e) => setSelectedFile(e.target.files[0])}
-              />
-
+              />  
+                          <label>Serial Type</label>
+            <select
+              value={serial_type}
+              onChange={(e) => setserial_type(e.target.value)}
+              className="file-type-select"
+            >
+              <option value="Default">Default</option>
+              <option value="Allianz Well">Allianz Well</option>
+            </select>
             </div>
             <div className="modal-buttons">
               <button
