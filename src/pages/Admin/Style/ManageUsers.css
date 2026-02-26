@@ -116,6 +116,7 @@
   letter-spacing: .05em;
   padding: 14px;
   border: none;
+  text-align: center; /* This centers the text horizontally */
 }
 
 .user-table td {

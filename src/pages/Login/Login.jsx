@@ -10,161 +10,196 @@ function Login() {
   const navigate = useNavigate();
   const { setUserRole, setCurrentUser, darkMode, toggleDarkMode } = useApp();
 
-  // --- Cooldown States ---
-  const [attempts, setAttempts] = useState(0);
-  const [cooldown, setCooldown] = useState(0);
-
-  useEffect(() => {
-    document.body.classList.add("login-page");
-    return () => {
-      document.body.classList.remove("login-page");
-    };
-  }, []);
-
-  // --- Cooldown Timer Logic ---
-  useEffect(() => {
-    let timer;
-    if (cooldown > 0) {
-      timer = setInterval(() => {
-        setCooldown((prev) => prev - 1);
-      }, 1000);
-    } else if (cooldown === 0 && attempts >= 5) {
-      setAttempts(0); // Reset attempts after timer ends
-    }
-    return () => clearInterval(timer);
-  }, [cooldown, attempts]);
-
+  // --- Form States ---
   const [identifier, setIdentifier] = useState(""); // email or username
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Allowed chars: letters, digits, @, ., _, -, + (covers both usernames and emails)
-  const ALLOWED_IDENTIFIER_CHARS = /^[a-zA-Z0-9@._\-+]*$/;
+  // --- Persistent Security States ---
+  const [attempts, setAttempts] = useState(() => 
+    parseInt(localStorage.getItem("login_attempts") || "0")
+  );
+  const [isSecondChance, setIsSecondChance] = useState(() => 
+    localStorage.getItem("is_second_chance") === "true"
+  );
+  const [cooldown, setCooldown] = useState(0);
+
+  // --- Cooldown & Body Class Effects ---
+  useEffect(() => {
+    document.body.classList.add("login-page");
+    
+    // Check for existing cooldown on mount
+    const expiry = localStorage.getItem("cooldown_expiry");
+    if (expiry) {
+      const remaining = Math.ceil((parseInt(expiry) - Date.now()) / 1000);
+      if (remaining > 0) setCooldown(remaining);
+      else localStorage.removeItem("cooldown_expiry");
+    }
+
+    return () => document.body.classList.remove("login-page");
+  }, []);
+
+  // --- Timer Logic ---
+  useEffect(() => {
+    let timer;
+    if (cooldown > 0) {
+      timer = setInterval(() => {
+        setCooldown((prev) => {
+          if (prev <= 1) {
+            localStorage.removeItem("cooldown_expiry");
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
+  // Sync attempts and stage to localStorage
+  useEffect(() => {
+    localStorage.setItem("login_attempts", attempts.toString());
+    localStorage.setItem("is_second_chance", isSecondChance.toString());
+  }, [attempts, isSecondChance]);
 
   const handleIdentifierChange = (e) => {
     const val = e.target.value;
-    if (ALLOWED_IDENTIFIER_CHARS.test(val)) {
-      setIdentifier(val);
-    }
+    if (/^[a-zA-Z0-9@._\-+]*$/.test(val)) setIdentifier(val);
   };
 
-  // Helper to handle failed attempts
-  const handleFailure = () => {
+  // --- Failure Logic (Cooldown vs Deactivation) ---
+// --- Failure Logic (Cooldown vs Deactivation with Logging) ---
+  const handleFailure = async (lookupId) => {
     const newCount = attempts + 1;
-    setAttempts(newCount);
+    
     if (newCount >= 5) {
-      setCooldown(300);
-      setError("Too many failed attempts. Please wait 5 minutes before trying again.");
+      if (!isSecondChance) {
+        // STAGE 1: Trigger 30s Cooldown
+        const expiryTime = Date.now() + 30 * 1000;
+        localStorage.setItem("cooldown_expiry", expiryTime.toString());
+        setAttempts(0);
+        setCooldown(30);
+        setIsSecondChance(true);
+        setError("Too many failed attempts. Please wait 30 seconds.");
+      } else {
+        // STAGE 2: Set Account to Inactive + Activity Log
+        setError("Your account is inactive. Please contact support.");
+        setAttempts(0);
+        setIsSecondChance(false);
+        localStorage.removeItem("login_attempts");
+        localStorage.removeItem("is_second_chance");
+
+        try {
+          // 1. Fetch User ID to ensure we link the log correctly
+          const { data: targetUser } = await supabase
+            .from("profiles")
+            .select("id")
+            .or(`email.eq.${lookupId},username.eq.${lookupId}`)
+            .single();
+
+          if (targetUser) {
+            // 2. Update Status to Inactive
+            await supabase
+              .from("profiles")
+              .update({ status: "Inactive" })
+              .eq("id", targetUser.id);
+
+            // 3. Insert Activity Log
+            // NOTE: Ensure your RLS Policy allows 'anon' to INSERT to activity_logs
+            await supabase.from("activity_logs").insert({
+              action: "USER_DEACTIVATED",
+              details: `Account auto-deactivated: ${lookupId}`,
+              performed_by: targetUser.id
+            });
+          }
+        } catch (err) {
+          console.error("Critical error during lockout logging:", err);
+        }
+      }
     } else {
-      setError(`Username or password is incorrect. (Attempt ${newCount}/5)`);
+      setAttempts(newCount);
+      const remaining = 5 - newCount;
+      setError(`Incorrect credentials. ${remaining} attempts left ${isSecondChance ? "before lockout" : "before cooldown"}.`);
     }
   };
 
+  // --- Main Login Function ---
+// --- Main Login Function ---
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (cooldown > 0) return; // Prevent submission during cooldown
+    if (cooldown > 0 || loading) return;
     setError("");
+    setLoading(true);
 
-    let email = identifier;
-
-    // If the identifier is not an email, look it up as username
-    if (!identifier.includes("@")) {
-      const { data, error: fetchError } = await supabase
+    try {
+      // 1. PRE-CHECK: Status validation
+      const { data: profileCheck, error: fetchError } = await supabase
         .from("profiles")
-        .select("email")
-        .eq("username", identifier)
+        .select("id, email, status, account_type")
+        .or(`email.eq.${identifier},username.eq.${identifier}`)
         .single();
 
-      if (fetchError || !data?.email) {
-        handleFailure();
+      // Block if already inactive
+      if (profileCheck?.status === "Inactive") {
+        setError("Your account is inactive. Please contact support.");
+        setLoading(false);
         return;
       }
 
-      email = data.email;
-    }
-
-    // Sign in with email and password
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (signInError) {
-      handleFailure();
-      return;
-    }
-
-    const user = data.user;
-    if (!user) {
-      handleFailure("Login failed. Try again.");
-      return;
-    }
-
-    // Success! Reset attempts
-    setAttempts(0);
-
-    // Fetch the latest account_type and avatar_url from profiles table
-    const { data: profileData, error: profileError } = await supabase
-      .from("profiles")
-      .select("account_type, id, username, first_name, last_name, status, avatar_url")
-      .eq("id", user.id)
-      .single();
-
-    if (profileError || !profileData) {
-      setError("Could not fetch user profile.");
-      return;
-    }
-
-    // Check if account is inactive
-    if (profileData.status === "Inactive") {
-      const accountType = profileData.account_type?.toLowerCase();
-      if (accountType === "ap") {
-        setError("Your account is inactive. Contact the Agency Leader");
-      } else if (accountType === "al") {
-        setError("Your Account is Inactive. Contact the Admin");
-      } else {
-        setError("Your account is inactive. Please contact support.");
+      // If user not found, trigger failure logic
+      if (fetchError || !profileCheck) {
+        await handleFailure(identifier);
+        setLoading(false);
+        return;
       }
-      return;
-    }
 
-    const accountType = profileData.account_type?.toLowerCase();
+      // 2. AUTHENTICATION
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: profileCheck.email,
+        password,
+      });
 
-    setUserRole(accountType?.toUpperCase());
+      if (signInError) {
+        await handleFailure(identifier);
+        setLoading(false);
+        return;
+      }
 
-    setCurrentUser({
-      id: profileData.id,
-      username: profileData.username,
-      name: `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim() || profileData.username,
-      firstName: profileData.first_name,
-      lastName: profileData.last_name,
-      email: user.email,
-      role: accountType?.toUpperCase(),
-      avatarUrl: profileData.avatar_url
-    });
+      // 3. SUCCESS: Clear security states
+      setAttempts(0);
+      setIsSecondChance(false);
+      localStorage.removeItem("login_attempts");
+      localStorage.removeItem("is_second_chance");
+      localStorage.removeItem("cooldown_expiry");
 
-    switch (accountType) {
-      case "admin":
-        navigate("/admin/dashboard");
-        break;
-      case "al":
-        navigate("/al/dashboard");
-        break;
-      case "ap":
-        navigate("/ap/dashboard");
-        break;
-      case "mp":
-        navigate("/mp/dashboard");
-        break;
-      case "md":
-        navigate("/md/dashboard");
-        break;
-      default:
-        setError("Unknown account type.");
+      // 4. GET FULL PROFILE & REDIRECT
+      const { data: fullProfile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", authData.user.id)
+        .single();
+
+      const role = fullProfile.account_type?.toUpperCase();
+      setUserRole(role);
+      setCurrentUser({
+        ...fullProfile,
+        email: authData.user.email,
+        role: role,
+        name: `${fullProfile.first_name || ''} ${fullProfile.last_name || ''}`.trim() || fullProfile.username
+      });
+
+      const routeMap = { ADMIN: "/admin", AL: "/al", AP: "/ap", MP: "/mp", MD: "/md" };
+      navigate(`${routeMap[role] || ""}/dashboard`);
+
+    } catch (err) {
+      console.error("Login system error:", err);
+      setError("A system error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
-
   return (
     <div className="login-wrapper">
       <button

@@ -138,10 +138,10 @@ body.dark-mode.page-profile .main-content {
 
 /* Flexbox wrapper for side-by-side */
 .modal-body-split {
-    display: flex;
-    gap: 30px;
-    padding: 20px;
-    align-items: flex-start;
+display: grid;
+  grid-template-columns: 1fr 280px; /* Wider form, fixed-width sidebar */
+  gap: 32px;
+  padding: 24px
 }
 
 .modal-form-inputs {
@@ -159,15 +159,34 @@ body.dark-mode.page-profile .main-content {
 
 /* The Square Preview Box */
 .large-avatar-preview {
-    width: 200px;
-    height: 200px;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-top: 10px;
-    border: 3px solid #6c5ce7; /* Or your theme color */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px dashed #e2e8f0;
+  position: relative;
 }
-
+.upload-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+.avatar-upload-wrapper:hover .upload-overlay {
+  opacity: 1;
+}
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .large-avatar-preview img {
     width: 100%;
     height: 100%;
@@ -402,11 +421,25 @@ body.dark-mode.page-profile .main-content {
 
 /* Form Grid - 3 columns */
 .form-grid-layout {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 column grid */
+  gap: 16px;
 }
-
+.avatar-upload-wrapper {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto;
+}
+.section-title {
+  grid-column: span 3;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6366f1; /* Brand color */
+  margin: 8px 0 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 .input-box.full-width {
     grid-column: span 3;
 }
@@ -498,6 +531,38 @@ body.dark-mode.page-profile .main-content {
     align-items: center;
     gap: 10px;
 }
+/* Placeholder container when no image is present */
+.empty-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #f1f5f9; /* Soft light gray */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8; /* Slate gray for the icon */
+  font-size: 4rem; /* Large icon */
+}
+
+/* Optional: Make the border dashed when empty to signal it's an upload area */
+.large-avatar-preview.is-empty {
+  border: 2px dashed #cbd5e1;
+  background-color: #f8fafc;
+}
+
+/* Ensure the overlay is always visible or at least more obvious when empty */
+
+
+.large-avatar-preview.is-empty .upload-overlay i {
+  background: rgb(75, 75, 75);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  margin-bottom: 8px;
+}
 
 .password-divider-text::after {
     content: '';
@@ -508,12 +573,12 @@ body.dark-mode.page-profile .main-content {
 
 /* Modal Footer */
 .modal-actions-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 16px 28px;
-    background: #f8fafc;
-    border-top: 1px solid #eaecf0;
+display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
 }
 
 .btn-cancel {

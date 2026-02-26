@@ -2,14 +2,23 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import supabase from "../../config/supabaseClient";
-import "./Style/Profile.css?v=2.1";
+import "./Style/Profile.css?v=2.2";
 
 const ProfilePage = () => {
     const navigate = useNavigate();
     const { darkMode, loadUser, setCurrentUser } = useApp();
     const [user, setUser] = useState(null);
     const [profile, setProfile] = useState(null);
-
+    const getMaxDate = () => {
+    const today = new Date();
+    const eighteenYearsAgo = new Date(
+        today.getFullYear() - 18,
+        today.getMonth(),
+        today.getDate()
+    );
+    // Format to YYYY-MM-DD for the input 'max' attribute
+    return eighteenYearsAgo.toISOString().split("T")[0];
+};
     // FIX: Move these inside the component
     const [uploading, setUploading] = useState(false);
     const [file, setFile] = useState(null);
@@ -28,7 +37,6 @@ const ProfilePage = () => {
         email: "",
         contact_number: "",
         Address: "",
-        civil_status: "",
         avatar_url: "" // Added this
     });
 
@@ -87,7 +95,6 @@ const ProfilePage = () => {
                     // Ensure contact_number is a string for the input field, even if null
                     contact_number: data.contact_number ? data.contact_number.toString() : "",
                     Address: data.Address || "",
-                    civil_status: data.civil_status || "",
                     avatar_url: data.avatar_url || ""
                 });
 
@@ -100,7 +107,17 @@ const ProfilePage = () => {
             console.error("Error fetching profile:", err.message);
         }
     };
-
+    const isUnder18 = (dateString) => {
+        if (!dateString) return false;
+        const today = new Date();
+        const birthDate = new Date(dateString);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age < 18;
+    };
     const handleUpdate = async (e) => {
         e.preventDefault();
         setUploading(true);
@@ -137,7 +154,6 @@ const ProfilePage = () => {
                 last_name: formData.last_name,
                 Middle: formData.Middle, // Matches your 'Middle' column
                 gender: formData.gender,
-                civil_status: formData.civil_status,
                 birthday: formData.birthday,
                 email: formData.email,
                 Address: formData.Address, // Matches your 'Address' column
@@ -276,10 +292,6 @@ const ProfilePage = () => {
                                 <span className="info-label">Birthday</span>
                                 <span className="info-value">{profile?.birthday || "N/A"}</span>
                             </div>
-                            <div className="info-item">
-                                <span className="info-label">Civil Status</span>
-                                <span className="info-value">{profile?.civil_status || "N/A"}</span>
-                            </div>
                         </div>
                     </div>
 
@@ -295,27 +307,26 @@ const ProfilePage = () => {
                                 <span className="info-label">Phone Number</span>
                                 <span className="info-value">+63 {profile?.contact_number || "N/A"}</span>
                             </div>
-                            <div className="info-item full-width">
-                                <span className="info-label">Office Address</span>
-                                <span className="info-value">{profile?.Address || "N/A"}</span>
-                            </div>
+
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* MODAL: UPDATE PROFILE */}
-            {isModalOpen && (
+{isModalOpen && (
                 <div className="modal-overlay">
                     <div className="modal-card wide-modal">
-                        {/* MODAL HEADER */}
+                        {/* HEADER */}
                         <div className="modal-header">
-                            <div className="modal-header-icon">
-                                <i className="fa-solid fa-user-pen"></i>
-                            </div>
-                            <div className="modal-header-text">
-                                <h3>Update Profile Information</h3>
-                                <p className="modal-subtitle">Modify your personal details and contact information.</p>
+                            <div className="header-content">
+                                <div className="modal-header-icon">
+                                    <i className="fa-solid fa-user-pen"></i>
+                                </div>
+                                <div className="modal-header-text">
+                                    <h3>Update Profile Information</h3>
+                                    <p className="modal-subtitle">Modify your personal details and contact information.</p>
+                                </div>
                             </div>
                             <button className="close-btn" onClick={() => setIsModalOpen(false)}>&times;</button>
                         </div>
@@ -323,72 +334,59 @@ const ProfilePage = () => {
                         <form onSubmit={handleUpdate}>
                             <div className="modal-body-split">
 
-                                {/* LEFT COLUMN: FORM FIELDS */}
+                                {/* LEFT: FORM FIELDS */}
                                 <div className="modal-form-inputs">
                                     <div className="form-grid-layout">
 
-                                        {/* File Upload Input */}
-                                        <div className="input-box full-width">
-                                            <label><i className="fa-solid fa-camera"></i> Change Profile Picture</label>
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                className="file-input-custom"
-                                                onChange={(e) => {
-                                                    const selectedFile = e.target.files[0];
-                                                    if (selectedFile) {
-                                                        setFile(selectedFile);
-                                                        setPreviewUrl(URL.createObjectURL(selectedFile));
-                                                    }
-                                                }}
-                                            />
-                                        </div>
-
-                                        {/* Row 1: Names */}
+                                        <h4 className="section-title">Personal Details</h4>
                                         <div className="input-box">
                                             <label>First Name</label>
-                                            <input type="text" placeholder="First Name" value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })} />
-                                        </div>
-                                        <div className="input-box">
-                                            <label>Last Name</label>
-                                            <input type="text" placeholder="Last Name" value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })} />
+                                            <input type="text" placeholder="e.g. John" value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })} />
                                         </div>
                                         <div className="input-box">
                                             <label>Middle Name</label>
                                             <input type="text" placeholder="Middle Name" value={formData.Middle} onChange={(e) => setFormData({ ...formData, Middle: e.target.value })} />
                                         </div>
+                                        <div className="input-box">
+                                            <label>Last Name</label>
+                                            <input type="text" placeholder="e.g. Doe" value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })} />
+                                        </div>
 
-                                        {/* Row 2: Status & Gender */}
                                         <div className="input-box">
                                             <label>Gender</label>
                                             <select value={formData.gender} onChange={(e) => setFormData({ ...formData, gender: e.target.value })}>
-                                                <option value="">Select Gender</option>
+                                                <option value="">Select</option>
                                                 <option value="Male">Male</option>
                                                 <option value="Female">Female</option>
                                             </select>
                                         </div>
                                         <div className="input-box">
-                                            <label>Civil Status</label>
-                                            <select value={formData.civil_status} onChange={(e) => setFormData({ ...formData, civil_status: e.target.value })}>
-                                                <option value="">Select Status</option>
-                                                <option value="Single">Single</option>
-                                                <option value="Married">Married</option>
-                                                <option value="Widowed">Widowed</option>
-                                                <option value="Divorced">Divorced</option>
-                                            </select>
-                                        </div>
-                                        <div className="input-box">
                                             <label>Birthday</label>
-                                            <input type="date" value={formData.birthday} onChange={(e) => setFormData({ ...formData, birthday: e.target.value })} />
+                                            <input
+                                                type="date"
+                                                value={formData.birthday}
+                                                max={getMaxDate()}
+                                                onChange={(e) => {
+                                                    const selectedDate = e.target.value;
+                                                    // Catch manual keyboard entry for users under 18
+                                                    if (selectedDate > getMaxDate()) {
+                                                        alert("You must be at least 18 years old.");
+                                                        return;
+                                                    }
+                                                    setFormData({ ...formData, birthday: selectedDate });
+                                                }}
+                                            />
+                                            {isUnder18(formData.birthday) && (
+                                                <span className="error-text">Must be 18+ years old</span>
+                                            )}
                                         </div>
 
-                                        {/* Row 3: Contact */}
+                                        <h4 className="section-title full-width">Contact Information</h4>
                                         <div className="input-box full-width">
                                             <label>Email Address</label>
-                                            <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                                            <input type="email" placeholder="john.doe@example.com" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                                         </div>
 
-                                        {/* CONTACT NUMBER WITH +63 AND VALIDATION */}
                                         <div className="input-box full-width">
                                             <label>Contact Number</label>
                                             <div className="contact-input-container">
@@ -401,48 +399,59 @@ const ProfilePage = () => {
                                                     maxLength="10"
                                                     onChange={(e) => {
                                                         const val = e.target.value;
-                                                        // Regex: Only allow digits and limit to 10
-                                                        if (/^\d*$/.test(val) && val.length <= 10) {
-                                                            setFormData({ ...formData, contact_number: val });
-                                                        }
+                                                        if (/^\d*$/.test(val)) setFormData({ ...formData, contact_number: val });
                                                     }}
                                                 />
                                             </div>
                                         </div>
-
-                                        {/* Row 4: Address */}
-                                        <div className="input-box full-width">
-                                            <label>Office/Home Address</label>
-                                            <input type="text" placeholder="Complete Address" value={formData.Address} onChange={(e) => setFormData({ ...formData, Address: e.target.value })} />
-                                        </div>
                                     </div>
                                 </div>
 
-                                {/* RIGHT COLUMN: PREVIEW */}
+                                {/* RIGHT: PHOTO UPLOAD */}
                                 <div className="modal-preview-sidebar">
-                                    <div className="preview-sticky-container">
-                                        <label className="preview-label">Live Preview</label>
-                                        <div className="large-avatar-preview">
-                                            <img
-                                                src={previewUrl || "https://via.placeholder.com/150"}
-                                                alt="Profile Preview"
-                                                className="preview-img"
-                                            />
+                                    <label className="preview-label">Profile Picture</label>
+                                    <div className="avatar-upload-wrapper">
+                                        <div className={`large-avatar-preview ${!previewUrl ? 'is-empty' : ''}`}>
+                                            {previewUrl ? (
+                                                <img src={previewUrl} alt="Profile" className="preview-img" />
+                                            ) : (
+                                                <div className="empty-avatar-placeholder">
+                                                    <i className="fa-solid fa-user"></i>
+                                                </div>
+                                            )}
+
+                                            <label htmlFor="file-upload" className="upload-overlay">
+                                                <i className="fa-solid fa-camera"></i>
+                                                <span>{previewUrl ? "Change Photo" : "Upload Photo"}</span>
+                                            </label>
                                         </div>
-                                        <p className="preview-hint">
-                                            <i className="fa-solid fa-circle-info"></i> Your photo is automatically centered and squared.
-                                        </p>
+
+                                        <input
+                                            id="file-upload"
+                                            type="file"
+                                            hidden
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const selectedFile = e.target.files[0];
+                                                if (selectedFile) {
+                                                    setFile(selectedFile);
+                                                    setPreviewUrl(URL.createObjectURL(selectedFile));
+                                                }
+                                            }}
+                                        />
                                     </div>
+                                    <p className="preview-hint">JPG or PNG. Max 5MB.</p>
                                 </div>
 
                             </div>
 
-                            {/* MODAL FOOTER */}
                             <div className="modal-actions-footer">
-                                <button type="button" className="btn-cancel" onClick={() => setIsModalOpen(false)}>
-                                    Discard Changes
-                                </button>
-                                <button type="submit" className="btn-save-security" disabled={uploading}>
+                                <button type="button" className="btn-cancel" onClick={() => setIsModalOpen(false)}>Discard</button>
+                                <button 
+                                    type="submit" 
+                                    className="btn-save-security" 
+                                    disabled={uploading || isUnder18(formData.birthday)}
+                                >
                                     {uploading ? <><i className="fa-solid fa-spinner fa-spin"></i> Saving...</> : "Save Profile"}
                                 </button>
                             </div>
@@ -450,6 +459,7 @@ const ProfilePage = () => {
                     </div>
                 </div>
             )}
+
 
             {/* MODAL: CHANGE PASSWORD */}
             {isPasswordModalOpen && (

@@ -385,64 +385,74 @@ const generatePassword = () => {
       </div>
 
       {/* USERS TABLE CONTAINER */}
-      <div className="content-container animate-spring delay-1">
-        <div className="container-header">
-          <h2>User Database ({showInactive ? "Inactive" : "Active"})</h2>
-        </div>
-        <div className="container-body">
-          <table className="user-table">
-            <thead>
-              <tr>
-                <th>No.</th>
-                <th>Last Name</th>
-                <th>First Name</th>
-                <th>Position</th>
-                <th>Status</th>
-                <th style={{ textAlign: "center" }}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.length === 0 ? (
-                <tr>
-                  <td colSpan="6" style={{ textAlign: "center", padding: "20px", color: "#666" }}>
-                    No {showInactive ? "inactive" : "active"} users found.
-                  </td>
-                </tr>
-              ) : (
-                filteredUsers.map((u, index) => (
-                  <tr key={u.id}>
-                    <td>{index + 1}</td>
-                    <td>{u.last_name}</td>
-                    <td>{u.first_name}</td>
-                    <td><span style={{ fontWeight: "600" }}>{u.account_type}</span></td>
-                    <td>
-                      <span className={`status-badge ${u.status === "Active" ? "active" : "inactive"}`}>
-                        {u.status || "Active"}
-                      </span>
-                    </td>
-                    <td className="action-cell">
-                      <button className="btn-view" onClick={() => openViewModal(u)} title="View Details">
-                        <i className="fa-solid fa-eye"></i> View
-                      </button>
-                      <button className="btn-update" onClick={() => openEditModal(u)} title="Edit User">
-                        <i className="fa-solid fa-pen"></i> Update
-                      </button>
-                      <button
-                        className="btn-delete"
-                        onClick={() => toggleUserStatus(u)}
-                        title={u.status === "Active" ? "Deactivate" : "Activate"}
-                        style={{ backgroundColor: u.status === "Active" ? "var(--danger-color)" : "var(--success-color)" }}
-                      >
-                        <i className={`fa-solid ${u.status === "Active" ? "fa-ban" : "fa-check"}`}></i> {u.status === "Active" ? "Inactive" : "Activate"}
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+<div className="content-container animate-spring delay-1">
+  <div className="container-header">
+    <h2>User Database ({showInactive ? "Inactive" : "Active"})</h2>
+  </div>
+  <div className="container-body">
+    <table className="user-table">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Last Name</th>
+          <th>First Name</th>
+          <th>Position</th>
+          <th>Status</th>
+          <th style={{ textAlign: "center" }}>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filteredUsers.length === 0 ? (
+          <tr>
+            <td colSpan="6" style={{ textAlign: "center", padding: "20px", color: "#666" }}>
+              No {showInactive ? "inactive" : "active"} users found.
+            </td>
+          </tr>
+        ) : (
+          filteredUsers.map((u, index) => (
+            <tr key={u.id}>
+              <td>{index + 1}</td>
+              <td>{u.last_name}</td>
+              <td>{u.first_name}</td>
+              <td><span style={{ fontWeight: "600" }}>{u.account_type}</span></td>
+              <td>
+                <span className={`status-badge ${u.status === "Active" ? "active" : "inactive"}`}>
+                  {u.status || "Active"}
+                </span>
+              </td>
+              <td className="action-cell">
+                {/* 1. Only show View/Update if the user is ACTIVE */}
+                {!showInactive && (
+                  <>
+                    <button className="btn-view" onClick={() => openViewModal(u)} title="View Details">
+                      <i className="fa-solid fa-eye"></i> View
+                    </button>
+                    <button className="btn-update" onClick={() => openEditModal(u)} title="Edit User">
+                      <i className="fa-solid fa-pen"></i> Update
+                    </button>
+                  </>
+                )}
+
+                {/* 2. Main Action Toggle: Shows 'Deactivate' for Active list, 'Activate' for Inactive list */}
+                <button
+                  className="btn-delete"
+                  onClick={() => toggleUserStatus(u)}
+                  title={u.status === "Active" ? "Deactivate" : "Activate"}
+                  style={{ 
+                    backgroundColor: u.status === "Active" ? "var(--danger-color)" : "var(--success-color)" 
+                  }}
+                >
+                  <i className={`fa-solid ${u.status === "Active" ? "fa-ban" : "fa-check"}`}></i>{" "}
+                  {u.status === "Active" ? "Deactivate" : "Activate"}
+                </button>
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+</div>
 
       {/* Add/Edit Modal */}
 {/* Add/Edit Modal */}

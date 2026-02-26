@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import supabase from "../../config/supabaseClient";
-import "./Style/Dashboard.css"; // Reuse dashboard styles for container
+import "./Style/Dashboard.css"; 
 
 const AdminActivityLogs = () => {
     const navigate = useNavigate();
@@ -15,7 +15,7 @@ const AdminActivityLogs = () => {
         checkAdmin();
     }, []);
 
-    const checkAdmin = async () => { // Defined inside component
+    const checkAdmin = async () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
             alert("Please login first");
@@ -23,7 +23,6 @@ const AdminActivityLogs = () => {
             return;
         }
 
-        // Robust role check: Try profiles table first, fallback to metadata
         let accountType = session.user.user_metadata?.account_type;
 
         try {
@@ -72,13 +71,16 @@ const AdminActivityLogs = () => {
         return new Date(dateString).toLocaleDateString("en-US", options);
     };
 
+    // Updated to handle Deactivation and Locked status
     const getActionLabel = (action) => {
         const labels = {
             'POLICY_CREATE': 'Policy Created',
             'POLICY_UPDATE': 'Policy Updated',
             'POLICY_STATUS_CHANGE': 'Status Changed',
             'USER_LOGIN': 'User Login',
-            'USER_LOGOUT': 'User Logout'
+            'USER_LOGOUT': 'User Logout',
+            'USER_DEACTIVATED': 'User Deactivated', // New Label
+            'USER_LOCKED': 'Account Locked'          // New Label
         };
         return labels[action] || action.replace(/_/g, ' ');
     };
@@ -120,11 +122,11 @@ const AdminActivityLogs = () => {
                 <div className="container-body" style={{ padding: 0 }}>
                     <table className="admin-user-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
-                            <tr>
-                                <th>Date & Time</th>
-                                <th>User</th>
-                                <th>Action</th>
-                                <th>Details</th>
+                            <tr style={{ textAlign: 'left', borderBottom: '2px solid #f1f5f9' }}>
+                                <th style={{ padding: '12px 20px' }}>Date & Time</th>
+                                <th style={{ padding: '12px 20px' }}>User</th>
+                                <th style={{ padding: '12px 20px' }}>Action</th>
+                                <th style={{ padding: '12px 20px' }}>Details</th>
                             </tr>
                         </thead>
 
@@ -148,14 +150,21 @@ const AdminActivityLogs = () => {
                                             ) : <span className="text-muted">System/Unknown</span>}
                                         </td>
                                         <td style={{ padding: '16px 20px' }}>
-                                            <span className={`action-badge ${log.action?.includes('CREATE') ? 'action-badge-success' :
-                                                log.action?.includes('UPDATE') || log.action?.includes('CHANGE') ? 'action-badge-info' :
-                                                    log.action?.includes('DELETE') ? 'action-badge-danger' : 'action-badge-default'
-                                                }`}>
+                                            <span className={`action-badge ${
+                                                log.action?.includes('CREATE') ? 'action-badge-success' :
+                                                (log.action?.includes('UPDATE') || log.action?.includes('CHANGE')) ? 'action-badge-info' :
+                                                (log.action?.includes('DEACTIVATED') || log.action?.includes('DELETE') || log.action?.includes('LOCKED')) ? 'action-badge-danger' : 
+                                                'action-badge-default'
+                                            }`}>
                                                 {getActionLabel(log.action)}
                                             </span>
                                         </td>
-                                        <td style={{ padding: '16px 20px', fontSize: '14px' }} className="text-primary">
+                                        <td style={{ 
+                                            padding: '16px 20px', 
+                                            fontSize: '14px',
+                                            color: log.action === 'USER_DEACTIVATED' ? '#e11d48' : '#334155',
+                                            fontWeight: log.action === 'USER_DEACTIVATED' ? '500' : '400'
+                                        }}>
                                             {log.details}
                                         </td>
                                     </tr>
