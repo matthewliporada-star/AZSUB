@@ -433,7 +433,7 @@ const generatePassword = () => {
                         title={u.status === "Active" ? "Deactivate" : "Activate"}
                         style={{ backgroundColor: u.status === "Active" ? "var(--danger-color)" : "var(--success-color)" }}
                       >
-                        <i className={`fa-solid ${u.status === "Active" ? "fa-ban" : "fa-check"}`}></i> {u.status === "Active" ? "Deactivate" : "Activate"}
+                        <i className={`fa-solid ${u.status === "Active" ? "fa-ban" : "fa-check"}`}></i> {u.status === "Active" ? "Inactive" : "Activate"}
                       </button>
                     </td>
                   </tr>
@@ -518,7 +518,7 @@ const generatePassword = () => {
           <div className="input-group">
             <label>Position</label>
             <select name="position" value={formData.position} onChange={handleFormChange}>
-              <option value="ADMIN">Admin</option>
+              <option value="Admin">Admin</option>
               <option value="MP">Managing Partner (MP)</option>
               <option value="AL">Agency Leader (AL)</option>
               <option value="AP">Agency Partner (AP)</option>
