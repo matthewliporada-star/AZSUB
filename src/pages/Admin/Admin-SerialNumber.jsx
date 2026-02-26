@@ -424,51 +424,78 @@ const AdminSerialNumber = () => {
       </div>
 
       {/* ================= MODAL ================= */}
-      {showViewModal && selectedSerial && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-title">Serial Tracking</div>
-            <div className="modal-form">
+{showViewModal && selectedSerial && (
+  <div className="modal-overlay">
+    <div className="modal-content">
+      <div className="modal-title">Serial Tracking</div>
+      <div className="modal-form">
+        
+        {/* Basic Info Section */}
+        <div style={{ marginBottom: "15px", fontSize: "14px", lineHeight: "1.6" }}>
+          <p><strong>Serial Number:</strong> {selectedSerial.serial_number}</p>
+          <p><strong>Serial Type:</strong> {selectedSerial.serial_type}</p>
+          <p><strong>Requested by:</strong> {selectedSerial.ResponseID || "Not yet taken"}</p>
+          <p><strong>Request Date:</strong> {new Date(selectedSerial.date).toLocaleDateString()}</p>
+        </div>
 
-              <div style={{ marginBottom: "15px", fontSize: "14px", lineHeight: "1.6" }}>
-                <p><strong>Serial Number:</strong> {selectedSerial.serial_number}</p>
-                <p><strong>Serial Type:</strong> {selectedSerial.serial_type}</p>
-                <p><strong>Requested by:</strong> {selectedSerial.ResponseID || "Not yet taken"}</p>
-                <p><strong>Request Date:</strong> {new Date(selectedSerial.date).toLocaleDateString()}</p>
-              </div>
-              <div className="hierarchy-section" style={{ borderTop: '1px solid #eee', marginTop: '15px', paddingTop: '15px' }}>
-                <h3 style={{ fontSize: "16px", marginBottom: "10px" }}>Tracking Status</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div className="hierarchy-card">
-                    <span><span style={{ color: "var(--success-color)", marginRight: "10px" }}>●</span>Serial Created</span>
-                    <span>{new Date(selectedSerial.date).toLocaleString()}</span>
-                  </div>
-                  <div className="hierarchy-card">
-                    <span><span style={{ color: selectedSerial.is_issued ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>Serial Confirm</span>
-                    <span className={`status-badge ${selectedSerial.is_issued ? 'active' : 'inactive'}`}>
-                      {selectedSerial.is_issued ? "Confirmed" : "In Progress"}
-                    </span>
-                  </div>
-                  <div className="hierarchy-card">
-                    <span><span style={{ color: selectedSerial.ResponseID ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>Serial Issued</span>
-                    <span className={`status-badge ${selectedSerial.ResponseID ? 'active' : 'inactive'}`}>
-                      {selectedSerial.ResponseID ? "Completed" : "Pending"}
-                    </span>
-                  </div>
-                </div>
-              </div>
+        {/* Tracking Status Section */}
+        <div className="hierarchy-section" style={{ borderTop: '1px solid #eee', marginTop: '15px', paddingTop: '15px' }}>
+          <h3 style={{ fontSize: "16px", marginBottom: "10px" }}>Tracking Status</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className="hierarchy-card">
+              <span><span style={{ color: "var(--success-color)", marginRight: "10px" }}>●</span>Serial Created</span>
+              <span>{new Date(selectedSerial.date).toLocaleString()}</span>
             </div>
-
-            <div className="modal-buttons">
-              <button className="modal-close" onClick={() => setShowViewModal(false)}>
-                Close
-              </button>
+            <div className="hierarchy-card">
+              <span><span style={{ color: selectedSerial.is_issued ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>Serial Confirm</span>
+              <span className={`status-badge ${selectedSerial.is_issued ? 'active' : 'inactive'}`}>
+                {selectedSerial.is_issued ? "Confirmed" : "In Progress"}
+              </span>
+            </div>
+            <div className="hierarchy-card">
+              <span><span style={{ color: selectedSerial.ResponseID ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>Serial Issued</span>
+              <span className={`status-badge ${selectedSerial.ResponseID ? 'active' : 'inactive'}`}>
+                {selectedSerial.ResponseID ? "Completed" : "Pending"}
+              </span>
             </div>
           </div>
-
         </div>
-      )}
 
+        {/* --- NEW: ATTACHED DOCUMENTS SECTION (NON-VIEWABLE) --- */}
+        <div className="file-info-section" style={{ borderTop: '1px solid #eee', marginTop: '15px', paddingTop: '15px' }}>
+          <h3 style={{ fontSize: "16px", marginBottom: "10px" }}>Attached Documents</h3>
+          {selectedSerial.file_name ? (
+            <div className="hierarchy-card" style={{ backgroundColor: '#f9f9f9', cursor: 'not-allowed' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontWeight: 'bold', fontSize: '13px' }}>
+                  📄 {selectedSerial.file_name}
+                </span>
+                <span style={{ fontSize: '11px', color: '#666' }}>
+                  Type: {selectedSerial.file_type || 'Unknown'} | Added: {new Date(selectedSerial.file_added_date || selectedSerial.date).toLocaleDateString()}
+                </span>
+              </div>
+              <span style={{ fontSize: '11px', color: '#d9534f', fontStyle: 'italic' }}>
+                View Restricted
+              </span>
+            </div>
+          ) : (
+            <div style={{ fontSize: '13px', color: '#999', textAlign: 'center', padding: '10px' }}>
+              No files uploaded for this serial.
+            </div>
+          )}
+        </div>
+        {/* ----------------------------------------------------- */}
+
+      </div>
+
+      <div className="modal-buttons">
+        <button className="modal-close" onClick={() => setShowViewModal(false)}>
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       {showImportModal && (
         <div className="modal-overlay">
           <div className="modal-content">
