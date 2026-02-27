@@ -18,10 +18,10 @@ function Login() {
   const [loading, setLoading] = useState(false);
 
   // --- Persistent Security States ---
-  const [attempts, setAttempts] = useState(() => 
+  const [attempts, setAttempts] = useState(() =>
     parseInt(localStorage.getItem("login_attempts") || "0")
   );
-  const [isSecondChance, setIsSecondChance] = useState(() => 
+  const [isSecondChance, setIsSecondChance] = useState(() =>
     localStorage.getItem("is_second_chance") === "true"
   );
   const [cooldown, setCooldown] = useState(0);
@@ -29,7 +29,7 @@ function Login() {
   // --- Cooldown & Body Class Effects ---
   useEffect(() => {
     document.body.classList.add("login-page");
-    
+
     // Check for existing cooldown on mount
     const expiry = localStorage.getItem("cooldown_expiry");
     if (expiry) {
@@ -70,10 +70,10 @@ function Login() {
   };
 
   // --- Failure Logic (Cooldown vs Deactivation) ---
-// --- Failure Logic (Cooldown vs Deactivation with Logging) ---
+  // --- Failure Logic (Cooldown vs Deactivation with Logging) ---
   const handleFailure = async (lookupId) => {
     const newCount = attempts + 1;
-    
+
     if (newCount >= 5) {
       if (!isSecondChance) {
         // STAGE 1: Trigger 30s Cooldown
@@ -126,7 +126,7 @@ function Login() {
   };
 
   // --- Main Login Function ---
-// --- Main Login Function ---
+  // --- Main Login Function ---
   const handleLogin = async (e) => {
     e.preventDefault();
     if (cooldown > 0 || loading) return;
@@ -187,7 +187,8 @@ function Login() {
         ...fullProfile,
         email: authData.user.email,
         role: role,
-        name: `${fullProfile.first_name || ''} ${fullProfile.last_name || ''}`.trim() || fullProfile.username
+        name: `${fullProfile.first_name || ''} ${fullProfile.last_name || ''}`.trim() || fullProfile.username,
+        avatarUrl: fullProfile.avatar_url
       });
 
       const routeMap = { ADMIN: "/admin", AL: "/al", AP: "/ap", MP: "/mp", MD: "/md" };

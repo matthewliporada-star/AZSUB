@@ -115,7 +115,7 @@ const MPLayout = ({ children, title = 'Dashboard' }) => {
 
                         {showProfileMenu && (
                             <div className="mp-profile-dropdown">
-                                <div className="mp-dropdown-item">
+                                <div className="mp-dropdown-item" onClick={() => navigate('/profile')}>
                                     <i className="fa-solid fa-user"></i> Profile
                                 </div>
                                 <hr className="mp-dropdown-divider" />

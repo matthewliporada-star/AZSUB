@@ -13,9 +13,11 @@ const TopBar = ({ sidebarOpen = true }) => {
     const navigate = useNavigate();
     const [showDropdown, setShowDropdown] = useState(false);
 
-    // Check if on AP, AL, Admin, or Profile pages
+    // Check if on AP, AL, MP, MD, Admin, or Profile pages
     const isDashboardPage = location.pathname.startsWith('/ap') ||
         location.pathname.startsWith('/al') ||
+        location.pathname.startsWith('/mp') ||
+        location.pathname.startsWith('/md') ||
         location.pathname.startsWith('/admin') ||
         location.pathname === '/profile';
 

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import MainLayout from './components/Layout/MainLayout';
+import ProfileLayout from './components/Layout/ProfileLayout';
 import Login from './pages/Login/Login';
 
 // MP Data Provider
@@ -61,7 +62,7 @@ function App() {
           <Route path="/admin/SerialNumber" element={<MainLayout><AdminSerialNumber /></MainLayout>} />
           <Route path="/admin/policies" element={<MainLayout><AdminPolicies /></MainLayout>} />
           <Route path="/admin/activity-logs" element={<MainLayout><AdminActivityLogs /></MainLayout>} />
-          <Route path="/profile" element={<MainLayout><ProfilePage /></MainLayout>} />
+          <Route path="/profile" element={<ProfileLayout><ProfilePage /></ProfileLayout>} />
 
           {/* AL Routes - Same as AP plus Team Performance */}
           <Route path="/al/dashboard" element={<MainLayout><ALDashboard /></MainLayout>} />

@@ -3,19 +3,23 @@
    Matches the reference screenshot exactly
    ========================================= */
 
-/* Override main-content when profile page is active */
-body.page-profile .main-content {
-    background-color: #f5f7fa !important;
+/* Override background when profile page is active */
+.page-profile-wrapper {
+    background-color: #f5f7fa;
+    min-height: 100%;
+    height: 100%;
 }
 
-body.dark-mode.page-profile .main-content {
-    background-color: #0d1117 !important;
+body.dark-mode .page-profile-wrapper {
+    background-color: #0d1117;
 }
 
 /* PAGE WRAPPER - Fills the complete main-content area */
 .profile-page-content {
     min-height: 100%;
     width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 32px 40px;
     box-sizing: border-box;
 }
@@ -130,6 +134,7 @@ body.dark-mode.page-profile .main-content {
 .btn-update:hover {
     background: #0052a3;
 }
+
 /* Make the modal wider to fit two columns */
 .wide-modal {
     max-width: 850px !important;
@@ -138,18 +143,21 @@ body.dark-mode.page-profile .main-content {
 
 /* Flexbox wrapper for side-by-side */
 .modal-body-split {
-display: grid;
-  grid-template-columns: 1fr 280px; /* Wider form, fixed-width sidebar */
-  gap: 32px;
-  padding: 24px
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    /* Wider form, fixed-width sidebar */
+    gap: 32px;
+    padding: 24px
 }
 
 .modal-form-inputs {
-    flex: 2; /* Takes up 2/3 of space */
+    flex: 2;
+    /* Takes up 2/3 of space */
 }
 
 .modal-preview-sidebar {
-    flex: 1; /* Takes up 1/3 of space */
+    flex: 1;
+    /* Takes up 1/3 of space */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -159,38 +167,43 @@ display: grid;
 
 /* The Square Preview Box */
 .large-avatar-preview {
-width: 100%;
-  height: 100%;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 2px dashed #e2e8f0;
-  position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px dashed #e2e8f0;
+    position: relative;
 }
+
 .upload-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  opacity: 0;
-  transition: opacity 0.2s;
-  cursor: pointer;
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.2s;
+    cursor: pointer;
 }
+
 .avatar-upload-wrapper:hover .upload-overlay {
-  opacity: 1;
+    opacity: 1;
 }
+
 .preview-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
+
 .large-avatar-preview img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* This makes the image fill the square without stretching */
+    object-fit: cover;
+    /* This makes the image fill the square without stretching */
 }
 
 .preview-hint {
@@ -214,6 +227,7 @@ width: 100%;
         flex-direction: column-reverse;
         align-items: center;
     }
+
     .modal-preview-sidebar {
         border-left: none;
         border-bottom: 1px solid #eee;
@@ -226,7 +240,8 @@ width: 100%;
 .contact-input-container {
     display: flex;
     align-items: center;
-    gap: 10px; /* Space between +63 and the input box */
+    gap: 10px;
+    /* Space between +63 and the input box */
     margin-top: 5px;
 }
 
@@ -247,7 +262,8 @@ width: 100%;
 
 /* The actual input box */
 .phone-input {
-    flex: 1; /* Takes up the remaining width */
+    flex: 1;
+    /* Takes up the remaining width */
     padding: 10px 15px;
     border: 1px solid #ddd;
     border-radius: 6px;
@@ -257,7 +273,8 @@ width: 100%;
 }
 
 .phone-input:focus {
-    border-color: #6c5ce7; /* Highlights your theme color on focus */
+    border-color: #6c5ce7;
+    /* Highlights your theme color on focus */
 }
 
 /* Optional: styling the placeholder to look like a PH number */
@@ -421,25 +438,30 @@ width: 100%;
 
 /* Form Grid - 3 columns */
 .form-grid-layout {
-display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 column grid */
-  gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 column grid */
+    gap: 16px;
 }
+
 .avatar-upload-wrapper {
-  position: relative;
-  width: 180px;
-  height: 180px;
-  margin: 0 auto;
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto;
 }
+
 .section-title {
-  grid-column: span 3;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #6366f1; /* Brand color */
-  margin: 8px 0 4px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+    grid-column: span 3;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #6366f1;
+    /* Brand color */
+    margin: 8px 0 4px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
+
 .input-box.full-width {
     grid-column: span 3;
 }
@@ -531,37 +553,41 @@ display: grid;
     align-items: center;
     gap: 10px;
 }
+
 /* Placeholder container when no image is present */
 .empty-avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  background-color: #f1f5f9; /* Soft light gray */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #94a3b8; /* Slate gray for the icon */
-  font-size: 4rem; /* Large icon */
+    width: 100%;
+    height: 100%;
+    background-color: #f1f5f9;
+    /* Soft light gray */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    /* Slate gray for the icon */
+    font-size: 4rem;
+    /* Large icon */
 }
 
 /* Optional: Make the border dashed when empty to signal it's an upload area */
 .large-avatar-preview.is-empty {
-  border: 2px dashed #cbd5e1;
-  background-color: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    background-color: #f8fafc;
 }
 
 /* Ensure the overlay is always visible or at least more obvious when empty */
 
 
 .large-avatar-preview.is-empty .upload-overlay i {
-  background: rgb(75, 75, 75);
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  margin-bottom: 8px;
+    background: rgb(75, 75, 75);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    margin-bottom: 8px;
 }
 
 .password-divider-text::after {
@@ -573,12 +599,12 @@ display: grid;
 
 /* Modal Footer */
 .modal-actions-footer {
-display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 16px 24px;
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
 }
 
 .btn-cancel {
@@ -706,9 +732,22 @@ display: flex;
 
 .dark-mode .input-box input:focus,
 .dark-mode .input-box select:focus,
-.dark-mode .input-wrapper input:focus {
+.dark-mode .input-wrapper input:focus,
+.dark-mode .phone-input:focus {
     border-color: #58a6ff;
     box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.15);
+}
+
+.dark-mode .country-code {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+.dark-mode .phone-input {
+    background: #0d1117;
+    border-color: #30363d;
+    color: #e6edf3;
 }
 
 .dark-mode .btn-cancel {

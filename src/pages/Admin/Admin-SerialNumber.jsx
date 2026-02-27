@@ -24,6 +24,7 @@ const AdminSerialNumber = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [serial_type, setserial_type] = useState("Default");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedSerial, setSelectedSerial] = useState(null);
@@ -188,7 +189,7 @@ const AdminSerialNumber = () => {
   }
 
   return (
-    <div className="dashboard-content" style={{ padding: '40px 50px' }}>
+    <div className={`dashboard-content ${darkMode ? "dark-mode" : ""}`} style={{ padding: '40px 50px' }}>
       {/* Header Row */}
       <div className="header-row" style={{ marginBottom: '24px' }}>
         <div>
@@ -233,7 +234,7 @@ const AdminSerialNumber = () => {
         <div className="table-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <div>
             {/* ================= FILTER CONTROLS ================= */}
-            <div className="filter-button-group" style={{ display: "flex", gap: "8px" }}>
+            <div className="filter-button-group">
               {["All", "Default", "Allianz Well", "Manual"].map((type) => (
                 <button
                   key={type}
@@ -241,17 +242,6 @@ const AdminSerialNumber = () => {
                   onClick={() => {
                     setFilterType(type);
                     setCurrentPage(1);
-                  }}
-                  style={{
-                    padding: "8px 16px",
-                    cursor: "pointer",
-                    borderRadius: "6px",
-                    border: "1px solid #e2e8f0",
-                    backgroundColor: filterType === type ? "#0f172a" : "#fff",
-                    color: filterType === type ? "#fff" : "#64748b",
-                    fontSize: "13px",
-                    fontWeight: "500",
-                    transition: "all 0.2s ease"
                   }}
                 >
                   {type === "All" ? "Show All" : type}
@@ -281,14 +271,14 @@ const AdminSerialNumber = () => {
           <table className="serial-table" style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
-                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>#</th>
-                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Serial Number</th>
-                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Confirm</th>
-                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Issued</th>
-                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Response ID</th>
-                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Serial Type</th>
-                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Date</th>
-                <th style={{ padding: "12px", textAlign: "left", color: "#64748b", fontWeight: "600", fontSize: "13px" }}>Action</th>
+                <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>#</th>
+                <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Serial Number</th>
+                <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Confirm</th>
+                <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Issued</th>
+                <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Response ID</th>
+                <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Serial Type</th>
+                <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Date</th>
+                <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -381,10 +371,6 @@ const AdminSerialNumber = () => {
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             style={{
-              border: "none",
-              background: "transparent",
-              cursor: currentPage === 1 ? "not-allowed" : "pointer",
-              color: currentPage === 1 ? "#cbd5e1" : "#64748b",
               display: "flex",
               alignItems: "center",
               gap: "8px",
@@ -394,8 +380,8 @@ const AdminSerialNumber = () => {
             <i className="fa-solid fa-chevron-left"></i> Previous
           </button>
 
-          <div className="pagination-info" style={{ fontSize: "14px", color: "#64748b" }}>
-            <span className="current-page-text" style={{ fontWeight: "600", color: "#0f172a" }}>{currentPage}</span>
+          <div className="pagination-info" style={{ fontSize: "14px" }}>
+            <span className="current-page-text" style={{ fontWeight: "600" }}>{currentPage}</span>
             <span className="total-pages-text"> of {Math.ceil(
               serial_numbers.filter(i => filterType === "All" || i.serial_type === filterType).length / 16
             ) || 1}</span>
@@ -408,10 +394,6 @@ const AdminSerialNumber = () => {
             )}
             onClick={() => setCurrentPage(prev => prev + 1)}
             style={{
-              border: "none",
-              background: "transparent",
-              cursor: currentPage >= Math.ceil(serial_numbers.length / 10) ? "not-allowed" : "pointer",
-              color: currentPage >= Math.ceil(serial_numbers.length / 10) ? "#cbd5e1" : "#64748b",
               display: "flex",
               alignItems: "center",
               gap: "8px",
@@ -424,104 +406,212 @@ const AdminSerialNumber = () => {
       </div>
 
       {/* ================= MODAL ================= */}
-{showViewModal && selectedSerial && (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <div className="modal-title">Serial Tracking</div>
-      <div className="modal-form">
-        
-        {/* Basic Info Section */}
-        <div style={{ marginBottom: "15px", fontSize: "14px", lineHeight: "1.6" }}>
-          <p><strong>Serial Number:</strong> {selectedSerial.serial_number}</p>
-          <p><strong>Serial Type:</strong> {selectedSerial.serial_type}</p>
-          <p><strong>Requested by:</strong> {selectedSerial.ResponseID || "Not yet taken"}</p>
-          <p><strong>Request Date:</strong> {new Date(selectedSerial.date).toLocaleDateString()}</p>
-        </div>
+      {showViewModal && selectedSerial && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-title">Serial Tracking</div>
+            <div className="modal-form">
 
-        {/* Tracking Status Section */}
-        <div className="hierarchy-section" style={{ borderTop: '1px solid #eee', marginTop: '15px', paddingTop: '15px' }}>
-          <h3 style={{ fontSize: "16px", marginBottom: "10px" }}>Tracking Status</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <div className="hierarchy-card">
-              <span><span style={{ color: "var(--success-color)", marginRight: "10px" }}>●</span>Serial Created</span>
-              <span>{new Date(selectedSerial.date).toLocaleString()}</span>
+              {/* Basic Info Section */}
+              <div style={{ marginBottom: "15px", fontSize: "14px", lineHeight: "1.6" }}>
+                <p><strong>Serial Number:</strong> {selectedSerial.serial_number}</p>
+                <p><strong>Serial Type:</strong> {selectedSerial.serial_type}</p>
+                <p><strong>Requested by:</strong> {selectedSerial.ResponseID || "Not yet taken"}</p>
+                <p><strong>Request Date:</strong> {new Date(selectedSerial.date).toLocaleDateString()}</p>
+              </div>
+
+              {/* Tracking Status Section */}
+              <div className="hierarchy-section" style={{ borderTop: '1px solid #eee', marginTop: '15px', paddingTop: '15px' }}>
+                <h3 style={{ fontSize: "16px", marginBottom: "10px" }}>Tracking Status</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div className="hierarchy-card">
+                    <span><span style={{ color: "var(--success-color)", marginRight: "10px" }}>●</span>Serial Created</span>
+                    <span>{new Date(selectedSerial.date).toLocaleString()}</span>
+                  </div>
+                  <div className="hierarchy-card">
+                    <span><span style={{ color: selectedSerial.is_issued ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>Serial Confirm</span>
+                    <span className={`status-badge ${selectedSerial.is_issued ? 'active' : 'inactive'}`}>
+                      {selectedSerial.is_issued ? "Confirmed" : "In Progress"}
+                    </span>
+                  </div>
+                  <div className="hierarchy-card">
+                    <span><span style={{ color: selectedSerial.ResponseID ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>Serial Issued</span>
+                    <span className={`status-badge ${selectedSerial.ResponseID ? 'active' : 'inactive'}`}>
+                      {selectedSerial.ResponseID ? "Completed" : "Pending"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* --- NEW: ATTACHED DOCUMENTS SECTION (NON-VIEWABLE) --- */}
+              <div className="file-info-section" style={{ borderTop: '1px solid #eee', marginTop: '15px', paddingTop: '15px' }}>
+                <h3 style={{ fontSize: "16px", marginBottom: "10px" }}>Attached Documents</h3>
+                {selectedSerial.file_name ? (
+                  <div className="hierarchy-card" style={{ backgroundColor: '#f9f9f9', cursor: 'not-allowed' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <span style={{ fontWeight: 'bold', fontSize: '13px' }}>
+                        📄 {selectedSerial.file_name}
+                      </span>
+                      <span style={{ fontSize: '11px', color: '#666' }}>
+                        Type: {selectedSerial.file_type || 'Unknown'} | Added: {new Date(selectedSerial.file_added_date || selectedSerial.date).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '11px', color: '#d9534f', fontStyle: 'italic' }}>
+                      View Restricted
+                    </span>
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '13px', color: '#999', textAlign: 'center', padding: '10px' }}>
+                    No files uploaded for this serial.
+                  </div>
+                )}
+              </div>
+              {/* ----------------------------------------------------- */}
+
             </div>
-            <div className="hierarchy-card">
-              <span><span style={{ color: selectedSerial.is_issued ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>Serial Confirm</span>
-              <span className={`status-badge ${selectedSerial.is_issued ? 'active' : 'inactive'}`}>
-                {selectedSerial.is_issued ? "Confirmed" : "In Progress"}
-              </span>
-            </div>
-            <div className="hierarchy-card">
-              <span><span style={{ color: selectedSerial.ResponseID ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>Serial Issued</span>
-              <span className={`status-badge ${selectedSerial.ResponseID ? 'active' : 'inactive'}`}>
-                {selectedSerial.ResponseID ? "Completed" : "Pending"}
-              </span>
+
+            <div className="modal-buttons">
+              <button className="modal-close" onClick={() => setShowViewModal(false)}>
+                Close
+              </button>
             </div>
           </div>
         </div>
-
-        {/* --- NEW: ATTACHED DOCUMENTS SECTION (NON-VIEWABLE) --- */}
-        <div className="file-info-section" style={{ borderTop: '1px solid #eee', marginTop: '15px', paddingTop: '15px' }}>
-          <h3 style={{ fontSize: "16px", marginBottom: "10px" }}>Attached Documents</h3>
-          {selectedSerial.file_name ? (
-            <div className="hierarchy-card" style={{ backgroundColor: '#f9f9f9', cursor: 'not-allowed' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <span style={{ fontWeight: 'bold', fontSize: '13px' }}>
-                  📄 {selectedSerial.file_name}
-                </span>
-                <span style={{ fontSize: '11px', color: '#666' }}>
-                  Type: {selectedSerial.file_type || 'Unknown'} | Added: {new Date(selectedSerial.file_added_date || selectedSerial.date).toLocaleDateString()}
-                </span>
-              </div>
-              <span style={{ fontSize: '11px', color: '#d9534f', fontStyle: 'italic' }}>
-                View Restricted
-              </span>
-            </div>
-          ) : (
-            <div style={{ fontSize: '13px', color: '#999', textAlign: 'center', padding: '10px' }}>
-              No files uploaded for this serial.
-            </div>
-          )}
-        </div>
-        {/* ----------------------------------------------------- */}
-
-      </div>
-
-      <div className="modal-buttons">
-        <button className="modal-close" onClick={() => setShowViewModal(false)}>
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      )}
       {showImportModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-title">Import CSV</div>
-            <div className="modal-form">
+        <div className="modal-overlay" style={{
+          position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
+          backgroundColor: "rgba(0, 0, 0, 0.45)", display: "flex",
+          justifyContent: "center", alignItems: "center", zIndex: 1000
+        }}>
+          <div className="modal-content" style={{
+            background: darkMode ? "#1e293b" : "#fff", borderRadius: "8px", width: "100%", maxWidth: "600px", minHeight: "350px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)", overflow: "visible", display: "flex", flexDirection: "column",
+            border: darkMode ? "1px solid #334155" : "none"
+          }}>
+            <div className="modal-title" style={{
+              padding: "20px 24px", borderBottom: darkMode ? "1px solid #334155" : "1px solid #e2e8f0",
+              fontSize: "20px", fontWeight: "700", color: darkMode ? "#f8fafc" : "#003266", margin: 0,
+              borderTopLeftRadius: "8px", borderTopRightRadius: "8px",
+              backgroundColor: darkMode ? "#0f172a" : "transparent"
+            }}>
+              Import CSV
+            </div>
 
-
+            <div className="modal-form" style={{ padding: "24px", flexGrow: 1, display: "flex", flexDirection: "column", overflow: "visible" }}>
               <input
                 type="file"
                 accept=".csv"
                 onChange={(e) => setSelectedFile(e.target.files[0])}
-              />  
-                          <label>Serial Type</label>
-            <select
-              value={serial_type}
-              onChange={(e) => setserial_type(e.target.value)}
-              className="file-type-select"
-            >
-              <option value="Default">Default</option>
-              <option value="Allianz Well">Allianz Well</option>
-            </select>
+                style={{
+                  display: "block", width: "100%", padding: "8px",
+                  border: darkMode ? "1px solid #334155" : "1px solid #cbd5e1", borderRadius: "8px",
+                  fontSize: "14px", color: darkMode ? "#f8fafc" : "#334155", marginBottom: "16px",
+                  boxSizing: "border-box", backgroundColor: darkMode ? "#0f172a" : "#fff"
+                }}
+              />
+              <label style={{
+                display: "block", fontSize: "11px", fontWeight: "600",
+                color: darkMode ? "#94a3b8" : "#64748b", textTransform: "uppercase", marginBottom: "6px"
+              }}>
+                Serial Type
+              </label>
+
+              <div
+                style={{ position: "relative" }}
+                tabIndex={0}
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget)) {
+                    setIsDropdownOpen(false);
+                  }
+                }}
+              >
+                <div
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    width: "100%", padding: "10px",
+                    border: isDropdownOpen ? (darkMode ? "1px solid #475569" : "1px solid #cbd5e1") : (darkMode ? "1px solid #334155" : "1px solid #cbd5e1"),
+                    borderRadius: isDropdownOpen ? "8px 8px 0 0" : "8px",
+                    fontSize: "14px", color: darkMode ? "#f8fafc" : "#003266", boxSizing: "border-box",
+                    backgroundColor: darkMode ? "#0f172a" : "#fff", cursor: "pointer",
+                    boxShadow: isDropdownOpen ? "0 0 0 1px rgba(0, 0, 0, 0.05)" : "none",
+                    transition: "all 0.2s",
+                    fontWeight: "500"
+                  }}
+                >
+                  {serial_type || "Select Type"}
+                  <i
+                    className={`fa-solid fa-chevron-${isDropdownOpen ? 'up' : 'down'}`}
+                    style={{ color: darkMode ? '#94a3b8' : '#003266', fontSize: '12px', transition: "transform 0.2s" }}
+                  ></i>
+                </div>
+                {isDropdownOpen && (
+                  <div className="custom-scrollbar-hide" style={{
+                    position: "absolute", top: "100%", left: 0, width: "100%",
+                    marginTop: "-1px", backgroundColor: darkMode ? "#1e293b" : "#fff",
+                    border: darkMode ? "1px solid #334155" : "1px solid #cbd5e1", borderRadius: "0 0 8px 8px",
+                    boxShadow: darkMode ? "0 4px 12px rgba(0, 0, 0, 0.5)" : "0 4px 12px rgba(0, 0, 0, 0.1)",
+                    zIndex: 2000, overflowY: "auto", overflowX: "hidden", maxHeight: "150px",
+                    scrollbarWidth: "none", msOverflowStyle: "none"
+                  }}>
+                    {["Default", "Allianz Well"].map((type) => (
+                      <div
+                        key={type}
+                        onClick={() => {
+                          setserial_type(type);
+                          setIsDropdownOpen(false);
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = type === serial_type
+                            ? (darkMode ? '#3b82f6' : '#002244')
+                            : (darkMode ? '#334155' : '#f8fafc');
+                          e.target.style.color = type === serial_type
+                            ? '#ffffff'
+                            : (darkMode ? '#f8fafc' : '#003266');
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = type === serial_type
+                            ? (darkMode ? '#2563eb' : '#003266')
+                            : (darkMode ? '#1e293b' : '#ffffff');
+                          e.target.style.color = type === serial_type
+                            ? '#ffffff'
+                            : (darkMode ? '#cbd5e1' : '#334155');
+                        }}
+                        style={{
+                          padding: "12px 14px", cursor: "pointer", fontSize: "14px",
+                          color: type === serial_type ? "#ffffff" : (darkMode ? "#cbd5e1" : "#334155"),
+                          backgroundColor: type === serial_type ? (darkMode ? "#2563eb" : "#003266") : (darkMode ? "#1e293b" : "#ffffff"),
+                          fontWeight: type === serial_type ? "600" : "400",
+                          borderBottom: darkMode ? "1px solid #334155" : "1px solid #e2e8f0",
+                          transition: "background-color 0.2s, color 0.2s"
+                        }}
+                      >
+                        {type}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="modal-buttons">
+
+            <div className="modal-buttons" style={{
+              padding: "16px 24px", borderTop: darkMode ? "1px solid #334155" : "1px solid #e2e8f0",
+              display: "flex", justifyContent: "flex-end", gap: "12px",
+              borderBottomLeftRadius: "8px", borderBottomRightRadius: "8px",
+              backgroundColor: darkMode ? "#0f172a" : "#f8fafc"
+            }}>
               <button
                 className="modal-close"
-                onClick={() => setShowImportModal(false)}
+                onClick={() => {
+                  setShowImportModal(false);
+                  setIsDropdownOpen(false);
+                }}
+                style={{
+                  padding: "8px 16px", borderRadius: "8px", border: darkMode ? "1px solid #475569" : "1px solid #e2e8f0",
+                  backgroundColor: darkMode ? "#1e293b" : "#fff", color: darkMode ? "#cbd5e1" : "#475569", fontSize: "14px",
+                  fontWeight: "500", cursor: "pointer"
+                }}
               >
                 Cancel
               </button>
@@ -529,12 +619,17 @@ const AdminSerialNumber = () => {
                 className="modal-submit"
                 onClick={handleSubmit}
                 disabled={uploading}
+                style={{
+                  padding: "8px 24px", borderRadius: "8px", border: "none",
+                  backgroundColor: darkMode ? "#2563eb" : "#003266", color: "#fff", fontSize: "14px",
+                  fontWeight: "600", cursor: uploading ? "not-allowed" : "pointer",
+                  opacity: uploading ? 0.7 : 1
+                }}
               >
                 {uploading ? "Uploading..." : "Submit"}
               </button>
             </div>
           </div>
-
         </div>
       )}
     </div>

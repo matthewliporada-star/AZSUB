@@ -52,6 +52,35 @@
   margin-bottom: 8px;
 }
 
+/* ================= FILTER CONTROLS ================= */
+.filter-button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  background-color: #f8fafc;
+}
+
+.filter-btn.active {
+  background-color: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+
 .table-header h3 {
   margin: 0;
   font-size: 20px;
@@ -103,8 +132,9 @@
   background-color: #ffffff;
   border: 1px solid #e0e4ec;
   color: #003266;
-  /* Matching your theme blue */
-  width: 40px;
+  width: auto;
+  min-width: 40px;
+  padding: 0 16px;
   height: 40px;
   border-radius: 8px;
   display: flex;
@@ -371,78 +401,101 @@
 
 /* ================= DARK MODE OVERRIDES ================= */
 body.dark-mode .admin-cards-grids {
-  background: #0d1117;
+  background: transparent !important;
 }
 
 body.dark-mode .admin-card {
-  background: #161b22;
-  border: 1px solid #30363d;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }
 
 body.dark-mode .admin-card p {
-  color: #8b949e;
+  color: #94a3b8 !important;
 }
 
 body.dark-mode .admin-card h2 {
-  color: #58a6ff;
+  color: #f8fafc !important;
 }
 
 body.dark-mode .admin-card.used {
-  background: linear-gradient(135deg, #1f2937, #111827);
-  border: 1px solid #374151;
+  background: linear-gradient(135deg, #1e293b, #0f172a) !important;
+  border: 1px solid #334155 !important;
 }
 
 body.dark-mode .admin-card.used h2,
 body.dark-mode .admin-card.used p {
-  color: #e5e7eb;
+  color: #f8fafc !important;
 }
 
+/* TABLE STYLES */
 body.dark-mode .serial-table {
-  background: #161b22;
-  box-shadow: none;
+  background: #1e293b !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
 }
 
+/* Ensure table headers render dark blue or dark slate instead of clashing */
+body.dark-mode .admin-user-table th,
 body.dark-mode .serial-table th {
-  background: #21262d;
-  color: #c9d1d9;
-  border-color: #30363d;
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+  border-bottom: 2px solid #3b82f6 !important;
 }
 
+body.dark-mode .user-table td,
 body.dark-mode .serial-table td {
-  color: #c9d1d9;
-  border-color: #30363d;
+  color: #cbd5e1 !important;
+  border-color: #334155 !important;
 }
 
-body.dark-mode .serial-table tbody tr:nth-child(even) {
-  background: #0d1117;
+body.dark-mode .serial-table tbody tr:nth-child(even),
+body.dark-mode .user-table tbody tr:nth-child(even) {
+  background: #1e293b !important;
 }
 
-body.dark-mode .serial-table tbody tr:hover {
-  background: #21262d;
+body.dark-mode .serial-table tbody tr:nth-child(odd),
+body.dark-mode .user-table tbody tr:nth-child(odd) {
+  background: #0f172a !important;
+}
+
+body.dark-mode .serial-table tbody tr:hover,
+body.dark-mode .user-table tbody tr:hover {
+  background: #334155 !important;
 }
 
 body.dark-mode .table-header h3 {
-  color: #c9d1d9;
+  color: #f8fafc !important;
 }
 
+/* PAGINATION */
 body.dark-mode .pagination-arrow-btn {
-  background: #21262d;
-  border-color: #30363d;
-  color: #c9d1d9;
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
 }
 
 body.dark-mode .pagination-arrow-btn:hover:not(:disabled) {
-  background: #30363d;
-  border-color: #58a6ff;
+  background: #334155 !important;
+  border-color: #475569 !important;
+}
+
+body.dark-mode .pagination-arrow-btn:disabled {
+  background: #0f172a !important;
+  color: #475569 !important;
+  border-color: #1e293b !important;
+}
+
+body.dark-mode .pagination-info {
+  color: #94a3b8 !important;
 }
 
 body.dark-mode .current-page-text {
-  color: #58a6ff;
+  color: #f8fafc !important;
 }
 
 body.dark-mode .total-pages-text {
-  color: #8b949e;
+  color: #94a3b8 !important;
 }
 
 body.dark-mode .modal {
@@ -465,6 +518,24 @@ body.dark-mode .modal select {
 body.dark-mode .cancel-btn {
   background: #21262d;
   color: #c9d1d9;
+}
+
+/* Filter Buttons Dark Mode */
+body.dark-mode .filter-btn {
+  background-color: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+
+body.dark-mode .filter-btn:hover {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+
+body.dark-mode .filter-btn.active {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
 }
 
 /* ===== TYPE BADGE DARK MODE ===== */

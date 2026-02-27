@@ -241,6 +241,61 @@
     color: #ff4b4b !important;
 }
 
+/* Fix CSS specificity overrides breaking Dark Mode legibility in TopBar */
+body.dark-mode .admin-layout .top-bar-content .profile-dropdown {
+    background-color: #1e293b !important;
+}
+
+body.dark-mode .admin-layout .top-bar-content .dropdown-item {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .admin-layout .top-bar-content .dropdown-item:hover {
+    background-color: #334155 !important;
+}
+
+body.dark-mode .admin-layout .top-bar-content .logout-item:hover {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+}
+
+/* === ENHANCED ADMIN LAYOUT DARK MODE (Sidebar, TopBar, Body) === */
+body.dark-mode .admin-layout {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .admin-layout .sidebar {
+    background: #1e293b !important;
+    border-right: 1px solid #334155 !important;
+}
+
+body.dark-mode .admin-layout .top-bar {
+    background: #1e293b !important;
+    border-bottom: 1px solid #334155 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .admin-layout .sidebar-item {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .admin-layout .sidebar-item:hover,
+body.dark-mode .admin-layout .sidebar-item.active {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .admin-layout .sidebar-toggle {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .admin-layout .sidebar-toggle:hover {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
 
 .admin-layout .top-bar-logo {
     font-size: 20px;
