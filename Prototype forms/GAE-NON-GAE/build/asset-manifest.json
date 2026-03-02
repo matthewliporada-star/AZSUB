@@ -1,0 +1,27 @@
+{
+  "files": {
+    "main.css": "/static/css/main.e095a628.css",
+    "main.js": "/static/js/main.35c6d3ef.js",
+    "static/js/453.089c2475.chunk.js": "/static/js/453.089c2475.chunk.js",
+    "static/media/Axiforma-Italic.ttf": "/static/media/Axiforma-Italic.d91acd2ec61b6bb9e21d.ttf",
+    "static/media/Axiforma-Medium.ttf": "/static/media/Axiforma-Medium.230a759003b2789cc0d1.ttf",
+    "static/media/Axiforma-Regular.ttf": "/static/media/Axiforma-Regular.c4f8a961a15e460f3a71.ttf",
+    "static/media/Axiforma-SemiBold.ttf": "/static/media/Axiforma-SemiBold.30aeae716e18207a63ec.ttf",
+    "static/media/Axiforma-Bold.ttf": "/static/media/Axiforma-Bold.179a245385b803119e63.ttf",
+    "static/media/Axiforma-Light.ttf": "/static/media/Axiforma-Light.fe89ffb1a89f5ea2b030.ttf",
+    "static/media/Axiforma-Italic.woff2": "/static/media/Axiforma-Italic.d601f3e8843303c880b9.woff2",
+    "static/media/Axiforma-SemiBold.woff2": "/static/media/Axiforma-SemiBold.bbe982e4b1ac79a12716.woff2",
+    "static/media/Axiforma-Bold.woff2": "/static/media/Axiforma-Bold.a3329a3314dd825fab49.woff2",
+    "static/media/Axiforma-Medium.woff2": "/static/media/Axiforma-Medium.1470f64529db935191c3.woff2",
+    "static/media/Axiforma-Regular.woff2": "/static/media/Axiforma-Regular.7f1cf476b4119c8b770e.woff2",
+    "static/media/Axiforma-Light.woff2": "/static/media/Axiforma-Light.2eda7463cbabc440bf97.woff2",
+    "index.html": "/index.html",
+    "main.e095a628.css.map": "/static/css/main.e095a628.css.map",
+    "main.35c6d3ef.js.map": "/static/js/main.35c6d3ef.js.map",
+    "453.089c2475.chunk.js.map": "/static/js/453.089c2475.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e095a628.css",
+    "static/js/main.35c6d3ef.js"
+  ]
+}

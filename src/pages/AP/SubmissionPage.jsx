@@ -480,6 +480,69 @@ const SubmissionPage = () => {
                     )}
                 </div>
 
+                {/* --- FILL APPLICATION FORM BUTTON --- */}
+                {formData.formType && (
+                    <div style={{
+                        marginTop: '24px',
+                        padding: '20px',
+                        background: darkMode
+                            ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1))'
+                            : 'linear-gradient(135deg, #eff6ff, #eef2ff)',
+                        borderRadius: '12px',
+                        border: `1px solid ${darkMode ? 'rgba(99, 102, 241, 0.2)' : '#c7d2fe'}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: '16px'
+                    }}>
+                        <div>
+                            <h4 style={{
+                                margin: '0 0 4px 0',
+                                fontSize: '15px',
+                                fontWeight: '700',
+                                color: darkMode ? '#e2e8f0' : '#1e3a5f'
+                            }}>
+                                📝 Fill Application Form
+                            </h4>
+                            <p style={{
+                                margin: 0,
+                                fontSize: '13px',
+                                color: darkMode ? '#94a3b8' : '#64748b'
+                            }}>
+                                {formData.formType === 'IHP'
+                                    ? 'Open the IHP Application Form to fill out and generate a PDF.'
+                                    : `Open the GAE / NON-GAE Application Form to fill out and generate a PDF.`
+                                }
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => window.open(`/application-form/${formData.formType}`, '_blank')}
+                            style={{
+                                padding: '12px 28px',
+                                background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '10px',
+                                fontWeight: '700',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                transition: 'all 0.3s ease',
+                                boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.3)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                whiteSpace: 'nowrap'
+                            }}
+                            onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 10px 15px -3px rgba(59, 130, 246, 0.4)'; }}
+                            onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 4px 6px -1px rgba(59, 130, 246, 0.3)'; }}
+                        >
+                            {formData.formType === 'IHP' ? '📋 Open IHP Form' : '📋 Open GAE / NON-GAE Form'}
+                        </button>
+                    </div>
+                )}
+
                 {/* --- MEDICAL SECTION --- */}
                 {showMedicalSection && (
                     <div className="medical-section" style={{ marginTop: '24px' }}>
@@ -675,6 +738,7 @@ const SubmissionPage = () => {
                     </div>
                 </div>
             )}
+
         </div>
     );
 };

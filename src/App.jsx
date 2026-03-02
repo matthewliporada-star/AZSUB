@@ -14,6 +14,7 @@ import ClientsPage from './pages/AP/ClientsPage';
 import SubmissionPage from './pages/AP/SubmissionPage';
 import SerialHistoryPage from './pages/AP/SerialHistoryPage';
 import DocHistoryPage from './pages/AP/DocHistoryPage';
+import FormPage from './pages/AP/forms/FormPage';
 
 // Admin Pages
 import AdminDashboard from './pages/Admin/Admin-Dashboard';
@@ -54,6 +55,9 @@ function App() {
           <Route path="/ap/submission" element={<MainLayout><SubmissionPage /></MainLayout>} />
           <Route path="/ap/serial-history" element={<MainLayout><SerialHistoryPage /></MainLayout>} />
           <Route path="/ap/doc-history" element={<MainLayout><DocHistoryPage /></MainLayout>} />
+
+          {/* Standalone Application Form Route */}
+          <Route path="/application-form/:formType" element={<FormPage />} />
 
           {/* Admin Routes */}
           {/* Admin Routes */}

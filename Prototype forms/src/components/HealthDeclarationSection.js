@@ -1,0 +1,1145 @@
+import React from "react";
+
+const HealthDeclarationSection = ({
+  formData,
+  dependents,
+  healthQuestions,
+  additionalConditions,
+  onHealthChange,
+  onHealthQuestionChange,
+  onAdditionalConditionChange,
+  onAddCondition,
+  onRemoveCondition,
+  onDependentHealthChange,
+  illnessOptions,
+}) => {
+  return (
+    <>
+      <PreExistingConditionsBlock
+        acknowledged={formData.preExistingConditionsAcknowledged}
+        onChange={(v) => onHealthChange("preExistingConditionsAcknowledged", v)}
+      />
+
+      <ImportantNotice />
+
+      {/* BASIC HEALTH MEASUREMENTS - MOVED TO TOP */}
+      <BasicHealthMeasurements
+        formData={formData}
+        dependents={dependents}
+        onHealthChange={onHealthChange}
+        onDependentHealthChange={onDependentHealthChange}
+      />
+
+      {/* LIFESTYLE QUESTIONS - MOVED TO MIDDLE */}
+      <LifestyleQuestions
+        formData={formData}
+        dependents={dependents}
+        onHealthChange={onHealthChange}
+        onDependentHealthChange={onDependentHealthChange}
+      />
+
+      {/* TABLES - MOVED TO BOTTOM */}
+      <IllnessTable
+        illnessOptions={illnessOptions}
+        healthQuestions={healthQuestions}
+        onChange={onHealthQuestionChange}
+      />
+
+      <AdditionalQuestionsTable
+        healthQuestions={healthQuestions}
+        onChange={onHealthQuestionChange}
+      />
+
+      <Questions3456Table
+        healthQuestions={healthQuestions}
+        onChange={onHealthQuestionChange}
+      />
+
+      <AdditionalInfoBlock
+        healthQuestions={healthQuestions}
+        dependents={dependents}
+        onChange={onHealthQuestionChange}
+      />
+
+      <AdditionalConditionsTable
+        conditions={additionalConditions}
+        onChange={onAdditionalConditionChange}
+        onAdd={onAddCondition}
+        onRemove={onRemoveCondition}
+      />
+    </>
+  );
+};
+
+// BASIC HEALTH MEASUREMENTS COMPONENT
+const BasicHealthMeasurements = ({
+  formData,
+  dependents,
+  onHealthChange,
+  onDependentHealthChange,
+}) => (
+  <div
+    style={{
+      marginTop: "30px",
+      padding: "20px",
+      border: "2px solid #395998",
+      borderRadius: "8px",
+      backgroundColor: "#f8f9fa",
+    }}
+  >
+    <h4 style={{ color: "#395998", marginBottom: "15px" }}>
+      Basic Health Measurements
+    </h4>
+
+    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <HealthMeasurementCard
+        title="Applicant Owner / Proposed Insured"
+        data={formData.healthDeclaration}
+        onChange={(field, value) =>
+          onHealthChange(`healthDeclaration.${field}`, value)
+        }
+      />
+
+      {dependents.map((dep, index) => (
+        <HealthMeasurementCard
+          key={dep.id}
+          title={`Dependent ${index + 1}`}
+          data={dep.healthDeclaration}
+          onChange={(field, value) =>
+            onDependentHealthChange(index, `healthDeclaration.${field}`, value)
+          }
+        />
+      ))}
+    </div>
+  </div>
+);
+
+const HealthMeasurementCard = ({ title, data, onChange }) => (
+  <div
+    style={{
+      padding: "15px",
+      border: "1px solid #e5e7eb",
+      borderRadius: "8px",
+      backgroundColor: "white",
+    }}
+  >
+    <h5 style={{ color: "#395998", marginBottom: "10px" }}>{title}</h5>
+
+    <div className="form-grid">
+      <div className="form-group">
+        <label>Height (feet/meters)</label>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <input
+            type="number"
+            step="0.01"
+            value={data.heightFeet}
+            onChange={(e) => onChange("heightFeet", e.target.value)}
+            placeholder="ft"
+            style={{ flex: 1 }}
+          />
+          <input
+            type="number"
+            step="0.01"
+            value={data.heightMeters}
+            onChange={(e) => onChange("heightMeters", e.target.value)}
+            placeholder="m"
+            style={{ flex: 1 }}
+          />
+        </div>
+      </div>
+      <div className="form-group">
+        <label>Weight (kg/lbs)</label>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <input
+            type="number"
+            step="0.1"
+            value={data.weightKg}
+            onChange={(e) => onChange("weightKg", e.target.value)}
+            placeholder="kg"
+            style={{ flex: 1 }}
+          />
+          <input
+            type="number"
+            step="0.1"
+            value={data.weightLbs}
+            onChange={(e) => onChange("weightLbs", e.target.value)}
+            placeholder="lbs"
+            style={{ flex: 1 }}
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// LIFESTYLE QUESTIONS COMPONENT
+const LifestyleQuestions = ({
+  formData,
+  dependents,
+  onHealthChange,
+  onDependentHealthChange,
+}) => (
+  <div
+    style={{
+      marginTop: "30px",
+      padding: "20px",
+      border: "2px solid #395998",
+      borderRadius: "8px",
+      backgroundColor: "#f8f9fa",
+    }}
+  >
+    <h4 style={{ color: "#395998", marginBottom: "15px" }}>
+      Lifestyle Questions
+    </h4>
+
+    {/* Applicant Lifestyle */}
+    <div
+      style={{
+        marginBottom: "30px",
+        padding: "15px",
+        border: "1px solid #e5e7eb",
+        borderRadius: "8px",
+        backgroundColor: "white",
+      }}
+    >
+      <h5 style={{ color: "#395998", marginBottom: "15px" }}>
+        Applicant Owner / Proposed Insured
+      </h5>
+
+      {/* Smoke/Vape */}
+      <div style={{ marginBottom: "20px" }}>
+        <p>
+          <strong>Do you smoke cigarettes or vape?</strong>
+        </p>
+        <div style={{ display: "flex", gap: "20px", marginBottom: "10px" }}>
+          <label>
+            <input
+              type="radio"
+              name="smokeVape"
+              checked={formData.healthDeclaration.smokeVape === true}
+              onChange={() =>
+                onHealthChange("healthDeclaration.smokeVape", true)
+              }
+            />{" "}
+            Yes
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="smokeVape"
+              checked={formData.healthDeclaration.smokeVape === false}
+              onChange={() =>
+                onHealthChange("healthDeclaration.smokeVape", false)
+              }
+            />{" "}
+            No
+          </label>
+        </div>
+        {formData.healthDeclaration.smokeVape && (
+          <div style={{ marginLeft: "20px" }}>
+            <label>If yes, no. of sticks/ml. per day: </label>
+            <input
+              type="text"
+              value={formData.healthDeclaration.smokeQuantity}
+              onChange={(e) =>
+                onHealthChange(
+                  "healthDeclaration.smokeQuantity",
+                  e.target.value,
+                )
+              }
+              placeholder="Sticks/ml per day"
+              style={{ marginLeft: "10px", padding: "5px", width: "200px" }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Alcohol */}
+      <div style={{ marginBottom: "20px" }}>
+        <p>
+          <strong>Do you drink alcohol?</strong>
+        </p>
+        <div style={{ display: "flex", gap: "20px", marginBottom: "10px" }}>
+          <label>
+            <input
+              type="radio"
+              name="alcohol"
+              checked={formData.healthDeclaration.alcohol === true}
+              onChange={() => onHealthChange("healthDeclaration.alcohol", true)}
+            />{" "}
+            Yes
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="alcohol"
+              checked={formData.healthDeclaration.alcohol === false}
+              onChange={() =>
+                onHealthChange("healthDeclaration.alcohol", false)
+              }
+            />{" "}
+            No
+          </label>
+        </div>
+        {formData.healthDeclaration.alcohol && (
+          <div style={{ marginLeft: "20px" }}>
+            <label>If yes, no. of bottles/glass per day: </label>
+            <input
+              type="text"
+              value={formData.healthDeclaration.alcoholQuantity}
+              onChange={(e) =>
+                onHealthChange(
+                  "healthDeclaration.alcoholQuantity",
+                  e.target.value,
+                )
+              }
+              placeholder="Bottles/glasses per day"
+              style={{ marginLeft: "10px", padding: "5px", width: "200px" }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Glasses/Contacts */}
+      <div style={{ marginBottom: "20px" }}>
+        <p>
+          <strong>Do you wear glasses or contacts?</strong>
+        </p>
+        <div style={{ display: "flex", gap: "20px", marginBottom: "10px" }}>
+          <label>
+            <input
+              type="radio"
+              name="glassesContacts"
+              checked={formData.healthDeclaration.glassesContacts === true}
+              onChange={() =>
+                onHealthChange("healthDeclaration.glassesContacts", true)
+              }
+            />{" "}
+            Yes
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="glassesContacts"
+              checked={formData.healthDeclaration.glassesContacts === false}
+              onChange={() =>
+                onHealthChange("healthDeclaration.glassesContacts", false)
+              }
+            />{" "}
+            No
+          </label>
+        </div>
+        {formData.healthDeclaration.glassesContacts && (
+          <div style={{ marginLeft: "20px" }}>
+            <label>If yes, eye grade: </label>
+            <input
+              type="text"
+              value={formData.healthDeclaration.eyeGrade}
+              onChange={(e) =>
+                onHealthChange("healthDeclaration.eyeGrade", e.target.value)
+              }
+              placeholder="Eye grade"
+              style={{ marginLeft: "10px", padding: "5px", width: "200px" }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+
+    {/* Dependents Lifestyle */}
+    {dependents.map((dep, index) => (
+      <div
+        key={dep.id}
+        style={{
+          marginBottom: "30px",
+          padding: "15px",
+          border: "1px solid #e5e7eb",
+          borderRadius: "8px",
+          backgroundColor: "white",
+        }}
+      >
+        <h5 style={{ color: "#395998", marginBottom: "15px" }}>
+          Dependent {index + 1}
+        </h5>
+
+        {/* Smoke/Vape */}
+        <div style={{ marginBottom: "20px" }}>
+          <p>
+            <strong>Do you smoke cigarettes or vape?</strong>
+          </p>
+          <div style={{ display: "flex", gap: "20px", marginBottom: "10px" }}>
+            <label>
+              <input
+                type="radio"
+                name={`smokeVape-${index}`}
+                checked={dep.healthDeclaration.smokeVape === true}
+                onChange={() =>
+                  onDependentHealthChange(
+                    index,
+                    "healthDeclaration.smokeVape",
+                    true,
+                  )
+                }
+              />{" "}
+              Yes
+            </label>
+            <label>
+              <input
+                type="radio"
+                name={`smokeVape-${index}`}
+                checked={dep.healthDeclaration.smokeVape === false}
+                onChange={() =>
+                  onDependentHealthChange(
+                    index,
+                    "healthDeclaration.smokeVape",
+                    false,
+                  )
+                }
+              />{" "}
+              No
+            </label>
+          </div>
+          {dep.healthDeclaration.smokeVape && (
+            <div style={{ marginLeft: "20px" }}>
+              <label>If yes, no. of sticks/ml. per day: </label>
+              <input
+                type="text"
+                value={dep.healthDeclaration.smokeQuantity}
+                onChange={(e) =>
+                  onDependentHealthChange(
+                    index,
+                    "healthDeclaration.smokeQuantity",
+                    e.target.value,
+                  )
+                }
+                placeholder="Sticks/ml per day"
+                style={{ marginLeft: "10px", padding: "5px", width: "200px" }}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Alcohol */}
+        <div style={{ marginBottom: "20px" }}>
+          <p>
+            <strong>Do you drink alcohol?</strong>
+          </p>
+          <div style={{ display: "flex", gap: "20px", marginBottom: "10px" }}>
+            <label>
+              <input
+                type="radio"
+                name={`alcohol-${index}`}
+                checked={dep.healthDeclaration.alcohol === true}
+                onChange={() =>
+                  onDependentHealthChange(
+                    index,
+                    "healthDeclaration.alcohol",
+                    true,
+                  )
+                }
+              />{" "}
+              Yes
+            </label>
+            <label>
+              <input
+                type="radio"
+                name={`alcohol-${index}`}
+                checked={dep.healthDeclaration.alcohol === false}
+                onChange={() =>
+                  onDependentHealthChange(
+                    index,
+                    "healthDeclaration.alcohol",
+                    false,
+                  )
+                }
+              />{" "}
+              No
+            </label>
+          </div>
+          {dep.healthDeclaration.alcohol && (
+            <div style={{ marginLeft: "20px" }}>
+              <label>If yes, no. of bottles/glass per day: </label>
+              <input
+                type="text"
+                value={dep.healthDeclaration.alcoholQuantity}
+                onChange={(e) =>
+                  onDependentHealthChange(
+                    index,
+                    "healthDeclaration.alcoholQuantity",
+                    e.target.value,
+                  )
+                }
+                placeholder="Bottles/glasses per day"
+                style={{ marginLeft: "10px", padding: "5px", width: "200px" }}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Glasses/Contacts */}
+        <div style={{ marginBottom: "20px" }}>
+          <p>
+            <strong>Do you wear glasses or contacts?</strong>
+          </p>
+          <div style={{ display: "flex", gap: "20px", marginBottom: "10px" }}>
+            <label>
+              <input
+                type="radio"
+                name={`glasses-${index}`}
+                checked={dep.healthDeclaration.glassesContacts === true}
+                onChange={() =>
+                  onDependentHealthChange(
+                    index,
+                    "healthDeclaration.glassesContacts",
+                    true,
+                  )
+                }
+              />{" "}
+              Yes
+            </label>
+            <label>
+              <input
+                type="radio"
+                name={`glasses-${index}`}
+                checked={dep.healthDeclaration.glassesContacts === false}
+                onChange={() =>
+                  onDependentHealthChange(
+                    index,
+                    "healthDeclaration.glassesContacts",
+                    false,
+                  )
+                }
+              />{" "}
+              No
+            </label>
+          </div>
+          {dep.healthDeclaration.glassesContacts && (
+            <div style={{ marginLeft: "20px" }}>
+              <label>If yes, eye grade: </label>
+              <input
+                type="text"
+                value={dep.healthDeclaration.eyeGrade}
+                onChange={(e) =>
+                  onDependentHealthChange(
+                    index,
+                    "healthDeclaration.eyeGrade",
+                    e.target.value,
+                  )
+                }
+                placeholder="Eye grade"
+                style={{ marginLeft: "10px", padding: "5px", width: "200px" }}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+// PRE-EXISTING CONDITIONS BLOCK
+const PreExistingConditionsBlock = ({ acknowledged, onChange }) => (
+  <div
+    style={{
+      marginBottom: "20px",
+      padding: "15px",
+      backgroundColor: "#e8f4fd",
+      borderRadius: "5px",
+      borderLeft: "4px solid #003266",
+    }}
+  >
+    <h4 style={{ color: "#003266", marginTop: 0 }}>PRE-EXISTING CONDITIONS</h4>
+    <p>
+      Pre-existing conditions are medical conditions or any related conditions
+      for which one or more symptoms have been displayed at some point during
+      the Insured's lifetime...
+    </p>
+    <div style={{ marginTop: "15px" }}>
+      <label style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <input
+          type="checkbox"
+          checked={acknowledged}
+          onChange={(e) => onChange(e.target.checked)}
+          required
+        />
+        <span>
+          I acknowledge that I have read and understood the pre-existing
+          conditions statement above.
+        </span>
+      </label>
+    </div>
+  </div>
+);
+
+const ImportantNotice = () => (
+  <div
+    style={{
+      marginBottom: "20px",
+      padding: "15px",
+      backgroundColor: "#fff3cd",
+      borderRadius: "5px",
+    }}
+  >
+    <p>
+      <strong>Important:</strong> Please answer the following questions on the
+      basis of your own and your dependents' complete medical history...
+    </p>
+  </div>
+);
+
+// TABLES (KEPT AT THE BOTTOM)
+const IllnessTable = ({ illnessOptions, healthQuestions, onChange }) => (
+  <div style={{ marginTop: "30px" }}>
+    <p>
+      <strong>
+        1. Have you ever suffered from or ever had the following illnesses or
+        diseases?
+      </strong>
+    </p>
+    <div style={{ overflowX: "auto", marginTop: "15px" }}>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          border: "1px solid #ddd",
+        }}
+      >
+        <thead>
+          <tr style={{ backgroundColor: "#f5f5f5" }}>
+            <th
+              style={{
+                padding: "12px",
+                textAlign: "left",
+                border: "1px solid #ddd",
+                width: "60%",
+              }}
+            >
+              Illness/Disease
+            </th>
+            <th
+              style={{
+                padding: "12px",
+                textAlign: "center",
+                border: "1px solid #ddd",
+              }}
+            >
+              Applicant
+            </th>
+            <th
+              style={{
+                padding: "12px",
+                textAlign: "center",
+                border: "1px solid #ddd",
+              }}
+            >
+              Dependent 1
+            </th>
+            <th
+              style={{
+                padding: "12px",
+                textAlign: "center",
+                border: "1px solid #ddd",
+              }}
+            >
+              Dependent 2
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {illnessOptions.map((illness, index) => (
+            <tr
+              key={illness.key}
+              style={{ backgroundColor: index % 2 === 0 ? "#fff" : "#f9f9f9" }}
+            >
+              <td style={{ padding: "10px 12px", border: "1px solid #ddd" }}>
+                {illness.label}
+              </td>
+              <td
+                style={{
+                  padding: "10px",
+                  textAlign: "center",
+                  border: "1px solid #ddd",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={healthQuestions.applicantOwner.q1[illness.key]}
+                  onChange={(e) =>
+                    onChange(
+                      "applicantOwner",
+                      "q1",
+                      illness.key,
+                      e.target.checked,
+                    )
+                  }
+                />
+              </td>
+              <td
+                style={{
+                  padding: "10px",
+                  textAlign: "center",
+                  border: "1px solid #ddd",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={healthQuestions.dependent1.q1[illness.key]}
+                  onChange={(e) =>
+                    onChange("dependent1", "q1", illness.key, e.target.checked)
+                  }
+                />
+              </td>
+              <td
+                style={{
+                  padding: "10px",
+                  textAlign: "center",
+                  border: "1px solid #ddd",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={healthQuestions.dependent2.q1[illness.key]}
+                  onChange={(e) =>
+                    onChange("dependent2", "q1", illness.key, e.target.checked)
+                  }
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
+
+const AdditionalQuestionsTable = ({ healthQuestions, onChange }) => (
+  <div style={{ marginTop: "30px" }}>
+    <p>
+      <strong>2. Have you ever:</strong>
+    </p>
+    <table
+      style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        border: "1px solid #ddd",
+      }}
+    >
+      <thead>
+        <tr style={{ backgroundColor: "#f5f5f5" }}>
+          <th
+            style={{
+              padding: "12px",
+              textAlign: "left",
+              border: "1px solid #ddd",
+            }}
+          >
+            Question
+          </th>
+          <th
+            style={{
+              padding: "12px",
+              textAlign: "center",
+              border: "1px solid #ddd",
+            }}
+          >
+            Applicant
+          </th>
+          <th
+            style={{
+              padding: "12px",
+              textAlign: "center",
+              border: "1px solid #ddd",
+            }}
+          >
+            Dependent 1
+          </th>
+          <th
+            style={{
+              padding: "12px",
+              textAlign: "center",
+              border: "1px solid #ddd",
+            }}
+          >
+            Dependent 2
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {[
+          {
+            key: "a",
+            label:
+              "been tested for HIV, Hepatitis A-B-C or currently awaiting the results of such a test?",
+          },
+          {
+            key: "b",
+            label:
+              "been admitted to a hospital or undergone surgery during the last ten (10) years?",
+          },
+          {
+            key: "c",
+            label:
+              "been incapacitated or unable to work for a period of more than 2 continuous weeks due to any symptom(s) or medical condition(s)?",
+          },
+        ].map((q, index) => (
+          <tr
+            key={q.key}
+            style={{ backgroundColor: index % 2 === 0 ? "#fff" : "#f9f9f9" }}
+          >
+            <td style={{ padding: "10px 12px", border: "1px solid #ddd" }}>
+              {q.label}
+            </td>
+            <td
+              style={{
+                padding: "10px",
+                textAlign: "center",
+                border: "1px solid #ddd",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={healthQuestions.applicantOwner.q2[q.key]}
+                onChange={(e) =>
+                  onChange("applicantOwner", "q2", q.key, e.target.checked)
+                }
+              />
+            </td>
+            <td
+              style={{
+                padding: "10px",
+                textAlign: "center",
+                border: "1px solid #ddd",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={healthQuestions.dependent1.q2[q.key]}
+                onChange={(e) =>
+                  onChange("dependent1", "q2", q.key, e.target.checked)
+                }
+              />
+            </td>
+            <td
+              style={{
+                padding: "10px",
+                textAlign: "center",
+                border: "1px solid #ddd",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={healthQuestions.dependent2.q2[q.key]}
+                onChange={(e) =>
+                  onChange("dependent2", "q2", q.key, e.target.checked)
+                }
+              />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+const Questions3456Table = ({ healthQuestions, onChange }) => (
+  <div style={{ marginTop: "30px" }}>
+    <table
+      style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        border: "1px solid #ddd",
+      }}
+    >
+      <thead>
+        <tr style={{ backgroundColor: "#f5f5f5" }}>
+          <th
+            style={{
+              padding: "12px",
+              textAlign: "left",
+              border: "1px solid #ddd",
+              width: "60%",
+            }}
+          >
+            Question
+          </th>
+          <th
+            style={{
+              padding: "12px",
+              textAlign: "center",
+              border: "1px solid #ddd",
+            }}
+          >
+            Applicant
+          </th>
+          <th
+            style={{
+              padding: "12px",
+              textAlign: "center",
+              border: "1px solid #ddd",
+            }}
+          >
+            Dependent 1
+          </th>
+          <th
+            style={{
+              padding: "12px",
+              textAlign: "center",
+              border: "1px solid #ddd",
+            }}
+          >
+            Dependent 2
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {[3, 4, 5, 6].map((num, index) => (
+          <tr
+            key={num}
+            style={{ backgroundColor: index % 2 === 0 ? "#fff" : "#f9f9f9" }}
+          >
+            <td style={{ padding: "10px 12px", border: "1px solid #ddd" }}>
+              <strong>{num}. </strong>
+              {getQuestionText(num)}
+            </td>
+            <td
+              style={{
+                padding: "10px",
+                textAlign: "center",
+                border: "1px solid #ddd",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={healthQuestions.applicantOwner[`q${num}`]}
+                onChange={(e) =>
+                  onChange("applicantOwner", `q${num}`, null, e.target.checked)
+                }
+              />
+            </td>
+            <td
+              style={{
+                padding: "10px",
+                textAlign: "center",
+                border: "1px solid #ddd",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={healthQuestions.dependent1[`q${num}`]}
+                onChange={(e) =>
+                  onChange("dependent1", `q${num}`, null, e.target.checked)
+                }
+              />
+            </td>
+            <td
+              style={{
+                padding: "10px",
+                textAlign: "center",
+                border: "1px solid #ddd",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={healthQuestions.dependent2[`q${num}`]}
+                onChange={(e) =>
+                  onChange("dependent2", `q${num}`, null, e.target.checked)
+                }
+              />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+const getQuestionText = (num) => {
+  const texts = {
+    3: "Are you taking any prescribed medication, any other medical treatment or is under the care of a medical specialist?",
+    4: "Have you undergone any medical tests or investigations, or awaiting results, treatment or further tests/investigations due to any symptom or medical conditions?",
+    5: "Do you have any other illnesses, medical condition or symptom(s) not mentioned above? If yes, please include details of any known or suspected issues whether or not medical advice has been sought or a diagnosis reached.",
+    6: "Has any of your applications ever been postponed, declined or accepted on special terms by any Insurance Company or Health Maintenance Organization (HMO)?",
+  };
+  return texts[num];
+};
+
+const AdditionalInfoBlock = ({ healthQuestions, dependents, onChange }) => (
+  <div style={{ marginTop: "30px" }}>
+    <h4 style={{ color: "#395998", marginBottom: "15px" }}>
+      Additional Information
+    </h4>
+    <p style={{ marginBottom: "15px" }}>
+      If you checked any boxes above, please provide details below:
+    </p>
+
+    <div className="form-group" style={{ marginBottom: "15px" }}>
+      <label>For Applicant Owner:</label>
+      <textarea
+        value={healthQuestions.applicantOwner.additionalInfo}
+        onChange={(e) =>
+          onChange("applicantOwner", "additionalInfo", null, e.target.value)
+        }
+        rows={3}
+        style={{ width: "100%", padding: "10px" }}
+      />
+    </div>
+
+    {dependents.length > 0 && (
+      <div className="form-group" style={{ marginBottom: "15px" }}>
+        <label>For Dependent 1:</label>
+        <textarea
+          value={healthQuestions.dependent1.additionalInfo}
+          onChange={(e) =>
+            onChange("dependent1", "additionalInfo", null, e.target.value)
+          }
+          rows={3}
+          style={{ width: "100%", padding: "10px" }}
+        />
+      </div>
+    )}
+
+    {dependents.length > 1 && (
+      <div className="form-group">
+        <label>For Dependent 2:</label>
+        <textarea
+          value={healthQuestions.dependent2.additionalInfo}
+          onChange={(e) =>
+            onChange("dependent2", "additionalInfo", null, e.target.value)
+          }
+          rows={3}
+          style={{ width: "100%", padding: "10px" }}
+        />
+      </div>
+    )}
+  </div>
+);
+
+const AdditionalConditionsTable = ({
+  conditions,
+  onChange,
+  onAdd,
+  onRemove,
+}) => (
+  <div
+    style={{
+      marginTop: "30px",
+      paddingTop: "20px",
+      borderTop: "2px solid #395998",
+    }}
+  >
+    <h4 style={{ color: "#395998", marginBottom: "15px" }}>
+      Additional Conditions
+    </h4>
+
+    {conditions.map((condition, index) => (
+      <div
+        key={index}
+        style={{
+          marginBottom: "20px",
+          padding: "15px",
+          border: "1px solid #e5e7eb",
+          borderRadius: "8px",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "10px",
+          }}
+        >
+          <h5>Condition {index + 1}</h5>
+          {conditions.length > 1 && (
+            <button
+              type="button"
+              onClick={() => onRemove(index)}
+              style={{
+                background: "#dc3545",
+                color: "white",
+                padding: "4px 8px",
+                fontSize: "12px",
+              }}
+            >
+              Remove
+            </button>
+          )}
+        </div>
+
+        <div className="form-grid">
+          <FormInput
+            label="Question No."
+            value={condition.questionNo}
+            onChange={(v) => onChange(index, "questionNo", v)}
+          />
+          <FormInput
+            label="Name of Person"
+            value={condition.nameOfPerson}
+            onChange={(v) => onChange(index, "nameOfPerson", v)}
+          />
+          <FormInput
+            label="Diagnosis"
+            value={condition.diagnosis}
+            onChange={(v) => onChange(index, "diagnosis", v)}
+          />
+        </div>
+
+        <div className="form-grid">
+          <FormInput
+            label="Date of Onset"
+            value={condition.dateOfOnset}
+            onChange={(v) => onChange(index, "dateOfOnset", v)}
+          />
+          <FormInput
+            label="Frequency/Severity"
+            value={condition.frequencySeverity}
+            onChange={(v) => onChange(index, "frequencySeverity", v)}
+          />
+          <FormInput
+            label="Medical Test Results"
+            value={condition.medicalTestResults}
+            onChange={(v) => onChange(index, "medicalTestResults", v)}
+          />
+        </div>
+
+        <div className="form-grid">
+          <FormInput
+            label="Treatment"
+            value={condition.treatment}
+            onChange={(v) => onChange(index, "treatment", v)}
+          />
+          <FormInput
+            label="Current Status"
+            value={condition.currentStatus}
+            onChange={(v) => onChange(index, "currentStatus", v)}
+          />
+        </div>
+      </div>
+    ))}
+
+    <button
+      type="button"
+      onClick={onAdd}
+      style={{
+        background: "#395998",
+        color: "white",
+        padding: "8px 16px",
+        marginTop: "10px",
+      }}
+    >
+      + Add Condition
+    </button>
+  </div>
+);
+
+const FormInput = ({ label, value, onChange }) => (
+  <div className="form-group">
+    <label>{label}</label>
+    <input
+      type="text"
+      value={value || ""}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  </div>
+);
+
+export default HealthDeclarationSection;

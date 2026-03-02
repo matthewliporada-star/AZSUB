@@ -1,0 +1,817 @@
+/* ===================== FONT FACE DEFINITION ===================== */
+@font-face {
+  font-family: 'Axiforma';
+  src: url('./fonts/Axiforma-Light.woff2') format('woff2'),
+    url('./fonts/Axiforma-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Axiforma';
+  src: url('./fonts/Axiforma-Regular.woff2') format('woff2'),
+    url('./fonts/Axiforma-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Axiforma';
+  src: url('./fonts/Axiforma-Medium.woff2') format('woff2'),
+    url('./fonts/Axiforma-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Axiforma';
+  src: url('./fonts/Axiforma-SemiBold.woff2') format('woff2'),
+    url('./fonts/Axiforma-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Axiforma';
+  src: url('./fonts/Axiforma-Bold.woff2') format('woff2'),
+    url('./fonts/Axiforma-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Axiforma';
+  src: url('./fonts/Axiforma-Italic.woff2') format('woff2'),
+    url('./fonts/Axiforma-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ===================== FULL-SCREEN MODAL OVERLAY ===================== */
+.form-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: formModalFadeIn 0.3s ease;
+}
+
+@keyframes formModalFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.form-modal-container {
+  width: 100vw;
+  height: 100vh;
+  background: #f8fafc;
+  border-radius: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: none;
+}
+
+.form-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #003266 0%, #2d4e91 100%);
+  color: white;
+  flex-shrink: 0;
+}
+
+.form-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: white !important;
+}
+
+.form-modal-close-btn {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: white !important;
+  padding: 8px 20px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  transition: all 0.2s !important;
+  min-width: auto !important;
+}
+
+.form-modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.form-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+/* ===================== SCOPED FORM STYLES ===================== */
+/* Fixed light-theme colors to prevent dark mode adaptation */
+.prototype-form-scope {
+  font-family: 'Axiforma', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f8fafc !important;
+  color: #333333 !important;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.prototype-form-scope * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  color: #333333 !important;
+  /* Force dark text for EVERYTHING by default */
+}
+
+/* APP CONTAINER & MAIN LAYOUT */
+.prototype-form-scope .app-container {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%);
+}
+
+.prototype-form-scope .main-content {
+  flex: 1;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* FORM SELECTOR - hidden in integrated mode */
+.prototype-form-scope .form-selector {
+  display: none;
+}
+
+/* BIG CARD STYLES */
+.prototype-form-scope .big-card {
+  background: white;
+  width: 100%;
+  max-width: 980px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.prototype-form-scope .big-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+.prototype-form-scope .big-card-header {
+  background: linear-gradient(135deg, #003266 0%, #2d4e91 50%, #003266 100%);
+  color: white;
+  padding: 32px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.prototype-form-scope .big-card-header h2 {
+  margin: 0 0 12px 0;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+.prototype-form-scope .big-card-header p {
+  margin: 0;
+  opacity: 0.95;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+  color: white !important;
+  /* Header text SHOULD be white */
+}
+
+.prototype-form-scope .big-card-body {
+  padding: 36px 40px;
+}
+
+/* INNER CARD STYLES */
+.prototype-form-scope .inner-card {
+  background: #ffffff;
+  padding: 28px;
+  border-radius: 14px;
+  margin-bottom: 28px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.prototype-form-scope .inner-card:last-child {
+  margin-bottom: 0;
+}
+
+.prototype-form-scope .inner-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  border-color: #d1d5db;
+}
+
+.prototype-form-scope .section-title {
+  margin: 0 0 24px 0;
+  font-size: 18px;
+  color: #003266 !important;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding-bottom: 16px;
+  border-bottom: 3px solid #e5e7eb;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.prototype-form-scope .section-title::before {
+  content: '';
+  width: 8px;
+  height: 24px;
+  background: linear-gradient(135deg, #003266, #2d4e91);
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* FORM GRID SYSTEM */
+.prototype-form-scope .form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.prototype-form-scope .form-grid:last-child {
+  margin-bottom: 0;
+}
+
+.prototype-form-scope .form-grid.two-column {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.prototype-form-scope .form-grid.three-column {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* FORM GROUP STYLES */
+.prototype-form-scope .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+  background: transparent !important;
+  /* Prevent parent background override */
+}
+
+.prototype-form-scope .form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.prototype-form-scope .form-group label {
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 14.5px;
+  color: #374151 !important;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.1px;
+}
+
+.prototype-form-scope .form-group label .required {
+  color: #dc3545;
+  font-weight: 700;
+  margin-left: 2px;
+  font-size: 16px;
+}
+
+/* FORM INPUTS */
+.prototype-form-scope input,
+.prototype-form-scope select,
+.prototype-form-scope textarea {
+  font-family: inherit;
+  padding: 14px 16px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 400;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+  width: 100%;
+  line-height: 1.5;
+  background-color: white;
+  color: #333333;
+}
+
+.prototype-form-scope input:focus,
+.prototype-form-scope select:focus,
+.prototype-form-scope textarea:focus {
+  outline: none;
+  border-color: #003266;
+  box-shadow: 0 0 0 4px rgba(0, 50, 102, 0.1);
+  background-color: white;
+}
+
+.prototype-form-scope input:hover,
+.prototype-form-scope select:hover,
+.prototype-form-scope textarea:hover {
+  border-color: #9ca3af;
+}
+
+.prototype-form-scope input::placeholder,
+.prototype-form-scope select::placeholder,
+.prototype-form-scope textarea::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.prototype-form-scope input:disabled,
+.prototype-form-scope select:disabled,
+.prototype-form-scope textarea:disabled {
+  background-color: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* TEXTAREA */
+.prototype-form-scope textarea {
+  resize: vertical;
+  line-height: 1.6;
+  min-height: 120px;
+  max-height: 300px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+/* SELECT */
+.prototype-form-scope select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23374151' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 18px;
+  padding-right: 48px;
+  height: 48px;
+  cursor: pointer;
+  background-color: white;
+}
+
+/* CHECKBOX & RADIO */
+.prototype-form-scope input[type="checkbox"],
+.prototype-form-scope input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+  accent-color: #003266;
+  padding: 0;
+}
+
+.prototype-form-scope .checkbox-group,
+.prototype-form-scope .radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+}
+
+.prototype-form-scope .checkbox-group label,
+.prototype-form-scope .radio-group label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* BUTTON STYLES */
+.prototype-form-scope .btn-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 2px solid #e5e7eb;
+  flex-wrap: wrap;
+}
+
+.prototype-form-scope .btn-group.center {
+  justify-content: center;
+}
+
+.prototype-form-scope button {
+  font-family: inherit;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.3px;
+  line-height: 1.4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 140px;
+  position: relative;
+  overflow: hidden;
+}
+
+.prototype-form-scope button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.prototype-form-scope button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.prototype-form-scope button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+
+/* Explicit overrides for nested spans or elements that might inherit light colors */
+.prototype-form-scope span,
+.prototype-form-scope label,
+.prototype-form-scope strong,
+.prototype-form-scope b,
+.prototype-form-scope i,
+.prototype-form-scope div:not(.big-card-header) {
+  color: inherit !important;
+}
+
+.prototype-form-scope .big-card-header * {
+  color: white !important;
+}
+
+.prototype-form-scope .btn-primary {
+  background: linear-gradient(135deg, #003266 0%, #2d4e91 100%);
+  color: white;
+  border: 1px solid #003266;
+}
+
+.prototype-form-scope .btn-primary:hover {
+  background: linear-gradient(135deg, #002855 0%, #264080 100%);
+  box-shadow: 0 8px 20px rgba(0, 50, 102, 0.25);
+}
+
+.prototype-form-scope .btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.prototype-form-scope .btn-secondary:hover {
+  background: #e5e7eb;
+  color: #1f2937;
+}
+
+.prototype-form-scope .btn-success {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: 1px solid #28a745;
+}
+
+.prototype-form-scope .btn-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #e35d6a 100%);
+  color: white;
+  border: 1px solid #dc3545;
+}
+
+.prototype-form-scope .btn-warning {
+  background: linear-gradient(135deg, #ffc107 0%, #ffd54f 100%);
+  color: #212529;
+  border: 1px solid #ffc107;
+}
+
+/* DECLARATION ITEMS */
+.prototype-form-scope .declaration-item {
+  margin-bottom: 18px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 10px;
+  border-left: 4px solid #003266;
+  font-size: 14.5px;
+  line-height: 1.6;
+  transition: all 0.3s ease;
+}
+
+.prototype-form-scope .declaration-item:hover {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  transform: translateX(4px);
+}
+
+.prototype-form-scope .declaration-item label {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+  font-weight: 500;
+  margin: 0;
+  gap: 14px;
+  line-height: 1.6;
+  color: #374151;
+  user-select: none;
+}
+
+.prototype-form-scope .declaration-item input[type="checkbox"] {
+  margin-top: 3px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* NOTICE & ALERT BOXES */
+.prototype-form-scope .notice-box {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border: 2px solid #ffc107;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin: 20px 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #856404;
+}
+
+.prototype-form-scope .alert-box {
+  padding: 18px 22px;
+  border-radius: 10px;
+  margin: 16px 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.prototype-form-scope .alert-box.info {
+  background: #e3f2fd;
+  color: #0d47a1;
+  border-left: 4px solid #2196f3;
+}
+
+/* TABLE STYLES */
+.prototype-form-scope table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 20px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.prototype-form-scope th {
+  background: linear-gradient(135deg, #003266 0%, #2d4e91 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 16px 20px;
+  text-align: left;
+}
+
+.prototype-form-scope td {
+  padding: 16px 20px;
+  font-size: 14.5px;
+  color: #374151;
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.prototype-form-scope tr:last-child td {
+  border-bottom: none;
+}
+
+.prototype-form-scope tr:hover td {
+  background-color: #f9fafb;
+}
+
+/* HEADINGS */
+.prototype-form-scope h1,
+.prototype-form-scope h3,
+.prototype-form-scope h4,
+.prototype-form-scope h5,
+.prototype-form-scope h6 {
+  font-weight: 600;
+  line-height: 1.3;
+  color: #003266 !important;
+  margin-bottom: 16px;
+}
+
+.prototype-form-scope h1 {
+  font-size: 28px;
+}
+
+.prototype-form-scope h3 {
+  font-size: 20px;
+}
+
+.prototype-form-scope h4 {
+  font-size: 18px;
+  margin: 24px 0 16px 0;
+  color: #374151 !important;
+}
+
+.prototype-form-scope h5 {
+  font-size: 16px;
+  margin: 20px 0 12px 0;
+  color: #4b5563 !important;
+}
+
+.prototype-form-scope p {
+  margin-bottom: 16px;
+  line-height: 1.6;
+  color: #4b5563 !important;
+}
+
+.prototype-form-scope p:last-child {
+  margin-bottom: 0;
+}
+
+/* LISTS */
+.prototype-form-scope ol,
+.prototype-form-scope ul {
+  margin: 16px 0 20px 24px;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.prototype-form-scope ol li,
+.prototype-form-scope ul li {
+  margin-bottom: 10px;
+  font-size: 14.5px;
+  color: #4b5563;
+  padding-left: 8px;
+}
+
+/* LOADING */
+.prototype-form-scope .loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(0, 50, 102, 0.1);
+  border-radius: 50%;
+  border-top-color: #003266;
+  animation: formSpin 1s ease-in-out infinite;
+}
+
+@keyframes formSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* SCROLLBAR */
+.prototype-form-scope ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.prototype-form-scope ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+.prototype-form-scope ::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #003266 0%, #2d4e91 100%);
+  border-radius: 8px;
+  border: 2px solid #f1f1f1;
+}
+
+/* RESPONSIVE - Desktop & Large Screens */
+@media (min-width: 1025px) {
+  .form-modal-container {
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    border-radius: 0;
+  }
+}
+
+/* RESPONSIVE - iPad & Tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .form-modal-container {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  .prototype-form-scope .big-card {
+    max-width: 100%;
+  }
+
+  .prototype-form-scope .form-grid.three-column {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* RESPONSIVE - Mobile & Small Tablets */
+@media (max-width: 768px) {
+  .prototype-form-scope .big-card-header {
+    padding: 24px;
+  }
+
+  .prototype-form-scope .big-card-header h2 {
+    font-size: 20px;
+  }
+
+  .prototype-form-scope .big-card-body {
+    padding: 20px;
+  }
+
+  .prototype-form-scope .inner-card {
+    padding: 16px;
+  }
+
+  .prototype-form-scope .form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  .prototype-form-scope .btn-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .prototype-form-scope button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .form-modal-container {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  /* Table responsiveness on small screens */
+  .prototype-form-scope table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
