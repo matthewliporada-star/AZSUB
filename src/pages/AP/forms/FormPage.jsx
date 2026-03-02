@@ -45,7 +45,9 @@ const FormPage = () => {
                 </div>
                 <div className="form-modal-body" style={{ flex: 1, padding: '20px' }}>
                     <div className="prototype-form-scope">
-                        {renderForm()}
+                        <div className="main-content">
+                            {renderForm()}
+                        </div>
                     </div>
                 </div>
             </div>

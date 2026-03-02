@@ -190,6 +190,7 @@
   overflow: hidden;
   border: 1px solid #e5e7eb;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin: 0 auto;
 }
 
 .prototype-form-scope .big-card:hover {
