@@ -39,7 +39,7 @@
   border-bottom: 1px solid #d1d5db;
 }
 
-.header-content {
+.box-header-group {
   display: flex;
   align-items: center;
   gap: 10px;

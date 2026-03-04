@@ -197,11 +197,11 @@ const AdminDashboard = () => {
         <div className="dashboard-right-col">
           <div className="box-card animate-spring delay-4">
             <div className="box-header">
-              <div className="header-content">
+              <div className="box-header-group">
                 <h2 className="box-title">Activity Log</h2>
                 <span className="box-badge">Recent</span>
               </div>
-              <button className="box-action-btn">View All</button>
+              <button className="box-action-btn" onClick={() => navigate("/admin/activity-logs")}>View All</button>
             </div>
             <div className="box-body">
               <ActivityLog />

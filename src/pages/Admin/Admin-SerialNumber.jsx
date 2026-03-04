@@ -106,15 +106,29 @@ const AdminSerialNumber = () => {
     setUsedSerials(used || 0);
   };
 
-  /* ================= TABLE ================= */
+  /* ================= TABLE (via Backend API to bypass RLS) ================= */
   const fetchserial_numbers = async () => {
-    const { data, error } = await supabase
-      .from("serial_number")
-      .select("*")
-      .order("date", { ascending: false });
+    try {
+      const response = await fetch('http://localhost:3000/api/admin/serial-numbers');
+      const result = await response.json();
 
-    if (error) console.error(error);
-    else setserial_numbers(data || []);
+      if (result.success) {
+        console.log("Fetched serial numbers from backend:", result.data);
+        setserial_numbers(result.data || []);
+
+        // Also update card counts from backend response
+        if (result.counts) {
+          setTotalUsers(result.counts.total || 0);
+          setUnusedDefault(result.counts.unusedDefault || 0);
+          setUnusedAllianz(result.counts.unusedAllianz || 0);
+          setUsedSerials(result.counts.usedSerials || 0);
+        }
+      } else {
+        console.error("Backend error:", result.message);
+      }
+    } catch (err) {
+      console.error("Error fetching serial numbers from API:", err);
+    }
   };
 
   /* ================= IMPORT ================= */
@@ -271,11 +285,10 @@ const AdminSerialNumber = () => {
           <table className="serial-table" style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid #e2e8f0" }}>
-                <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>#</th>
                 <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Serial Number</th>
                 <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Confirm</th>
                 <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Issued</th>
-                <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Response ID</th>
+                <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Requested By</th>
                 <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Serial Type</th>
                 <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Date</th>
                 <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", fontSize: "13px" }}>Action</th>
@@ -326,11 +339,26 @@ const AdminSerialNumber = () => {
                 return currentRecords.map((item, index) => (
                   <tr key={item.serial_id || index} style={{ borderBottom: "1px solid #f1f5f9" }}>
                     {/* We use firstIndex + index + 1 so that Page 2 starts at 17, 18, etc. */}
-                    <td style={{ padding: "16px 12px", color: "#475569", fontSize: "14px" }}>{firstIndex + index + 1}</td>
                     <td style={{ padding: "16px 12px", color: "#1e293b", fontWeight: "500", fontSize: "14px" }}>{item.serial_number}</td>
-                    <td style={{ padding: "16px 12px", color: "#475569", fontSize: "14px" }}>{item.is_issued ? "Yes" : "-"}</td>
-                    <td style={{ padding: "16px 12px", color: "#475569", fontSize: "14px" }}>{item.Confirm ? "Yes" : "-"}</td>
-                    <td style={{ padding: "16px 12px", color: "#475569", fontSize: "14px" }}>{item.ResponseID || "-"}</td>
+                    <td style={{ padding: "16px 12px", color: "#475569", fontSize: "14px" }}>{(item.is_issued || item.submissionStatus === 'Issued') ? "Yes" : "-"}</td>
+                    <td style={{ padding: "16px 12px", color: "#475569", fontSize: "14px" }}>{(item.Confirm || item.submissionStatus === 'Issued') ? "Yes" : "-"}</td>
+                    <td style={{ padding: "16px 12px", color: "#475569", fontSize: "14px" }}>
+                      {item.issuer ? (
+                        <span
+                          style={{ color: '#2563eb', cursor: 'pointer', fontWeight: '500', textDecoration: 'underline' }}
+                          onClick={() => navigate("/admin/ManageUsers")}
+                        >
+                          {item.issuer.first_name} {item.issuer.last_name}
+                        </span>
+                      ) : item.submissionProfile ? (
+                        <span
+                          style={{ color: '#2563eb', cursor: 'pointer', fontWeight: '500', textDecoration: 'underline' }}
+                          onClick={() => navigate("/admin/ManageUsers")}
+                        >
+                          {item.submissionProfile.first_name} {item.submissionProfile.last_name}
+                        </span>
+                      ) : (item.RequestedBy || item.ResponseID || "-")}
+                    </td>
                     <td style={{ padding: "16px 12px" }}>
                       <span className={`type-badge ${item.serial_type?.replace(/\s+/g, '-').toLowerCase()}`} style={{
                         padding: "4px 10px",
@@ -416,7 +444,13 @@ const AdminSerialNumber = () => {
               <div style={{ marginBottom: "15px", fontSize: "14px", lineHeight: "1.6" }}>
                 <p><strong>Serial Number:</strong> {selectedSerial.serial_number}</p>
                 <p><strong>Serial Type:</strong> {selectedSerial.serial_type}</p>
-                <p><strong>Requested by:</strong> {selectedSerial.ResponseID || "Not yet taken"}</p>
+                <p><strong>Requested by:</strong> {
+                  selectedSerial.issuer ?
+                    `${selectedSerial.issuer.first_name} ${selectedSerial.issuer.last_name}` :
+                    selectedSerial.submissionProfile ?
+                      `${selectedSerial.submissionProfile.first_name} ${selectedSerial.submissionProfile.last_name}` :
+                      (selectedSerial.RequestedBy || selectedSerial.ResponseID || "Not yet taken")
+                }</p>
                 <p><strong>Request Date:</strong> {new Date(selectedSerial.date).toLocaleDateString()}</p>
               </div>
 
@@ -429,15 +463,15 @@ const AdminSerialNumber = () => {
                     <span>{new Date(selectedSerial.date).toLocaleString()}</span>
                   </div>
                   <div className="hierarchy-card">
-                    <span><span style={{ color: selectedSerial.is_issued ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>Serial Confirm</span>
-                    <span className={`status-badge ${selectedSerial.is_issued ? 'active' : 'inactive'}`}>
-                      {selectedSerial.is_issued ? "Confirmed" : "In Progress"}
+                    <span><span style={{ color: (selectedSerial.is_issued || selectedSerial.submissionStatus === 'Issued') ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>Serial Confirm</span>
+                    <span className={`status-badge ${(selectedSerial.is_issued || selectedSerial.submissionStatus === 'Issued') ? 'active' : 'inactive'}`}>
+                      {(selectedSerial.is_issued || selectedSerial.submissionStatus === 'Issued') ? "Confirmed" : "In Progress"}
                     </span>
                   </div>
                   <div className="hierarchy-card">
-                    <span><span style={{ color: selectedSerial.ResponseID ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>Serial Issued</span>
-                    <span className={`status-badge ${selectedSerial.ResponseID ? 'active' : 'inactive'}`}>
-                      {selectedSerial.ResponseID ? "Completed" : "Pending"}
+                    <span><span style={{ color: (selectedSerial.ResponseID || selectedSerial.submissionStatus === 'Issued') ? "var(--success-color)" : "#ccc", marginRight: "10px" }}>●</span>Serial Issued</span>
+                    <span className={`status-badge ${(selectedSerial.ResponseID || selectedSerial.submissionStatus === 'Issued') ? 'active' : 'inactive'}`}>
+                      {(selectedSerial.ResponseID || selectedSerial.submissionStatus === 'Issued') ? "Completed" : "Pending"}
                     </span>
                   </div>
                 </div>

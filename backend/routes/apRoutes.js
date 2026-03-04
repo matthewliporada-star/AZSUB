@@ -154,7 +154,12 @@ router.post('/monitoring/submit', async (req, res) => {
         }
 
         if (isManual && serialId) {
-            await supabase.from('serial_number').update({ is_issued: true }).eq('serial_id', serialId);
+            await supabase.from('serial_number')
+                .update({
+                    is_issued: true,
+                    issued_by: profileId
+                })
+                .eq('serial_id', serialId);
         }
 
         const safePremium = parseFloat(body.premiumPaid) || 0;
@@ -180,7 +185,12 @@ router.post('/monitoring/submit', async (req, res) => {
         if (error) throw error;
 
         if (!isManual && body.serialNumber) {
-            await supabase.from('serial_number').update({ is_issued: true }).eq('serial_number', body.serialNumber);
+            await supabase.from('serial_number')
+                .update({
+                    is_issued: true,
+                    issued_by: profileId
+                })
+                .eq('serial_number', body.serialNumber);
         }
 
         res.status(201).json({ success: true, data: { ...data, serial_number: body.serialNumber } });

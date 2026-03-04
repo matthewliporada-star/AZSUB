@@ -7,6 +7,8 @@ const DocHistoryPage = () => {
     const [statusFilter, setStatusFilter] = useState('All');
     const [searchTerm, setSearchTerm] = useState('');
     const [pendingSearchTerm, setPendingSearchTerm] = useState('');
+    const [expandedCardId, setExpandedCardId] = useState(null);
+    const [confirmModal, setConfirmModal] = useState({ isOpen: false, id: null, status: null });
 
     // --- PAGINATION STATE ---
     const [currentPage, setCurrentPage] = useState(1);
@@ -16,10 +18,13 @@ const DocHistoryPage = () => {
         loadMonitoringData();
     }, []);
 
+    // [UPDATE] Admin check
+    const isAdmin = currentUser?.role?.toLowerCase() === 'admin' || currentUser?.account_type?.toLowerCase() === 'admin';
+
     // Filter Logic
     const submissions = monitoringData.filter(item => {
-        // [UPDATE] Restrict to current user's transactions only
-        if (currentUser?.id && item.profile_id !== currentUser.id) return false;
+        // Restrict to current user's transactions only, unless Admin
+        if (!isAdmin && currentUser?.id && item.profile_id !== currentUser.id) return false;
 
         const hasDocuments = item.form_type;
         const matchesStatus = statusFilter === 'All' || item.status === statusFilter;
@@ -47,16 +52,25 @@ const DocHistoryPage = () => {
         }
     };
 
-    const updateStatus = async (id, newStatus) => {
-        if (!confirm(`Mark this submission as ${newStatus}?`)) return;
+    const executeUpdateStatus = async () => {
+        const { id, status: newStatus } = confirmModal;
+        if (!id) return;
+
+        setConfirmModal({ isOpen: false, id: null, status: null });
+
         try {
+            console.log(`Updating submission ${id} to ${newStatus}`);
             const res = await api.updateSubmissionStatus(id, newStatus);
+
             if (res.success) {
-                alert('Status Updated Successfully! ✓');
-                loadMonitoringData();
+                alert(`Successfully marked as ${newStatus}! ✓`);
+                await loadMonitoringData();
+            } else {
+                alert(`Error: ${res.message || 'Failed to update status'}`);
             }
         } catch (error) {
-            alert('Error updating status');
+            console.error('Update status error:', error);
+            alert('Failed to connect to server. Please try again.');
         }
     };
 
@@ -246,7 +260,13 @@ const DocHistoryPage = () => {
                                         style={{
                                             borderLeft: 'none',
                                             overflow: 'hidden',
-                                            position: 'relative'
+                                            position: 'relative',
+                                            cursor: status === 'Pending' ? 'pointer' : 'default'
+                                        }}
+                                        onClick={() => {
+                                            if (status === 'Pending') {
+                                                setExpandedCardId(expandedCardId === item.id ? null : item.id);
+                                            }
                                         }}
                                         onMouseEnter={(e) => {
                                             e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)';
@@ -428,7 +448,7 @@ const DocHistoryPage = () => {
                                         </div>
 
                                         {/* Action Buttons (Only for Pending) — flat design */}
-                                        {status === 'Pending' && (
+                                        {status === 'Pending' && expandedCardId === item.id && (
                                             <div style={{
                                                 display: 'flex',
                                                 gap: '10px',
@@ -436,7 +456,7 @@ const DocHistoryPage = () => {
                                                 borderTop: `1px solid ${darkMode ? 'rgba(255,255,255,0.06)' : '#f0f0f0'}`
                                             }}>
                                                 <button
-                                                    onClick={() => updateStatus(item.id, 'Issued')}
+                                                    onClick={(e) => { e.stopPropagation(); setConfirmModal({ isOpen: true, id: item.id, status: 'Issued' }); }}
                                                     style={{
                                                         flex: 1,
                                                         padding: '10px 20px',
@@ -464,7 +484,7 @@ const DocHistoryPage = () => {
                                                     Issue Policy
                                                 </button>
                                                 <button
-                                                    onClick={() => updateStatus(item.id, 'Declined')}
+                                                    onClick={(e) => { e.stopPropagation(); setConfirmModal({ isOpen: true, id: item.id, status: 'Declined' }); }}
                                                     style={{
                                                         flex: 1,
                                                         padding: '10px 20px',
@@ -604,6 +624,95 @@ const DocHistoryPage = () => {
                     </>
                 )}
             </div>
+
+            {/* Custom Confirmation Modal */}
+            {confirmModal.isOpen && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    background: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 9999,
+                    animation: 'fadeIn 0.2s ease-out'
+                }} onClick={(e) => { e.stopPropagation(); setConfirmModal({ isOpen: false, id: null, status: null }); }}>
+                    <div style={{
+                        background: darkMode ? '#1e293b' : 'white',
+                        padding: '30px',
+                        borderRadius: '12px',
+                        width: '90%',
+                        maxWidth: '400px',
+                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                        transform: 'translateY(0)',
+                        animation: 'slideUp 0.2s ease-out',
+                        textAlign: 'center'
+                    }} onClick={(e) => e.stopPropagation()}>
+                        <div style={{
+                            width: '48px',
+                            height: '48px',
+                            borderRadius: '50%',
+                            background: confirmModal.status === 'Issued' ? (darkMode ? '#14532d' : '#dcfce7') : (darkMode ? '#7f1d1d' : '#fee2e2'),
+                            color: confirmModal.status === 'Issued' ? '#16a34a' : '#ef4444',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            margin: '0 auto 16px auto'
+                        }}>
+                            {confirmModal.status === 'Issued' ? (
+                                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                            ) : (
+                                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            )}
+                        </div>
+                        <h3 style={{ margin: '0 0 10px 0', color: darkMode ? '#FFFDFE' : '#1e293b', fontSize: '18px' }}>
+                            Confirm Action
+                        </h3>
+                        <p style={{ margin: '0 0 24px 0', color: darkMode ? '#94a3b8' : '#64748b', fontSize: '15px' }}>
+                            Are you sure you want to mark this submission as <strong>{confirmModal.status}</strong>?
+                        </p>
+                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                                onClick={() => setConfirmModal({ isOpen: false, id: null, status: null })}
+                                style={{
+                                    padding: '10px 20px',
+                                    borderRadius: '8px',
+                                    border: darkMode ? '1px solid #475569' : '1px solid #cbd5e1',
+                                    background: darkMode ? '#334155' : 'white',
+                                    color: darkMode ? '#e2e8f0' : '#475569',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    flex: 1
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={executeUpdateStatus}
+                                style={{
+                                    padding: '10px 20px',
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    background: confirmModal.status === 'Issued' ? '#16a34a' : '#ef4444',
+                                    color: 'white',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    flex: 1
+                                }}
+                            >
+                                Yes, Confirm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
