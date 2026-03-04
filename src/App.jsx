@@ -22,6 +22,7 @@ import ManageUsers from './pages/Admin/ManageUsers';
 import AdminSerialNumber from './pages/Admin/Admin-SerialNumber';
 import AdminPolicies from './pages/Admin/Admin-Policies';
 import AdminActivityLogs from './pages/Admin/Admin-ActivityLogs';
+import AdminRecord from './pages/Admin/Admin-Record';
 
 // Common Pages
 import ProfilePage from './pages/Common/ProfilePage';
@@ -56,17 +57,19 @@ function App() {
           <Route path="/ap/serial-history" element={<MainLayout><SerialHistoryPage /></MainLayout>} />
           <Route path="/ap/doc-history" element={<MainLayout><DocHistoryPage /></MainLayout>} />
 
+
           {/* Standalone Application Form Route */}
           <Route path="/application-form/:formType" element={<FormPage />} />
 
-          {/* Admin Routes */}
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={<MainLayout><AdminDashboard /></MainLayout>} />
           <Route path="/admin/ManageUsers" element={<MainLayout><ManageUsers /></MainLayout>} />
           <Route path="/admin/SerialNumber" element={<MainLayout><AdminSerialNumber /></MainLayout>} />
           <Route path="/admin/policies" element={<MainLayout><AdminPolicies /></MainLayout>} />
           <Route path="/admin/activity-logs" element={<MainLayout><AdminActivityLogs /></MainLayout>} />
+          <Route path="/admin/records" element={<MainLayout><AdminRecord /></MainLayout>} />
           <Route path="/profile" element={<ProfileLayout><ProfilePage /></ProfileLayout>} />
+
 
           {/* AL Routes - Same as AP plus Team Performance */}
           <Route path="/al/dashboard" element={<MainLayout><ALDashboard /></MainLayout>} />
