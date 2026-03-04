@@ -7,6 +7,7 @@ const apRoutes = require('./routes/apRoutes');
 const alRoutes = require('./routes/alRoutes');
 const mpRoutes = require('./routes/mpRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,5 +25,6 @@ app.use('/api', apRoutes);
 app.use('/api', alRoutes);
 app.use('/api', mpRoutes);
 app.use('/api', adminRoutes);
+app.use('/api', authRoutes);
 
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

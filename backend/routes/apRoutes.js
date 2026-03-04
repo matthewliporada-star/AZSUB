@@ -5,7 +5,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const { supabase } = require('../config/supabase');
-const { sendGraphEmail, ALLIANZ_HO_EMAIL } = require('../config/graphMailer');
+const { sendGoogleEmail, ALLIANZ_HO_EMAIL } = require('../config/googleMailer');
 const {
     calculateNextPaymentDate,
     uploadFileToSupabase,
@@ -79,17 +79,29 @@ router.post('/monitoring/submit', async (req, res) => {
         const body = req.body;
         console.log(`Processing Submission: ${body.policyType} | Serial: ${body.serialNumber}`);
 
-        const MANUAL_POLICIES = ['Eazy Health', 'Allianz Fundamental Cover', 'Allianz Secure Pro'];
-        const isManual = MANUAL_POLICIES.includes(body.policyType);
-
         let finalPolicyId = null;
-        const { data: exactMatch } = await supabase.from('policy').select('policy_id').eq('policy_type', body.policyType).maybeSingle();
-        if (exactMatch) finalPolicyId = exactMatch.policy_id;
-        else {
-            const { data: all } = await supabase.from('policy').select('policy_id, policy_type');
-            const match = all?.find(p => p.policy_type.trim().toLowerCase() === body.policyType.trim().toLowerCase());
-            if (match) finalPolicyId = match.policy_id;
+        let isManual = false;
+
+        // Fetch policy details to determine ID and if it's manual
+        const { data: policyData } = await supabase
+            .from('policy')
+            .select('policy_id, request_type')
+            .eq('policy_name', body.policyType)
+            .maybeSingle();
+
+        if (policyData) {
+            finalPolicyId = policyData.policy_id;
+            isManual = policyData.request_type?.toLowerCase() === 'manual';
+        } else {
+            // Fallback: try case-insensitive search if exact match fails
+            const { data: all } = await supabase.from('policy').select('policy_id, policy_name, request_type');
+            const match = all?.find(p => p.policy_name.trim().toLowerCase() === body.policyType.trim().toLowerCase());
+            if (match) {
+                finalPolicyId = match.policy_id;
+                isManual = match.request_type?.toLowerCase() === 'manual';
+            }
         }
+
         if (!finalPolicyId) throw new Error(`Policy Type '${body.policyType}' not found.`);
 
         let profileId = body.profileId || null;
@@ -320,7 +332,7 @@ router.post('/form-submissions', upload.any(), async (req, res) => {
         }
 
         try {
-            await sendGraphEmail({
+            await sendGoogleEmail({
                 from: senderEmail || process.env.EMAIL_USER, // Agent's email, fallback to System
                 to: ALLIANZ_HO_EMAIL,
                 subject: `Submission: ${serialNumber} - ${existing.client_name}`,
@@ -457,7 +469,7 @@ router.post('/vsp/send-attestation', async (req, res) => {
         // Agent's email is already selected in STEP 2 (submission.profiles.email)
         const agentEmail = submission.profiles?.email;
 
-        await sendGraphEmail({
+        await sendGoogleEmail({
             from: agentEmail || process.env.EMAIL_USER, // Agent's email, fallback to System
             to: clientEmail,
             cc: submission.profiles?.email,

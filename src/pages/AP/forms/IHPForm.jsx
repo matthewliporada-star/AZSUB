@@ -29,6 +29,7 @@ import {
   INITIAL_FORM_DATA,
   ILLNESS_OPTIONS,
 } from "./constants/formConstants";
+import { MOCK_IHP_DATA } from "./constants/mockIhpData";
 import {
   formatDate,
   getDateParts,
@@ -154,6 +155,14 @@ function IHPForm({ sharedData, updateSharedData }) {
 
   const removeAdditionalCondition = (index) =>
     setAdditionalConditions((prev) => prev.filter((_, i) => i !== index));
+
+  const handleAutoFill = () => {
+    setFormData(MOCK_IHP_DATA.formData);
+    setDependents(MOCK_IHP_DATA.dependents);
+    setHealthQuestions(MOCK_IHP_DATA.healthQuestions);
+    setPolicyInfo(MOCK_IHP_DATA.policyInfo);
+    setAdditionalConditions(MOCK_IHP_DATA.additionalConditions);
+  };
 
   // PDF Testing function
   const testPDFFilling = async () => {
@@ -1359,6 +1368,22 @@ function IHPForm({ sharedData, updateSharedData }) {
         {/* Action Buttons */}
         <div className="btn-group">
           <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={handleAutoFill}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#28a745",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontWeight: "600"
+              }}
+            >
+              Auto Fill
+            </button>
             <TestPDFButton onTest={testPDFFilling} />
             <ResetButton />
           </div>
