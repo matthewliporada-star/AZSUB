@@ -28,6 +28,8 @@ const ManageUsers = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [showResetSuccessModal, setShowResetSuccessModal] = useState(false);
+  const [resetSuccessData, setResetSuccessData] = useState({ user: '', password: '', email: '' });
 
   // -- Form Data --
   const [formData, setFormData] = useState({
@@ -106,6 +108,28 @@ const ManageUsers = () => {
       );
     } catch (err) {
       console.error('Error marking notification as read:', err);
+    }
+  };
+
+  const markAllNotificationsAsRead = async () => {
+    try {
+      // Get all unread notifications
+      const unreadIds = notifications.filter(n => !n.is_read).map(n => n.id);
+      
+      if (unreadIds.length === 0) return;
+
+      // Update all unread notifications
+      await supabase
+        .from('admin_notifications')
+        .update({ is_read: true })
+        .in('id', unreadIds);
+
+      // Update local state
+      setNotifications(prev =>
+        prev.map(n => ({ ...n, is_read: true }))
+      );
+    } catch (err) {
+      console.error('Error marking all notifications as read:', err);
     }
   };
 
@@ -371,11 +395,87 @@ const ManageUsers = () => {
   const handleResetPassword = async (userItem) => {
     if (!userItem.last_name) return;
 
-    const confirmMsg = `Are you sure you want to send a password reset email to ${userItem.first_name} ${userItem.last_name}?\n\nWhen they click the link, their password will be reset to the default format and their account will be activated.`;
+    const confirmMsg = `Are you sure you want to:\n\n1. Reset password to DEFAULT FORMAT\n2. Activate account\n3. Send reset email\n\nUser: ${userItem.first_name} ${userItem.last_name}`;
 
     if (window.confirm(confirmMsg)) {
       try {
-        // Send custom password reset email using Supabase
+        setLoading(true);
+
+        // Call backend to reset password
+        console.log('Calling backend to reset password...');
+        const resetResponse = await fetch('http://localhost:3000/api/admin/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: userItem.id,
+            email: userItem.email,
+            lastName: userItem.last_name
+          })
+        });
+
+        const resetResult = await resetResponse.json();
+        
+        if (!resetResult.success) {
+          throw new Error(resetResult.message || 'Failed to reset password');
+        }
+
+        console.log('✅ Backend reset successful:', resetResult);
+
+        // Step 2: Update status to Active (even if status is already Active, this ensures it)
+        const { error: statusError } = await supabase
+          .from("profiles")
+          .update({ status: "Active" })
+          .eq("id", userItem.id);
+
+        if (statusError) throw statusError;
+        console.log('✅ Status updated to Active');
+
+        // Step 3: Send password reset email
+        const { error: emailError } = await supabase.auth.resetPasswordForEmail(userItem.email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+
+        if (emailError) throw emailError;
+        console.log('✅ Reset email sent');
+
+        // Step 4: Log the activity
+        await logActivity("PASSWORD_RESET", `Password reset to ${resetResult.password}, account activated and email sent to ${userItem.first_name} ${userItem.last_name}`);
+
+        // Step 5: Create admin notification
+        await supabase.from("admin_notifications").insert({
+          user_id: user.id,
+          message: `✅ Account Activated: ${userItem.first_name} ${userItem.last_name} | Password: ${resetResult.password}`,
+          type: 'password_reset',
+          target_user_id: userItem.id,
+          is_read: false
+        });
+
+        setResetSuccessData({
+          user: `${userItem.first_name} ${userItem.last_name}`,
+          password: resetResult.password,
+          email: userItem.email
+        });
+        setShowResetSuccessModal(true);
+        await fetchUsers();
+      } catch (err) {
+        console.error("❌ Error resetting password:", err);
+        alert("Failed to reset password:\n\n" + err.message + "\n\n⚠️ Make sure the backend server is running:\ncd backend && node server.js");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleResendResetEmail = async (userItem) => {
+    if (!userItem.last_name) return;
+
+    const confirmMsg = `Are you sure you want to resend the password reset email to ${userItem.first_name} ${userItem.last_name}?`;
+
+    if (window.confirm(confirmMsg)) {
+      try {
+        setLoading(true);
+
+        // Just resend the password reset email without changing status
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(userItem.email, {
           redirectTo: `${window.location.origin}/reset-password`,
         });
@@ -383,22 +483,24 @@ const ManageUsers = () => {
         if (resetError) throw resetError;
 
         // Log the activity
-        await logActivity("PASSWORD_RESET", `Password reset email sent to ${userItem.first_name} ${userItem.last_name}`);
+        await logActivity("PASSWORD_RESET_RESEND", `Password reset email resent to ${userItem.first_name} ${userItem.last_name}`);
 
         // Create admin notification
         await supabase.from("admin_notifications").insert({
           user_id: user.id,
-          message: `Password reset email sent to ${userItem.first_name} ${userItem.last_name}`,
+          message: `Password reset email resent to ${userItem.first_name} ${userItem.last_name}`,
           type: 'password_reset',
           target_user_id: userItem.id,
           is_read: false
         });
 
-        alert(`Password reset email sent to ${userItem.email}. The user will need to click the link to complete the reset.`);
-        fetchUsers();
+        alert(`Password reset email resent to ${userItem.email}.`);
+        await fetchUsers();
       } catch (err) {
-        console.error("Error sending reset email:", err);
-        alert("Failed to send reset email: " + err.message);
+        console.error("Error resending reset email:", err);
+        alert("Failed to resend email: " + err.message);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -500,11 +602,34 @@ const ManageUsers = () => {
                   alignItems: 'center',
                 }}>
                   <span>Notifications</span>
-                  {unreadNotificationsCount > 0 && (
-                    <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500' }}>
-                      {unreadNotificationsCount} unread
-                    </span>
-                  )}
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    {unreadNotificationsCount > 0 && (
+                      <>
+                        <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500' }}>
+                          {unreadNotificationsCount} unread
+                        </span>
+                        <button
+                          onClick={markAllNotificationsAsRead}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#3b82f6',
+                            cursor: 'pointer',
+                            fontSize: '11px',
+                            fontWeight: '600',
+                            padding: '2px 6px',
+                            textDecoration: 'underline',
+                            transition: 'color 0.2s'
+                          }}
+                          onMouseEnter={(e) => e.target.style.color = '#2563eb'}
+                          onMouseLeave={(e) => e.target.style.color = '#3b82f6'}
+                          title="Mark all notifications as read"
+                        >
+                          Mark All
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
                 {notifications.length === 0 ? (
                   <div style={{ padding: '24px 16px', color: '#6b7280', fontSize: '14px', textAlign: 'center' }}>
@@ -515,29 +640,49 @@ const ManageUsers = () => {
                   notifications.map(notification => (
                     <div
                       key={notification.id}
-                      onClick={() => markNotificationAsRead(notification.id)}
                       style={{
                         padding: '12px 16px',
                         borderBottom: '1px solid #f1f5f9',
-                        cursor: 'pointer',
                         background: notification.is_read ? 'white' : '#eff6ff',
                         transition: 'background 0.2s',
                         display: 'flex',
                         gap: '10px',
                         alignItems: 'flex-start',
+                        justifyContent: 'space-between'
                       }}
                     >
-                      <span style={{
-                        width: '8px', height: '8px', borderRadius: '50%',
-                        background: notification.is_read ? 'transparent' : '#3b82f6',
-                        flexShrink: 0, marginTop: '5px',
-                      }} />
-                      <div>
-                        <div style={{ fontSize: '13px', color: '#1e293b', lineHeight: '1.4' }}>{notification.message}</div>
-                        <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>
-                          {new Date(notification.created_at).toLocaleString()}
+                      <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', flex: 1 }}>
+                        <span style={{
+                          width: '8px', height: '8px', borderRadius: '50%',
+                          background: notification.is_read ? 'transparent' : '#3b82f6',
+                          flexShrink: 0, marginTop: '5px',
+                        }} />
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: '13px', color: '#1e293b', lineHeight: '1.4' }}>{notification.message}</div>
+                          <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>
+                            {new Date(notification.created_at).toLocaleString()}
+                          </div>
                         </div>
                       </div>
+                      {!notification.is_read && (
+                        <button
+                          onClick={() => markNotificationAsRead(notification.id)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#3b82f6',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            padding: '4px 8px',
+                            flexShrink: 0,
+                            marginLeft: '8px'
+                          }}
+                          title="Mark as read"
+                        >
+                          ✓ Mark Read
+                        </button>
+                      )}
                     </div>
                   ))
                 )}
@@ -813,11 +958,292 @@ const ManageUsers = () => {
               </div>
             </div>
             <div className="modal-buttons">
-              <button type="button" className="modal-close" onClick={closeModal}>Close</button>
+              <button 
+                type="button" 
+                className="modal-close" 
+                onClick={closeModal}
+              >
+                Close
+              </button>
+              {selectedUser && selectedUser.status === "Active" && (
+                <button 
+                  type="button" 
+                  className="modal-submit"
+                  onClick={() => handleResendResetEmail(selectedUser)}
+                  style={{ backgroundColor: 'var(--primary-color)' }}
+                  disabled={loading}
+                >
+                  <i className="fa-solid fa-envelope"></i> {loading ? "Sending..." : "Resend Reset Email"}
+                </button>
+              )}
             </div>
           </div>
         </div>
       )}
+
+      {/* Reset Password Success Modal */}
+      {showResetSuccessModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          backdropFilter: 'blur(4px)',
+          animation: 'fadeIn 0.3s ease-out'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '16px',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)',
+            maxWidth: '480px',
+            width: '100%',
+            margin: '20px',
+            overflow: 'hidden',
+            animation: 'slideUp 0.3s ease-out'
+          }}>
+            {/* Header with gradient */}
+            <div style={{
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              padding: '40px 32px',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                width: '64px',
+                height: '64px',
+                background: 'rgba(255, 255, 255, 0.2)',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px',
+                backdropFilter: 'blur(10px)'
+              }}>
+                <i className="fa-solid fa-check" style={{ 
+                  color: '#fff', 
+                  fontSize: '32px'
+                }}></i>
+              </div>
+              <h2 style={{
+                color: '#fff',
+                fontSize: '24px',
+                fontWeight: '800',
+                margin: '0 0 8px 0',
+                letterSpacing: '-0.5px'
+              }}>Password Reset Successful!</h2>
+              <p style={{
+                color: 'rgba(255, 255, 255, 0.9)',
+                fontSize: '14px',
+                margin: 0
+              }}>Account activated and ready to use</p>
+            </div>
+
+            {/* Content */}
+            <div style={{ padding: '32px' }}>
+              {/* User Info */}
+              <div style={{
+                background: '#f0fdf4',
+                border: '1px solid #dcfce7',
+                borderRadius: '12px',
+                padding: '16px',
+                marginBottom: '24px'
+              }}>
+                <div style={{
+                  color: '#6b7280',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  letterSpacing: '0.5px',
+                  textTransform: 'uppercase',
+                  marginBottom: '8px'
+                }}>User Account</div>
+                <div style={{
+                  fontSize: '16px',
+                  fontWeight: '700',
+                  color: '#1f2937'
+                }}>{resetSuccessData.user}</div>
+              </div>
+
+              {/* Status */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '16px',
+                marginBottom: '24px'
+              }}>
+                <div style={{
+                  background: '#eff6ff',
+                  border: '1px solid #bfdbfe',
+                  borderRadius: '12px',
+                  padding: '16px'
+                }}>
+                  <div style={{
+                    color: '#1e40af',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    letterSpacing: '0.5px',
+                    textTransform: 'uppercase',
+                    marginBottom: '8px'
+                  }}>Status</div>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <i className="fa-solid fa-check-circle" style={{
+                      color: '#3b82f6',
+                      fontSize: '16px'
+                    }}></i>
+                    <span style={{
+                      fontSize: '15px',
+                      fontWeight: '700',
+                      color: '#1e40af'
+                    }}>ACTIVE</span>
+                  </div>
+                </div>
+
+                <div style={{
+                  background: '#eff6ff',
+                  border: '1px solid #bfdbfe',
+                  borderRadius: '12px',
+                  padding: '16px'
+                }}>
+                  <div style={{
+                    color: '#1e40af',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    letterSpacing: '0.5px',
+                    textTransform: 'uppercase',
+                    marginBottom: '8px'
+                  }}>Default Password</div>
+                  <div style={{
+                    fontSize: '16px',
+                    fontWeight: '700',
+                    color: '#1e40af',
+                    fontFamily: 'Courier New, monospace',
+                    letterSpacing: '1px'
+                  }}>{resetSuccessData.password}</div>
+                </div>
+              </div>
+
+              {/* Password Box */}
+              <div style={{
+                background: '#f3e8ff',
+                border: '2px solid #d8b4fe',
+                borderRadius: '12px',
+                padding: '20px',
+                marginBottom: '24px'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px'
+                }}>
+                  <i className="fa-solid fa-lightbulb" style={{
+                    color: '#a855f7',
+                    fontSize: '18px',
+                    marginTop: '2px',
+                    flexShrink: 0
+                  }}></i>
+                  <div>
+                    <div style={{
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: '#6b21a8',
+                      marginBottom: '6px'
+                    }}>Quick Start</div>
+                    <ul style={{
+                      fontSize: '13px',
+                      color: '#7e22ce',
+                      margin: 0,
+                      paddingLeft: '20px',
+                      lineHeight: '1.6'
+                    }}>
+                      <li>User can login with the default password above</li>
+                      <li>A reset link was sent to: <strong>{resetSuccessData.email}</strong></li>
+                      <li>User should set a new password on first login</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Email Sent Info */}
+              <div style={{
+                background: '#fef3c7',
+                border: '1px solid #fcd34d',
+                borderRadius: '12px',
+                padding: '12px 16px',
+                marginBottom: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <i className="fa-solid fa-envelope" style={{
+                  color: '#d97706',
+                  fontSize: '16px',
+                  flexShrink: 0
+                }}></i>
+                <div style={{
+                  fontSize: '13px',
+                  color: '#92400e',
+                  fontWeight: '500'
+                }}>Reset email sent to <strong>{resetSuccessData.email}</strong></div>
+              </div>
+
+              {/* Action Button */}
+              <button
+                onClick={() => setShowResetSuccessModal(false)}
+                style={{
+                  width: '100%',
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '14px 20px',
+                  borderRadius: '10px',
+                  fontSize: '15px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                  letterSpacing: '0.3px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+                }}
+              >
+                <i className="fa-solid fa-check" style={{ marginRight: '8px' }}></i>
+                Understood
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 };

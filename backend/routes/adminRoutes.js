@@ -111,9 +111,75 @@ router.patch('/form-submissions/:id/status', async (req, res) => {
 
         res.json({ success: true, message: `Status updated to ${status}` });
     } catch (err) {
-        console.error('Crash in /form-submissions/:id/status:', err);
+        console.error('Error in /form-submissions/:id/status:', err);
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
+});
+
+// Reset User Password - Generate default password and update auth
+router.post('/admin/reset-password', async (req, res) => {
+  try {
+    const { userId, email, lastName } = req.body;
+    
+    // Generate default password
+    const month = String(new Date().getMonth() + 1).padStart(2, '0');
+    const year = String(new Date().getFullYear()).slice(-2);
+    const passwordPrefix = lastName.slice(0, 2);
+    const defaultPassword = `#${passwordPrefix.charAt(0).toUpperCase()}${passwordPrefix.charAt(1).toLowerCase()}${month}${year}`;
+    
+    // Update user password with Supabase admin
+    const { data: updateData, error: updateError } = await supabase.auth.admin.updateUserById(userId, {
+      password: defaultPassword,
+      email_confirm: true,
+    });
+    
+    if (updateError) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Failed to update password: ' + updateError.message 
+      });
+    }
+    
+    // Update user status to Active in profiles table
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .update({ status: 'Active' })
+      .eq('id', userId);
+    
+    if (profileError) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Failed to update profile: ' + profileError.message 
+      });
+    }
+    
+    // Send password reset email with custom password via Supabase
+    const { error: emailError } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${process.env.FRONTEND_URL}/auth/reset-password`,
+      data: {
+        custom_password: defaultPassword
+      }
+    });
+    
+    if (emailError) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Failed to send email: ' + emailError.message 
+      });
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'Password reset email sent',
+      generatedPassword: defaultPassword 
+    });
+    
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      message: error.message 
+    });
+  }
 });
 
 module.exports = router;
