@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import supabase from "../../config/supabaseClient";
 import "./Style/Record.css";
+
 const AdminRecord = () => {
     const navigate = useNavigate();
     const { darkMode } = useApp();
@@ -13,6 +14,7 @@ const AdminRecord = () => {
     const [showModal, setShowModal] = useState(false);
     const [editingRecord, setEditingRecord] = useState(null);
     const [selectedPolicy, setSelectedPolicy] = useState(null);
+    const [viewMode, setViewMode] = useState('active'); // 'active', 'archived', 'all'
     const [formData, setFormData] = useState({
         policy_id: '',
         client_name: '',
@@ -23,7 +25,8 @@ const AdminRecord = () => {
         agency: '',
         date_submitted: '',
         date_processed: '',
-        date_issued: ''
+        date_issued: '',
+        is_archived: false
     });
     const [stats, setStats] = useState({
         totalRecords: 0,
@@ -137,20 +140,22 @@ const AdminRecord = () => {
     };
 
     const calculateStats = (data) => {
-        const uniqueClients = new Set(data.map(record => record.client_name)).size;
+        const activeRecords = data.filter(record => !record.is_archived);
+        
+        const uniqueClients = new Set(activeRecords.map(record => record.client_name)).size;
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-        const recentSubmissions = data.filter(record =>
+        const recentSubmissions = activeRecords.filter(record =>
             record.date_submitted && new Date(record.date_submitted) >= thirtyDaysAgo
         ).length;
 
-        const pendingProcessing = data.filter(record =>
-            !record.date_processed
+        const pendingProcessing = activeRecords.filter(record =>
+            !record.date_processed && !record.is_archived
         ).length;
 
         setStats({
-            totalRecords: data.length,
+            totalRecords: activeRecords.length,
             uniqueClients,
             recentSubmissions,
             pendingProcessing
@@ -189,7 +194,8 @@ const AdminRecord = () => {
             agency: '',
             date_submitted: '',
             date_processed: '',
-            date_issued: ''
+            date_issued: '',
+            is_archived: false
         });
         setShowModal(true);
     };
@@ -207,7 +213,8 @@ const AdminRecord = () => {
             agency: record.agency || '',
             date_submitted: record.date_submitted || '',
             date_processed: record.date_processed || '',
-            date_issued: record.date_issued || ''
+            date_issued: record.date_issued || '',
+            is_archived: record.is_archived || false
         });
         setShowModal(true);
     };
@@ -237,6 +244,7 @@ const AdminRecord = () => {
                         date_submitted: formData.date_submitted || null,
                         date_processed: formData.date_processed || null,
                         date_issued: formData.date_issued || null,
+                        is_archived: formData.is_archived,
                         updated_at: new Date()
                     })
                     .eq('id', editingRecord.id);
@@ -265,7 +273,8 @@ const AdminRecord = () => {
                         agency: formData.agency,
                         date_submitted: formData.date_submitted || null,
                         date_processed: formData.date_processed || null,
-                        date_issued: formData.date_issued || null
+                        date_issued: formData.date_issued || null,
+                        is_archived: false
                     }])
                     .select();
 
@@ -292,8 +301,9 @@ const AdminRecord = () => {
         }
     };
 
-    const handleDelete = async (id, clientName) => {
-        if (!window.confirm(`Are you sure you want to delete the record for ${clientName}?`)) {
+    const handleArchive = async (id, clientName, currentArchiveStatus) => {
+        const action = currentArchiveStatus ? "restore" : "archive";
+        if (!window.confirm(`Are you sure you want to ${action} the record for ${clientName}?`)) {
             return;
         }
 
@@ -301,7 +311,10 @@ const AdminRecord = () => {
         try {
             const { error } = await supabase
                 .from("record")
-                .delete()
+                .update({ 
+                    is_archived: !currentArchiveStatus,
+                    updated_at: new Date()
+                })
                 .eq('id', id);
 
             if (error) throw error;
@@ -309,17 +322,17 @@ const AdminRecord = () => {
             await supabase
                 .from("activity_logs")
                 .insert([{
-                    action: 'POLICY_DELETE',
+                    action: currentArchiveStatus ? 'POLICY_RESTORE' : 'POLICY_ARCHIVE',
                     performed_by: user.id,
-                    details: `Deleted record for ${clientName}`,
+                    details: `${currentArchiveStatus ? 'Restored' : 'Archived'} record for ${clientName}`,
                     created_at: new Date()
                 }]);
 
             await fetchRecords();
-            alert("Record deleted successfully!");
+            alert(`Record ${currentArchiveStatus ? 'restored' : 'archived'} successfully!`);
         } catch (err) {
-            console.error("Error deleting record:", err);
-            alert("Error deleting record: " + err.message);
+            console.error("Error archiving record:", err);
+            alert("Error archiving record: " + err.message);
         } finally {
             setLoading(false);
         }
@@ -337,7 +350,9 @@ const AdminRecord = () => {
     };
 
     const getStatusBadge = (record) => {
-        if (record.date_issued) {
+        if (record.is_archived) {
+            return <span className="status-badge status-archived">Archived</span>;
+        } else if (record.date_issued) {
             return <span className="status-badge status-issued">Issued</span>;
         } else if (record.date_processed) {
             return <span className="status-badge status-processed">Processed</span>;
@@ -352,6 +367,18 @@ const AdminRecord = () => {
         if (!name) return '—';
         return name.length > maxLength ? name.substring(0, maxLength) + '…' : name;
     };
+
+    // Filter records based on view mode
+    const getFilteredRecords = () => {
+        if (viewMode === 'active') {
+            return records.filter(record => !record.is_archived);
+        } else if (viewMode === 'archived') {
+            return records.filter(record => record.is_archived);
+        }
+        return records; // 'all' view
+    };
+
+    const filteredRecords = getFilteredRecords();
 
     return (
         <div className="dashboard-content">
@@ -409,11 +436,20 @@ const AdminRecord = () => {
                 <div className="container-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", background: "transparent", borderBottom: "none", padding: "20px 0 10px 0" }}>
                     <h2 style={{ fontSize: "18px", fontWeight: "600", color: "#333", margin: 0 }}>
                         <i className="fa-solid fa-database" style={{ marginRight: '8px' }}></i>
-                        All Policy Records ({stats.totalRecords} total)
+                        {viewMode === 'active' ? 'Active Policy Records' : 
+                         viewMode === 'archived' ? 'Archived Records' : 'All Records'} 
+                        ({filteredRecords.length} total)
                     </h2>
                     <div className="header-actions">
                         <button className="btn-secondary" onClick={fetchRecords}>
                             <i className="fa-solid fa-rotate-right"></i> Refresh
+                        </button>
+                        <button 
+                            className={`btn-archive ${viewMode === 'archived' ? 'active' : ''}`} 
+                            onClick={() => setViewMode(viewMode === 'archived' ? 'active' : 'archived')}
+                        >
+                            <i className={`fa-solid ${viewMode === 'archived' ? 'fa-file-lines' : 'fa-archive'}`}></i> 
+                            {viewMode === 'archived' ? 'Policy Record' : 'Archived'}
                         </button>
                         <button className="btn-primary" onClick={openCreateModal}>
                             <i className="fa-solid fa-plus"></i> New Record
@@ -450,16 +486,18 @@ const AdminRecord = () => {
                                         Loading records...
                                     </td>
                                 </tr>
-                            ) : records.length === 0 ? (
+                            ) : filteredRecords.length === 0 ? (
                                 <tr>
                                     <td colSpan="14" className="empty-cell">
                                         <i className="fa-solid fa-inbox"></i>
-                                        No records found. Click "New Record" to add one.
+                                        {viewMode === 'active' ? 'No active records found.' : 
+                                         viewMode === 'archived' ? 'No archived records found.' : 
+                                         'No records found.'} Click "New Record" to add one.
                                     </td>
                                 </tr>
                             ) : (
-                                records.map((record) => (
-                                    <tr key={record.id}>
+                                filteredRecords.map((record) => (
+                                    <tr key={record.id} className={record.is_archived ? 'archived-row' : ''}>
                                         <td className="record-id">#{record.id}</td>
                                         <td className="client-cell" title={record.client_name}>
                                             <div className="client-name">{truncateName(record.client_name)}</div>
@@ -511,11 +549,11 @@ const AdminRecord = () => {
                                                     <i className="fa-solid fa-edit"></i>
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDelete(record.id, record.client_name)}
-                                                    className="delete-btn"
-                                                    title="Delete Record"
+                                                    onClick={() => handleArchive(record.id, record.client_name, record.is_archived)}
+                                                    className={record.is_archived ? "restore-btn" : "archive-btn"}
+                                                    title={record.is_archived ? "Restore Record" : "Archive Record"}
                                                 >
-                                                    <i className="fa-solid fa-trash"></i>
+                                                    <i className={`fa-solid ${record.is_archived ? 'fa-box-open' : 'fa-box-archive'}`}></i>
                                                 </button>
                                             </div>
                                         </td>
@@ -676,6 +714,20 @@ const AdminRecord = () => {
                                         onChange={handleInputChange}
                                     />
                                 </div>
+
+                                {editingRecord && (
+                                    <div className="form-group full-width">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                name="is_archived"
+                                                checked={formData.is_archived}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, is_archived: e.target.checked }))}
+                                            />
+                                            <span style={{ marginLeft: '8px' }}>Mark as Archived</span>
+                                        </label>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="modal-footer">

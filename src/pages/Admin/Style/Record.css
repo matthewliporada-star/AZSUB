@@ -22,7 +22,78 @@
     margin-bottom: 24px;
     animation: fadeInUp 0.6s ease-out;
 }
+/* Archive button styles */
+.btn-archive {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #6c757d;
+    color: white;
+    transition: all 0.2s;
+}
 
+.btn-archive:hover {
+    background-color: #5a6268;
+}
+
+.btn-archive.active {
+    background-color: #007bff;
+}
+
+.btn-archive.active:hover {
+    background-color: #0069d9;
+}
+
+/* Archived row styling */
+.archived-row {
+    background-color: #f8f9fa;
+    opacity: 0.8;
+}
+
+.archived-row:hover {
+    background-color: #e9ecef !important;
+}
+
+/* Status badge for archived */
+.status-archived {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Archive and restore button styles */
+.archive-btn {
+    background-color: #ffc107;
+    color: #212529;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.archive-btn:hover {
+    background-color: #e0a800;
+}
+
+.restore-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.restore-btn:hover {
+    background-color: #218838;
+}
 .title {
     font-size: 28px;
     font-weight: 700;
