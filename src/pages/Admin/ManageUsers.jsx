@@ -26,6 +26,8 @@ const ManageUsers = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
 
   // -- Form Data --
   const [formData, setFormData] = useState({
@@ -56,7 +58,56 @@ const ManageUsers = () => {
   // -- Initialization --
   useEffect(() => {
     checkAdmin();
+    fetchNotifications();
   }, []);
+
+  // Subscribe to real-time notifications
+  useEffect(() => {
+    const subscription = supabase
+      .channel('admin_notifications')
+      .on('postgres_changes', 
+        { event: 'INSERT', schema: 'public', table: 'admin_notifications' },
+        (payload) => {
+          setNotifications(prev => [payload.new, ...prev]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('admin_notifications')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (!error) {
+        setNotifications(data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  };
+
+  const markNotificationAsRead = async (notificationId) => {
+    try {
+      await supabase
+        .from('admin_notifications')
+        .update({ is_read: true })
+        .eq('id', notificationId);
+      
+      setNotifications(prev =>
+        prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n)
+      );
+    } catch (err) {
+      console.error('Error marking notification as read:', err);
+    }
+  };
 
   const checkAdmin = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -66,7 +117,6 @@ const ManageUsers = () => {
       return;
     }
     const type = session.user.user_metadata?.account_type;
-    // Basic check, adjust if case sensitivity needed
     if (!type || type.toLowerCase() !== "admin") {
       alert("You do not have access to this page");
       navigate("/");
@@ -98,7 +148,6 @@ const ManageUsers = () => {
     const counts = { AL: 0, AP: 0, MD: 0, MP: 0, ADMIN: 0 };
     userData.forEach((u) => {
       const role = u.account_type?.toUpperCase();
-      // Handle 'ADMIN' variations if any
       const normalizedRole = role === 'ADMIN' ? 'ADMIN' : role;
       if (counts.hasOwnProperty(normalizedRole)) {
         counts[normalizedRole]++;
@@ -135,7 +184,6 @@ const ManageUsers = () => {
     const { name, value } = e.target;
     let finalValue = value;
 
-    // Capitalize the first letter for First Name and Last Name
     if (name === "firstName" || name === "lastName") {
       finalValue = value.charAt(0).toUpperCase() + value.slice(1);
     }
@@ -152,16 +200,11 @@ const ManageUsers = () => {
       return;
     }
 
-    // 1. Get the first two letters of the last name
     const firstTwo = formData.lastName.trim().substring(0, 2);
     const formattedName = `${firstTwo.charAt(0).toUpperCase()}${firstTwo.length > 1 ? firstTwo.charAt(1).toLowerCase() : 'x'}`;
-
-    // 2. Get current Month (MM) and Year (YYYY)
     const now = new Date();
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const month = String(now.getMonth() + 1).padStart(2, '0');
     const year = now.getFullYear();
-
-    // 3. Combine to create #Ca022026
     const pwd = `#${formattedName}${month}${year}`;
 
     setFormData({ ...formData, password: pwd });
@@ -198,11 +241,10 @@ const ManageUsers = () => {
       lastName: u.last_name,
       email: u.email,
       position: u.account_type,
-      password: "", // Don't show password
+      password: "",
       reportsTo: "",
     });
 
-    // Fetch current supervisor
     const { data } = await supabase
       .from("user_hierarchy")
       .select("report_to_id")
@@ -219,7 +261,6 @@ const ManageUsers = () => {
     setSelectedUser(u);
     setShowViewModal(true);
 
-    // Fetch hierarchy info for view
     const [supRes, subRes] = await Promise.all([
       supabase.from("user_hierarchy").select("profiles:report_to_id(first_name, last_name, account_type)").eq("user_id", u.id).eq("is_active", true).maybeSingle(),
       supabase.from("user_hierarchy").select("profiles:user_id(first_name, last_name, account_type)").eq("report_to_id", u.id).eq("is_active", true)
@@ -239,7 +280,6 @@ const ManageUsers = () => {
       let userIdToProcess = selectedUser?.id;
 
       if (isEditMode) {
-        // UPDATE
         const { error } = await supabase
           .from("profiles")
           .update({
@@ -253,7 +293,6 @@ const ManageUsers = () => {
         await logActivity("USER_UPDATE", `Updated user details for ${formData.firstName} ${formData.lastName}`);
         setSuccessMsg("User updated successfully!");
       } else {
-        // CREATE
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
@@ -286,11 +325,8 @@ const ManageUsers = () => {
         setSuccessMsg("User created successfully!");
       }
 
-      // Handle Hierarchy Update
       if (formData.reportsTo && userIdToProcess) {
-        // Deactivate old
         await supabase.from("user_hierarchy").update({ is_active: false }).eq("user_id", userIdToProcess);
-        // Insert new
         await supabase.from("user_hierarchy").insert({
           user_id: userIdToProcess,
           report_to_id: formData.reportsTo,
@@ -335,35 +371,33 @@ const ManageUsers = () => {
   const handleResetPassword = async (userItem) => {
     if (!userItem.last_name) return;
 
-    const firstTwo = userItem.last_name.trim().substring(0, 2);
-    const formattedName = `${firstTwo.charAt(0).toUpperCase()}${firstTwo.length > 1 ? firstTwo.charAt(1).toLowerCase() : 'x'}`;
-    const now = new Date();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const year = now.getFullYear();
-    const defaultPwd = `#${formattedName}${month}${year}`;
-
-    const confirmMsg = `Are you sure you want to reset the password for ${userItem.first_name} to the default: ${defaultPwd}?\n\nNote: For security reasons, the system will send a secure password recovery email to ${userItem.email} instead of sending the plaintext password.`;
+    const confirmMsg = `Are you sure you want to send a password reset email to ${userItem.first_name} ${userItem.last_name}?\n\nWhen they click the link, their password will be reset to the default format and their account will be activated.`;
 
     if (window.confirm(confirmMsg)) {
       try {
-        const { error: resetError } = await supabase.auth.resetPasswordForEmail(userItem.email);
+        // Send custom password reset email using Supabase
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(userItem.email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
 
         if (resetError) throw resetError;
 
-        // Change the user's status to Active
-        const { error: updateError } = await supabase
-          .from("profiles")
-          .update({ status: "Active" })
-          .eq("id", userItem.id);
+        // Log the activity
+        await logActivity("PASSWORD_RESET", `Password reset email sent to ${userItem.first_name} ${userItem.last_name}`);
 
-        if (updateError) throw updateError;
+        // Create admin notification
+        await supabase.from("admin_notifications").insert({
+          user_id: user.id,
+          message: `Password reset email sent to ${userItem.first_name} ${userItem.last_name}`,
+          type: 'password_reset',
+          target_user_id: userItem.id,
+          is_read: false
+        });
 
-        await logActivity("USER_UPDATE", `Sent password reset email and activated ${userItem.first_name} ${userItem.last_name}`);
-
-        alert(`Password reset email sent to ${userItem.email} and user account has been Activated.`);
-        fetchUsers(); // Refresh the list
+        alert(`Password reset email sent to ${userItem.email}. The user will need to click the link to complete the reset.`);
+        fetchUsers();
       } catch (err) {
-        console.error("Error resetting password:", err);
+        console.error("Error sending reset email:", err);
         alert("Failed to send reset email: " + err.message);
       }
     }
@@ -375,10 +409,82 @@ const ManageUsers = () => {
     return showInactive ? status === "Inactive" : status === "Active";
   });
 
-
+  const unreadNotificationsCount = notifications.filter(n => !n.is_read).length;
 
   return (
     <div className="dashboard-content" style={{ padding: '40px 50px' }}>
+      {/* Notification Bell */}
+      <div className="notification-bell-container" style={{ position: 'relative', display: 'inline-block', float: 'right' }}>
+        <button
+          className="notification-bell"
+          onClick={() => setShowNotifications(!showNotifications)}
+          style={{
+            background: 'none',
+            border: 'none',
+            fontSize: '24px',
+            cursor: 'pointer',
+            position: 'relative'
+          }}
+        >
+          <i className="fa-solid fa-bell"></i>
+          {unreadNotificationsCount > 0 && (
+            <span style={{
+              position: 'absolute',
+              top: '-5px',
+              right: '-5px',
+              background: 'red',
+              color: 'white',
+              borderRadius: '50%',
+              padding: '2px 6px',
+              fontSize: '12px'
+            }}>
+              {unreadNotificationsCount}
+            </span>
+          )}
+        </button>
+
+        {showNotifications && (
+          <div style={{
+            position: 'absolute',
+            right: 0,
+            top: '40px',
+            width: '300px',
+            background: 'white',
+            border: '1px solid #ddd',
+            borderRadius: '8px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            zIndex: 1000,
+            maxHeight: '400px',
+            overflowY: 'auto'
+          }}>
+            <div style={{ padding: '10px', borderBottom: '1px solid #ddd', fontWeight: 'bold' }}>
+              Notifications
+            </div>
+            {notifications.length === 0 ? (
+              <div style={{ padding: '10px', color: '#666' }}>No notifications</div>
+            ) : (
+              notifications.map(notification => (
+                <div
+                  key={notification.id}
+                  onClick={() => markNotificationAsRead(notification.id)}
+                  style={{
+                    padding: '10px',
+                    borderBottom: '1px solid #eee',
+                    cursor: 'pointer',
+                    background: notification.is_read ? 'white' : '#f0f7ff'
+                  }}
+                >
+                  <div style={{ fontSize: '14px' }}>{notification.message}</div>
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                    {new Date(notification.created_at).toLocaleString()}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+
       <div className="header-row">
         <div>
           <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#333" }}>Manage Users</h1>
@@ -458,7 +564,6 @@ const ManageUsers = () => {
                       </span>
                     </td>
                     <td className="action-cell">
-                      {/* 1. Only show View/Update if the user is ACTIVE */}
                       {!showInactive && (
                         <>
                           <button className="btn-view" onClick={() => openViewModal(u)} title="View Details">
@@ -470,7 +575,6 @@ const ManageUsers = () => {
                         </>
                       )}
 
-                      {/* 2. Show Reset Password if user is INACTIVE */}
                       {showInactive && (
                         <button
                           className="btn-update"
@@ -482,7 +586,6 @@ const ManageUsers = () => {
                         </button>
                       )}
 
-                      {/* 3. Main Action Toggle: Shows 'Deactivate' for Active list, 'Activate' for Inactive list */}
                       <button
                         className="btn-delete"
                         onClick={() => toggleUserStatus(u)}
@@ -503,7 +606,6 @@ const ManageUsers = () => {
         </div>
       </div>
 
-      {/* Add/Edit Modal */}
       {/* Add/Edit Modal */}
       {showAddModal && (
         <div className="modal-overlay">
@@ -640,7 +742,6 @@ const ManageUsers = () => {
                 <div className="input-group"><label>Status</label><input type="text" value={selectedUser.status} readOnly /></div>
               </div>
 
-              {/* Hierarchy View */}
               <div className="hierarchy-section" style={{ borderTop: '1px solid var(--border-color)', marginTop: '20px', paddingTop: '20px' }}>
                 <h3 style={{ fontSize: '16px', marginBottom: '15px', color: 'var(--primary-color)' }}>Hierarchy</h3>
                 <div className="hierarchy-item" style={{ marginBottom: '20px' }}>
@@ -673,7 +774,6 @@ const ManageUsers = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

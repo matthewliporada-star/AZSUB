@@ -48,7 +48,7 @@ function Login() {
 
           if (!profile || !profile.last_name) throw new Error("User profile incomplete. Cannot reset.");
 
-          // 2. Generate Default Password: #FirstTwoLettersOfMonthYear
+          // 2. Generate Default Password: #FirstTwoLettersOfLastNameMMYYYY
           const firstTwo = profile.last_name.trim().substring(0, 2);
           const formattedName = `${firstTwo.charAt(0).toUpperCase()}${firstTwo.length > 1 ? firstTwo.charAt(1).toLowerCase() : 'x'}`;
           const now = new Date();
@@ -60,11 +60,19 @@ function Login() {
           const { error: updateError } = await supabase.auth.updateUser({ password: defaultPwd });
           if (updateError) throw updateError;
 
-          // 4. Log the activity and sign the user out to force them to log in with new credentials
+          // 4. Log the activity
           await supabase.from("activity_logs").insert({
             action: "USER_UPDATE",
             details: `Password automatically reset to default via recovery link for ${profile.first_name} ${profile.last_name}`,
             performed_by: session.user.id
+          });
+
+          // 5. Create admin notification
+          await supabase.from("admin_notifications").insert({
+            message: `${profile.first_name} ${profile.last_name} has reset their password and activated their account`,
+            type: 'password_reset_completed',
+            target_user_id: session.user.id,
+            is_read: false
           });
 
           await supabase.auth.signOut();
@@ -129,7 +137,6 @@ function Login() {
     if (/^[a-zA-Z0-9@._\-+]*$/.test(val)) setIdentifier(val);
   };
 
-  // --- Failure Logic (Cooldown vs Deactivation) ---
   // --- Failure Logic (Cooldown vs Deactivation with Logging) ---
   const handleFailure = async (lookupId) => {
     const newCount = attempts + 1;
@@ -167,7 +174,6 @@ function Login() {
               .eq("id", targetUser.id);
 
             // 3. Insert Activity Log
-            // NOTE: Ensure your RLS Policy allows 'anon' to INSERT to activity_logs
             await supabase.from("activity_logs").insert({
               action: "USER_DEACTIVATED",
               details: `Account auto-deactivated: ${lookupId}`,
@@ -185,7 +191,6 @@ function Login() {
     }
   };
 
-  // --- Main Login Function ---
   // --- Main Login Function ---
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -261,6 +266,7 @@ function Login() {
       setLoading(false);
     }
   };
+  
   return (
     <div className="login-wrapper">
       <button
