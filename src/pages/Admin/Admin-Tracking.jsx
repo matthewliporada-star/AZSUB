@@ -2,12 +2,13 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import supabase from '../../config/supabaseClient';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend, PointElement, LineElement, Filler } from 'chart.js';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
-import MPLayout from './../MPLayout';
-import { DashboardSkeleton } from './../MPSkeletons';
-import { useMPData } from './../MPData';
-import './../MP_Styles.css';
+import MPLayout from '../MP/MPLayout';
+import { DashboardSkeleton } from '../MP/MPSkeletons';
+import { useMPData } from '../MP/MPData';
+import '../MP/MP_Styles.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend, PointElement, LineElement, Filler);
 
@@ -49,8 +50,40 @@ const AdminTracking = () => {
     const { darkMode } = useApp();
     const { mpStats, alPerformance, apPerformance, refreshData, loading, error } = useMPData();
 
-
     const navigate = useNavigate();
+
+    // -- Admin Access Guard --
+    useEffect(() => {
+        const checkAdmin = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                navigate('/');
+                return;
+            }
+
+            // Check user_metadata first, then fall back to profiles table
+            let accountType = session.user.user_metadata?.account_type;
+            try {
+                const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('account_type')
+                    .eq('id', session.user.id)
+                    .single();
+                if (!error && profile) {
+                    accountType = profile.account_type;
+                }
+            } catch (err) {
+                console.warn('Profile check failed, using metadata:', err);
+            }
+
+            if (accountType?.toLowerCase() !== 'admin') {
+                alert('You do not have access to this page');
+                navigate('/');
+            }
+        };
+        checkAdmin();
+    }, [navigate]);
+
     const [viewMode, setViewMode] = useState('overview');
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -536,9 +569,7 @@ const AdminTracking = () => {
 
     if (error) {
         return (
-            <MPLayout title="">
-                <div style={{ padding: '24px', color: 'red' }}>Error loading data: {error}</div>
-            </MPLayout>
+            <div style={{ padding: '24px', color: 'red' }}>Error loading data: {error}</div>
         );
     }
 
@@ -916,7 +947,7 @@ const AdminTracking = () => {
     );
 
     return (
-        <MPLayout title="">
+        <div className="dashboard-content mp-layout">
             <div className="mp-dashboard-content">
                 {viewMode === 'overview' && renderOverview()}
             </div>
@@ -1320,7 +1351,7 @@ const AdminTracking = () => {
                     </div>
                 )
             }
-        </MPLayout >
+        </div>
     );
 };
 

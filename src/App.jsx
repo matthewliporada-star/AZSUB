@@ -24,6 +24,7 @@ import AdminSerialNumber from './pages/Admin/Admin-SerialNumber';
 import AdminPolicies from './pages/Admin/Admin-Policies';
 import AdminActivityLogs from './pages/Admin/Admin-ActivityLogs';
 import AdminRecord from './pages/Admin/Admin-Record';
+import AdminTracking from './pages/Admin/Admin-Tracking';
 
 // Common Pages
 import ProfilePage from './pages/Common/ProfilePage';
@@ -69,6 +70,9 @@ function App() {
           <Route path="/admin/policies" element={<MainLayout><AdminPolicies /></MainLayout>} />
           <Route path="/admin/activity-logs" element={<MainLayout><AdminActivityLogs /></MainLayout>} />
           <Route path="/admin/records" element={<MainLayout><AdminRecord /></MainLayout>} />
+          <Route element={<MPDataProvider><Outlet /></MPDataProvider>}>
+            <Route path="/admin/tracking" element={<MainLayout><AdminTracking /></MainLayout>} />
+          </Route>
           <Route path="/profile" element={<ProfileLayout><ProfilePage /></ProfileLayout>} />
 
 

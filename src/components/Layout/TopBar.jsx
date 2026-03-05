@@ -109,9 +109,9 @@ const TopBar = ({ sidebarOpen = true }) => {
                                     <div className="dropdown-item" onClick={() => navigate('/profile')}>Profile</div>
                                     {location.pathname.startsWith('/admin') && (
                                         <div className="dropdown-item" onClick={() => navigate('/admin/SerialNumber')}>Serial Number</div>
-                                    )}                              
+                                    )}
                                     {location.pathname.startsWith('/admin') && (
-                                        <div className="dropdown-item" onClick={() => navigate('/admin/tracking')}>Tracking</div>
+                                        <div className="dropdown-item" onClick={() => navigate('/admin/tracking')}>Sales Tracker</div>
                                     )}
                                     <div className="dropdown-item logout-item" onClick={handleLogout}>Logout</div>
                                 </div>

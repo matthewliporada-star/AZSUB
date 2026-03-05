@@ -543,7 +543,7 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
 }
 
 /* --- STAT CARDS --- */
-.mp-layout .dashboard-grid {
+.dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
@@ -551,7 +551,7 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
     width: 100%;
 }
 
-.mp-layout .stat-card {
+.stat-card {
     background: #fff;
     /* Unified card background */
     border-radius: 12px;
@@ -569,38 +569,37 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
     justify-content: center;
 }
 
-
-.mp-layout .stat-card:hover {
+.stat-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 /* Neutralized Card Colors for Light Mode */
-.mp-layout .card-blue-dark,
-.mp-layout .card-green,
-.mp-layout .card-blue-medium,
-.mp-layout .card-orange,
-.mp-layout .card-purple,
-.mp-layout .card-red,
-.mp-layout .card-teal,
-.mp-layout .card-dark {
+.card-blue-dark,
+.card-green,
+.card-blue-medium,
+.card-orange,
+.card-purple,
+.card-red,
+.card-teal,
+.card-dark {
     border-left-color: #dee2e6 !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.mp-layout .stat-card:hover {
+.stat-card:hover {
     border-left-color: var(--mp-primary-color) !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
-.mp-layout .stat-header {
+.stat-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
 }
 
-.mp-layout .stat-label {
+.stat-label {
     font-size: 13px;
     font-weight: 600;
     color: #64748b;
@@ -609,7 +608,7 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
     letter-spacing: 0.5px;
 }
 
-.mp-layout .stat-value {
+.stat-value {
     font-size: 24px;
     font-weight: 700;
     color: #1e293b;
@@ -617,14 +616,14 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
     margin-bottom: 8px;
 }
 
-.mp-layout .stat-subtext {
+.stat-subtext {
     font-size: 12px;
     color: #64748b;
     /* Lighter gray for dark background */
 }
 
 /* Sparkline Container */
-.mp-layout .sparkline-container {
+.sparkline-container {
     position: absolute;
     right: 20px;
     top: 50%;
