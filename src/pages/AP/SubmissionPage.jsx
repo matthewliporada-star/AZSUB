@@ -533,7 +533,9 @@ const SubmissionPage = () => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '8px',
-                                whiteSpace: 'nowrap'
+                                whiteSpace: 'nowrap',
+                                width: 'fit-content',
+                                flex: '0 0 auto'
                             }}
                             onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 10px 15px -3px rgba(59, 130, 246, 0.4)'; }}
                             onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 4px 6px -1px rgba(59, 130, 246, 0.3)'; }}
@@ -647,15 +649,32 @@ const SubmissionPage = () => {
                                                         borderBottom: '1px solid #eee'
                                                     }}>
                                                         <span>📄 {file.name}</span>
-                                                        <button
-                                                            onClick={() => handleRemoveFile(req.id, idx)}
-                                                            style={{
-                                                                marginLeft: '10px', border: 'none', backgroundColor: '#ff6b6b',
-                                                                color: 'white', borderRadius: '4px', cursor: 'pointer', padding: '2px 8px'
-                                                            }}
-                                                        >
-                                                            &times;
-                                                        </button>
+                                                        <div style={{ display: 'flex', gap: '8px', marginLeft: '10px' }}>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => window.open(URL.createObjectURL(file), '_blank')}
+                                                                style={{
+                                                                    border: 'none', backgroundColor: '#3b82f6',
+                                                                    color: 'white', borderRadius: '4px', cursor: 'pointer', padding: '2px 10px',
+                                                                    width: 'fit-content', flex: '0 0 auto', fontSize: '12px', fontWeight: 'bold'
+                                                                }}
+                                                                title="Preview File"
+                                                            >
+                                                                Preview
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleRemoveFile(req.id, idx)}
+                                                                style={{
+                                                                    border: 'none', backgroundColor: '#ff6b6b',
+                                                                    color: 'white', borderRadius: '4px', cursor: 'pointer', padding: '2px 10px',
+                                                                    width: 'fit-content', flex: '0 0 auto', fontSize: '13px', fontWeight: 'bold'
+                                                                }}
+                                                                title="Remove File"
+                                                            >
+                                                                &times;
+                                                            </button>
+                                                        </div>
                                                     </li>
                                                 ))}
                                             </ul>

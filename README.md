@@ -7,7 +7,9 @@ frontend
 backend
 - cd backend
 - node server.js
-
+- npm install nodemai
+ler
+- npm install pdf-lib
 Credentials
 
 -MP

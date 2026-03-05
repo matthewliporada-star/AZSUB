@@ -400,7 +400,9 @@ const MonitoringPage = () => {
                                 transition: 'all 0.2s',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '8px'
+                                gap: '8px',
+                                width: 'fit-content',
+                                flex: '0 0 auto'
                             }}
                         >
                             {submitting && <span className="loading"></span>}
