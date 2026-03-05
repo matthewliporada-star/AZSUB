@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import './responsive.css';
 import { AppProvider } from './context/AppContext';
 import MainLayout from './components/Layout/MainLayout';
 import ProfileLayout from './components/Layout/ProfileLayout';

@@ -1,0 +1,620 @@
+/* =============================================================
+   GLOBAL RESPONSIVE STYLES
+   Covers: Admin, AP, AL, MP, Login, Profile
+   Breakpoints:
+     1200px — Large tablet / small laptop
+     992px  — Tablet portrait
+     768px  — Mobile landscape
+     576px  — Mobile portrait
+   NOTE: Only adds overrides. Desktop layout is never changed.
+   ============================================================= */
+
+/* ─────────────────────────────────────────
+   SHARED UTILITY OVERRIDES
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+
+    /* Tables → horizontal scroll */
+    .admin-user-table,
+    .user-table,
+    .al-layout table,
+    .ap-layout table,
+    .mp-layout table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Modals → full width on mobile */
+    .modal-content,
+    .modal-card,
+    .modal-card.wide-modal {
+        width: 96% !important;
+        max-width: 96% !important;
+        margin: 0 auto;
+        border-radius: 10px;
+    }
+}
+
+/* ─────────────────────────────────────────
+   ADMIN LAYOUT
+───────────────────────────────────────── */
+
+/* ≤ 1200px — reduce sidebar padding */
+@media (max-width: 1200px) {
+    .admin-main-content {
+        padding: 28px 30px;
+    }
+
+    .admin-main-content.expanded {
+        padding: 28px 40px;
+    }
+
+    .admin-cards-grid {
+        gap: 20px;
+    }
+}
+
+/* ≤ 992px — collapse sidebar by default */
+@media (max-width: 992px) {
+    .admin-sidebar {
+        width: 0 !important;
+        padding: 0 !important;
+        overflow: visible;
+    }
+
+    .admin-sidebar .admin-sidebar-logo,
+    .admin-sidebar .admin-sidebar-menu {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .admin-header {
+        left: 0 !important;
+    }
+
+    .admin-main-content {
+        margin-left: 0 !important;
+        padding: 24px 20px;
+    }
+
+    .admin-cards-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+}
+
+/* ≤ 768px — single column */
+@media (max-width: 768px) {
+    .admin-header {
+        padding: 10px 16px;
+    }
+
+    .admin-header h1 {
+        font-size: 20px;
+    }
+
+    .admin-main-content {
+        padding: 16px 12px;
+    }
+
+    .admin-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .admin-card {
+        padding: 20px;
+        min-height: unset;
+    }
+
+    .admin-card-number {
+        font-size: 32px;
+    }
+
+    /* Header row actions stack */
+    .header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .header-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .header-actions button {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    /* Role cards grid */
+    .role-cards-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+}
+
+/* ≤ 576px — very small mobile */
+@media (max-width: 576px) {
+    .admin-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .role-cards-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .admin-main-content {
+        padding: 12px 10px;
+    }
+}
+
+/* ─────────────────────────────────────────
+   AL LAYOUT
+───────────────────────────────────────── */
+
+/* ≤ 1200px */
+@media (max-width: 1200px) {
+    .al-layout .main-content {
+        padding: 28px 24px;
+    }
+}
+
+/* ≤ 992px — collapse AL sidebar */
+@media (max-width: 992px) {
+    .al-layout .sidebar {
+        width: 0 !important;
+        overflow: hidden;
+        box-shadow: none;
+    }
+
+    .al-layout .sidebar.open {
+        width: 280px !important;
+        overflow: visible;
+        z-index: 1100;
+    }
+
+    .al-layout .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .al-layout .al-topbar,
+    .al-layout .topbar {
+        left: 0 !important;
+        width: 100% !important;
+    }
+}
+
+/* ≤ 768px */
+@media (max-width: 768px) {
+    .al-layout .main-content {
+        padding: 16px 12px;
+        margin-top: 60px;
+    }
+
+    /* Cards → stack */
+    .al-layout .stats-grid,
+    .al-layout .cards-grid,
+    .al-layout .kpi-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 12px !important;
+    }
+
+    /* Header */
+    .al-layout .page-header,
+    .al-layout .header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .al-layout .header-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .al-layout .header-actions button,
+    .al-layout .header-actions a {
+        flex: 1;
+        min-width: 100px;
+        text-align: center;
+    }
+
+    /* Charts */
+    .al-layout .chart-container,
+    .al-layout .chart-card {
+        overflow-x: auto;
+    }
+}
+
+/* ≤ 576px */
+@media (max-width: 576px) {
+
+    .al-layout .stats-grid,
+    .al-layout .cards-grid,
+    .al-layout .kpi-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .al-layout .main-content {
+        padding: 10px 8px;
+    }
+}
+
+/* ─────────────────────────────────────────
+   AP LAYOUT
+───────────────────────────────────────── */
+
+/* ≤ 1200px */
+@media (max-width: 1200px) {
+    .ap-layout .main-content {
+        padding: 28px 24px;
+    }
+}
+
+/* ≤ 992px — collapse AP sidebar */
+@media (max-width: 992px) {
+    .ap-layout .sidebar {
+        width: 0 !important;
+        overflow: hidden;
+        box-shadow: none;
+    }
+
+    .ap-layout .sidebar.open {
+        width: 260px !important;
+        overflow: visible;
+        z-index: 1100;
+    }
+
+    .ap-layout .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .ap-layout .ap-topbar,
+    .ap-layout .topbar {
+        left: 0 !important;
+        width: 100% !important;
+    }
+}
+
+/* ≤ 768px */
+@media (max-width: 768px) {
+    .ap-layout .main-content {
+        padding: 16px 12px;
+        margin-top: 60px;
+    }
+
+    .ap-layout .stats-grid,
+    .ap-layout .cards-grid,
+    .ap-layout .kpi-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 12px !important;
+    }
+
+    .ap-layout .page-header,
+    .ap-layout .header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .ap-layout .header-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .ap-layout .header-actions button,
+    .ap-layout .header-actions a {
+        flex: 1;
+        min-width: 100px;
+        text-align: center;
+    }
+
+    /* AP monitoring/form grid */
+    .ap-layout .form-grid,
+    .ap-layout .two-col-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ≤ 576px */
+@media (max-width: 576px) {
+
+    .ap-layout .stats-grid,
+    .ap-layout .cards-grid,
+    .ap-layout .kpi-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .ap-layout .main-content {
+        padding: 10px 8px;
+    }
+}
+
+/* ─────────────────────────────────────────
+   MP LAYOUT
+───────────────────────────────────────── */
+
+/* ≤ 992px — collapse MP sidebar */
+@media (max-width: 992px) {
+    .mp-layout .mp-sidebar {
+        width: 0 !important;
+        overflow: hidden;
+        box-shadow: none;
+    }
+
+    .mp-layout .mp-sidebar.open {
+        width: 260px !important;
+        overflow: visible;
+        z-index: 1100;
+    }
+
+    .mp-layout .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .mp-layout .mp-header,
+    .mp-layout .topbar {
+        left: 0 !important;
+        width: 100% !important;
+    }
+}
+
+/* ≤ 768px */
+@media (max-width: 768px) {
+    .mp-layout .main-content {
+        padding: 16px 12px;
+    }
+
+    .mp-layout .stats-row,
+    .mp-layout .kpi-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .mp-layout .header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+/* ─────────────────────────────────────────
+   LOGIN PAGE
+───────────────────────────────────────── */
+
+/* ≤ 1024px — reduce image panel */
+@media (max-width: 1024px) {
+    .login-container {
+        flex-direction: column;
+    }
+
+    .login-left-panel {
+        display: none;
+    }
+
+    .login-right-panel {
+        width: 100%;
+        padding: 40px 32px;
+        justify-content: center;
+    }
+}
+
+/* ≤ 576px */
+@media (max-width: 576px) {
+    .login-right-panel {
+        padding: 32px 20px;
+    }
+
+    .login-wrapper {
+        padding: 0;
+    }
+
+    .signin-button {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .login-dark-mode-toggle {
+        top: 12px;
+        right: 12px;
+    }
+}
+
+/* ─────────────────────────────────────────
+   PROFILE PAGE
+───────────────────────────────────────── */
+
+/* ≤ 992px */
+@media (max-width: 992px) {
+    .profile-page-content {
+        padding: 20px 20px;
+    }
+
+    .profile-info-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0;
+    }
+
+    .info-section+.info-section {
+        border-left: none !important;
+        border-top: 1px solid #eaecf0;
+        padding-left: 0 !important;
+        padding-top: 24px;
+        margin-top: 8px;
+    }
+
+    /* Update profile modal */
+    .modal-body-split {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+    }
+
+    .modal-preview-sidebar {
+        border-left: none !important;
+        border-top: 1px solid #eee;
+        padding-left: 0 !important;
+        padding-top: 16px;
+    }
+}
+
+/* ≤ 768px */
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 20px 20px;
+    }
+
+    .profile-header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .form-grid-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .section-title {
+        grid-column: span 1 !important;
+    }
+
+    .input-box.full-width {
+        grid-column: span 1 !important;
+    }
+
+    .modal-actions-footer {
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+
+    .modal-actions-footer button {
+        width: 100%;
+    }
+}
+
+/* ─────────────────────────────────────────
+   MANAGE USERS (Admin)
+───────────────────────────────────────── */
+
+/* ≤ 992px */
+@media (max-width: 992px) {
+    .role-cards-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 12px !important;
+    }
+}
+
+/* ≤ 768px */
+@media (max-width: 768px) {
+
+    /* Actions stack */
+    .action-cell {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        justify-content: center;
+    }
+
+    .action-cell button {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+
+    /* Manage users table */
+    .user-table th,
+    .user-table td {
+        padding: 8px 6px;
+        font-size: 12px;
+    }
+
+    /* Modal form */
+    .name-row {
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    .password-position-row {
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+}
+
+/* ─────────────────────────────────────────
+   TOPBAR (Shared across all layouts)
+───────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .topbar {
+        padding: 10px 14px !important;
+    }
+
+    .topbar-right {
+        gap: 8px !important;
+    }
+
+    .topbar-user-name {
+        display: none;
+        /* hide name on small screens, keep avatar */
+    }
+
+    .dark-toggle-btn span,
+    .topbar-user-label {
+        display: none;
+    }
+}
+
+/* ─────────────────────────────────────────
+   CONTENT CONTAINERS (shared)
+───────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .content-container {
+        padding: 14px !important;
+        border-radius: 8px;
+    }
+
+    .container-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .dashboard-content {
+        padding: 16px 12px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-content {
+        padding: 10px 8px !important;
+    }
+}
+
+/* ─────────────────────────────────────────
+   MOBILE SIDEBAR OVERLAY
+   (adds dark overlay behind open sidebar)
+───────────────────────────────────────── */
+
+@media (max-width: 992px) {
+    .sidebar-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 1050;
+    }
+}
