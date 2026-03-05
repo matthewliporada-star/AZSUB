@@ -65,7 +65,7 @@ const ManageUsers = () => {
   useEffect(() => {
     const subscription = supabase
       .channel('admin_notifications')
-      .on('postgres_changes', 
+      .on('postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'admin_notifications' },
         (payload) => {
           setNotifications(prev => [payload.new, ...prev]);
@@ -100,7 +100,7 @@ const ManageUsers = () => {
         .from('admin_notifications')
         .update({ is_read: true })
         .eq('id', notificationId);
-      
+
       setNotifications(prev =>
         prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n)
       );
@@ -413,84 +413,13 @@ const ManageUsers = () => {
 
   return (
     <div className="dashboard-content" style={{ padding: '40px 50px' }}>
-      {/* Notification Bell */}
-      <div className="notification-bell-container" style={{ position: 'relative', display: 'inline-block', float: 'right' }}>
-        <button
-          className="notification-bell"
-          onClick={() => setShowNotifications(!showNotifications)}
-          style={{
-            background: 'none',
-            border: 'none',
-            fontSize: '24px',
-            cursor: 'pointer',
-            position: 'relative'
-          }}
-        >
-          <i className="fa-solid fa-bell"></i>
-          {unreadNotificationsCount > 0 && (
-            <span style={{
-              position: 'absolute',
-              top: '-5px',
-              right: '-5px',
-              background: 'red',
-              color: 'white',
-              borderRadius: '50%',
-              padding: '2px 6px',
-              fontSize: '12px'
-            }}>
-              {unreadNotificationsCount}
-            </span>
-          )}
-        </button>
-
-        {showNotifications && (
-          <div style={{
-            position: 'absolute',
-            right: 0,
-            top: '40px',
-            width: '300px',
-            background: 'white',
-            border: '1px solid #ddd',
-            borderRadius: '8px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-            zIndex: 1000,
-            maxHeight: '400px',
-            overflowY: 'auto'
-          }}>
-            <div style={{ padding: '10px', borderBottom: '1px solid #ddd', fontWeight: 'bold' }}>
-              Notifications
-            </div>
-            {notifications.length === 0 ? (
-              <div style={{ padding: '10px', color: '#666' }}>No notifications</div>
-            ) : (
-              notifications.map(notification => (
-                <div
-                  key={notification.id}
-                  onClick={() => markNotificationAsRead(notification.id)}
-                  style={{
-                    padding: '10px',
-                    borderBottom: '1px solid #eee',
-                    cursor: 'pointer',
-                    background: notification.is_read ? 'white' : '#f0f7ff'
-                  }}
-                >
-                  <div style={{ fontSize: '14px' }}>{notification.message}</div>
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                    {new Date(notification.created_at).toLocaleString()}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-      </div>
 
       <div className="header-row">
         <div>
           <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#333" }}>Manage Users</h1>
           <p style={{ color: "#777" }}>Create, update, and manage user accounts</p>
         </div>
-        <div className="header-actions">
+        <div className="header-actions" style={{ position: 'relative', alignItems: 'center', display: 'flex', gap: '10px' }}>
           <button
             className="btn-secondary"
             onClick={() => setShowInactive(!showInactive)}
@@ -500,6 +429,121 @@ const ManageUsers = () => {
           <button className="add-btn" onClick={openAddModal}>
             + Add User
           </button>
+
+          {/* Notification Bell */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              style={{
+                background: 'none',
+                border: '1.5px solid #d0d5dd',
+                borderRadius: '8px',
+                width: '38px',
+                height: '38px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                position: 'relative',
+                color: '#344054',
+                fontSize: '16px',
+                backgroundColor: '#fff',
+                flexShrink: 0,
+              }}
+              title="Notifications"
+            >
+              <i className="fa-solid fa-bell"></i>
+              {unreadNotificationsCount > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: '-4px',
+                  right: '-4px',
+                  background: '#ef4444',
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: '18px',
+                  height: '18px',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  lineHeight: 1,
+                }}>
+                  {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                </span>
+              )}
+            </button>
+
+            {showNotifications && (
+              <div style={{
+                position: 'absolute',
+                right: 0,
+                top: 'calc(100% + 8px)',
+                width: '320px',
+                background: 'white',
+                border: '1px solid #e2e8f0',
+                borderRadius: '10px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                zIndex: 9999,
+                maxHeight: '420px',
+                overflowY: 'auto',
+              }}>
+                <div style={{
+                  padding: '14px 16px',
+                  borderBottom: '1px solid #e2e8f0',
+                  fontWeight: '700',
+                  fontSize: '14px',
+                  color: '#101828',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
+                  <span>Notifications</span>
+                  {unreadNotificationsCount > 0 && (
+                    <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500' }}>
+                      {unreadNotificationsCount} unread
+                    </span>
+                  )}
+                </div>
+                {notifications.length === 0 ? (
+                  <div style={{ padding: '24px 16px', color: '#6b7280', fontSize: '14px', textAlign: 'center' }}>
+                    <i className="fa-solid fa-bell-slash" style={{ fontSize: '24px', marginBottom: '8px', display: 'block', opacity: 0.4 }}></i>
+                    No notifications yet
+                  </div>
+                ) : (
+                  notifications.map(notification => (
+                    <div
+                      key={notification.id}
+                      onClick={() => markNotificationAsRead(notification.id)}
+                      style={{
+                        padding: '12px 16px',
+                        borderBottom: '1px solid #f1f5f9',
+                        cursor: 'pointer',
+                        background: notification.is_read ? 'white' : '#eff6ff',
+                        transition: 'background 0.2s',
+                        display: 'flex',
+                        gap: '10px',
+                        alignItems: 'flex-start',
+                      }}
+                    >
+                      <span style={{
+                        width: '8px', height: '8px', borderRadius: '50%',
+                        background: notification.is_read ? 'transparent' : '#3b82f6',
+                        flexShrink: 0, marginTop: '5px',
+                      }} />
+                      <div>
+                        <div style={{ fontSize: '13px', color: '#1e293b', lineHeight: '1.4' }}>{notification.message}</div>
+                        <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>
+                          {new Date(notification.created_at).toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
