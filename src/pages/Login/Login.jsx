@@ -26,29 +26,23 @@ function Login() {
   );
   const [cooldown, setCooldown] = useState(0);
 
-  // --- Intercept Password Recovery Callback ---
+  // --- Intercept Password Recovery Callback (PKCE-compatible) ---
   useEffect(() => {
-    const handlePasswordRecovery = async () => {
-      // Supabase appends the session via hash fragment for password recovery
-      const hash = window.location.hash;
-      if (hash && hash.includes("type=recovery")) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'PASSWORD_RECOVERY' && session) {
         setLoading(true);
-        setError("");
+        setError('');
         try {
-          // Wait briefly to ensure Supabase client processes the hash and establishes the session
-          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-          if (sessionError || !session) throw new Error("Invalid or expired recovery link.");
-
           // 1. Fetch user's profile to get last name for generating default password
           const { data: profile } = await supabase
-            .from("profiles")
-            .select("first_name, last_name")
-            .eq("id", session.user.id)
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', session.user.id)
             .single();
 
-          if (!profile || !profile.last_name) throw new Error("User profile incomplete. Cannot reset.");
+          if (!profile || !profile.last_name) throw new Error('User profile incomplete. Cannot reset.');
 
-          // 2. Generate Default Password: #FirstTwoLettersOfMonthYear
+          // 2. Generate default password: #XxMMYYYY
           const firstTwo = profile.last_name.trim().substring(0, 2);
           const formattedName = `${firstTwo.charAt(0).toUpperCase()}${firstTwo.length > 1 ? firstTwo.charAt(1).toLowerCase() : 'x'}`;
           const now = new Date();
@@ -56,35 +50,39 @@ function Login() {
           const year = now.getFullYear();
           const defaultPwd = `#${formattedName}${month}${year}`;
 
-          // 3. Forcefully Update the Password
+          // 3. Reset the password to default
           const { error: updateError } = await supabase.auth.updateUser({ password: defaultPwd });
           if (updateError) throw updateError;
 
-          // 4. Log the activity and sign the user out to force them to log in with new credentials
-          await supabase.from("activity_logs").insert({
-            action: "USER_UPDATE",
-            details: `Password automatically reset to default via recovery link for ${profile.first_name} ${profile.last_name}`,
+          // 4. Set profile status to Active — happens only when user clicks the link
+          await supabase
+            .from('profiles')
+            .update({ status: 'Active' })
+            .eq('id', session.user.id);
+
+          // 5. Log the activity
+          await supabase.from('activity_logs').insert({
+            action: 'USER_UPDATE',
+            details: `Password reset to default via recovery link for ${profile.first_name} ${profile.last_name}. Account activated.`,
             performed_by: session.user.id
           });
 
+          // 6. Sign out and show success
           await supabase.auth.signOut();
-          window.location.hash = ""; // Clear hash
-          setError(""); // Clear error just in case
-          alert(`Success! Your password has been reset to the default format.\nYour default password is: ${defaultPwd}\n\nPlease log in using this password.`);
+          alert(`✅ Password reset successful!\n\nYour new default password is:\n${defaultPwd}\n\nPlease log in using this password.`);
 
         } catch (err) {
-          console.error("Recovery Error:", err);
-          setError(err.message || "Failed to reset password from link.");
-          await supabase.auth.signOut(); // Ensure clean state on failure
+          console.error('Recovery Error:', err);
+          setError(err.message || 'Failed to reset password from link.');
+          await supabase.auth.signOut();
         } finally {
           setLoading(false);
-          navigate("/login", { replace: true });
         }
       }
-    };
+    });
 
-    handlePasswordRecovery();
-  }, [navigate]);
+    return () => subscription.unsubscribe();
+  }, []);
 
   // --- Cooldown & Body Class Effects ---
   useEffect(() => {
