@@ -10,6 +10,7 @@ const AdminRecord = () => {
     const [user, setUser] = useState(null);
     const [records, setRecords] = useState([]);
     const [policies, setPolicies] = useState([]);
+    const [intermediaries, setIntermediaries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingRecord, setEditingRecord] = useState(null);
@@ -70,6 +71,7 @@ const AdminRecord = () => {
         }
         setUser(session.user);
         fetchPolicies();
+        fetchIntermediaries();
         fetchRecords();
     };
 
@@ -85,6 +87,21 @@ const AdminRecord = () => {
             setPolicies(data || []);
         } catch (err) {
             console.error("Error fetching policies:", err);
+        }
+    };
+
+    const fetchIntermediaries = async () => {
+        try {
+            const { data, error } = await supabase
+                .from("profiles")
+                .select("id, first_name, last_name, email, account_type")
+                .or("account_type.eq.AL,account_type.eq.AP")
+                .order("first_name");
+
+            if (error) throw error;
+            setIntermediaries(data || []);
+        } catch (err) {
+            console.error("Error fetching intermediaries:", err);
         }
     };
 
@@ -164,6 +181,17 @@ const AdminRecord = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+        
+        // Validate serial number - only numbers, max 10 digits
+        if (name === 'serial_number') {
+            const numericValue = value.replace(/[^0-9]/g, '').slice(0, 10);
+            setFormData(prev => ({
+                ...prev,
+                [name]: numericValue
+            }));
+            return;
+        }
+        
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -179,6 +207,29 @@ const AdminRecord = () => {
 
         const policy = policies.find(p => p.policy_id === parseInt(policyId));
         setSelectedPolicy(policy);
+    };
+
+    const handleIntermediaryChange = (e) => {
+        const intermediaryId = e.target.value;
+        
+        if (!intermediaryId) {
+            setFormData(prev => ({
+                ...prev,
+                intermediary: '',
+                intermediary_email: ''
+            }));
+            return;
+        }
+
+        const intermediary = intermediaries.find(i => i.id === intermediaryId);
+        if (intermediary) {
+            const fullName = `${intermediary.first_name} ${intermediary.last_name}`.trim();
+            setFormData(prev => ({
+                ...prev,
+                intermediary: fullName,
+                intermediary_email: intermediary.email || ''
+            }));
+        }
     };
 
     const openCreateModal = () => {
@@ -644,11 +695,14 @@ const AdminRecord = () => {
                                 <div className="form-group">
                                     <label>Serial Number</label>
                                     <input
-                                        type="number"
+                                        type="text"
                                         name="serial_number"
                                         value={formData.serial_number}
                                         onChange={handleInputChange}
-                                        placeholder="Enter serial number"
+                                        placeholder="Enter serial number (max 10 digits)"
+                                        maxLength="10"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
                                     />
                                 </div>
 
@@ -665,13 +719,17 @@ const AdminRecord = () => {
 
                                 <div className="form-group">
                                     <label>Intermediary</label>
-                                    <input
-                                        type="text"
-                                        name="intermediary"
-                                        value={formData.intermediary}
-                                        onChange={handleInputChange}
-                                        placeholder="Enter intermediary name"
-                                    />
+                                    <select
+                                        value={formData.intermediary ? intermediaries.find(i => `${i.first_name} ${i.last_name}`.trim() === formData.intermediary)?.id || '' : ''}
+                                        onChange={handleIntermediaryChange}
+                                    >
+                                        <option value="">Select Intermediary (AL/AP)</option>
+                                        {intermediaries.map((intermediary) => (
+                                            <option key={intermediary.id} value={intermediary.id}>
+                                                {intermediary.first_name} {intermediary.last_name} ({intermediary.account_type})
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
 
                                 <div className="form-group">
@@ -681,7 +739,8 @@ const AdminRecord = () => {
                                         name="intermediary_email"
                                         value={formData.intermediary_email}
                                         onChange={handleInputChange}
-                                        placeholder="Enter email address"
+                                        placeholder="Auto-populated from selection"
+                                        readOnly
                                     />
                                 </div>
 
