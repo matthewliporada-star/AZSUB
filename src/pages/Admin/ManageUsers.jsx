@@ -332,6 +332,43 @@ const ManageUsers = () => {
     }
   };
 
+  const handleResetPassword = async (userItem) => {
+    if (!userItem.last_name) return;
+
+    const firstTwo = userItem.last_name.trim().substring(0, 2);
+    const formattedName = `${firstTwo.charAt(0).toUpperCase()}${firstTwo.length > 1 ? firstTwo.charAt(1).toLowerCase() : 'x'}`;
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const defaultPwd = `#${formattedName}${month}${year}`;
+
+    const confirmMsg = `Are you sure you want to reset the password for ${userItem.first_name} to the default: ${defaultPwd}?\n\nNote: For security reasons, the system will send a secure password recovery email to ${userItem.email} instead of sending the plaintext password.`;
+
+    if (window.confirm(confirmMsg)) {
+      try {
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(userItem.email);
+
+        if (resetError) throw resetError;
+
+        // Change the user's status to Active
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ status: "Active" })
+          .eq("id", userItem.id);
+
+        if (updateError) throw updateError;
+
+        await logActivity("USER_UPDATE", `Sent password reset email and activated ${userItem.first_name} ${userItem.last_name}`);
+
+        alert(`Password reset email sent to ${userItem.email} and user account has been Activated.`);
+        fetchUsers(); // Refresh the list
+      } catch (err) {
+        console.error("Error resetting password:", err);
+        alert("Failed to send reset email: " + err.message);
+      }
+    }
+  };
+
   // -- Render Helpers --
   const filteredUsers = users.filter(u => {
     const status = u.status || "Active";
@@ -433,7 +470,19 @@ const ManageUsers = () => {
                         </>
                       )}
 
-                      {/* 2. Main Action Toggle: Shows 'Deactivate' for Active list, 'Activate' for Inactive list */}
+                      {/* 2. Show Reset Password if user is INACTIVE */}
+                      {showInactive && (
+                        <button
+                          className="btn-update"
+                          onClick={() => handleResetPassword(u)}
+                          title="Send Password Reset Email"
+                          style={{ backgroundColor: 'var(--primary-color)', marginRight: '8px' }}
+                        >
+                          <i className="fa-solid fa-key"></i> Reset Password
+                        </button>
+                      )}
+
+                      {/* 3. Main Action Toggle: Shows 'Deactivate' for Active list, 'Activate' for Inactive list */}
                       <button
                         className="btn-delete"
                         onClick={() => toggleUserStatus(u)}

@@ -26,6 +26,66 @@ function Login() {
   );
   const [cooldown, setCooldown] = useState(0);
 
+  // --- Intercept Password Recovery Callback ---
+  useEffect(() => {
+    const handlePasswordRecovery = async () => {
+      // Supabase appends the session via hash fragment for password recovery
+      const hash = window.location.hash;
+      if (hash && hash.includes("type=recovery")) {
+        setLoading(true);
+        setError("");
+        try {
+          // Wait briefly to ensure Supabase client processes the hash and establishes the session
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          if (sessionError || !session) throw new Error("Invalid or expired recovery link.");
+
+          // 1. Fetch user's profile to get last name for generating default password
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("first_name, last_name")
+            .eq("id", session.user.id)
+            .single();
+
+          if (!profile || !profile.last_name) throw new Error("User profile incomplete. Cannot reset.");
+
+          // 2. Generate Default Password: #FirstTwoLettersOfMonthYear
+          const firstTwo = profile.last_name.trim().substring(0, 2);
+          const formattedName = `${firstTwo.charAt(0).toUpperCase()}${firstTwo.length > 1 ? firstTwo.charAt(1).toLowerCase() : 'x'}`;
+          const now = new Date();
+          const month = String(now.getMonth() + 1).padStart(2, '0');
+          const year = now.getFullYear();
+          const defaultPwd = `#${formattedName}${month}${year}`;
+
+          // 3. Forcefully Update the Password
+          const { error: updateError } = await supabase.auth.updateUser({ password: defaultPwd });
+          if (updateError) throw updateError;
+
+          // 4. Log the activity and sign the user out to force them to log in with new credentials
+          await supabase.from("activity_logs").insert({
+            action: "USER_UPDATE",
+            details: `Password automatically reset to default via recovery link for ${profile.first_name} ${profile.last_name}`,
+            performed_by: session.user.id
+          });
+
+          await supabase.auth.signOut();
+          window.location.hash = ""; // Clear hash
+          setError(""); // Clear error just in case
+          alert(`Success! Your password has been reset to the default format.\nYour default password is: ${defaultPwd}\n\nPlease log in using this password.`);
+
+        } catch (err) {
+          console.error("Recovery Error:", err);
+          setError(err.message || "Failed to reset password from link.");
+          await supabase.auth.signOut(); // Ensure clean state on failure
+        } finally {
+          setLoading(false);
+          navigate("/login", { replace: true });
+        }
+      }
+    };
+
+    handlePasswordRecovery();
+  }, [navigate]);
+
   // --- Cooldown & Body Class Effects ---
   useEffect(() => {
     document.body.classList.add("login-page");
