@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import supabase from "../../config/supabaseClient";
-import "./Style/Dashboard.css"; 
+import "./Style/Dashboard.css";
 
 const AdminActivityLogs = () => {
     const navigate = useNavigate();
@@ -101,7 +101,7 @@ const AdminActivityLogs = () => {
                 padding: "24px",
                 border: "1px solid rgba(0,0,0,0.05)"
             }}>
-                <div className="container-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                <div className="container-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", background: "transparent", borderBottom: "none", padding: "20px 0 10px 0" }}>
                     <h2 style={{ fontSize: "18px", fontWeight: "600", color: "#333", margin: 0 }}>System Activities (Last 100)</h2>
                     <button className="btn-secondary" onClick={fetchLogs} title="Refresh Logs" style={{
                         background: "white",
@@ -150,17 +150,16 @@ const AdminActivityLogs = () => {
                                             ) : <span className="text-muted">System/Unknown</span>}
                                         </td>
                                         <td style={{ padding: '16px 20px' }}>
-                                            <span className={`action-badge ${
-                                                log.action?.includes('CREATE') ? 'action-badge-success' :
+                                            <span className={`action-badge ${log.action?.includes('CREATE') ? 'action-badge-success' :
                                                 (log.action?.includes('UPDATE') || log.action?.includes('CHANGE')) ? 'action-badge-info' :
-                                                (log.action?.includes('DEACTIVATED') || log.action?.includes('DELETE') || log.action?.includes('LOCKED')) ? 'action-badge-danger' : 
-                                                'action-badge-default'
-                                            }`}>
+                                                    (log.action?.includes('DEACTIVATED') || log.action?.includes('DELETE') || log.action?.includes('LOCKED')) ? 'action-badge-danger' :
+                                                        'action-badge-default'
+                                                }`}>
                                                 {getActionLabel(log.action)}
                                             </span>
                                         </td>
-                                        <td style={{ 
-                                            padding: '16px 20px', 
+                                        <td style={{
+                                            padding: '16px 20px',
                                             fontSize: '14px',
                                             color: log.action === 'USER_DEACTIVATED' ? '#e11d48' : '#334155',
                                             fontWeight: log.action === 'USER_DEACTIVATED' ? '500' : '400'

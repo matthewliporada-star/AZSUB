@@ -23,6 +23,10 @@ const DashboardPage = () => {
     const [monthlyHistory, setMonthlyHistory] = useState({});
     const [selectedMonthKey, setSelectedMonthKey] = useState('');
 
+    // --- GLOBAL MONTH FILTER ---
+    const [globalMonthFilter, setGlobalMonthFilter] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
     // --- CALENDAR STATE ---
     const [showCalendarModal, setShowCalendarModal] = useState(false);
     const [showDayModal, setShowDayModal] = useState(false);
@@ -37,18 +41,56 @@ const DashboardPage = () => {
         loadMonitoringData();
     }, []);
 
+    // --- CLICK OUTSIDE DROPDOWN LISTENER ---
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (isDropdownOpen && !event.target.closest('.custom-dropdown-container')) {
+                setIsDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isDropdownOpen]);
+
     // --- DATA PROCESSING ---
     useEffect(() => {
         if (monitoringData && monitoringData.length > 0) {
             let totalANP = 0, monthlyANP = 0;
-            let submitted = monitoringData.length, issued = 0, declined = 0, pending = 0;
+            let submitted = 0, issued = 0, declined = 0, pending = 0;
             const historyAgg = {};
 
             const now = new Date();
             const currentMonth = now.getMonth();
             const currentYear = now.getFullYear();
 
+            // 1. Build history aggregation for all data to power the dropdowns and Historical ANP card
             monitoringData.forEach(item => {
+                if (item.status === 'Issued') {
+                    const anpVal = parseFloat(item.anp) || 0;
+                    const dDate = new Date(item.created_at);
+                    if (!isNaN(dDate)) {
+                        const monthKey = `${dDate.getFullYear()}-${String(dDate.getMonth() + 1).padStart(2, '0')}`;
+                        historyAgg[monthKey] = (historyAgg[monthKey] || 0) + anpVal;
+                    }
+                }
+            });
+
+            // 2. Filter data for the snapshot cards based on globalMonthFilter
+            let dataToProcess = monitoringData;
+            if (globalMonthFilter) {
+                // globalMonthFilter format is YYYY-MM
+                dataToProcess = monitoringData.filter(item => {
+                    const itemDate = new Date(item.created_at);
+                    if (isNaN(itemDate)) return false;
+                    const itemMonthStr = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, '0')}`;
+                    return itemMonthStr === globalMonthFilter;
+                });
+            }
+
+            // 3. Calculate stats on filtered data
+            submitted = dataToProcess.length;
+
+            dataToProcess.forEach(item => {
                 if (item.status === 'Issued') {
                     const anpVal = parseFloat(item.anp) || 0;
                     totalANP += anpVal;
@@ -56,11 +98,11 @@ const DashboardPage = () => {
 
                     const dDate = new Date(item.created_at);
                     if (!isNaN(dDate)) {
-                        if (dDate.getMonth() === currentMonth && dDate.getFullYear() === currentYear) {
+                        if (globalMonthFilter) {
+                            monthlyANP += anpVal; // If filtered by a specific month, all ANP is that month's ANP
+                        } else if (dDate.getMonth() === currentMonth && dDate.getFullYear() === currentYear) {
                             monthlyANP += anpVal;
                         }
-                        const monthKey = `${dDate.getFullYear()}-${String(dDate.getMonth() + 1).padStart(2, '0')}`;
-                        historyAgg[monthKey] = (historyAgg[monthKey] || 0) + anpVal;
                     }
                 } else if (item.status === 'Declined') declined++;
                 else pending++;
@@ -74,7 +116,7 @@ const DashboardPage = () => {
                 setSelectedMonthKey(availableKeys[0]);
             }
         }
-    }, [monitoringData, selectedMonthKey]);
+    }, [monitoringData, selectedMonthKey, globalMonthFilter]);
 
     // --- PAGINATION LOGIC ---
     // Filter data to only show items with serial numbers (matching your original table logic)
@@ -236,7 +278,89 @@ const DashboardPage = () => {
 
     return (
         <>
-            <h2 style={{ marginBottom: '20px', color: '#2c3e50' }}>Dashboard Overview</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h2 style={{ color: '#2c3e50', margin: 0 }}>Dashboard Overview</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <label style={{ fontSize: '14px', fontWeight: '600', color: darkMode ? '#94a3b8' : '#64748b' }}>Filter:</label>
+                    <div className="custom-dropdown-container" style={{ position: 'relative' }}>
+                        <div
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            style={{
+                                padding: '8px 16px',
+                                fontSize: '14px',
+                                borderRadius: '8px',
+                                border: darkMode ? '1px solid #334155' : '1px solid #e2e8f0',
+                                backgroundColor: darkMode ? '#1e293b' : '#ffffff',
+                                color: darkMode ? '#f8fafc' : '#1e293b',
+                                cursor: 'pointer',
+                                fontWeight: '600',
+                                minWidth: '160px',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                                transition: 'all 0.2s',
+                            }}
+                        >
+                            <span>{globalMonthFilter ? formatMonthKey(globalMonthFilter) : 'All Time'}</span>
+                            <span style={{ fontSize: '10px', marginLeft: '10px', transform: isDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
+                        </div>
+
+                        {isDropdownOpen && (
+                            <div style={{
+                                position: 'absolute',
+                                top: 'calc(100% + 8px)',
+                                right: 0,
+                                zIndex: 100,
+                                backgroundColor: darkMode ? '#1e293b' : '#ffffff',
+                                border: darkMode ? '1px solid #334155' : '1px solid #e2e8f0',
+                                borderRadius: '8px',
+                                boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+                                minWidth: '100%',
+                                overflow: 'hidden',
+                                animation: 'fadeIn 0.2s ease'
+                            }}>
+                                <div
+                                    onClick={() => { setGlobalMonthFilter(''); setIsDropdownOpen(false); }}
+                                    style={{
+                                        padding: '10px 16px',
+                                        fontSize: '14px',
+                                        cursor: 'pointer',
+                                        background: globalMonthFilter === '' ? (darkMode ? '#334155' : '#f1f5f9') : 'transparent',
+                                        color: globalMonthFilter === '' ? (darkMode ? '#3b82f6' : '#2563eb') : (darkMode ? '#cbd5e1' : '#475569'),
+                                        fontWeight: globalMonthFilter === '' ? '600' : '500',
+                                        transition: 'background 0.2s'
+                                    }}
+                                    onMouseEnter={e => e.currentTarget.style.background = darkMode ? '#334155' : '#f8fafc'}
+                                    onMouseLeave={e => e.currentTarget.style.background = globalMonthFilter === '' ? (darkMode ? '#334155' : '#f1f5f9') : 'transparent'}
+                                >
+                                    All Time
+                                </div>
+                                {sortedMonthKeys.map(key => (
+                                    <div
+                                        key={key}
+                                        onClick={() => { setGlobalMonthFilter(key); setIsDropdownOpen(false); }}
+                                        style={{
+                                            padding: '10px 16px',
+                                            fontSize: '14px',
+                                            cursor: 'pointer',
+                                            background: globalMonthFilter === key ? (darkMode ? '#334155' : '#f1f5f9') : 'transparent',
+                                            color: globalMonthFilter === key ? (darkMode ? '#3b82f6' : '#2563eb') : (darkMode ? '#cbd5e1' : '#475569'),
+                                            fontWeight: globalMonthFilter === key ? '600' : '500',
+                                            borderTop: darkMode ? '1px solid #334155' : '1px solid #f1f5f9',
+                                            transition: 'background 0.2s'
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.background = darkMode ? '#334155' : '#f8fafc'}
+                                        onMouseLeave={e => e.currentTarget.style.background = globalMonthFilter === key ? (darkMode ? '#334155' : '#f1f5f9') : 'transparent'}
+                                    >
+                                        {formatMonthKey(key)}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
 
             <div className="dashboard-grid">
                 {/* TOP ROW */}
@@ -260,34 +384,12 @@ const DashboardPage = () => {
                     <div className="stat-subtext">This Month</div>
                 </div>
 
-                <div className="stat-card animate-spring delay-3" style={{ background: 'linear-gradient(135deg, #1c2b3e 0%, #0d1117 100%)', color: 'white' }}>
+                <div className="stat-card animate-spring delay-3">
                     <div className="stat-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
-                        <div className="stat-label" style={{ color: 'rgba(255,255,255,0.8)' }}>Historical ANP</div>
-                        <select
-                            value={selectedMonthKey}
-                            onChange={(e) => setSelectedMonthKey(e.target.value)}
-                            style={{
-                                padding: '4px 12px',
-                                fontSize: '12px',
-                                borderRadius: '20px',
-                                border: '1px solid rgba(255,255,255,0.2)',
-                                backgroundColor: 'rgba(255,255,255,0.1)',
-                                color: 'white',
-                                cursor: 'pointer',
-                                outline: 'none',
-                                fontWeight: '600',
-                                backdropFilter: 'blur(5px)'
-                            }}
-                        >
-                            {sortedMonthKeys.length > 0 ? (
-                                sortedMonthKeys.map(key => <option key={key} value={key} style={{ color: '#333' }}>{formatMonthKey(key)}</option>)
-                            ) : (
-                                <option value="" style={{ color: '#333' }}>No Data</option>
-                            )}
-                        </select>
+                        <div className="stat-label">Historical ANP</div>
                     </div>
-                    <div className="stat-value" style={{ color: 'white' }}>PHP {selectedMonthANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                    <div className="stat-subtext" style={{ color: 'rgba(255,255,255,0.6)' }}>{selectedMonthKey ? formatMonthKey(selectedMonthKey) : 'Select Month'}</div>
+                    <div className="stat-value">PHP {selectedMonthANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div className="stat-subtext">{selectedMonthKey ? formatMonthKey(selectedMonthKey) : 'Select Month'}</div>
                 </div>
 
                 <div

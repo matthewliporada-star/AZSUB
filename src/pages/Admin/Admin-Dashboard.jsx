@@ -145,8 +145,8 @@ const AdminDashboard = () => {
 
           {/* USER TABLE CONTAINER */}
           <div className="content-container animate-spring delay-3">
-            <div className="container-header">
-              <h2>Users List</h2>
+            <div className="container-header" style={{ background: 'transparent', borderBottom: 'none', padding: '20px 0 10px 0' }}>
+              <h2 style={{ fontSize: '18px', margin: 0 }}>Users List</h2>
               <button
                 className="btn-secondary"
                 style={{ fontSize: '12px', padding: '6px 12px' }}

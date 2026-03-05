@@ -1788,11 +1788,17 @@ body.dark-mode .ap-layout .status-badge.status-rejected {
 .ap-layout .calendar-controls button {
     background: none;
     border: 1px solid #dee2e6;
-    padding: 4px 12px;
+    padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
     color: #0055b8;
     font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+    text-transform: uppercase;
 }
 
 

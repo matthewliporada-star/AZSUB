@@ -94,16 +94,16 @@ const AdminRecord = () => {
                 .order("date_submitted", { ascending: false });
 
             if (recordsError) throw recordsError;
-            
+
             console.log("Records fetched:", recordsData);
 
             if (recordsData && recordsData.length > 0) {
                 const policyIds = [...new Set(recordsData
                     .map(r => r.policy_id)
                     .filter(id => id != null))];
-                
+
                 let policyMap = {};
-                
+
                 if (policyIds.length > 0) {
                     const { data: policiesData, error: policiesError } = await supabase
                         .from("policy")
@@ -140,12 +140,12 @@ const AdminRecord = () => {
         const uniqueClients = new Set(data.map(record => record.client_name)).size;
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        
-        const recentSubmissions = data.filter(record => 
+
+        const recentSubmissions = data.filter(record =>
             record.date_submitted && new Date(record.date_submitted) >= thirtyDaysAgo
         ).length;
 
-        const pendingProcessing = data.filter(record => 
+        const pendingProcessing = data.filter(record =>
             !record.date_processed
         ).length;
 
@@ -171,7 +171,7 @@ const AdminRecord = () => {
             ...prev,
             policy_id: policyId
         }));
-        
+
         const policy = policies.find(p => p.policy_id === parseInt(policyId));
         setSelectedPolicy(policy);
     };
@@ -242,7 +242,7 @@ const AdminRecord = () => {
                     .eq('id', editingRecord.id);
 
                 if (error) throw error;
-                
+
                 await supabase
                     .from("activity_logs")
                     .insert([{
@@ -406,9 +406,9 @@ const AdminRecord = () => {
             </div>
 
             <div className="content-container">
-                <div className="container-header">
-                    <h2>
-                        <i className="fa-solid fa-database"></i>
+                <div className="container-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", background: "transparent", borderBottom: "none", padding: "20px 0 10px 0" }}>
+                    <h2 style={{ fontSize: "18px", fontWeight: "600", color: "#333", margin: 0 }}>
+                        <i className="fa-solid fa-database" style={{ marginRight: '8px' }}></i>
                         All Policy Records ({stats.totalRecords} total)
                     </h2>
                     <div className="header-actions">
@@ -420,7 +420,7 @@ const AdminRecord = () => {
                         </button>
                     </div>
                 </div>
-                
+
                 <div className="table-container">
                     <table className="admin-user-table records-table">
                         <thead>
@@ -503,14 +503,14 @@ const AdminRecord = () => {
                                         <td className="status-cell">{getStatusBadge(record)}</td>
                                         <td className="actions-cell">
                                             <div className="action-buttons">
-                                                <button 
+                                                <button
                                                     onClick={() => openEditModal(record)}
                                                     className="edit-btn"
                                                     title="Edit Record"
                                                 >
                                                     <i className="fa-solid fa-edit"></i>
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={() => handleDelete(record.id, record.client_name)}
                                                     className="delete-btn"
                                                     title="Delete Record"

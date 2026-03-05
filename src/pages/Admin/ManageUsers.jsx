@@ -130,43 +130,43 @@ const ManageUsers = () => {
     }
   }, [formData.position, showAddModal, isEditMode, selectedUser, fetchPotentialUplines]);
 
-// -- Form Handlers --
-const handleFormChange = (e) => {
-  const { name, value } = e.target;
-  let finalValue = value;
+  // -- Form Handlers --
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    let finalValue = value;
 
-  // Capitalize the first letter for First Name and Last Name
-  if (name === "firstName" || name === "lastName") {
-    finalValue = value.charAt(0).toUpperCase() + value.slice(1);
-  }
+    // Capitalize the first letter for First Name and Last Name
+    if (name === "firstName" || name === "lastName") {
+      finalValue = value.charAt(0).toUpperCase() + value.slice(1);
+    }
 
-  setFormData({ 
-    ...formData, 
-    [name]: finalValue 
-  });
-};
+    setFormData({
+      ...formData,
+      [name]: finalValue
+    });
+  };
 
-const generatePassword = () => {
-  if (!formData.lastName.trim()) {
-    setModalError("Please enter last name first");
-    return;
-  }
+  const generatePassword = () => {
+    if (!formData.lastName.trim()) {
+      setModalError("Please enter last name first");
+      return;
+    }
 
-  // 1. Get the first two letters of the last name
-  const firstTwo = formData.lastName.trim().substring(0, 2);
-  const formattedName = `${firstTwo.charAt(0).toUpperCase()}${firstTwo.length > 1 ? firstTwo.charAt(1).toLowerCase() : 'x'}`;
+    // 1. Get the first two letters of the last name
+    const firstTwo = formData.lastName.trim().substring(0, 2);
+    const formattedName = `${firstTwo.charAt(0).toUpperCase()}${firstTwo.length > 1 ? firstTwo.charAt(1).toLowerCase() : 'x'}`;
 
-  // 2. Get current Month (MM) and Year (YYYY)
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-  const year = now.getFullYear();
+    // 2. Get current Month (MM) and Year (YYYY)
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const year = now.getFullYear();
 
-  // 3. Combine to create #Ca022026
-  const pwd = `#${formattedName}${month}${year}`;
+    // 3. Combine to create #Ca022026
+    const pwd = `#${formattedName}${month}${year}`;
 
-  setFormData({ ...formData, password: pwd });
-  setModalError("");
-};
+    setFormData({ ...formData, password: pwd });
+    setModalError("");
+  };
 
   const closeModal = () => {
     setShowAddModal(false);
@@ -385,195 +385,195 @@ const generatePassword = () => {
       </div>
 
       {/* USERS TABLE CONTAINER */}
-<div className="content-container animate-spring delay-1">
-  <div className="container-header">
-    <h2>User Database ({showInactive ? "Inactive" : "Active"})</h2>
-  </div>
-  <div className="container-body">
-    <table className="user-table">
-      <thead>
-        <tr>
-          <th>No.</th>
-          <th>Last Name</th>
-          <th>First Name</th>
-          <th>Position</th>
-          <th>Status</th>
-          <th style={{ textAlign: "center" }}>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {filteredUsers.length === 0 ? (
-          <tr>
-            <td colSpan="6" style={{ textAlign: "center", padding: "20px", color: "#666" }}>
-              No {showInactive ? "inactive" : "active"} users found.
-            </td>
-          </tr>
-        ) : (
-          filteredUsers.map((u, index) => (
-            <tr key={u.id}>
-              <td>{index + 1}</td>
-              <td>{u.last_name}</td>
-              <td>{u.first_name}</td>
-              <td><span style={{ fontWeight: "600" }}>{u.account_type}</span></td>
-              <td>
-                <span className={`status-badge ${u.status === "Active" ? "active" : "inactive"}`}>
-                  {u.status || "Active"}
-                </span>
-              </td>
-              <td className="action-cell">
-                {/* 1. Only show View/Update if the user is ACTIVE */}
-                {!showInactive && (
-                  <>
-                    <button className="btn-view" onClick={() => openViewModal(u)} title="View Details">
-                      <i className="fa-solid fa-eye"></i> View
-                    </button>
-                    <button className="btn-update" onClick={() => openEditModal(u)} title="Edit User">
-                      <i className="fa-solid fa-pen"></i> Update
-                    </button>
-                  </>
-                )}
+      <div className="content-container animate-spring delay-1">
+        <div className="container-header" style={{ background: 'transparent', borderBottom: 'none', padding: '20px 0 10px 0' }}>
+          <h2 style={{ fontSize: '18px', margin: 0 }}>User Database ({showInactive ? "Inactive" : "Active"})</h2>
+        </div>
+        <div className="container-body">
+          <table className="user-table">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th style={{ textAlign: "center" }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.length === 0 ? (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: "center", padding: "20px", color: "#666" }}>
+                    No {showInactive ? "inactive" : "active"} users found.
+                  </td>
+                </tr>
+              ) : (
+                filteredUsers.map((u, index) => (
+                  <tr key={u.id}>
+                    <td>{index + 1}</td>
+                    <td>{u.last_name}</td>
+                    <td>{u.first_name}</td>
+                    <td><span style={{ fontWeight: "600" }}>{u.account_type}</span></td>
+                    <td>
+                      <span className={`status-badge ${u.status === "Active" ? "active" : "inactive"}`}>
+                        {u.status || "Active"}
+                      </span>
+                    </td>
+                    <td className="action-cell">
+                      {/* 1. Only show View/Update if the user is ACTIVE */}
+                      {!showInactive && (
+                        <>
+                          <button className="btn-view" onClick={() => openViewModal(u)} title="View Details">
+                            <i className="fa-solid fa-eye"></i> View
+                          </button>
+                          <button className="btn-update" onClick={() => openEditModal(u)} title="Edit User">
+                            <i className="fa-solid fa-pen"></i> Update
+                          </button>
+                        </>
+                      )}
 
-                {/* 2. Main Action Toggle: Shows 'Deactivate' for Active list, 'Activate' for Inactive list */}
-                <button
-                  className="btn-delete"
-                  onClick={() => toggleUserStatus(u)}
-                  title={u.status === "Active" ? "Deactivate" : "Activate"}
-                  style={{ 
-                    backgroundColor: u.status === "Active" ? "var(--danger-color)" : "var(--success-color)" 
-                  }}
-                >
-                  <i className={`fa-solid ${u.status === "Active" ? "fa-ban" : "fa-check"}`}></i>{" "}
-                  {u.status === "Active" ? "Deactivate" : "Activate"}
-                </button>
-              </td>
-            </tr>
-          ))
-        )}
-      </tbody>
-    </table>
-  </div>
-</div>
-
-      {/* Add/Edit Modal */}
-{/* Add/Edit Modal */}
-{showAddModal && (
-  <div className="modal-overlay">
-    <div className="modal-content">
-      <div className="modal-title">
-        {isEditMode ? "Edit User" : "Add New User"}
+                      {/* 2. Main Action Toggle: Shows 'Deactivate' for Active list, 'Activate' for Inactive list */}
+                      <button
+                        className="btn-delete"
+                        onClick={() => toggleUserStatus(u)}
+                        title={u.status === "Active" ? "Deactivate" : "Activate"}
+                        style={{
+                          backgroundColor: u.status === "Active" ? "var(--danger-color)" : "var(--success-color)"
+                        }}
+                      >
+                        <i className={`fa-solid ${u.status === "Active" ? "fa-ban" : "fa-check"}`}></i>{" "}
+                        {u.status === "Active" ? "Deactivate" : "Activate"}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <form className="modal-form" onSubmit={submitUser}>
-        <div className="name-row">
-          <div className="input-group">
-            <label>First Name</label>
-            <input 
-              type="text" 
-              name="firstName" 
-              placeholder="e.g. John"
-              required 
-              value={formData.firstName} 
-              onChange={handleFormChange} 
-            />
-          </div>
-          <div className="input-group">
-            <label>Last Name</label>
-            <input 
-              type="text" 
-              name="lastName" 
-              placeholder="e.g. Smith"
-              required 
-              value={formData.lastName} 
-              onChange={handleFormChange} 
-            />
-          </div>
-        </div>
+      {/* Add/Edit Modal */}
+      {/* Add/Edit Modal */}
+      {showAddModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-title">
+              {isEditMode ? "Edit User" : "Add New User"}
+            </div>
 
-        {!isEditMode && (
-          <div className="input-group">
-            <label>Email</label>
-            <input 
-              type="email" 
-              name="email" 
-              required 
-              value={formData.email} 
-              onChange={handleFormChange} 
-            />
-          </div>
-        )}
+            <form className="modal-form" onSubmit={submitUser}>
+              <div className="name-row">
+                <div className="input-group">
+                  <label>First Name</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder="e.g. John"
+                    required
+                    value={formData.firstName}
+                    onChange={handleFormChange}
+                  />
+                </div>
+                <div className="input-group">
+                  <label>Last Name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder="e.g. Smith"
+                    required
+                    value={formData.lastName}
+                    onChange={handleFormChange}
+                  />
+                </div>
+              </div>
 
-        <div className="password-position-row">
-          {!isEditMode && (
-            <div className="input-group">
-              <label>Password</label>
-              <div className="password-input-wrapper">
-                <input 
-                  type={showPassword ? "text" : "password"} 
-                  name="password" 
-                  required 
-                  value={formData.password} 
-                  readOnly 
-                />
-                <button 
-                  type="button" 
-                  className="generate-btn" 
-                  onClick={generatePassword}
-                >
-                  Generate
+              {!isEditMode && (
+                <div className="input-group">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={handleFormChange}
+                  />
+                </div>
+              )}
+
+              <div className="password-position-row">
+                {!isEditMode && (
+                  <div className="input-group">
+                    <label>Password</label>
+                    <div className="password-input-wrapper">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        required
+                        value={formData.password}
+                        readOnly
+                      />
+                      <button
+                        type="button"
+                        className="generate-btn"
+                        onClick={generatePassword}
+                      >
+                        Generate
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="input-group">
+                  <label>Position</label>
+                  <select name="position" value={formData.position} onChange={handleFormChange}>
+                    <option value="Admin">Admin</option>
+                    <option value="MP">Managing Partner (MP)</option>
+                    <option value="AL">Agency Leader (AL)</option>
+                    <option value="AP">Agency Partner (AP)</option>
+                    <option value="MD">Managing Director (MD)</option>
+                  </select>
+                </div>
+              </div>
+
+              {(formData.position === 'AP' || formData.position === 'AL') && (
+                <div className="input-group">
+                  <label>Reports To</label>
+                  <select name="reportsTo" value={formData.reportsTo} onChange={handleFormChange}>
+                    <option value="">-- Select Supervisor --</option>
+                    {potentialUplines.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.first_name} {u.last_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {modalError && (
+                <p className="modal-error" style={{ color: 'var(--danger-color)', fontSize: '14px' }}>
+                  {modalError}
+                </p>
+              )}
+              {successMsg && (
+                <p className="modal-success" style={{ color: 'var(--success-color)', fontSize: '14px' }}>
+                  {successMsg}
+                </p>
+              )}
+
+              <div className="modal-buttons">
+                <button type="button" className="modal-close" onClick={closeModal}>
+                  Cancel
+                </button>
+                <button type="submit" className="modal-submit" disabled={loading}>
+                  {loading ? "Processing..." : (isEditMode ? "Update" : "Create")}
                 </button>
               </div>
-            </div>
-          )}
-          
-          <div className="input-group">
-            <label>Position</label>
-            <select name="position" value={formData.position} onChange={handleFormChange}>
-              <option value="Admin">Admin</option>
-              <option value="MP">Managing Partner (MP)</option>
-              <option value="AL">Agency Leader (AL)</option>
-              <option value="AP">Agency Partner (AP)</option>
-              <option value="MD">Managing Director (MD)</option>
-            </select>
+            </form>
           </div>
         </div>
-
-        {(formData.position === 'AP' || formData.position === 'AL') && (
-          <div className="input-group">
-            <label>Reports To</label>
-            <select name="reportsTo" value={formData.reportsTo} onChange={handleFormChange}>
-              <option value="">-- Select Supervisor --</option>
-              {potentialUplines.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.first_name} {u.last_name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {modalError && (
-          <p className="modal-error" style={{ color: 'var(--danger-color)', fontSize: '14px' }}>
-            {modalError}
-          </p>
-        )}
-        {successMsg && (
-          <p className="modal-success" style={{ color: 'var(--success-color)', fontSize: '14px' }}>
-            {successMsg}
-          </p>
-        )}
-
-        <div className="modal-buttons">
-          <button type="button" className="modal-close" onClick={closeModal}>
-            Cancel
-          </button>
-          <button type="submit" className="modal-submit" disabled={loading}>
-            {loading ? "Processing..." : (isEditMode ? "Update" : "Create")}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
+      )}
 
       {/* View Modal */}
       {showViewModal && selectedUser && (
