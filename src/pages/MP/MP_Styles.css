@@ -229,11 +229,11 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
     top: 0;
     left: 260px;
     right: 0;
-    right: 0;
-    background: transparent;
+    background: #ffffff;
     color: #333;
     padding: 12px 40px;
-    box-shadow: none;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid #e9ecef;
     z-index: 99;
     display: flex;
     justify-content: space-between;
@@ -3114,6 +3114,9 @@ body.dark-mode .activity-dot.inactive {
 
 /* --- DARK MODE HEADER --- */
 body.dark-mode .mp-layout .mp-header {
+    background: #161B22 !important;
+    border-bottom: 1px solid #30363d !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
     color: #e2e8f0 !important;
 }
 

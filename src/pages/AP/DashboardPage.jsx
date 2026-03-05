@@ -1,10 +1,52 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
-import { Doughnut, Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import { Doughnut, Bar, Line } from 'react-chartjs-2';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler);
+
+const SparklineTrend = ({ data, color, percentage }) => {
+    const chartData = {
+        labels: ['1', '2', '3', '4', '5', '6', '7'],
+        datasets: [
+            {
+                data: data || [10, 15, 12, 22, 18, 25, 24],
+                borderColor: color || '#3b82f6',
+                borderWidth: 2,
+                tension: 0.4,
+                pointRadius: 0,
+                fill: true,
+                backgroundColor: (context) => {
+                    const ctx = context.chart.ctx;
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 50);
+                    gradient.addColorStop(0, `${color || '#3b82f6'}40`);
+                    gradient.addColorStop(1, `${color || '#3b82f6'}00`);
+                    return gradient;
+                }
+            }
+        ]
+    };
+
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: { x: { display: false }, y: { display: false, min: 0 } },
+        layout: { padding: 0 }
+    };
+
+    return (
+        <div style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', width: '90px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', pointerEvents: 'none', zIndex: 10 }}>
+            <div style={{ fontSize: '13px', fontWeight: '800', color: percentage >= 0 ? '#22c55e' : '#ef4444', marginBottom: '2px', letterSpacing: '0.2px' }}>
+                {percentage >= 0 ? '↑' : '↓'} {Math.abs(percentage)}%
+            </div>
+            <div style={{ width: '100%', height: '40px', position: 'relative' }}>
+                <Line data={chartData} options={options} />
+            </div>
+        </div>
+    );
+};
 
 const DashboardPage = () => {
     const { monitoringData, loadMonitoringData, darkMode } = useApp();
@@ -279,7 +321,6 @@ const DashboardPage = () => {
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 style={{ color: '#2c3e50', margin: 0 }}>Dashboard Overview</h2>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <label style={{ fontSize: '14px', fontWeight: '600', color: darkMode ? '#94a3b8' : '#64748b' }}>Filter:</label>
                     <div className="custom-dropdown-container" style={{ position: 'relative' }}>
@@ -364,8 +405,8 @@ const DashboardPage = () => {
 
             <div className="dashboard-grid">
                 {/* TOP ROW */}
-                <div className="stat-card animate-spring delay-1">
-                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: '#395998' }}>💰</div>
+                <div className="stat-card animate-spring delay-1" style={{ position: 'relative', overflow: 'hidden' }}>
+                    <SparklineTrend data={[12, 19, 15, 25, 22, 30, 28]} color="#3b82f6" percentage={12.4} />
                     <div className="stat-header">
                         <div className="stat-label">Total ANP</div>
                     </div>
@@ -375,8 +416,8 @@ const DashboardPage = () => {
                     </div>
                 </div>
 
-                <div className="stat-card animate-spring delay-2">
-                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: '#22c55e' }}>📅</div>
+                <div className="stat-card animate-spring delay-2" style={{ position: 'relative', overflow: 'hidden' }}>
+                    <SparklineTrend data={[5, 12, 8, 18, 15, 22, 25]} color="#22c55e" percentage={8.1} />
                     <div className="stat-header">
                         <div className="stat-label">Monthly ANP</div>
                     </div>
@@ -411,8 +452,8 @@ const DashboardPage = () => {
                 </div>
 
                 {/* BOTTOM ROW */}
-                <div className="stat-card animate-spring delay-5">
-                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: darkMode ? '#3b82f6' : '#3b82f6' }}>📝</div>
+                <div className="stat-card animate-spring delay-5" style={{ position: 'relative', overflow: 'hidden' }}>
+                    <SparklineTrend data={[10, 15, 13, 22, 20, 28, 25]} color="#f59e0b" percentage={4.3} />
                     <div className="stat-header">
                         <div className="stat-label">Submitted</div>
                     </div>
@@ -420,8 +461,8 @@ const DashboardPage = () => {
                     <div className="stat-subtext">Applications</div>
                 </div>
 
-                <div className="stat-card animate-spring delay-1">
-                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: '#22c55e' }}>✓</div>
+                <div className="stat-card animate-spring delay-1" style={{ position: 'relative', overflow: 'hidden' }}>
+                    <SparklineTrend data={[2, 8, 5, 15, 12, 20, 18]} color="#22c55e" percentage={15.2} />
                     <div className="stat-header">
                         <div className="stat-label">Issued</div>
                     </div>
@@ -429,8 +470,8 @@ const DashboardPage = () => {
                     <div className="stat-subtext" style={{ color: '#22c55e' }}>{stats.submitted ? ((stats.issued / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
                 </div>
 
-                <div className="stat-card animate-spring delay-2">
-                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: darkMode ? '#3b82f6' : '#3b82f6' }}>⏱</div>
+                <div className="stat-card animate-spring delay-2" style={{ position: 'relative', overflow: 'hidden' }}>
+                    <SparklineTrend data={[5, 4, 6, 3, 5, 4, 3]} color="#06b6d4" percentage={-2.4} />
                     <div className="stat-header">
                         <div className="stat-label">Pending</div>
                     </div>
@@ -438,8 +479,8 @@ const DashboardPage = () => {
                     <div className="stat-subtext">Awaiting Action</div>
                 </div>
 
-                <div className="stat-card animate-spring delay-3">
-                    <div style={{ position: 'absolute', top: 0, right: 0, padding: '10px', opacity: 0.1, fontSize: '80px', transform: 'translate(20%, -20%)', color: '#ef4444' }}>✕</div>
+                <div className="stat-card animate-spring delay-3" style={{ position: 'relative', overflow: 'hidden' }}>
+                    <SparklineTrend data={[0, 1, 0, 2, 1, 0, 0]} color="#ef4444" percentage={1.1} />
                     <div className="stat-header">
                         <div className="stat-label">Declined</div>
                     </div>

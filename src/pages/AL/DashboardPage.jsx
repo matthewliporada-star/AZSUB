@@ -1,10 +1,52 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
-import { Doughnut, Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import { Doughnut, Bar, Line } from 'react-chartjs-2';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler);
+
+const SparklineTrend = ({ data, color, percentage }) => {
+    const chartData = {
+        labels: ['1', '2', '3', '4', '5', '6', '7'],
+        datasets: [
+            {
+                data: data || [10, 15, 12, 22, 18, 25, 24],
+                borderColor: color || '#3b82f6',
+                borderWidth: 2,
+                tension: 0.4,
+                pointRadius: 0,
+                fill: true,
+                backgroundColor: (context) => {
+                    const ctx = context.chart.ctx;
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 50);
+                    gradient.addColorStop(0, `${color || '#3b82f6'}40`);
+                    gradient.addColorStop(1, `${color || '#3b82f6'}00`);
+                    return gradient;
+                }
+            }
+        ]
+    };
+
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: { x: { display: false }, y: { display: false, min: 0 } },
+        layout: { padding: 0 }
+    };
+
+    return (
+        <div style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', width: '90px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', pointerEvents: 'none', zIndex: 10 }}>
+            <div style={{ fontSize: '13px', fontWeight: '800', color: percentage >= 0 ? '#22c55e' : '#ef4444', marginBottom: '2px', letterSpacing: '0.2px' }}>
+                {percentage >= 0 ? '↑' : '↓'} {Math.abs(percentage)}%
+            </div>
+            <div style={{ width: '100%', height: '40px', position: 'relative' }}>
+                <Line data={chartData} options={options} />
+            </div>
+        </div>
+    );
+};
 
 const DashboardPage = () => {
     const { monitoringData, loadMonitoringData, currentUser, darkMode } = useApp();
@@ -23,6 +65,10 @@ const DashboardPage = () => {
     const [monthlyHistory, setMonthlyHistory] = useState({});
     const [selectedMonthKey, setSelectedMonthKey] = useState('');
 
+    // --- FILTER STATE ---
+    const [globalMonthFilter, setGlobalMonthFilter] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
     // --- CALENDAR STATE ---
     const [showCalendarModal, setShowCalendarModal] = useState(false);
     const [showDayModal, setShowDayModal] = useState(false);
@@ -37,18 +83,60 @@ const DashboardPage = () => {
         loadMonitoringData();
     }, []);
 
+    // --- CLICK OUTSIDE DROPDOWN LISTENER ---
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (isDropdownOpen && !event.target.closest('.custom-dropdown-container')) {
+                setIsDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isDropdownOpen]);
+
     // --- DATA PROCESSING ---
     useEffect(() => {
         if (monitoringData && monitoringData.length > 0) {
             let totalANP = 0, monthlyANP = 0;
-            let submitted = monitoringData.length, issued = 0, declined = 0, pending = 0;
+            let submitted = 0, issued = 0, declined = 0, pending = 0;
             const historyAgg = {};
 
             const now = new Date();
             const currentMonth = now.getMonth();
             const currentYear = now.getFullYear();
 
+            // 1. Build history aggregation
             monitoringData.forEach(item => {
+                if (item.status === 'Issued') {
+                    const totalPremium = parseFloat(item.premium_paid) || 0;
+                    let modalPremium = totalPremium;
+                    const mode = (item.mode_of_payment || '').trim();
+                    if (mode === 'Monthly') modalPremium = totalPremium / 12;
+                    else if (mode === 'Quarterly') modalPremium = totalPremium / 4;
+                    else if (mode === 'Semi-Annual') modalPremium = totalPremium / 2;
+
+                    const dDate = new Date(item.created_at);
+                    if (!isNaN(dDate)) {
+                        const monthKey = `${dDate.getFullYear()}-${String(dDate.getMonth() + 1).padStart(2, '0')}`;
+                        historyAgg[monthKey] = (historyAgg[monthKey] || 0) + modalPremium;
+                    }
+                }
+            });
+
+            // 2. Filter data for other stats
+            let dataToProcess = monitoringData;
+            if (globalMonthFilter) {
+                dataToProcess = monitoringData.filter(item => {
+                    const itemDate = new Date(item.created_at);
+                    if (isNaN(itemDate)) return false;
+                    const itemMonthStr = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, '0')}`;
+                    return itemMonthStr === globalMonthFilter;
+                });
+            }
+
+            submitted = dataToProcess.length;
+
+            dataToProcess.forEach(item => {
                 if (item.status === 'Issued') {
                     // 1. Total ANP = Full Premium Paid
                     const totalPremium = parseFloat(item.premium_paid) || 0;
@@ -64,12 +152,11 @@ const DashboardPage = () => {
 
                     const dDate = new Date(item.created_at);
                     if (!isNaN(dDate)) {
-                        if (dDate.getMonth() === currentMonth && dDate.getFullYear() === currentYear) {
+                        if (dDate.getMonth() === currentMonth && dDate.getFullYear() === currentYear && !globalMonthFilter) {
+                            monthlyANP += modalPremium;
+                        } else if (globalMonthFilter) {
                             monthlyANP += modalPremium;
                         }
-                        const monthKey = `${dDate.getFullYear()}-${String(dDate.getMonth() + 1).padStart(2, '0')}`;
-                        // Historical graph uses Monthly/Installment value to show cleaner trend
-                        historyAgg[monthKey] = (historyAgg[monthKey] || 0) + modalPremium;
                     }
                 } else if (item.status === 'Declined') declined++;
                 else pending++;
@@ -83,7 +170,7 @@ const DashboardPage = () => {
                 setSelectedMonthKey(availableKeys[0]);
             }
         }
-    }, [monitoringData, selectedMonthKey]);
+    }, [monitoringData, selectedMonthKey, globalMonthFilter]);
 
     // --- PAGINATION LOGIC ---
     const serialData = (monitoringData || []).filter(s => s.serial_number);
@@ -216,103 +303,173 @@ const DashboardPage = () => {
 
     return (
         <>
-            <h2 style={{ marginBottom: '20px', color: '#2c3e50' }}>Dashboard Overview</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h2 style={{ color: '#2c3e50', margin: 0, display: 'none' }}>Dashboard Overview</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <label style={{ fontSize: '14px', fontWeight: '600', color: darkMode ? '#94a3b8' : '#64748b' }}>Filter:</label>
+                    <div className="custom-dropdown-container" style={{ position: 'relative' }}>
+                        <div
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            style={{
+                                padding: '8px 16px',
+                                fontSize: '14px',
+                                borderRadius: '8px',
+                                border: darkMode ? '1px solid #334155' : '1px solid #e2e8f0',
+                                backgroundColor: darkMode ? '#1e293b' : '#ffffff',
+                                color: darkMode ? '#f8fafc' : '#1e293b',
+                                cursor: 'pointer',
+                                fontWeight: '600',
+                                minWidth: '160px',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                                transition: 'all 0.2s',
+                            }}
+                        >
+                            <span>{globalMonthFilter ? formatMonthKey(globalMonthFilter) : 'All Time'}</span>
+                            <span style={{ fontSize: '10px', marginLeft: '10px', transform: isDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
+                        </div>
+
+                        {isDropdownOpen && (
+                            <div style={{
+                                position: 'absolute',
+                                top: 'calc(100% + 8px)',
+                                right: 0,
+                                zIndex: 100,
+                                backgroundColor: darkMode ? '#1e293b' : '#ffffff',
+                                border: darkMode ? '1px solid #334155' : '1px solid #e2e8f0',
+                                borderRadius: '8px',
+                                boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+                                minWidth: '100%',
+                                overflow: 'hidden',
+                                animation: 'fadeIn 0.2s ease'
+                            }}>
+                                <div
+                                    onClick={() => { setGlobalMonthFilter(''); setIsDropdownOpen(false); }}
+                                    style={{
+                                        padding: '10px 16px',
+                                        fontSize: '14px',
+                                        cursor: 'pointer',
+                                        background: globalMonthFilter === '' ? (darkMode ? '#334155' : '#f1f5f9') : 'transparent',
+                                        color: globalMonthFilter === '' ? (darkMode ? '#3b82f6' : '#2563eb') : (darkMode ? '#cbd5e1' : '#475569'),
+                                        fontWeight: globalMonthFilter === '' ? '600' : '500',
+                                        transition: 'background 0.2s'
+                                    }}
+                                    onMouseEnter={e => e.currentTarget.style.background = darkMode ? '#334155' : '#f8fafc'}
+                                    onMouseLeave={e => e.currentTarget.style.background = globalMonthFilter === '' ? (darkMode ? '#334155' : '#f1f5f9') : 'transparent'}
+                                >
+                                    All Time
+                                </div>
+                                {sortedMonthKeys.map(key => (
+                                    <div
+                                        key={key}
+                                        onClick={() => { setGlobalMonthFilter(key); setIsDropdownOpen(false); }}
+                                        style={{
+                                            padding: '10px 16px',
+                                            fontSize: '14px',
+                                            cursor: 'pointer',
+                                            background: globalMonthFilter === key ? (darkMode ? '#334155' : '#f1f5f9') : 'transparent',
+                                            color: globalMonthFilter === key ? (darkMode ? '#3b82f6' : '#2563eb') : (darkMode ? '#cbd5e1' : '#475569'),
+                                            fontWeight: globalMonthFilter === key ? '600' : '500',
+                                            borderTop: darkMode ? '1px solid #334155' : '1px solid #f1f5f9',
+                                            transition: 'background 0.2s'
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.background = darkMode ? '#334155' : '#f8fafc'}
+                                        onMouseLeave={e => e.currentTarget.style.background = globalMonthFilter === key ? (darkMode ? '#334155' : '#f1f5f9') : 'transparent'}
+                                    >
+                                        {formatMonthKey(key)}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
 
             <div className="dashboard-grid">
                 {/* TOP ROW */}
-                <div className="stat-card blue animate-spring delay-1">
-                    <div className="stat-header"><div className="stat-label">Total ANP</div></div>
+                <div className="stat-card animate-spring delay-1" style={{ position: 'relative' }}>
+                    <SparklineTrend data={[12, 19, 15, 25, 22, 30, 28]} color="#3b82f6" percentage={12.4} />
+                    <div className="stat-header">
+                        <div className="stat-label">Total ANP</div>
+                    </div>
                     <div className="stat-value">PHP {stats.totalANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                    <div className="stat-subtext">All-time annual premium</div>
+                    <div className="stat-subtext" style={{ color: '#22c55e', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <span>▲</span> All-time annual premium
+                    </div>
                 </div>
 
-                <div className="stat-card green animate-spring delay-2">
-                    <div className="stat-header"><div className="stat-label">Monthly ANP</div></div>
+                <div className="stat-card animate-spring delay-2" style={{ position: 'relative' }}>
+                    <SparklineTrend data={[5, 12, 8, 18, 15, 22, 25]} color="#22c55e" percentage={8.1} />
+                    <div className="stat-header">
+                        <div className="stat-label">Monthly ANP</div>
+                    </div>
                     <div className="stat-value">PHP {stats.monthlyANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                     <div className="stat-subtext">This Month</div>
                 </div>
 
-                <div className="stat-card purple animate-spring delay-3" style={{
-                    background: darkMode ? '#161B22' : '#fff',
-                    border: darkMode ? '1px solid var(--border-subtle-dark)' : '1px solid #e2e8f0',
-                    boxShadow: darkMode ? '0 10px 15px -3px rgba(0, 0, 0, 0.3)' : '0 4px 12px rgba(0, 0, 0, 0.08)',
-                    color: darkMode ? 'white' : '#1e293b'
-                }}>
+                <div className="stat-card animate-spring delay-3">
                     <div className="stat-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
-                        <div className="stat-label" style={{ whiteSpace: 'nowrap', color: darkMode ? 'rgba(255,255,255,0.9)' : '#64748b', fontSize: '14px', letterSpacing: '0.5px', textTransform: 'uppercase', fontWeight: '600' }}>Historical ANP</div>
-                        <select
-                            value={selectedMonthKey}
-                            onChange={(e) => setSelectedMonthKey(e.target.value)}
-                            style={{
-                                padding: '4px 12px',
-                                fontSize: '12px',
-                                borderRadius: '20px',
-                                border: darkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid #cbd5e1',
-                                backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : '#f1f5f9',
-                                color: darkMode ? 'white' : '#1e293b',
-                                cursor: 'pointer',
-                                outline: 'none',
-                                fontWeight: '600',
-                                backdropFilter: 'blur(5px)'
-                            }}
-                        >
-                            {sortedMonthKeys.length > 0 ? (
-                                sortedMonthKeys.map(key => <option key={key} value={key} style={{ color: '#333' }}>{formatMonthKey(key)}</option>)
-                            ) : (
-                                <option value="" style={{ color: '#333' }}>No Data</option>
-                            )}
-                        </select>
+                        <div className="stat-label">Historical ANP</div>
                     </div>
-                    <div className="stat-value" style={{ color: darkMode ? 'white' : '#1e293b', fontSize: '28px', fontWeight: '800', marginBottom: '5px' }}>PHP {selectedMonthANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                    <div className="stat-subtext" style={{ color: darkMode ? 'rgba(255,255,255,0.7)' : '#64748b', fontSize: '13px' }}>{selectedMonthKey ? formatMonthKey(selectedMonthKey) : 'Select Month'}</div>
+                    <div className="stat-value">PHP {selectedMonthANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div className="stat-subtext">{selectedMonthKey ? formatMonthKey(selectedMonthKey) : 'Select Month'}</div>
                 </div>
 
                 <div
                     className="stat-card animate-spring delay-4"
-                    style={{
-                        borderLeft: '4px solid #0055b8',
-                        cursor: 'pointer',
-                        transition: 'transform 0.2s',
-                        backgroundColor: darkMode ? '#f39c12' : '#fff',
-                        color: 'white'
-                    }}
                     onClick={() => setShowCalendarModal(true)}
                 >
                     <div className="stat-header">
-                        <div className="stat-label" style={{ color: '#0055b8' }}>Tools</div>
+                        <div className="stat-label" style={{ color: darkMode ? '#60a5fa' : '#395998', fontWeight: 'bold' }}>Tools</div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                        <span style={{ fontSize: '32px' }}>📅</span>
+                        <div style={{ background: darkMode ? 'rgba(96, 165, 250, 0.1)' : 'rgba(57, 89, 152, 0.1)', padding: '10px', borderRadius: '12px' }}>
+                            <span style={{ fontSize: '24px', filter: darkMode ? 'grayscale(1) brightness(1.5)' : 'none' }}>📅</span>
+                        </div>
                         <div>
-                            <div className="stat-value" style={{ fontSize: '18px', marginBottom: '0' }}>Calendar</div>
+                            <div className="stat-value" style={{ fontSize: '18px', marginBottom: '2px' }}>Calendar</div>
                             <div className="stat-subtext">Schedule & Actions</div>
                         </div>
                     </div>
                 </div>
 
                 {/* BOTTOM ROW */}
-                <div className="stat-card orange animate-spring delay-5">
-                    <div className="stat-header"><div className="stat-label">Submitted</div></div>
+                <div className="stat-card animate-spring delay-5" style={{ position: 'relative' }}>
+                    <SparklineTrend data={[10, 15, 13, 22, 20, 28, 25]} color="#f59e0b" percentage={4.3} />
+                    <div className="stat-header">
+                        <div className="stat-label">Submitted</div>
+                    </div>
                     <div className="stat-value">{stats.submitted}</div>
                     <div className="stat-subtext">Applications</div>
                 </div>
 
-                <div className="stat-card purple animate-spring delay-1">
-                    <div className="stat-header"><div className="stat-label">Issued</div></div>
+                <div className="stat-card animate-spring delay-1" style={{ position: 'relative' }}>
+                    <SparklineTrend data={[2, 8, 5, 15, 12, 20, 18]} color="#22c55e" percentage={15.2} />
+                    <div className="stat-header">
+                        <div className="stat-label">Issued</div>
+                    </div>
                     <div className="stat-value">{stats.issued}</div>
-                    <div className="stat-subtext">{stats.submitted ? ((stats.issued / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
+                    <div className="stat-subtext" style={{ color: '#22c55e' }}>{stats.submitted ? ((stats.issued / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
                 </div>
 
-                <div className="stat-card teal animate-spring delay-2">
-                    <div className="stat-header"><div className="stat-label">Pending</div></div>
+                <div className="stat-card animate-spring delay-2" style={{ position: 'relative' }}>
+                    <SparklineTrend data={[5, 4, 6, 3, 5, 4, 3]} color="#06b6d4" percentage={-2.4} />
+                    <div className="stat-header">
+                        <div className="stat-label">Pending</div>
+                    </div>
                     <div className="stat-value">{stats.pending}</div>
                     <div className="stat-subtext">Awaiting Action</div>
                 </div>
 
-                <div className="stat-card red animate-spring delay-3">
-                    <div className="stat-header"><div className="stat-label">Declined</div></div>
+                <div className="stat-card animate-spring delay-3" style={{ position: 'relative' }}>
+                    <SparklineTrend data={[0, 1, 0, 2, 1, 0, 0]} color="#ef4444" percentage={1.1} />
+                    <div className="stat-header">
+                        <div className="stat-label">Declined</div>
+                    </div>
                     <div className="stat-value">{stats.declined}</div>
-                    <div className="stat-subtext">{stats.submitted ? ((stats.declined / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
+                    <div className="stat-subtext" style={{ color: '#ef4444' }}>{stats.submitted ? ((stats.declined / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
                 </div>
             </div>
 

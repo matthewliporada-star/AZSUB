@@ -536,7 +536,7 @@ const MPDashboard = () => {
 
     if (error) {
         return (
-            <MPLayout title="Dashboard Overview">
+            <MPLayout title="">
                 <div style={{ padding: '24px', color: 'red' }}>Error loading data: {error}</div>
             </MPLayout>
         );
@@ -916,7 +916,7 @@ const MPDashboard = () => {
     );
 
     return (
-        <MPLayout title="Dashboard Overview">
+        <MPLayout title="">
             <div className="mp-dashboard-content">
                 {viewMode === 'overview' && renderOverview()}
             </div>
