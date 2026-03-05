@@ -624,7 +624,7 @@
 
 .prototype-form-scope th {
   background: linear-gradient(135deg, #003266 0%, #2d4e91 100%);
-  color: white;
+  color: white !important;
   font-weight: 600;
   font-size: 14px;
   padding: 16px 20px;
