@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import supabase from "../../config/supabaseClient";
@@ -53,54 +53,10 @@ const ManageUsers = () => {
   // -- Filter State --
   const [showInactive, setShowInactive] = useState(false);
 
-  // -- Reset Password Notifications --
-  const [pendingResets, setPendingResets] = useState({}); // { userId: { name, email, sentAt } }
-  const [toastNotifications, setToastNotifications] = useState([]); // [{ id, message, type }]
-  const toastIdRef = useRef(0);
-
   // -- Initialization --
   useEffect(() => {
     checkAdmin();
   }, []);
-
-  // -- Real-time subscription: detect when user activates account via reset link --
-  useEffect(() => {
-    const channel = supabase
-      .channel('profile-status-changes')
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'profiles', filter: 'status=eq.Active' },
-        (payload) => {
-          const updatedUser = payload.new;
-          setPendingResets(prev => {
-            if (prev[updatedUser.id]) {
-              const name = `${updatedUser.first_name} ${updatedUser.last_name}`;
-              addToast(`✅ ${name} has reset their password and is now Active!`, 'success');
-              const next = { ...prev };
-              delete next[updatedUser.id];
-              return next;
-            }
-            return prev;
-          });
-          fetchUsers();
-        }
-      )
-      .subscribe();
-
-    return () => supabase.removeChannel(channel);
-  }, []);
-
-  const addToast = (message, type = 'info') => {
-    const id = ++toastIdRef.current;
-    setToastNotifications(prev => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToastNotifications(prev => prev.filter(t => t.id !== id));
-    }, 6000);
-  };
-
-  const dismissToast = (id) => {
-    setToastNotifications(prev => prev.filter(t => t.id !== id));
-  };
 
   const checkAdmin = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -377,27 +333,35 @@ const ManageUsers = () => {
   };
 
   const handleResetPassword = async (userItem) => {
-    const confirmMsg = `Send a password reset email to ${userItem.first_name} ${userItem.last_name} (${userItem.email})?\n\nThe user's account will be activated only after they click the link in the email.`;
+    if (!userItem.last_name) return;
+
+    const firstTwo = userItem.last_name.trim().substring(0, 2);
+    const formattedName = `${firstTwo.charAt(0).toUpperCase()}${firstTwo.length > 1 ? firstTwo.charAt(1).toLowerCase() : 'x'}`;
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const defaultPwd = `#${formattedName}${month}${year}`;
+
+    const confirmMsg = `Are you sure you want to reset the password for ${userItem.first_name} to the default: ${defaultPwd}?\n\nNote: For security reasons, the system will send a secure password recovery email to ${userItem.email} instead of sending the plaintext password.`;
 
     if (window.confirm(confirmMsg)) {
       try {
-        const { error: resetError } = await supabase.auth.resetPasswordForEmail(userItem.email, {
-          redirectTo: `${window.location.origin}/`
-        });
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(userItem.email);
+
         if (resetError) throw resetError;
 
-        // Track this user as pending reset
-        setPendingResets(prev => ({
-          ...prev,
-          [userItem.id]: {
-            name: `${userItem.first_name} ${userItem.last_name}`,
-            email: userItem.email,
-            sentAt: new Date()
-          }
-        }));
+        // Change the user's status to Active
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ status: "Active" })
+          .eq("id", userItem.id);
 
-        await logActivity("USER_UPDATE", `Sent password reset email to ${userItem.first_name} ${userItem.last_name}`);
-        addToast(`📧 Reset email sent to ${userItem.first_name} ${userItem.last_name}. Waiting for them to click the link...`, 'info');
+        if (updateError) throw updateError;
+
+        await logActivity("USER_UPDATE", `Sent password reset email and activated ${userItem.first_name} ${userItem.last_name}`);
+
+        alert(`Password reset email sent to ${userItem.email} and user account has been Activated.`);
+        fetchUsers(); // Refresh the list
       } catch (err) {
         console.error("Error resetting password:", err);
         alert("Failed to send reset email: " + err.message);
@@ -415,40 +379,6 @@ const ManageUsers = () => {
 
   return (
     <div className="dashboard-content" style={{ padding: '40px 50px' }}>
-
-      {/* TOAST NOTIFICATIONS */}
-      <div style={{
-        position: 'fixed', top: '20px', right: '24px', zIndex: 9999,
-        display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '380px'
-      }}>
-        {toastNotifications.map(toast => (
-          <div key={toast.id} style={{
-            background: toast.type === 'success' ? '#dcfce7' : '#dbeafe',
-            border: `1px solid ${toast.type === 'success' ? '#86efac' : '#93c5fd'}`,
-            borderLeft: `4px solid ${toast.type === 'success' ? '#22c55e' : '#3b82f6'}`,
-            borderRadius: '8px',
-            padding: '14px 16px',
-            fontSize: '13px',
-            color: toast.type === 'success' ? '#15803d' : '#1e40af',
-            fontWeight: '500',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            gap: '10px',
-            animation: 'slideIn 0.3s ease',
-          }}>
-            <span>{toast.message}</span>
-            <button
-              onClick={() => dismissToast(toast.id)}
-              style={{
-                background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px',
-                color: toast.type === 'success' ? '#15803d' : '#1e40af', flexShrink: 0, lineHeight: 1
-              }}
-            >×</button>
-          </div>
-        ))}
-      </div>
       <div className="header-row">
         <div>
           <h1 style={{ fontSize: "28px", fontWeight: "700", color: "#333" }}>Manage Users</h1>
@@ -520,22 +450,7 @@ const ManageUsers = () => {
                   <tr key={u.id}>
                     <td>{index + 1}</td>
                     <td>{u.last_name}</td>
-                    <td>
-                      {u.first_name}
-                      {pendingResets[u.id] && (
-                        <span title={`Reset email sent at ${pendingResets[u.id].sentAt.toLocaleTimeString()}`} style={{
-                          marginLeft: '8px',
-                          fontSize: '11px',
-                          background: '#fef9c3',
-                          border: '1px solid #fde047',
-                          color: '#854d0e',
-                          borderRadius: '4px',
-                          padding: '2px 6px',
-                          fontWeight: '600',
-                          whiteSpace: 'nowrap',
-                        }}>⏳ Awaiting Reset</span>
-                      )}
-                    </td>
+                    <td>{u.first_name}</td>
                     <td><span style={{ fontWeight: "600" }}>{u.account_type}</span></td>
                     <td>
                       <span className={`status-badge ${u.status === "Active" ? "active" : "inactive"}`}>
