@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../CIS.css";
 
 function PersonalInformation({ personalInfo, setPersonalInfo, countries }) {
   const [cities, setCities] = useState({});
@@ -117,7 +118,8 @@ function PersonalInformation({ personalInfo, setPersonalInfo, countries }) {
         },
         {
           key: "secondary_residence",
-          label: "Provide information for any current secondary residence and previous primary and secondary residences you have had in the past 10 years",
+          label:
+            "Provide information for any current secondary residence and previous primary and secondary residences you have had in the past 10 years",
         },
         {
           key: "permanent_address",

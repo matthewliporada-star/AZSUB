@@ -1,47 +1,189 @@
-import React from "react";
+import React, { useState } from "react";
+import "../CIS.css";
 
+const PolicyBeneficiary = () => {
+  const [beneficiaries, setBeneficiaries] = useState([
+    {
+      id: Date.now(),
+      name: "",
+      type: "",
+      relationship: "",
+      dob: "",
+      passport: "",
+      share: "",
+    },
+  ]);
 
-const PolicyBeneficiary = ({ beneficiary = {}, handleBeneficiaryChange }) => {
+  const [deleteMode, setDeleteMode] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
+
+  const handleChange = (index, field, value) => {
+    const updated = [...beneficiaries];
+    updated[index][field] = value;
+    setBeneficiaries(updated);
+  };
+
+  const addRow = () => {
+    setBeneficiaries([
+      ...beneficiaries,
+      {
+        id: Date.now(),
+        name: "",
+        type: "",
+        relationship: "",
+        dob: "",
+        passport: "",
+        share: "",
+      },
+    ]);
+  };
+
+  const toggleDelete = () => {
+    if (deleteMode && selectedRows.length > 0) {
+      setBeneficiaries(
+        beneficiaries.filter((_, i) => !selectedRows.includes(i))
+      );
+      setSelectedRows([]);
+    }
+    setDeleteMode(!deleteMode);
+  };
+
   return (
     <div className="form-box">
       <h3 className="section-title">Policy Beneficiary</h3>
 
-      <div className="form-grid-2">
-        <div className="input-group">
-          <label>Name</label>
-          <input
-            type="text"
-            className="box-input"
-            value={beneficiary.name || ""}
-            onChange={(e) =>
-              handleBeneficiaryChange("name", e.target.value)
-            }
-          />
-        </div>
+      <table className="income-table">
+        <thead>
+          <tr>
+            <th className="delete-col">{deleteMode ? "Select" : ""}</th>
+            <th>Name</th>
+            <th>Primary / Contingent</th>
+            <th>Relationship to Proposed Insured</th>
+            <th>Date of Birth</th>
+            <th>Passport No.</th>
+            <th>Allocated Share (%)</th>
+          </tr>
+        </thead>
 
-        <div className="input-group">
-          <label>Relation</label>
-          <input
-            type="text"
-            className="box-input"
-            value={beneficiary.relation || ""}
-            onChange={(e) =>
-              handleBeneficiaryChange("relation", e.target.value)
-            }
-          />
-        </div>
+        <tbody>
+          {beneficiaries.map((b, i) => (
+            <tr key={b.id}>
+              <td className="delete-col">
+                {deleteMode && (
+                  <input
+                    type="checkbox"
+                    checked={selectedRows.includes(i)}
+                    onChange={(e) => {
+                      if (e.target.checked)
+                        setSelectedRows([...selectedRows, i]);
+                      else
+                        setSelectedRows(
+                          selectedRows.filter((index) => index !== i)
+                        );
+                    }}
+                  />
+                )}
+              </td>
 
-        <div className="input-group">
-          <label>Share (%)</label>
-          <input
-            type="number"
-            className="box-input"
-            value={beneficiary.sharePercent || ""}
-            onChange={(e) =>
-              handleBeneficiaryChange("sharePercent", e.target.value)
-            }
-          />
-        </div>
+              <td>
+                <input
+                  className="box-input"
+                  type="text"
+                  value={b.name}
+                  onChange={(e) =>
+                    handleChange(i, "name", e.target.value)
+                  }
+                />
+              </td>
+
+              <td>
+                <select
+                  className="box-input"
+                  value={b.type}
+                  onChange={(e) =>
+                    handleChange(i, "type", e.target.value)
+                  }
+                >
+                  <option value="">Select</option>
+                  <option value="Primary">Primary</option>
+                  <option value="Contingent">Contingent</option>
+                </select>
+              </td>
+
+              <td>
+                <input
+                  className="box-input"
+                  type="text"
+                  value={b.relationship}
+                  onChange={(e) =>
+                    handleChange(i, "relationship", e.target.value)
+                  }
+                />
+              </td>
+
+              <td>
+                <input
+                  className="box-input"
+                  type="date"
+                  value={b.dob}
+                  onChange={(e) =>
+                    handleChange(i, "dob", e.target.value)
+                  }
+                />
+              </td>
+
+              <td>
+                <input
+                  className="box-input"
+                  type="text"
+                  value={b.passport}
+                  onChange={(e) =>
+                    handleChange(i, "passport", e.target.value)
+                  }
+                />
+              </td>
+
+              <td>
+                <input
+                  className="box-input"
+                  type="number"
+                  value={b.share}
+                  onChange={(e) =>
+                    handleChange(i, "share", e.target.value)
+                  }
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Buttons */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: "10px",
+          marginTop: "15px",
+        }}
+      >
+        {!deleteMode && (
+          <button
+            type="button"
+            className="btn-travel-add"
+            onClick={addRow}
+          >
+            + Add Beneficiary
+          </button>
+        )}
+
+        <button
+          type="button"
+          className="btn-travel-delete"
+          onClick={toggleDelete}
+        >
+          {deleteMode ? "Confirm Delete" : "Delete"}
+        </button>
       </div>
     </div>
   );

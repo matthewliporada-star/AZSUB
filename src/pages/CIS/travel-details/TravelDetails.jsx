@@ -1,5 +1,6 @@
 // TravelDetails.jsx
 import React from "react";
+import "../CIS.css";
 
 function TravelDetails({
   travelDetails,

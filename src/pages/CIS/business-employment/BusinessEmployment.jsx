@@ -1,22 +1,42 @@
-import React from "react";
+// BusinessEmployment.jsx
+import React, { useState } from "react";
+import "../CIS.css";
 
-function BusinessEmployment({ employment = {}, handleEmploymentChange = () => {} }) {
+const BusinessEmployment = () => {
+  // ✅ Internal state
+  const [employment, setEmployment] = useState({
+    businessName: "",
+    nature: "",
+    duties: "",
+    businessType: "",
+    ownership: "",
+    address: "",
+    website: "",
+    telephone: "",
+    incorporationDate: "",
+    previousExperience: "",
+  });
+
+  // ✅ Internal handler
+  const handleEmploymentChange = (field, value) => {
+    setEmployment((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   return (
     <div className="employment-section">
       <div className="form-box">
         <h3 className="section-title">Business / Employment Information</h3>
-
         <div className="form-grid-2">
-
-
-          {/* NEW FIELDS */}
 
           <div className="input-group">
             <label>Name of Business</label>
             <input
               type="text"
               className="box-input"
-              value={employment.businessName || ""}
+              value={employment.businessName}
               onChange={(e) => handleEmploymentChange("businessName", e.target.value)}
             />
           </div>
@@ -26,7 +46,7 @@ function BusinessEmployment({ employment = {}, handleEmploymentChange = () => {}
             <input
               type="text"
               className="box-input"
-              value={employment.nature || ""}
+              value={employment.nature}
               onChange={(e) => handleEmploymentChange("nature", e.target.value)}
             />
           </div>
@@ -36,7 +56,7 @@ function BusinessEmployment({ employment = {}, handleEmploymentChange = () => {}
             <input
               type="text"
               className="box-input"
-              value={employment.duties || ""}
+              value={employment.duties}
               onChange={(e) => handleEmploymentChange("duties", e.target.value)}
             />
           </div>
@@ -48,7 +68,7 @@ function BusinessEmployment({ employment = {}, handleEmploymentChange = () => {}
             <input
               type="text"
               className="box-input"
-              value={employment.businessType || ""}
+              value={employment.businessType}
               onChange={(e) => handleEmploymentChange("businessType", e.target.value)}
             />
           </div>
@@ -58,7 +78,7 @@ function BusinessEmployment({ employment = {}, handleEmploymentChange = () => {}
             <input
               type="number"
               className="box-input"
-              value={employment.ownership || ""}
+              value={employment.ownership}
               onChange={(e) => handleEmploymentChange("ownership", e.target.value)}
             />
           </div>
@@ -68,7 +88,7 @@ function BusinessEmployment({ employment = {}, handleEmploymentChange = () => {}
             <input
               type="text"
               className="box-input"
-              value={employment.address || ""}
+              value={employment.address}
               onChange={(e) => handleEmploymentChange("address", e.target.value)}
             />
           </div>
@@ -78,7 +98,7 @@ function BusinessEmployment({ employment = {}, handleEmploymentChange = () => {}
             <input
               type="text"
               className="box-input"
-              value={employment.website || ""}
+              value={employment.website}
               onChange={(e) => handleEmploymentChange("website", e.target.value)}
             />
           </div>
@@ -88,7 +108,7 @@ function BusinessEmployment({ employment = {}, handleEmploymentChange = () => {}
             <input
               type="text"
               className="box-input"
-              value={employment.telephone || ""}
+              value={employment.telephone}
               onChange={(e) => handleEmploymentChange("telephone", e.target.value)}
             />
           </div>
@@ -98,7 +118,7 @@ function BusinessEmployment({ employment = {}, handleEmploymentChange = () => {}
             <input
               type="date"
               className="box-input"
-              value={employment.incorporationDate || ""}
+              value={employment.incorporationDate}
               onChange={(e) => handleEmploymentChange("incorporationDate", e.target.value)}
             />
           </div>
@@ -110,7 +130,7 @@ function BusinessEmployment({ employment = {}, handleEmploymentChange = () => {}
             <textarea
               className="box-input"
               rows="3"
-              value={employment.previousExperience || ""}
+              value={employment.previousExperience}
               onChange={(e) => handleEmploymentChange("previousExperience", e.target.value)}
             />
           </div>
@@ -119,6 +139,6 @@ function BusinessEmployment({ employment = {}, handleEmploymentChange = () => {}
       </div>
     </div>
   );
-}
+};
 
 export default BusinessEmployment;

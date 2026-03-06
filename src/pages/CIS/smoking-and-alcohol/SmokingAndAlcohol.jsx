@@ -1,4 +1,5 @@
 import React from "react";
+import "../CIS.css";
 
 function SmokingAndAlcohol({ habits = {}, handleHabitsChange = () => {} }) {
   const defaultHabits = {

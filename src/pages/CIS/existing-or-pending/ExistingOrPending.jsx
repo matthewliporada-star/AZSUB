@@ -122,19 +122,7 @@ function ExistingOrPending({
 
         {/* Add/Delete Buttons */}
         <div className="adds-deletes-container-cis">
-          <button
-            type="button"
-            className="btn-add-member-cis"
-            onClick={addRow}
-            style={{
-              width: "170px",
-              height: "40px",
-              marginRight: "15px", // space between buttons
-              marginTop: "10px", // move buttons down (position)
-              position: "relative",
-              left: "680px",
-            }}
-          >
+          <button type="button" className="btn-add-member-cis" onClick={addRow}>
             Add Insurance
           </button>
 
@@ -142,13 +130,6 @@ function ExistingOrPending({
             type="button"
             className="btn-delete-member-cis"
             onClick={deleteRow}
-            style={{
-              width: "150px",
-              height: "40px",
-              marginTop: "10px",
-              position: "relative",
-              left: "680px",
-            }}
           >
             Delete Last
           </button>

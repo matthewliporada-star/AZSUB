@@ -4,6 +4,8 @@ import { AppProvider } from './context/AppContext';
 import MainLayout from './components/Layout/MainLayout';
 import ProfileLayout from './components/Layout/ProfileLayout';
 import Login from './pages/Login/Login';
+import MPLayout from './pages/MP/MPLayout';
+import CISForm from "./pages/CIS/CIS";
 
 // MP Data Provider
 import { MPDataProvider } from './pages/MP/MPData.jsx';
@@ -32,6 +34,7 @@ import ProfilePage from './pages/Common/ProfilePage';
 // AL Pages
 import ALDashboard from './pages/AL/DashboardPage';
 import ALTeamPerformance from './pages/AL/PerformanceDashboardPage';
+import CIS from './pages/CIS/CIS';
 
 // MP Pages
 
@@ -84,12 +87,15 @@ function App() {
           <Route path="/al/submission" element={<MainLayout><SubmissionPage /></MainLayout>} />
           <Route path="/al/serial-history" element={<MainLayout><SerialHistoryPage /></MainLayout>} />
           <Route path="/al/doc-history" element={<MainLayout><DocHistoryPage /></MainLayout>} />
+          <Route path="/al/cis" element={<MainLayout><CIS /></MainLayout>} />
+          
 
           {/* MD/MP Routes */}
           <Route element={<MPDataProvider><Outlet /></MPDataProvider>}>
-            <Route path="/mp/dashboard" element={<MPDashboard />} />
-            <Route path="/mp/al-performance" element={<ALPerformance />} />
-            <Route path="/mp/ap-performance" element={<APPerformance />} />
+          <Route path="/mp/dashboard" element={<MPLayout><MPDashboard /></MPLayout>} />
+          <Route path="/mp/al-performance" element={<MPLayout><ALPerformance /></MPLayout>} />
+          <Route path="/mp/ap-performance" element={<MPLayout><APPerformance /></MPLayout>} />
+          <Route path="/mp/cis" element={<MPLayout><CIS /></MPLayout>} />  {/* Wrap CIS with MPLayout */}
           </Route>
 
           {/* MD Routes */}

@@ -10,7 +10,6 @@
 .webpage-container {
   min-height: 50vh;
   width: 100%;
-  
 }
 
 /* =========================
@@ -23,7 +22,7 @@
   padding: 40px 20px;
   display: flex;
   flex-direction: column;
-  align-items: stretch;   /* ✅ allows children full width */
+  align-items: stretch; /* ✅ allows children full width */
 }
 
 .content-header {
@@ -46,7 +45,7 @@
 .search-container.centered {
   display: flex;
   justify-content: center; /* horizontal centering */
-  align-items: center;     /* vertical alignment */
+  align-items: center; /* vertical alignment */
   gap: 0.5rem;
   margin: 0 auto 1rem;
   max-width: 800px;
@@ -61,7 +60,9 @@
   border-radius: 5px;
   border: 1px solid #ccc;
   font-size: 0.95rem;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
 }
 
 .search-container.centered .search-bar:focus {
@@ -79,7 +80,9 @@
   padding: 0.5rem 1rem;
   border-radius: 5px;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
+  transition:
+    background 0.3s ease,
+    transform 0.2s ease;
   text-align: center;
   display: flex;
   align-items: center;
@@ -142,7 +145,9 @@
   border-radius: 5px;
   cursor: pointer;
   text-align: center;
-  transition: background 0.3s ease, transform 0.2s ease;
+  transition:
+    background 0.3s ease,
+    transform 0.2s ease;
 }
 
 .step2-next-btn:hover {
@@ -158,7 +163,9 @@
   padding: 0.5rem 1rem;
   border-radius: 5px;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
+  transition:
+    background 0.3s ease,
+    transform 0.2s ease;
 }
 
 .save-form-btn:hover {
@@ -178,6 +185,8 @@
   width: 100%;
   max-width: 1100px;
   box-shadow: 20px 20px 10px rgba(0, 0, 0, 0.05);
+  position: relative;
+  bottom: 30px;
 }
 
 /* =========================
@@ -217,13 +226,15 @@
 ========================= */
 .input-group {
   position: relative;
-  margin-bottom: 15px;
+  margin-bottom: 10px; /* tighter spacing between rows */
 }
 
 .input-group label {
+  display: block; /* ensure label is on top of input */
+  margin-bottom: 0px; /* or 0px for no space */
   font-weight: 600;
-  margin-bottom: 8px;
   font-size: 0.9rem;
+  line-height: 4.5; /* optional: controls vertical spacing inside label */
 }
 
 .box-input {
@@ -275,6 +286,7 @@
 .income-table input,
 .income-table select {
   width: 100%;
+  height: 30px;
 }
 
 /* =========================
@@ -371,17 +383,15 @@
   margin-bottom: 0.5rem;
 }
 
-
-
 .cis-page-wrapper .cis-page h1 {
   font-size: 2rem;
 }
 
 .step-title {
-  font-size: 17px;       /* keep font size */
-  text-align: center;    /* center horizontally in its container */
-  width: 100%;           /* ensure it spans full container width */
-  margin-bottom: 5px;   /* optional spacing from input */
+  font-size: 17px; /* keep font size */
+  text-align: center; /* center horizontally in its container */
+  width: 100%; /* ensure it spans full container width */
+  margin-bottom: 5px; /* optional spacing from input */
 }
 
 .view-window {
@@ -394,38 +404,37 @@
 }
 
 .cis-page-wrapper.mp-top {
-  margin-top: -50px; /* adjust as needed */
+  margin-top: -90px; /* shift form up under the fixed header */
   transition: margin 0.3s ease;
 }
 
 /* Wrapper */
 .mobile-input-wrapper {
   display: flex;
-  width: 100%;
-  max-width: 400px;
+  width: 100%; /* let it take full available space */
+  max-width: 400px; /* optional max size */
   height: 42px;
   background: #fff;
 }
 
 /* Country Code Dropdown */
 .mobile-country-code {
+  flex: 0 0 150px; /* fixed width: 80px */
   border: 2px solid #ced4da;
-  border-right: none; /* remove right border so input connects */
-  border-radius: 6px 0 0 6px; /* rounded left corners */
+  border-right: none;
+  border-radius: 6px 0 0 6px;
   padding: 0 10px;
   font-size: 0.95rem;
   outline: none;
-  width: 150px;
   background: #fff;
-  appearance: none;
 }
 
 /* Mobile Number Input */
 .cis-page-wrapper .mobile-number-input-cis {
-  flex: 1;
+  flex: 1; /* takes remaining space */
   border: 2px solid #ced4da;
-  border-left: none; /* remove left border to connect with select */
-  border-radius: 0 6px 6px 0; /* rounded right corners */
+  border-left: none;
+  border-radius: 0 6px 6px 0;
   padding: 0 10px;
   font-size: 0.95rem;
   outline: none;
@@ -438,8 +447,8 @@
 
 /* Email input smaller and aligned */
 .email-input-group .box-input {
-  width: 60%;        /* smaller than full column */
-  max-width: 500px;  /* optional max */
+  width: 60%; /* smaller than full column */
+  max-width: 500px; /* optional max */
   padding: 8px 10px; /* reduce padding for visual balance */
   font-size: 0.95rem;
 }
@@ -488,7 +497,6 @@
   cursor: pointer;
   font-size: 0.8rem;
   height: 25px;
-
 }
 
 .btn-delete-row:hover {
@@ -514,9 +522,9 @@
 
 /* Instruction text after "-" in label */
 .medical-instruction {
-  color: red;           /* make instructions red */
+  color: red;
   font-weight: 200;
-  font-size: 1.3dvb;
+  font-size: 0.85rem;
 }
 
 /* Ensure inputs align nicely with long labels */
@@ -526,62 +534,30 @@
   margin-bottom: 15px;
 }
 
-/* Optional: make box-input full width for better alignment */
-.box-input {
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid #ced4da;
-  font-size: 0.95rem;
-  outline: none;
-}
-
-.cis-page-wrapper .add-row-container .btn-add-row {
-  background-color: #1f3b73;
-  color: #fff;
-  border: none;
-  padding: 5px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: background 0.2s;
-}
-
-.cis-page-wrapper .add-row-container .btn-add-row:hover {
-  background-color: #0f2955;
-}
-
-/* Hide default checkbox */
+/* Custom checkbox styling */
 .custom-checkbox input {
   display: none;
 }
 
-/* Container */
 .custom-checkbox {
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  position: relative;
-  top: 15px;
 }
 
-/* Custom box */
 .custom-checkbox .checkmark {
   width: 18px;
   height: 18px;
-  border: 2px solid #3b82f6; /* same tone as add button */
+  border: 2px solid #3b82f6;
   border-radius: 4px;
   transition: all 0.2s ease;
-  position: relative;
 }
 
-/* When checked */
 .custom-checkbox input:checked + .checkmark {
   background-color: #3b82f6;
 }
 
-/* Check icon */
 .custom-checkbox input:checked + .checkmark::after {
   content: "";
   position: absolute;
@@ -596,9 +572,6 @@
 
 .btn-travel-add,
 .btn-travel-delete {
-  position: static; /* remove relative positioning */
-  left: auto;
-  top: auto;
   padding: 5px 12px;
   border-radius: 6px;
   font-size: 0.85rem;
@@ -625,7 +598,7 @@
 }
 
 .long-label .label-parenthesis {
-  display: block; 
+  display: block;
   font-size: 0.75rem;
   color: red;
   white-space: normal; /* allow wrapping */
@@ -633,7 +606,7 @@
 }
 
 .form-grid-2 .input-group label {
-  min-height: 30px;   /* increase height */
+  min-height: 30px; /* increase height */
   display: block;
 }
 
@@ -642,12 +615,13 @@
 }
 
 .input-group.long-label label {
-  display: flex;         /* inline flex to keep label + parenthesis in one line */
-  align-items: center;   /* vertical align middle */
-  gap: 4px;              /* small space between label and parenthesis */
+  display: flex; /* inline flex to keep label + parenthesis in one line */
+  align-items: center; /* vertical align middle */
+  gap: 4px; /* small space between label and parenthesis */
   font-weight: 700;
   font-size: 0.6rem;
-  flex-wrap: nowrap;     /* prevent line break */
+  flex-wrap: nowrap; /* prevent line break */
+  margin-bottom: 2px; /* smaller spacing for long labels if needed */
 }
 
 .input-group.long-label .label-parenthesis {
@@ -666,7 +640,8 @@ body.dark-mode {
 }
 
 body.dark-mode .insurance-form,
-body.dark-mode .form-box {  /* ✅ add form-box here */
+body.dark-mode .form-box {
+  /* ✅ add form-box here */
   background-color: #1e1e1e;
   color: white;
   border-color: #333; /* optional: make border darker if needed */
@@ -718,7 +693,6 @@ body.dark-mode .form-box select {
   border-radius: 8px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
-
 }
 
 /* Input groups */
@@ -777,12 +751,9 @@ body.dark-mode .family-medical-section .input-group .box-input {
 .family-medical-section .custom-checkbox .checkmark {
   width: 18px;
   height: 18px;
-  border: 2px solid #3b82f6; /* same tone as add button */
+  border: 2px solid #3b82f6;
   border-radius: 4px;
   transition: all 0.2s ease;
-  position: relative;
-  bottom: 18px;
-  right: 430px;
 }
 
 /* Optional: checked state */
@@ -798,9 +769,9 @@ body.dark-mode .family-medical-section .input-group .box-input {
 
 .add-delete-container-cis {
   display: flex;
-  justify-content: flex-end;   /* align right */
-  gap: 10px;
-  margin-top: 15px;
+  justify-content: flex-start; /* left side */
+  gap: 10px; /* space between buttons */
+  margin-top: 10px;
 }
 
 .btn-add-member-cis,
@@ -825,7 +796,6 @@ body.dark-mode .family-medical-section .input-group .box-input {
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
-
 
 .compact-title {
   font-size: 14px;
@@ -911,7 +881,7 @@ body.dark-mode .family-medical-section .input-group .box-input {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -925,7 +895,7 @@ body.dark-mode .family-medical-section .input-group .box-input {
   min-width: 280px;
   max-width: 350px;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .modal-content h4 {
@@ -1000,7 +970,10 @@ body.dark-mode .family-medical-section .input-group .box-input {
   position: relative;
 }
 
-.family-compact-card .delete-checkbox-wrapper input:checked + .checkmark::after {
+.family-compact-card
+  .delete-checkbox-wrapper
+  input:checked
+  + .checkmark::after {
   content: "";
   position: absolute;
   left: 4px;
@@ -1049,4 +1022,94 @@ body.dark-mode .family-medical-section .input-group .box-input {
   border: none !important;
   border-radius: 6px !important;
   cursor: pointer !important;
+}
+
+.add-row-container {
+  display: flex;
+  justify-content: flex-end; /* pushes buttons to the right */
+  gap: 10px; /* space between buttons */
+  margin-top: 10px;
+}
+
+.adds-deletes-container-cis {
+  display: flex;
+  justify-content: flex-end; /* moves buttons to the RIGHT */
+  gap: 15px; /* space between buttons */
+  margin-top: 15px;
+}
+
+.add-btn {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: #2c7be5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delete-btn {
+  margin-top: 10px;
+  padding: 6px 14px;
+  background: #e55353;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* =========================
+   BUSINESS / EMPLOYMENT LONG LABEL FIX
+========================= */
+.employment-section .form-grid-2 .input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.employment-section .form-grid-2 .input-group label {
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: normal; /* allow wrapping for long labels */
+  margin-top: 15px;
+}
+
+.employment-section .form-grid-2 .input-group label.long-label {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  word-break: break-word; /* break long text to next line */
+}
+
+.employment-section .form-grid-2 .input-group input.box-input,
+.employment-section .form-grid-2 .input-group textarea.box-input {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 10px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #c5d1e0;
+  box-sizing: border-box;
+}
+
+/* Optional: make textarea scrollable if content is long */
+.employment-section .form-grid-2 .input-group textarea.box-input {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* Scoped grid for spouse addresses only */
+.spouse-address-grid {
+  display: grid;
+  grid-template-columns: 250px 200px 120px; /* City | Country | Postal */
+  gap: 20px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .spouse-address-grid {
+    grid-template-columns: 1fr 1fr 1fr; /* shrink for mobile */
+    gap: 15px;
+  }
 }
