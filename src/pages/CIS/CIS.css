@@ -1,0 +1,1052 @@
+/* =========================
+   GLOBAL LAYOUT
+========================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.webpage-container {
+  min-height: 50vh;
+  width: 100%;
+  
+}
+
+/* =========================
+   MAIN CONTENT
+========================= */
+.main-content.cis {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;   /* ✅ allows children full width */
+}
+
+.content-header {
+  width: 100%;
+  max-width: 1100px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.content-header h1 {
+  color: #003366;
+  font-size: 2rem;
+  margin: 0;
+}
+
+/* =========================
+   SEARCH & UPLOAD
+========================= */
+/* Center container content */
+.search-container.centered {
+  display: flex;
+  justify-content: center; /* horizontal centering */
+  align-items: center;     /* vertical alignment */
+  gap: 0.5rem;
+  margin: 0 auto 1rem;
+  max-width: 800px;
+  width: 100%;
+}
+
+/* Search input styling */
+.search-container.centered .search-bar {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-container.centered .search-bar:focus {
+  outline: none;
+  border-color: #001f4d;
+  box-shadow: 0 0 0 2px rgba(0, 31, 77, 0.2);
+}
+
+/* Search button styling */
+.search-container.centered .search-btn-cis {
+  flex: 0 0 120px;
+  background-color: #001f4d;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-container.centered .search-btn-cis:hover {
+  background-color: #003366;
+  transform: translateY(-1px);
+}
+
+/* Upload container */
+.upload-container {
+  text-align: center;
+  margin-top: 25px;
+}
+
+/* Drop zone styling */
+.drop-zone {
+  width: 240px;
+  height: 190px;
+  background: #e9edf5;
+  margin: 25px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px dashed transparent;
+}
+
+.drop-zone:hover {
+  background: #dbe7ff;
+  border-color: #003366;
+}
+
+.cloud-symbol {
+  font-size: 30px;
+  color: #003366;
+}
+
+/* =========================
+   STEP BUTTONS
+========================= */
+.step-footer {
+  display: flex;
+  justify-content: center; /* center the button horizontally */
+  margin-top: 20px;
+}
+
+.step2-next-btn {
+  max-width: 150px;
+  width: 100%;
+  padding: 0.5rem 1.5rem;
+  background-color: #001f4d;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.step2-next-btn:hover {
+  background-color: #003366;
+  transform: translateY(-1px);
+}
+
+/* Save form button */
+.save-form-btn {
+  background-color: #001f4d;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.save-form-btn:hover {
+  background-color: #003366;
+  transform: translateY(-1px);
+}
+
+/* =========================
+   FORM BOX DESIGN
+========================= */
+.form-box {
+  background: #ffffff;
+  border: 1px solid #e0e6f0;
+  border-radius: 14px;
+  padding: 30px;
+  margin-bottom: 40px;
+  width: 100%;
+  max-width: 1100px;
+  box-shadow: 20px 20px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* =========================
+   SECTION TITLE
+========================= */
+.section-title {
+  background: #003366;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  padding: 14px;
+  border-radius: 10px;
+  margin: -30px -30px 30px -30px;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* =========================
+   GRID SYSTEM
+========================= */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* =========================
+   INPUT STYLING
+========================= */
+.input-group {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.box-input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1.5px solid #c5d1e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  background: #fff;
+  transition: 0.2s ease;
+}
+
+.box-input:focus {
+  border-color: #003366;
+  box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+}
+
+/* =========================
+   TABLE DESIGN
+========================= */
+.income-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 0.9rem;
+}
+
+.income-table th {
+  text-align: left;
+  padding: 12px;
+  background: #f2f6ff;
+  color: #003366;
+  border-bottom: 2px solid #003366;
+}
+
+.income-table td {
+  padding: 10px;
+  border-bottom: 1px solid #e0e6f0;
+  vertical-align: top;
+}
+
+.income-table td:first-child {
+  font-weight: 500;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.income-table input,
+.income-table select {
+  width: 100%;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.btn-navy-cis {
+  background: #003366;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  height: 40px;
+  padding: 0 18px;
+  transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-navy-cis:hover {
+  background: #00264d;
+  transform: translateY(-1px);
+}
+
+.action-center {
+  text-align: center;
+  margin-top: 25px;
+}
+
+/* =========================
+   ANIMATION
+========================= */
+.step-fade {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 900px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .main-content.cis {
+    padding: 25px 15px;
+  }
+
+  .search-container.centered {
+    flex-direction: column;
+    width: 90%;
+  }
+
+  .search-container.centered .search-btn-cis {
+    width: 100%;
+  }
+
+  .step2-next-btn {
+    max-width: 150px;
+  }
+}
+
+/* =========================
+   CIS PAGE SPECIFIC
+========================= */
+.main-content .cis-page {
+  padding: 20px;
+}
+
+.main-content .cis-page h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.main-content .cis-page .box-input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+
+
+.cis-page-wrapper .cis-page h1 {
+  font-size: 2rem;
+}
+
+.step-title {
+  font-size: 17px;       /* keep font size */
+  text-align: center;    /* center horizontally in its container */
+  width: 100%;           /* ensure it spans full container width */
+  margin-bottom: 5px;   /* optional spacing from input */
+}
+
+.view-window {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cis-page-wrapper.mp-top {
+  margin-top: -50px; /* adjust as needed */
+  transition: margin 0.3s ease;
+}
+
+/* Wrapper */
+.mobile-input-wrapper {
+  display: flex;
+  width: 100%;
+  max-width: 400px;
+  height: 42px;
+  background: #fff;
+}
+
+/* Country Code Dropdown */
+.mobile-country-code {
+  border: 2px solid #ced4da;
+  border-right: none; /* remove right border so input connects */
+  border-radius: 6px 0 0 6px; /* rounded left corners */
+  padding: 0 10px;
+  font-size: 0.95rem;
+  outline: none;
+  width: 150px;
+  background: #fff;
+  appearance: none;
+}
+
+/* Mobile Number Input */
+.cis-page-wrapper .mobile-number-input-cis {
+  flex: 1;
+  border: 2px solid #ced4da;
+  border-left: none; /* remove left border to connect with select */
+  border-radius: 0 6px 6px 0; /* rounded right corners */
+  padding: 0 10px;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+/* Divider line */
+.mobile-country-code {
+  border-right: 1px solid #ccc;
+}
+
+/* Email input smaller and aligned */
+.email-input-group .box-input {
+  width: 60%;        /* smaller than full column */
+  max-width: 500px;  /* optional max */
+  padding: 8px 10px; /* reduce padding for visual balance */
+  font-size: 0.95rem;
+}
+
+/* Optional: vertically align with mobile input */
+.form-grid-2 > .input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Email Wrapper */
+.email-input-wrapper {
+  width: 100%;
+  padding-bottom: 20px;
+}
+
+/* Email Input */
+.email-input {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  height: 42px; /* Match mobile + other inputs */
+}
+
+.btn-add-row {
+  background-color: #1f3b73;
+  color: #fff;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.btn-add-row:hover {
+  background-color: #0f2955;
+}
+
+.cis-page-wrapper .btn-delete-row {
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 100px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  height: 25px;
+
+}
+
+.btn-delete-row:hover {
+  background-color: #b02a37;
+}
+
+.income-table select,
+.income-table input.box-input {
+  width: 100%;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+/* Medical form labels */
+.medical-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+/* Instruction text after "-" in label */
+.medical-instruction {
+  color: red;           /* make instructions red */
+  font-weight: 200;
+  font-size: 1.3dvb;
+}
+
+/* Ensure inputs align nicely with long labels */
+.form-grid-2.medical-grid .input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+/* Optional: make box-input full width for better alignment */
+.box-input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.cis-page-wrapper .add-row-container .btn-add-row {
+  background-color: #1f3b73;
+  color: #fff;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.cis-page-wrapper .add-row-container .btn-add-row:hover {
+  background-color: #0f2955;
+}
+
+/* Hide default checkbox */
+.custom-checkbox input {
+  display: none;
+}
+
+/* Container */
+.custom-checkbox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  top: 15px;
+}
+
+/* Custom box */
+.custom-checkbox .checkmark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #3b82f6; /* same tone as add button */
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+/* When checked */
+.custom-checkbox input:checked + .checkmark {
+  background-color: #3b82f6;
+}
+
+/* Check icon */
+.custom-checkbox input:checked + .checkmark::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.btn-travel-add,
+.btn-travel-delete {
+  position: static; /* remove relative positioning */
+  left: auto;
+  top: auto;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background-color: #1f3b73;
+  color: #fff;
+  border: none;
+  transition: background 0.2s;
+}
+
+.btn-travel-add:hover,
+.btn-travel-delete:hover {
+  background-color: #0f2955;
+}
+
+.label-parenthesis {
+  color: red;
+  font-weight: normal; /* optional */
+  white-space: nowrap;
+}
+
+.long-label label {
+  line-height: 1.4;
+}
+
+.long-label .label-parenthesis {
+  display: block; 
+  font-size: 0.75rem;
+  color: red;
+  white-space: normal; /* allow wrapping */
+  line-height: 1.2;
+}
+
+.form-grid-2 .input-group label {
+  min-height: 30px;   /* increase height */
+  display: block;
+}
+
+.long-label label {
+  white-space: nowrap;
+}
+
+.input-group.long-label label {
+  display: flex;         /* inline flex to keep label + parenthesis in one line */
+  align-items: center;   /* vertical align middle */
+  gap: 4px;              /* small space between label and parenthesis */
+  font-weight: 700;
+  font-size: 0.6rem;
+  flex-wrap: nowrap;     /* prevent line break */
+}
+
+.input-group.long-label .label-parenthesis {
+  font-size: 0.65rem;
+  color: red;
+  white-space: normal; /* allow wrapping */
+}
+
+/* =========================
+   DARK MODE SUPPORT
+========================= */
+
+body.dark-mode {
+  background-color: #121212;
+  color: white;
+}
+
+body.dark-mode .insurance-form,
+body.dark-mode .form-box {  /* ✅ add form-box here */
+  background-color: #1e1e1e;
+  color: white;
+  border-color: #333; /* optional: make border darker if needed */
+}
+
+body.dark-mode .insurance-form label,
+body.dark-mode .form-box label {
+  color: white;
+}
+
+body.dark-mode .insurance-form input,
+body.dark-mode .insurance-form textarea,
+body.dark-mode .insurance-form select,
+body.dark-mode .form-box input,
+body.dark-mode .form-box textarea,
+body.dark-mode .form-box select {
+  background-color: #2a2a2a;
+  color: white;
+  border: 1px solid #444;
+}
+
+body.dark-mode .insurance-form input::placeholder,
+body.dark-mode .form-box input::placeholder,
+body.dark-mode .insurance-form textarea::placeholder,
+body.dark-mode .form-box textarea::placeholder,
+body.dark-mode .insurance-form select::placeholder,
+body.dark-mode .form-box select::placeholder {
+  color: #aaa;
+}
+
+/* Optional: smooth transition */
+body,
+body.dark-mode .insurance-form,
+body.dark-mode .form-box,
+body.dark-mode .insurance-form input,
+body.dark-mode .form-box input,
+body.dark-mode .insurance-form textarea,
+body.dark-mode .form-box textarea,
+body.dark-mode .insurance-form select,
+body.dark-mode .form-box select {
+  transition: all 0.3s ease;
+}
+
+/* =========================
+   FAMILY MEDICAL FORM
+========================= */
+.family-medical-section .form-box {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+
+}
+
+/* Input groups */
+.family-medical-section .input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.family-medical-section .input-group label {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.family-medical-section .input-group .box-input {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Add Member Button */
+.btn-add-member {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: none;
+  background: #3b82f6;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-add-member:hover {
+  background: #2563eb;
+}
+
+/* =========================
+   DARK MODE OVERRIDES
+========================= */
+body.dark-mode .family-medical-section .form-box {
+  background-color: #1e1e1e;
+  color: white;
+}
+
+body.dark-mode .family-medical-section .input-group label {
+  color: white;
+}
+
+body.dark-mode .family-medical-section .input-group .box-input {
+  background-color: #2a2a2a;
+  color: white;
+  border: 1px solid #444;
+}
+
+.family-medical-section .custom-checkbox .checkmark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #3b82f6; /* same tone as add button */
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  position: relative;
+  bottom: 18px;
+  right: 430px;
+}
+
+/* Optional: checked state */
+.family-medical-section .custom-checkbox input:checked + .checkmark {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* =========================
+   EXISTING / PENDING BUTTONS
+   (Same style as Travel Details)
+========================= */
+
+.add-delete-container-cis {
+  display: flex;
+  justify-content: flex-end;   /* align right */
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-add-member-cis,
+.btn-delete-member-cis {
+  background-color: #1f3b73;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s ease;
+}
+
+.btn-add-member-cis:hover,
+.btn-delete-member-cis:hover {
+  background-color: #0f2955;
+}
+
+.family-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+
+.compact-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.compact-field {
+  margin-bottom: 8px;
+}
+
+.compact-field label {
+  font-size: 12px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.small-input {
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+.delete-checkbox-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+/* =========================
+   FAMILY MEDICAL INPUT FLOATING LABEL
+========================= */
+.family-compact-card .compact-field {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.family-compact-card .compact-field input.small-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1.5px solid #c5d1e0;
+  font-size: 0.9rem;
+  outline: none;
+  background: #fff;
+}
+
+/* Floating label effect */
+.family-compact-card .compact-field label {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #999;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+/* Label moves up when input has value or is focused */
+.family-compact-card .compact-field input:focus + label,
+.family-compact-card .compact-field input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 0.7rem;
+  color: #003366;
+  background: #f9faff;
+  padding: 0 4px;
+}
+
+/* Focus style */
+.family-compact-card .compact-field input.small-input:focus {
+  border-color: #003366;
+  box-shadow: 0 0 0 2px rgba(0, 51, 102, 0.1);
+}
+
+/* =========================
+   MODAL FOR ADD ROW
+========================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 25px 20px;
+  border-radius: 10px;
+  min-width: 280px;
+  max-width: 350px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.modal-content h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.modal-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.modal-btn {
+  flex: 1 1 40%;
+  background-color: #1f3b73;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s ease;
+}
+
+.modal-btn:hover {
+  background-color: #0f2955;
+}
+
+.modal-cancel {
+  background-color: #b02a37;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.modal-cancel:hover {
+  background-color: #92242b;
+}
+
+/* =========================
+   DELETE ROW CHECKBOX
+========================= */
+.family-compact-card .delete-checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.family-compact-card .delete-checkbox-wrapper input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Optional: simple custom checkbox style */
+.family-compact-card .delete-checkbox-wrapper .checkmark {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  position: relative;
+}
+
+.family-compact-card .delete-checkbox-wrapper input:checked + .checkmark::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0px;
+  width: 5px;
+  height: 10px;
+  border: solid #1f3b73;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Make long Type text fully visible and scrollable */
+.type-textarea {
+  width: 100%;
+  min-height: 60px; /* adjust for readability */
+  resize: none;
+  border: none;
+  background-color: transparent;
+  font-size: 0.9rem;
+  line-height: 1.2rem;
+  overflow-x: auto; /* horizontal scroll if text too long */
+}
+
+/* Scrollable table wrapper */
+.table-container {
+  overflow-x: auto;
+}
+
+/* Modal-specific Add/Delete buttons */
+.modal-add-btn {
+  width: 170px !important;
+  height: 40px !important;
+  margin-right: 15px !important;
+  background-color: #1f3b73 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+}
+
+.modal-delete-btn {
+  width: 150px !important;
+  height: 40px !important;
+  background-color: #dc2626 !important; /* red like delete */
+  color: white !important;
+  border: none !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+}
