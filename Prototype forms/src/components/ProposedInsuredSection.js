@@ -112,7 +112,7 @@ const ProposedInsuredSection = ({ data, onChange }) => {
             />
           </div>
 
-          <h4 style={{ marginTop: "20px", color: "#395998" }}>
+          <h4 style={{ marginTop: "20px", color: "#003266" }}>
             Present Address
           </h4>
           <AddressForm
@@ -120,7 +120,7 @@ const ProposedInsuredSection = ({ data, onChange }) => {
             onChange={(f, v) => handleNestedChange("presentAddress", f, v)}
           />
 
-          <h4 style={{ marginTop: "20px", color: "#395998" }}>
+          <h4 style={{ marginTop: "20px", color: "#003266" }}>
             Work Information
           </h4>
           <WorkInfoForm
@@ -128,7 +128,7 @@ const ProposedInsuredSection = ({ data, onChange }) => {
             onChange={(f, v) => handleNestedChange("workInformation", f, v)}
           />
 
-          <h4 style={{ marginTop: "20px", color: "#395998" }}>
+          <h4 style={{ marginTop: "20px", color: "#003266" }}>
             Relationship and Current Insurance
           </h4>
           <div className="form-grid">

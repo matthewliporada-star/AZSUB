@@ -22,7 +22,7 @@ const HealthDeclarationSection = ({
 
       <ImportantNotice />
 
-      {/* BASIC HEALTH MEASUREMENTS - MOVED TO TOP */}
+      {/* BASIC HEALTH MEASUREMENTS - UPDATED TO TABLE FORMAT */}
       <BasicHealthMeasurements
         formData={formData}
         dependents={dependents}
@@ -55,11 +55,7 @@ const HealthDeclarationSection = ({
         onChange={onHealthQuestionChange}
       />
 
-      <AdditionalInfoBlock
-        healthQuestions={healthQuestions}
-        dependents={dependents}
-        onChange={onHealthQuestionChange}
-      />
+      {/* REMOVED: AdditionalInfoBlock component */}
 
       <AdditionalConditionsTable
         conditions={additionalConditions}
@@ -71,7 +67,7 @@ const HealthDeclarationSection = ({
   );
 };
 
-// BASIC HEALTH MEASUREMENTS COMPONENT
+// UPDATED BASIC HEALTH MEASUREMENTS COMPONENT - NOW IN TABLE FORMAT
 const BasicHealthMeasurements = ({
   formData,
   dependents,
@@ -82,92 +78,332 @@ const BasicHealthMeasurements = ({
     style={{
       marginTop: "30px",
       padding: "20px",
-      border: "2px solid #395998",
+      border: "2px solid #003266",
       borderRadius: "8px",
       backgroundColor: "#f8f9fa",
     }}
   >
-    <h4 style={{ color: "#395998", marginBottom: "15px" }}>
+    <h4 style={{ color: "#003266", marginBottom: "15px" }}>
       Basic Health Measurements
     </h4>
 
-    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-      <HealthMeasurementCard
-        title="Applicant Owner / Proposed Insured"
-        data={formData.healthDeclaration}
-        onChange={(field, value) =>
-          onHealthChange(`healthDeclaration.${field}`, value)
-        }
-      />
+    <div style={{ overflowX: "auto" }}>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          border: "1px solid #ddd",
+        }}
+      >
+        <thead>
+          <tr style={{ backgroundColor: "#003266", color: "white" }}>
+            <th
+              style={{
+                padding: "12px",
+                textAlign: "left",
+                border: "1px solid #003266",
+              }}
+            >
+              Measurement
+            </th>
+            <th
+              style={{
+                padding: "12px",
+                textAlign: "center",
+                border: "1px solid #003266",
+              }}
+            >
+              Applicant Owner / Proposed Insured
+            </th>
+            <th
+              style={{
+                padding: "12px",
+                textAlign: "center",
+                border: "1px solid #003266",
+              }}
+            >
+              Dependent 1
+            </th>
+            <th
+              style={{
+                padding: "12px",
+                textAlign: "center",
+                border: "1px solid #003266",
+              }}
+            >
+              Dependent 2
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {/* Height Row */}
+          <tr style={{ backgroundColor: "#f9f9f9" }}>
+            <td
+              style={{
+                padding: "12px",
+                border: "1px solid #ddd",
+                fontWeight: "bold",
+              }}
+            >
+              Height
+            </td>
+            <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "5px",
+                  justifyContent: "center",
+                }}
+              >
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.healthDeclaration.heightFeet}
+                  onChange={(e) =>
+                    onHealthChange(
+                      "healthDeclaration.heightFeet",
+                      e.target.value,
+                    )
+                  }
+                  placeholder="ft"
+                  style={{ width: "60px", padding: "5px" }}
+                />
+                <span>ft</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.healthDeclaration.heightMeters}
+                  onChange={(e) =>
+                    onHealthChange(
+                      "healthDeclaration.heightMeters",
+                      e.target.value,
+                    )
+                  }
+                  placeholder="m"
+                  style={{ width: "60px", padding: "5px" }}
+                />
+                <span>m</span>
+              </div>
+            </td>
+            <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+              {dependents[0] && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "5px",
+                    justifyContent: "center",
+                  }}
+                >
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={dependents[0].healthDeclaration?.heightFeet || ""}
+                    onChange={(e) =>
+                      onDependentHealthChange(
+                        0,
+                        "healthDeclaration.heightFeet",
+                        e.target.value,
+                      )
+                    }
+                    placeholder="ft"
+                    style={{ width: "60px", padding: "5px" }}
+                  />
+                  <span>ft</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={dependents[0].healthDeclaration?.heightMeters || ""}
+                    onChange={(e) =>
+                      onDependentHealthChange(
+                        0,
+                        "healthDeclaration.heightMeters",
+                        e.target.value,
+                      )
+                    }
+                    placeholder="m"
+                    style={{ width: "60px", padding: "5px" }}
+                  />
+                  <span>m</span>
+                </div>
+              )}
+            </td>
+            <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+              {dependents[1] && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "5px",
+                    justifyContent: "center",
+                  }}
+                >
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={dependents[1].healthDeclaration?.heightFeet || ""}
+                    onChange={(e) =>
+                      onDependentHealthChange(
+                        1,
+                        "healthDeclaration.heightFeet",
+                        e.target.value,
+                      )
+                    }
+                    placeholder="ft"
+                    style={{ width: "60px", padding: "5px" }}
+                  />
+                  <span>ft</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={dependents[1].healthDeclaration?.heightMeters || ""}
+                    onChange={(e) =>
+                      onDependentHealthChange(
+                        1,
+                        "healthDeclaration.heightMeters",
+                        e.target.value,
+                      )
+                    }
+                    placeholder="m"
+                    style={{ width: "60px", padding: "5px" }}
+                  />
+                  <span>m</span>
+                </div>
+              )}
+            </td>
+          </tr>
 
-      {dependents.map((dep, index) => (
-        <HealthMeasurementCard
-          key={dep.id}
-          title={`Dependent ${index + 1}`}
-          data={dep.healthDeclaration}
-          onChange={(field, value) =>
-            onDependentHealthChange(index, `healthDeclaration.${field}`, value)
-          }
-        />
-      ))}
-    </div>
-  </div>
-);
-
-const HealthMeasurementCard = ({ title, data, onChange }) => (
-  <div
-    style={{
-      padding: "15px",
-      border: "1px solid #e5e7eb",
-      borderRadius: "8px",
-      backgroundColor: "white",
-    }}
-  >
-    <h5 style={{ color: "#395998", marginBottom: "10px" }}>{title}</h5>
-
-    <div className="form-grid">
-      <div className="form-group">
-        <label>Height (feet/meters)</label>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <input
-            type="number"
-            step="0.01"
-            value={data.heightFeet}
-            onChange={(e) => onChange("heightFeet", e.target.value)}
-            placeholder="ft"
-            style={{ flex: 1 }}
-          />
-          <input
-            type="number"
-            step="0.01"
-            value={data.heightMeters}
-            onChange={(e) => onChange("heightMeters", e.target.value)}
-            placeholder="m"
-            style={{ flex: 1 }}
-          />
-        </div>
-      </div>
-      <div className="form-group">
-        <label>Weight (kg/lbs)</label>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <input
-            type="number"
-            step="0.1"
-            value={data.weightKg}
-            onChange={(e) => onChange("weightKg", e.target.value)}
-            placeholder="kg"
-            style={{ flex: 1 }}
-          />
-          <input
-            type="number"
-            step="0.1"
-            value={data.weightLbs}
-            onChange={(e) => onChange("weightLbs", e.target.value)}
-            placeholder="lbs"
-            style={{ flex: 1 }}
-          />
-        </div>
-      </div>
+          {/* Weight Row */}
+          <tr>
+            <td
+              style={{
+                padding: "12px",
+                border: "1px solid #ddd",
+                fontWeight: "bold",
+              }}
+            >
+              Weight
+            </td>
+            <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "5px",
+                  justifyContent: "center",
+                }}
+              >
+                <input
+                  type="number"
+                  step="0.1"
+                  value={formData.healthDeclaration.weightKg}
+                  onChange={(e) =>
+                    onHealthChange("healthDeclaration.weightKg", e.target.value)
+                  }
+                  placeholder="kg"
+                  style={{ width: "60px", padding: "5px" }}
+                />
+                <span>kg /</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={formData.healthDeclaration.weightLbs}
+                  onChange={(e) =>
+                    onHealthChange(
+                      "healthDeclaration.weightLbs",
+                      e.target.value,
+                    )
+                  }
+                  placeholder="lbs"
+                  style={{ width: "60px", padding: "5px" }}
+                />
+                <span>lbs</span>
+              </div>
+            </td>
+            <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+              {dependents[0] && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "5px",
+                    justifyContent: "center",
+                  }}
+                >
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={dependents[0].healthDeclaration?.weightKg || ""}
+                    onChange={(e) =>
+                      onDependentHealthChange(
+                        0,
+                        "healthDeclaration.weightKg",
+                        e.target.value,
+                      )
+                    }
+                    placeholder="kg"
+                    style={{ width: "60px", padding: "5px" }}
+                  />
+                  <span>kg /</span>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={dependents[0].healthDeclaration?.weightLbs || ""}
+                    onChange={(e) =>
+                      onDependentHealthChange(
+                        0,
+                        "healthDeclaration.weightLbs",
+                        e.target.value,
+                      )
+                    }
+                    placeholder="lbs"
+                    style={{ width: "60px", padding: "5px" }}
+                  />
+                  <span>lbs</span>
+                </div>
+              )}
+            </td>
+            <td style={{ padding: "12px", border: "1px solid #ddd" }}>
+              {dependents[1] && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "5px",
+                    justifyContent: "center",
+                  }}
+                >
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={dependents[1].healthDeclaration?.weightKg || ""}
+                    onChange={(e) =>
+                      onDependentHealthChange(
+                        1,
+                        "healthDeclaration.weightKg",
+                        e.target.value,
+                      )
+                    }
+                    placeholder="kg"
+                    style={{ width: "60px", padding: "5px" }}
+                  />
+                  <span>kg /</span>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={dependents[1].healthDeclaration?.weightLbs || ""}
+                    onChange={(e) =>
+                      onDependentHealthChange(
+                        1,
+                        "healthDeclaration.weightLbs",
+                        e.target.value,
+                      )
+                    }
+                    placeholder="lbs"
+                    style={{ width: "60px", padding: "5px" }}
+                  />
+                  <span>lbs</span>
+                </div>
+              )}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 );
@@ -183,12 +419,12 @@ const LifestyleQuestions = ({
     style={{
       marginTop: "30px",
       padding: "20px",
-      border: "2px solid #395998",
+      border: "2px solid #003266",
       borderRadius: "8px",
       backgroundColor: "#f8f9fa",
     }}
   >
-    <h4 style={{ color: "#395998", marginBottom: "15px" }}>
+    <h4 style={{ color: "#003266", marginBottom: "15px" }}>
       Lifestyle Questions
     </h4>
 
@@ -202,7 +438,7 @@ const LifestyleQuestions = ({
         backgroundColor: "white",
       }}
     >
-      <h5 style={{ color: "#395998", marginBottom: "15px" }}>
+      <h5 style={{ color: "#003266", marginBottom: "15px" }}>
         Applicant Owner / Proposed Insured
       </h5>
 
@@ -358,7 +594,7 @@ const LifestyleQuestions = ({
           backgroundColor: "white",
         }}
       >
-        <h5 style={{ color: "#395998", marginBottom: "15px" }}>
+        <h5 style={{ color: "#003266", marginBottom: "15px" }}>
           Dependent {index + 1}
         </h5>
 
@@ -552,22 +788,23 @@ const PreExistingConditionsBlock = ({ acknowledged, onChange }) => (
     <p>
       Pre-existing conditions are medical conditions or any related conditions
       for which one or more symptoms have been displayed at some point during
-      the Insured's lifetime...
+      the Insured’s lifetime, irrespective of whether any medical treatment or
+      advice was sought. Any such condition or related condition which presented
+      signs or symptoms which the Insured was aware of or should reasonably have
+      been aware will be deemed to be a pre-existing condition. Pre-existing
+      conditions disclosed during the application are covered under the policy,
+      unless otherwise advised by us in writing. Conditions arising between the
+      completion of the Application form and the date of entry of an Insured,
+      will equally be deemed to be pre-existing. Such pre-existing conditions
+      will also be subject to medical underwriting and if not disclosed, they
+      will not be covered.<br></br>
+      <br></br>
+      Please advise us of any material changes to the information provided,
+      between submission of this application and acceptance by us. You are
+      hereby obliged on request to provide any further information that we might
+      require. Full and accurate completion of this Application Form and
+      disclosure of all relevant information are conditions precedent to cover
     </p>
-    <div style={{ marginTop: "15px" }}>
-      <label style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <input
-          type="checkbox"
-          checked={acknowledged}
-          onChange={(e) => onChange(e.target.checked)}
-          required
-        />
-        <span>
-          I acknowledge that I have read and understood the pre-existing
-          conditions statement above.
-        </span>
-      </label>
-    </div>
   </div>
 );
 
@@ -582,7 +819,11 @@ const ImportantNotice = () => (
   >
     <p>
       <strong>Important:</strong> Please answer the following questions on the
-      basis of your own and your dependents' complete medical history...
+      basis of your own and your dependents’ complete medical history. All
+      material facts (facts likely to influence our assessment and acceptance of
+      this application) must be disclosed. Failure to do so may invalidate the
+      policy. If you are in any doubt as to whether a fact is material, then it
+      should be disclosed.
     </p>
   </div>
 );
@@ -769,17 +1010,17 @@ const AdditionalQuestionsTable = ({ healthQuestions, onChange }) => (
           {
             key: "a",
             label:
-              "been tested for HIV, Hepatitis A-B-C or currently awaiting the results of such a test?",
+              "a. been tested for HIV, Hepatitis A-B-C or currently awaiting the results of such a test?",
           },
           {
             key: "b",
             label:
-              "been admitted to a hospital or undergone surgery during the last ten (10) years?",
+              "b. been admitted to a hospital or undergone surgery during the last ten (10) years?",
           },
           {
             key: "c",
             label:
-              "been incapacitated or unable to work for a period of more than 2 continuous weeks due to any symptom(s) or medical condition(s)?",
+              "c. been incapacitated or unable to work for a period of more than 2 continuous weeks due to any symptom(s) or medical condition(s)?",
           },
         ].map((q, index) => (
           <tr
@@ -963,57 +1204,6 @@ const getQuestionText = (num) => {
   return texts[num];
 };
 
-const AdditionalInfoBlock = ({ healthQuestions, dependents, onChange }) => (
-  <div style={{ marginTop: "30px" }}>
-    <h4 style={{ color: "#395998", marginBottom: "15px" }}>
-      Additional Information
-    </h4>
-    <p style={{ marginBottom: "15px" }}>
-      If you checked any boxes above, please provide details below:
-    </p>
-
-    <div className="form-group" style={{ marginBottom: "15px" }}>
-      <label>For Applicant Owner:</label>
-      <textarea
-        value={healthQuestions.applicantOwner.additionalInfo}
-        onChange={(e) =>
-          onChange("applicantOwner", "additionalInfo", null, e.target.value)
-        }
-        rows={3}
-        style={{ width: "100%", padding: "10px" }}
-      />
-    </div>
-
-    {dependents.length > 0 && (
-      <div className="form-group" style={{ marginBottom: "15px" }}>
-        <label>For Dependent 1:</label>
-        <textarea
-          value={healthQuestions.dependent1.additionalInfo}
-          onChange={(e) =>
-            onChange("dependent1", "additionalInfo", null, e.target.value)
-          }
-          rows={3}
-          style={{ width: "100%", padding: "10px" }}
-        />
-      </div>
-    )}
-
-    {dependents.length > 1 && (
-      <div className="form-group">
-        <label>For Dependent 2:</label>
-        <textarea
-          value={healthQuestions.dependent2.additionalInfo}
-          onChange={(e) =>
-            onChange("dependent2", "additionalInfo", null, e.target.value)
-          }
-          rows={3}
-          style={{ width: "100%", padding: "10px" }}
-        />
-      </div>
-    )}
-  </div>
-);
-
 const AdditionalConditionsTable = ({
   conditions,
   onChange,
@@ -1024,11 +1214,11 @@ const AdditionalConditionsTable = ({
     style={{
       marginTop: "30px",
       paddingTop: "20px",
-      borderTop: "2px solid #395998",
+      borderTop: "2px solid #003266",
     }}
   >
-    <h4 style={{ color: "#395998", marginBottom: "15px" }}>
-      Additional Conditions
+    <h4 style={{ color: "#003266", marginBottom: "15px" }}>
+      Additional Information
     </h4>
 
     {conditions.map((condition, index) => (
@@ -1120,7 +1310,7 @@ const AdditionalConditionsTable = ({
       type="button"
       onClick={onAdd}
       style={{
-        background: "#395998",
+        background: "#003266",
         color: "white",
         padding: "8px 16px",
         marginTop: "10px",

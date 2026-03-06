@@ -2,7 +2,7 @@ import React from "react";
 
 const ContingentOwnerSection = ({ data, onChange }) => (
   <>
-    <h4 style={{ marginTop: "20px", color: "#395998" }}>
+    <h4 style={{ marginTop: "20px", color: "#003266" }}>
       Contingent Owner upon death of Applicant Owner
     </h4>
     <div className="form-grid">

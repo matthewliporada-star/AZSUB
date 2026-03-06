@@ -38,10 +38,10 @@ const DependentSection = ({
               alignItems: "center",
               marginBottom: "20px",
               paddingBottom: "10px",
-              borderBottom: "2px solid #395998",
+              borderBottom: "2px solid #003266",
             }}
           >
-            <h4 style={{ color: "#395998", margin: 0, fontSize: "18px" }}>
+            <h4 style={{ color: "#003266", margin: 0, fontSize: "18px" }}>
               Dependent {index + 1}
             </h4>
             {dependents.length > 1 && (
@@ -66,7 +66,7 @@ const DependentSection = ({
 
           {/* Personal Information */}
           <h5
-            style={{ color: "#395998", marginBottom: "15px", fontSize: "16px" }}
+            style={{ color: "#003266", marginBottom: "15px", fontSize: "16px" }}
           >
             Personal Information
           </h5>
@@ -100,7 +100,7 @@ const DependentSection = ({
             value={dep.otherLegalName}
             onChange={(v) => handleChange(index, "otherLegalName", v)}
           />
-
+          <br></br>
           <div className="form-grid">
             <FormInput
               type="date"
@@ -163,7 +163,7 @@ const DependentSection = ({
           {/* Present Address Section */}
           <h5
             style={{
-              color: "#395998",
+              color: "#003266",
               marginTop: "25px",
               marginBottom: "15px",
               fontSize: "16px",
@@ -220,7 +220,7 @@ const DependentSection = ({
           {/* Work Information Section */}
           <h5
             style={{
-              color: "#395998",
+              color: "#003266",
               marginTop: "25px",
               marginBottom: "15px",
               fontSize: "16px",
@@ -308,7 +308,7 @@ const DependentSection = ({
           {/* Current Health Insurance */}
           <h5
             style={{
-              color: "#395998",
+              color: "#003266",
               marginTop: "25px",
               marginBottom: "15px",
               fontSize: "16px",
@@ -348,7 +348,7 @@ const DependentSection = ({
         type="button"
         onClick={onAdd}
         style={{
-          background: "#395998",
+          background: "#003266",
           color: "white",
           padding: "12px 24px",
           marginTop: "20px",
