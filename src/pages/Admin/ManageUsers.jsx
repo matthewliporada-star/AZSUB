@@ -430,21 +430,18 @@ const ManageUsers = () => {
         if (statusError) throw statusError;
         console.log('✅ Status updated to Active');
 
-        // Step 3: Send password reset email
-        const { error: emailError } = await supabase.auth.resetPasswordForEmail(userItem.email, {
-          redirectTo: `${window.location.origin}/reset-password`,
-        });
-
-        if (emailError) throw emailError;
-        console.log('✅ Reset email sent');
-
+        // NOTE: backend already sends the reset email (and includes the generated password),
+        // avoid calling `resetPasswordForEmail` again on the client or we'll hit Supabase rate limits.
+        //
         // Step 4: Log the activity
-        await logActivity("PASSWORD_RESET", `Password reset to ${resetResult.password}, account activated and email sent to ${userItem.first_name} ${userItem.last_name}`);
+        const newPassword = resetResult.generatedPassword || resetResult.password;
+
+        await logActivity("PASSWORD_RESET", `Password reset to ${newPassword}, account activated and email sent to ${userItem.first_name} ${userItem.last_name}`);
 
         // Step 5: Create admin notification
         await supabase.from("admin_notifications").insert({
           user_id: user.id,
-          message: `✅ Account Activated: ${userItem.first_name} ${userItem.last_name} | Password: ${resetResult.password}`,
+          message: `✅ Account Activated: ${userItem.first_name} ${userItem.last_name} | Password: ${newPassword}`,
           type: 'password_reset',
           target_user_id: userItem.id,
           is_read: false
@@ -452,14 +449,17 @@ const ManageUsers = () => {
 
         setResetSuccessData({
           user: `${userItem.first_name} ${userItem.last_name}`,
-          password: resetResult.password,
+          password: newPassword,
           email: userItem.email
         });
         setShowResetSuccessModal(true);
         await fetchUsers();
       } catch (err) {
         console.error("❌ Error resetting password:", err);
-        alert("Failed to reset password:\n\n" + err.message + "\n\n⚠️ Make sure the backend server is running:\ncd backend && node server.js");
+
+        // if supabase returns a rate-limit message, just re-display it without the backend-warning
+        const msg = err.message || "Unknown error";
+        alert("Failed to reset password:\n\n" + msg);
       } finally {
         setLoading(false);
       }
