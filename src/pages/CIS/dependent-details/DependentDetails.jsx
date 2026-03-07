@@ -31,11 +31,10 @@ const DependentDetails = () => {
   return (
     <div className="dependent-section">
       <div className="form-box">
-        <h3 className="section-title">Dependent Details</h3>
+        <h3 className="dependent-section-title">Dependent Details</h3>
 
         {dependents.map((dep, index) => (
-          <div key={index} className="form-grid-2 dependent-entry">
-            {/* Show "×" only if toggle is active */}
+          <div key={index} className="dependent-entry">
             {showDeleteBtns && dependents.length > 1 && (
               <button
                 type="button"
@@ -46,70 +45,72 @@ const DependentDetails = () => {
               </button>
             )}
 
-            <div className="input-group">
-              <label>Dependent Name {index + 1}</label>
-              <input
-                type="text"
-                className="box-input"
-                value={dep.name}
-                onChange={(e) =>
-                  handleDependentsChange(index, "name", e.target.value)
-                }
-              />
-            </div>
+            <div className="dependent-form-grid-2">
+              <div className="dependent-input-group">
+                <label className="dependent-label">
+                  Dependent Name {index + 1}
+                </label>
+                <input
+                  type="text"
+                  className="dependent-input"
+                  value={dep.name}
+                  onChange={(e) =>
+                    handleDependentsChange(index, "name", e.target.value)
+                  }
+                />
+              </div>
 
-            <div className="input-group">
-              <label>Relationship</label>
-              <input
-                type="text"
-                className="box-input"
-                value={dep.relation}
-                onChange={(e) =>
-                  handleDependentsChange(index, "relation", e.target.value)
-                }
-              />
-            </div>
+              <div className="dependent-input-group">
+                <label className="dependent-label">Relationship</label>
+                <input
+                  type="text"
+                  className="dependent-input"
+                  value={dep.relation}
+                  onChange={(e) =>
+                    handleDependentsChange(index, "relation", e.target.value)
+                  }
+                />
+              </div>
 
-            <div className="input-group">
-              <label>Nationality</label>
-              <input
-                type="text"
-                className="box-input"
-                value={dep.nationality}
-                onChange={(e) =>
-                  handleDependentsChange(index, "nationality", e.target.value)
-                }
-              />
-            </div>
+              <div className="dependent-input-group">
+                <label className="dependent-label">Nationality</label>
+                <input
+                  type="text"
+                  className="dependent-input"
+                  value={dep.nationality}
+                  onChange={(e) =>
+                    handleDependentsChange(index, "nationality", e.target.value)
+                  }
+                />
+              </div>
 
-            <div className="input-group">
-              <label>Date of Birth</label>
-              <input
-                type="date"
-                className="box-input"
-                value={dep.dob}
-                onChange={(e) =>
-                  handleDependentsChange(index, "dob", e.target.value)
-                }
-              />
+              <div className="dependent-input-group">
+                <label className="dependent-label">Date of Birth</label>
+                <input
+                  type="date"
+                  className="dependent-input"
+                  value={dep.dob}
+                  onChange={(e) =>
+                    handleDependentsChange(index, "dob", e.target.value)
+                  }
+                />
+              </div>
             </div>
           </div>
         ))}
 
-        {/* Add & Delete buttons side by side */}
         <div className="dependent-actions">
-          <button type="button" onClick={addDependent} className="add-btn">
+          <button type="button" className="add-btn" onClick={addDependent}>
             + Add Dependent
           </button>
-          {dependents.length > 1 && (
-            <button
-              type="button"
-              onClick={() => setShowDeleteBtns(!showDeleteBtns)}
-              className="delete-btn"
-            >
-              Delete
-            </button>
-          )}
+
+          <button
+            type="button"
+            className="delete-dependent-btn"
+            onClick={() => setShowDeleteBtns(!showDeleteBtns)}
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>

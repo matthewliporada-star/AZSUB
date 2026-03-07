@@ -120,7 +120,6 @@ function ExistingOrPending({
           </div>
         ))}
 
-        {/* Add/Delete Buttons */}
         <div className="adds-deletes-container-cis">
           <button type="button" className="btn-add-member-cis" onClick={addRow}>
             Add Insurance

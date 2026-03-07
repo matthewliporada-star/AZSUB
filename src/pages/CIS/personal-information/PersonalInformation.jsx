@@ -21,8 +21,22 @@ function PersonalInformation({ personalInfo, setPersonalInfo, countries }) {
     return ["City 1", "City 2", "City 3"];
   };
 
+  const formatPhone = (value) => {
+    const digits = value.replace(/\D/g, "");
+    if (!digits) return "";
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    const part1 = digits.slice(0, 3);
+    const part2 = digits.slice(3, 6);
+    const part3 = digits.slice(6, 10);
+    const rest = digits.slice(10);
+    return rest
+      ? `${part1}-${part2}-${part3} ${rest}`
+      : `${part1}-${part2}-${part3}`;
+  };
+
   return (
-    <div className="form-box">
+    <div className="form-box personal-info-section">
       <h3 className="section-title">Personal Information</h3>
 
       {/* Full Name & Father's Name */}
@@ -81,11 +95,12 @@ function PersonalInformation({ personalInfo, setPersonalInfo, countries }) {
               type="tel"
               className="mobile-number-input-cis"
               placeholder="Enter mobile number"
+              maxLength={18}
               value={personalInfo.mobile_no}
               onChange={(e) =>
                 handlePersonalInfoChange(
                   "mobile_no",
-                  e.target.value.replace(/\D/g, ""),
+                  formatPhone(e.target.value),
                 )
               }
             />

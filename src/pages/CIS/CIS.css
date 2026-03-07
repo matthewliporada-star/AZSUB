@@ -1,568 +1,203 @@
-/* =========================
+/* ========================================
    GLOBAL LAYOUT
-========================= */
+======================================== */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.webpage-container {
-  min-height: 50vh;
+.cis-page-wrapper {
   width: 100%;
+  min-height: 100vh;
+  background-color: #f5f6fa;
+  padding: 20px;
 }
 
-/* =========================
-   MAIN CONTENT
-========================= */
-.main-content.cis {
-  width: 100%;
+.cis-page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: stretch; /* ✅ allows children full width */
+  gap: 15px; /* space between modules */
 }
 
+/* ========================================
+   HEADER
+======================================== */
 .content-header {
-  width: 100%;
-  max-width: 1100px;
   text-align: center;
   margin-bottom: 30px;
 }
 
 .content-header h1 {
-  color: #003366;
   font-size: 2rem;
-  margin: 0;
+  font-weight: 700;
+  color: #2f3640;
 }
 
-/* =========================
-   SEARCH & UPLOAD
-========================= */
-/* Center container content */
-.search-container.centered {
-  display: flex;
-  justify-content: center; /* horizontal centering */
-  align-items: center; /* vertical alignment */
-  gap: 0.5rem;
-  margin: 0 auto 1rem;
-  max-width: 800px;
+/* ========================================
+   MODULE CONTAINERS (Separate Forms)
+======================================== */
+.module-box {
   width: 100%;
-}
-
-/* Search input styling */
-.search-container.centered .search-bar {
-  flex: 1;
-  min-width: 0;
-  padding: 0.5rem 0.75rem;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 0.95rem;
-  transition:
-    border-color 0.3s,
-    box-shadow 0.3s;
-}
-
-.search-container.centered .search-bar:focus {
-  outline: none;
-  border-color: #001f4d;
-  box-shadow: 0 0 0 2px rgba(0, 31, 77, 0.2);
-}
-
-/* Search button styling */
-.search-container.centered .search-btn-cis {
-  flex: 0 0 120px;
-  background-color: #001f4d;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-  transition:
-    background 0.3s ease,
-    transform 0.2s ease;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.search-container.centered .search-btn-cis:hover {
-  background-color: #003366;
-  transform: translateY(-1px);
-}
-
-/* Upload container */
-.upload-container {
-  text-align: center;
-  margin-top: 25px;
-}
-
-/* Drop zone styling */
-.drop-zone {
-  width: 240px;
-  height: 190px;
-  background: #e9edf5;
-  margin: 25px auto;
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 2px dashed transparent;
+  gap: 25px;
 }
 
-.drop-zone:hover {
-  background: #dbe7ff;
-  border-color: #003366;
-}
-
-.cloud-symbol {
-  font-size: 30px;
-  color: #003366;
-}
-
-/* =========================
-   STEP BUTTONS
-========================= */
-.step-footer {
-  display: flex;
-  justify-content: center; /* center the button horizontally */
-  margin-top: 20px;
-}
-
-.step2-next-btn {
-  max-width: 150px;
-  width: 100%;
-  padding: 0.5rem 1.5rem;
-  background-color: #001f4d;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.module-box .section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000000;
+  border-bottom: 2px solid #40739e;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
   text-align: center;
-  transition:
-    background 0.3s ease,
-    transform 0.2s ease;
 }
 
-.step2-next-btn:hover {
-  background-color: #003366;
-  transform: translateY(-1px);
-}
-
-/* Save form button */
-.save-form-btn {
-  background-color: #001f4d;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-  transition:
-    background 0.3s ease,
-    transform 0.2s ease;
-}
-
-.save-form-btn:hover {
-  background-color: #003366;
-  transform: translateY(-1px);
-}
-
-/* =========================
-   FORM BOX DESIGN
-========================= */
-.form-box {
-  background: #ffffff;
-  border: 1px solid #e0e6f0;
-  border-radius: 14px;
-  padding: 30px;
-  margin-bottom: 40px;
-  width: 100%;
-  max-width: 1100px;
-  box-shadow: 20px 20px 10px rgba(0, 0, 0, 0.05);
-  position: relative;
-  bottom: 30px;
-}
-
-/* =========================
-   SECTION TITLE
-========================= */
-.section-title {
-  background: #003366;
-  color: white;
-  text-align: center;
-  font-weight: bold;
-  padding: 14px;
-  border-radius: 10px;
-  margin: -30px -30px 30px -30px;
-  font-size: 1.1rem;
-  letter-spacing: 0.5px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-/* =========================
-   GRID SYSTEM
-========================= */
+/* ========================================
+   FORM GRIDS
+======================================== */
 .form-grid-2 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
 }
 
 .form-grid-3 {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
 }
 
-/* =========================
-   INPUT STYLING
-========================= */
 .input-group {
-  position: relative;
-  margin-bottom: 10px; /* tighter spacing between rows */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .input-group label {
-  display: block; /* ensure label is on top of input */
-  margin-bottom: 0px; /* or 0px for no space */
+  font-size: 0.875rem;
   font-weight: 600;
+  color: #2f3640;
+}
+
+.input-group .label-parenthesis {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: #718093;
+}
+
+/* ========================================
+   INPUTS & SELECTS
+======================================== */
+.box-input,
+.module-box select,
+.module-box input[type="date"],
+.module-box input[type="number"],
+.habit-input {
+  padding: 10px 12px;
   font-size: 0.9rem;
-  line-height: 4.5; /* optional: controls vertical spacing inside label */
-}
-
-.box-input {
-  width: 100%;
-  padding: 11px 12px;
-  border: 1.5px solid #c5d1e0;
-  border-radius: 8px;
-  font-size: 0.95rem;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
   outline: none;
-  background: #fff;
-  transition: 0.2s ease;
+  transition: 0.2s all;
 }
 
-.box-input:focus {
-  border-color: #003366;
-  box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+.box-input:focus,
+.module-box select:focus,
+.module-box input:focus,
+.habit-input:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 6px rgba(64, 115, 158, 0.3);
 }
 
-/* =========================
-   TABLE DESIGN
-========================= */
-.income-table {
+.box-input:disabled,
+.habit-input:disabled {
+  background-color: #f5f6fa;
+  color: #7f8fa6;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   TABLES
+======================================== */
+.table-container {
+  overflow-x: auto;
+}
+
+.module-box table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
   font-size: 0.9rem;
 }
 
-.income-table th {
+.module-box th,
+.module-box td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #dcdde1;
   text-align: left;
-  padding: 12px;
-  background: #f2f6ff;
-  color: #003366;
-  border-bottom: 2px solid #003366;
 }
 
-.income-table td {
-  padding: 10px;
-  border-bottom: 1px solid #e0e6f0;
-  vertical-align: top;
+.module-box th {
+  background-color: #f5f6fa;
+  font-weight: 600;
+  color: #2f3640;
 }
 
-.income-table td:first-child {
-  font-weight: 500;
-  white-space: normal;
-  word-break: break-word;
+.module-box tr:hover {
+  background-color: #f1f2f6;
 }
 
-.income-table input,
-.income-table select {
-  width: 100%;
-  height: 30px;
-}
-
-/* =========================
-   BUTTONS
-========================= */
-.btn-navy-cis {
-  background: #003366;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  height: 40px;
-  padding: 0 18px;
-  transition: 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-navy-cis:hover {
-  background: #00264d;
-  transform: translateY(-1px);
-}
-
-.action-center {
-  text-align: center;
-  margin-top: 25px;
-}
-
-/* =========================
-   ANIMATION
-========================= */
-.step-fade {
-  animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-@media (max-width: 900px) {
-  .form-grid-2 {
-    grid-template-columns: 1fr;
-  }
-
-  .form-grid-3 {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .main-content.cis {
-    padding: 25px 15px;
-  }
-
-  .search-container.centered {
-    flex-direction: column;
-    width: 90%;
-  }
-
-  .search-container.centered .search-btn-cis {
-    width: 100%;
-  }
-
-  .step2-next-btn {
-    max-width: 150px;
-  }
-}
-
-/* =========================
-   CIS PAGE SPECIFIC
-========================= */
-.main-content .cis-page {
-  padding: 20px;
-}
-
-.main-content .cis-page h1 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.main-content .cis-page .box-input {
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.cis-page-wrapper .cis-page h1 {
-  font-size: 2rem;
-}
-
-.step-title {
-  font-size: 17px; /* keep font size */
-  text-align: center; /* center horizontally in its container */
-  width: 100%; /* ensure it spans full container width */
-  margin-bottom: 5px; /* optional spacing from input */
-}
-
-.view-window {
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.cis-page-wrapper.mp-top {
-  margin-top: -90px; /* shift form up under the fixed header */
-  transition: margin 0.3s ease;
-}
-
-/* Wrapper */
-.mobile-input-wrapper {
-  display: flex;
-  width: 100%; /* let it take full available space */
-  max-width: 400px; /* optional max size */
-  height: 42px;
-  background: #fff;
-}
-
-/* Country Code Dropdown */
-.mobile-country-code {
-  flex: 0 0 150px; /* fixed width: 80px */
-  border: 2px solid #ced4da;
-  border-right: none;
-  border-radius: 6px 0 0 6px;
-  padding: 0 10px;
-  font-size: 0.95rem;
-  outline: none;
-  background: #fff;
-}
-
-/* Mobile Number Input */
-.cis-page-wrapper .mobile-number-input-cis {
-  flex: 1; /* takes remaining space */
-  border: 2px solid #ced4da;
-  border-left: none;
-  border-radius: 0 6px 6px 0;
-  padding: 0 10px;
-  font-size: 0.95rem;
-  outline: none;
-}
-
-/* Divider line */
-.mobile-country-code {
-  border-right: 1px solid #ccc;
-}
-
-/* Email input smaller and aligned */
-.email-input-group .box-input {
-  width: 60%; /* smaller than full column */
-  max-width: 500px; /* optional max */
-  padding: 8px 10px; /* reduce padding for visual balance */
-  font-size: 0.95rem;
-}
-
-/* Optional: vertically align with mobile input */
-.form-grid-2 > .input-group {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Email Wrapper */
-.email-input-wrapper {
-  width: 100%;
-  padding-bottom: 20px;
-}
-
-/* Email Input */
-.email-input {
-  width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 8px 10px;
-  font-size: 0.95rem;
-  height: 42px; /* Match mobile + other inputs */
-}
-
-.btn-add-row {
-  background-color: #1f3b73;
-  color: #fff;
-  border: none;
-  padding: 5px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: background 0.2s;
-}
-
-.btn-add-row:hover {
-  background-color: #0f2955;
-}
-
-.cis-page-wrapper .btn-delete-row {
-  color: #fff;
-  padding: 3px 8px;
-  border-radius: 100px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  height: 25px;
-}
-
-.btn-delete-row:hover {
-  background-color: #b02a37;
-}
-
-.income-table select,
-.income-table input.box-input {
-  width: 100%;
-  padding: 4px 6px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-}
-
-/* Medical form labels */
-.medical-label {
-  display: block;
-  font-weight: 500;
-  margin-bottom: 4px;
-  line-height: 1.3;
-}
-
-/* Instruction text after "-" in label */
-.medical-instruction {
-  color: red;
-  font-weight: 200;
-  font-size: 0.85rem;
-}
-
-/* Ensure inputs align nicely with long labels */
-.form-grid-2.medical-grid .input-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 15px;
-}
-
-/* Custom checkbox styling */
-.custom-checkbox input {
-  display: none;
-}
-
+/* ========================================
+   CHECKBOXES
+======================================== */
 .custom-checkbox {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+}
+
+.custom-checkbox input {
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
 .custom-checkbox .checkmark {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #3b82f6;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: #f5f6fa;
+  border: 1px solid #dcdde1;
   border-radius: 4px;
-  transition: all 0.2s ease;
 }
 
-.custom-checkbox input:checked + .checkmark {
-  background-color: #3b82f6;
+.custom-checkbox input:checked ~ .checkmark {
+  background-color: #40739e;
+  border-color: #40739e;
 }
 
-.custom-checkbox input:checked + .checkmark::after {
+.custom-checkbox .checkmark:after {
   content: "";
   position: absolute;
-  left: 4px;
-  top: 0px;
+  display: none;
+}
+
+.custom-checkbox input:checked ~ .checkmark:after {
+  display: block;
+  left: 6px;
+  top: 2px;
   width: 5px;
   height: 10px;
   border: solid white;
@@ -570,546 +205,1942 @@
   transform: rotate(45deg);
 }
 
-.btn-travel-add,
-.btn-travel-delete {
-  padding: 5px 12px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  background-color: #1f3b73;
-  color: #fff;
+/* ========================================
+   ADD / DELETE BUTTONS
+======================================== */
+.add-row-container {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.btn-add,
+.btn-delete {
+  padding: 8px 18px;
+  font-size: 0.875rem;
   border: none;
-  transition: background 0.2s;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
 }
 
-.btn-travel-add:hover,
-.btn-travel-delete:hover {
-  background-color: #0f2955;
+.btn-add {
+  background-color: #001e78;
+  color: #fff;
 }
 
-.label-parenthesis {
-  color: red;
-  font-weight: normal; /* optional */
-  white-space: nowrap;
+.btn-add:hover {
+  background-color: #002fff;
 }
 
-.long-label label {
-  line-height: 1.4;
+.btn-delete {
+  background-color: #e84118;
+  color: #fff;
 }
 
-.long-label .label-parenthesis {
-  display: block;
-  font-size: 0.75rem;
-  color: red;
-  white-space: normal; /* allow wrapping */
-  line-height: 1.2;
+.btn-delete:hover {
+  background-color: #ff4d4d;
 }
 
-.form-grid-2 .input-group label {
-  min-height: 30px; /* increase height */
-  display: block;
+/* ========================================
+   RESPONSIVE
+======================================== */
+@media (max-width: 992px) {
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .add-row-container {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 
-.long-label label {
-  white-space: nowrap;
+@media (max-width: 480px) {
+  .cis-page-wrapper {
+    padding: 15px;
+  }
+
+  .module-box {
+    padding: 20px;
+  }
+
+  .module-box .section-title {
+    font-size: 1.5rem;
+  }
+
+  .box-input,
+  .habit-input {
+    font-size: 0.85rem;
+  }
 }
 
-.input-group.long-label label {
-  display: flex; /* inline flex to keep label + parenthesis in one line */
-  align-items: center; /* vertical align middle */
-  gap: 4px; /* small space between label and parenthesis */
-  font-weight: 700;
-  font-size: 0.6rem;
-  flex-wrap: nowrap; /* prevent line break */
-  margin-bottom: 2px; /* smaller spacing for long labels if needed */
+/* ========================================
+   TABLE SPACING BETWEEN SECTIONS
+======================================== */
+
+/* Add spacing between tables/forms */
+.cis-table-section {
+  margin-bottom: 30px; /* space below each table/form */
 }
 
-.input-group.long-label .label-parenthesis {
-  font-size: 0.65rem;
-  color: red;
-  white-space: normal; /* allow wrapping */
+.spouse-section {
+  margin-top: 30px; /* optional extra space above spouse form */
+  margin-bottom: 30px;
 }
 
-/* =========================
-   DARK MODE SUPPORT
-========================= */
-
-body.dark-mode {
-  background-color: #121212;
-  color: white;
-}
-
-body.dark-mode .insurance-form,
-body.dark-mode .form-box {
-  /* ✅ add form-box here */
-  background-color: #1e1e1e;
-  color: white;
-  border-color: #333; /* optional: make border darker if needed */
-}
-
-body.dark-mode .insurance-form label,
-body.dark-mode .form-box label {
-  color: white;
-}
-
-body.dark-mode .insurance-form input,
-body.dark-mode .insurance-form textarea,
-body.dark-mode .insurance-form select,
-body.dark-mode .form-box input,
-body.dark-mode .form-box textarea,
-body.dark-mode .form-box select {
-  background-color: #2a2a2a;
-  color: white;
-  border: 1px solid #444;
-}
-
-body.dark-mode .insurance-form input::placeholder,
-body.dark-mode .form-box input::placeholder,
-body.dark-mode .insurance-form textarea::placeholder,
-body.dark-mode .form-box textarea::placeholder,
-body.dark-mode .insurance-form select::placeholder,
-body.dark-mode .form-box select::placeholder {
-  color: #aaa;
-}
-
-/* Optional: smooth transition */
-body,
-body.dark-mode .insurance-form,
-body.dark-mode .form-box,
-body.dark-mode .insurance-form input,
-body.dark-mode .form-box input,
-body.dark-mode .insurance-form textarea,
-body.dark-mode .form-box textarea,
-body.dark-mode .insurance-form select,
-body.dark-mode .form-box select {
-  transition: all 0.3s ease;
-}
-
-/* =========================
-   FAMILY MEDICAL FORM
-========================= */
-.family-medical-section .form-box {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-/* Input groups */
-.family-medical-section .input-group {
+/* ========================================
+   PERSONAL INFORMATION MODULE
+======================================== */
+.personal-info-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
+  gap: 15px;
+}
+
+.personal-info-section .section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000000;
   margin-bottom: 15px;
+  text-align: center;
+  border-bottom: 2px solid #40739e;
+  padding-bottom: 8px;
+  position: relative;
+  
 }
 
-.family-medical-section .input-group label {
-  font-weight: 600;
-  margin-bottom: 5px;
-}
-
-.family-medical-section .input-group .box-input {
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-/* Add Member Button */
-.btn-add-member {
-  margin-top: 10px;
-  padding: 8px 12px;
-  border: none;
-  background: #3b82f6;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.btn-add-member:hover {
-  background: #2563eb;
-}
-
-/* =========================
-   DARK MODE OVERRIDES
-========================= */
-body.dark-mode .family-medical-section .form-box {
-  background-color: #1e1e1e;
-  color: white;
-}
-
-body.dark-mode .family-medical-section .input-group label {
-  color: white;
-}
-
-body.dark-mode .family-medical-section .input-group .box-input {
-  background-color: #2a2a2a;
-  color: white;
-  border: 1px solid #444;
-}
-
-.family-medical-section .custom-checkbox .checkmark {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #3b82f6;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-/* Optional: checked state */
-.family-medical-section .custom-checkbox input:checked + .checkmark {
-  background-color: #3b82f6;
-  border-color: #3b82f6;
-}
-
-/* =========================
-   EXISTING / PENDING BUTTONS
-   (Same style as Travel Details)
-========================= */
-
-.add-delete-container-cis {
-  display: flex;
-  justify-content: flex-start; /* left side */
-  gap: 10px; /* space between buttons */
-  margin-top: 10px;
-}
-
-.btn-add-member-cis,
-.btn-delete-member-cis {
-  background-color: #1f3b73;
-  color: #fff;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: background 0.2s ease;
-}
-
-.btn-add-member-cis:hover,
-.btn-delete-member-cis:hover {
-  background-color: #0f2955;
-}
-
-.family-compact-grid {
+/* ===============================
+   FORM GRID
+=============================== */
+.form-grid-2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 }
 
-.compact-title {
-  font-size: 14px;
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 0.875rem;
   font-weight: 600;
-  margin-bottom: 10px;
+  color: #2f3640;
 }
 
-.compact-field {
-  margin-bottom: 8px;
+.input-group .label-parenthesis {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: #718093;
 }
 
-.compact-field label {
-  font-size: 12px;
-  display: block;
-  margin-bottom: 4px;
-}
-
-.small-input {
-  padding: 6px 8px;
-  font-size: 13px;
-}
-
-.delete-checkbox-wrapper {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-
-/* =========================
-   FAMILY MEDICAL INPUT FLOATING LABEL
-========================= */
-.family-compact-card .compact-field {
-  position: relative;
-  margin-bottom: 12px;
-}
-
-.family-compact-card .compact-field input.small-input {
-  width: 100%;
+/* ===============================
+   INPUT FIELDS
+=============================== */
+.box-input {
   padding: 10px 12px;
+  font-size: 0.9rem;
+  border: 1px solid #dcdde1;
   border-radius: 6px;
-  border: 1.5px solid #c5d1e0;
+  outline: none;
+  transition:
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+
+.box-input:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 6px rgba(64, 115, 158, 0.3);
+}
+
+/* ===============================
+   MOBILE INPUT WRAPPER
+=============================== */
+.mobile-input-wrapper {
+  display: flex;
+  gap: 10px;
+}
+
+.mobile-country-code {
+  padding: 10px 12px;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  background-color: #f5f6fa;
+  cursor: pointer;
+  min-width: 130px;
+}
+
+.mobile-number-input-cis {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
   font-size: 0.9rem;
   outline: none;
-  background: #fff;
+  transition:
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
 }
 
-/* Floating label effect */
-.family-compact-card .compact-field label {
+.mobile-number-input-cis:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 6px rgba(64, 115, 158, 0.3);
+}
+
+/* ===============================
+   SELECT FIELDS
+=============================== */
+select.box-input {
+  appearance: none;
+  background-color: #f5f6fa;
+  cursor: pointer;
+}
+
+select.box-input:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 6px rgba(64, 115, 158, 0.3);
+}
+
+/* ===============================
+   RESPONSIVE
+=============================== */
+@media (max-width: 992px) {
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .mobile-input-wrapper {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .personal-info-section {
+    padding: 20px;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .box-input,
+  .mobile-number-input-cis,
+  .mobile-country-code {
+    font-size: 0.85rem;
+  }
+}
+
+/* ========================================
+   TRAVEL DETAILS MODULE (ISOLATED)
+======================================== */
+.travel-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin: 40px 0; /* added top/bottom margin to separate from other forms */
+}
+
+.travel-section .section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000000;
+  border-bottom: 2px solid #40739e;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* ===============================
+   TRAVEL TABLE (ISOLATED)
+=============================== */
+.travel-section table.travel-table {
+  width: 100%;
+  border-collapse: separate; /* separate borders so it looks like a standalone table */
+  border-spacing: 0 8px; /* add vertical spacing between rows */
+  font-size: 0.9rem;
+  background-color: #fdfdfd; /* subtle contrast from section */
+  border-radius: 8px; /* rounded corners for table */
+}
+
+.travel-table th,
+.travel-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: none; /* remove shared border */
+}
+
+.travel-table th {
+  background-color: #f5f6fa;
+  font-weight: 600;
+  color: #2f3640;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.travel-table tr {
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+}
+
+.travel-table tr:hover {
+  background-color: #f1f2f6;
+}
+
+.travel-table select,
+.travel-table input {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 0.875rem;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  outline: none;
+  transition: 0.2s all;
+}
+
+.travel-table select:focus,
+.travel-table input:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 5px rgba(64, 115, 158, 0.3);
+}
+
+/* ===============================
+   CHECKBOXES
+=============================== */
+.custom-checkbox {
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+}
+
+.custom-checkbox input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.custom-checkbox .checkmark {
   position: absolute;
-  top: 50%;
-  left: 12px;
-  transform: translateY(-50%);
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #999;
-  pointer-events: none;
-  transition: all 0.2s ease;
-}
-
-/* Label moves up when input has value or is focused */
-.family-compact-card .compact-field input:focus + label,
-.family-compact-card .compact-field input:not(:placeholder-shown) + label {
-  top: -8px;
-  left: 8px;
-  font-size: 0.7rem;
-  color: #003366;
-  background: #f9faff;
-  padding: 0 4px;
-}
-
-/* Focus style */
-.family-compact-card .compact-field input.small-input:focus {
-  border-color: #003366;
-  box-shadow: 0 0 0 2px rgba(0, 51, 102, 0.1);
-}
-
-/* =========================
-   MODAL FOR ADD ROW
-========================= */
-.modal-overlay {
-  position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  height: 20px;
+  width: 20px;
+  background-color: #f5f6fa;
+  border: 1px solid #dcdde1;
+  border-radius: 4px;
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  background-color: #40739e;
+  border-color: #40739e;
+}
+
+.custom-checkbox .checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.custom-checkbox input:checked ~ .checkmark:after {
+  display: block;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* ===============================
+   ADD / DELETE BUTTONS
+=============================== */
+.add-row-container {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.btn-add-travel,
+.btn-delete-travel {
+  padding: 8px 18px;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-add-travel {
+  background-color: #001e78;
+  color: #fff;
+}
+
+.btn-add-travel:hover {
+  background-color: #002fff;
+}
+
+.btn-delete-travel {
+  background-color: #e84118;
+  color: #fff;
+}
+
+.btn-delete-travel:hover {
+  background-color: #ff4d4d;
+}
+
+/* ===============================
+   RESPONSIVE
+=============================== */
+@media (max-width: 992px) {
+  .travel-table th,
+  .travel-table td {
+    font-size: 0.825rem;
+    padding: 8px;
+  }
+
+  .add-row-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .travel-section {
+    padding: 20px;
+    margin: 30px 0;
+  }
+}
+
+/* ========================================
+   SMOKING & ALCOHOL HABITS MODULE (2x2 GRID)
+======================================== */
+
+/* SECTION TITLE */
+.smoking-section .section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000000;
+  border-bottom: 2px solid #40739e;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+  position: relative;
+  bottom: 30px;
+}
+
+/* MODULE CONTAINER */
+.smoking-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+/* ===============================
+   INPUT GRID (2x2)
+=============================== */
+.smoking-section .form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columns */
+  grid-template-rows: repeat(2, auto); /* 2 rows */
+  gap: 20px;
+}
+
+.smoking-section .input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.smoking-section .input-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #2f3640;
+}
+
+.smoking-section .input-group .label-parenthesis {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: #ff0800;
+}
+
+/* ===============================
+   INPUTS & SELECTS
+=============================== */
+.habit-input,
+.smoking-section select {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 0.875rem;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  outline: none;
+  transition: 0.2s all;
+}
+
+.habit-input:focus,
+.smoking-section select:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 5px rgba(64, 115, 158, 0.3);
+}
+
+/* ===============================
+   DISABLED INPUTS
+=============================== */
+.habit-input:disabled {
+  background-color: #f5f6fa;
+  color: #7f8fa6;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   RESPONSIVE
+=============================== */
+@media (max-width: 992px) {
+  .smoking-section .form-grid-2 {
+    grid-template-columns: 1fr; /* stack into 1 column for tablets */
+    grid-template-rows: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .smoking-section {
+    padding: 20px;
+  }
+}
+
+/* ========================================
+   PERSONAL MEDICAL DETAILS MODULE
+======================================== */
+.personal-medical-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.personal-medical-section .section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000000;
+  border-bottom: 2px solid #40739e;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+  position: relative;
+  bottom: 30px;
+}
+
+/* ===============================
+   FORM GRID (2 columns)
+=============================== */
+.personal-medical-section .form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columns */
+  gap: 20px;
+}
+
+/* ===============================
+   INPUT GROUPS
+=============================== */
+.personal-medical-section .input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch; /* ensures inputs align vertically */
+}
+
+.personal-medical-section .input-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #2f3640;
+  line-height: 1.2; /* allows multi-line wrapping without breaking layout */
+  word-break: break-word; /* wrap long text */
+}
+
+.personal-medical-section .input-group .label-parenthesis {
+  font-weight: 400;
+  font-size: 0.6rem;
+  color: #ff0800;
+}
+
+/* ===============================
+   INPUT FIELDS
+=============================== */
+.personal-medical-section .box-input {
+  padding: 9px 12px;
+  font-size: 0.875rem;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  outline: none;
+  transition: 0.2s all;
+}
+
+.personal-medical-section .box-input:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 5px rgba(64, 115, 158, 0.3);
+}
+
+/* ===============================
+   DISABLED INPUTS
+=============================== */
+.personal-medical-section .box-input:disabled {
+  background-color: #f5f6fa;
+  color: #7f8fa6;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   RESPONSIVE
+=============================== */
+@media (max-width: 992px) {
+  .personal-medical-section .form-grid-2 {
+    grid-template-columns: 1fr; /* stack into 1 column on tablets */
+  }
+}
+
+@media (max-width: 480px) {
+  .personal-medical-section {
+    padding: 20px;
+  }
+}
+
+/* ========================================
+   FAMILY MEDICAL HISTORY MODULE - 2x2 GRID
+======================================== */
+.family-medical-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.family-medical-section .section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000000;
+  border-bottom: 2px solid #40739e;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+  position: relative;
+  bottom: 30px;
+}
+
+/* Grid per member */
+.family-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columns for members */
+  gap: 20px;
+}
+
+.family-compact-card {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Card header spans 2 columns */
+.family-compact-card .compact-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.family-compact-card .compact-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #2f3640;
+}
+
+/* Fields */
+.family-compact-card .compact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.family-compact-card .compact-field input {
+  padding: 8px 10px;
+  font-size: 0.875rem;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  outline: none;
+  transition: 0.2s all;
+}
+
+.family-compact-card .compact-field input:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 5px rgba(64, 115, 158, 0.3);
+}
+
+/* Checkbox */
+.custom-checkbox {
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+}
+
+.custom-checkbox input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.custom-checkbox .checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: #f5f6fa;
+  border: 1px solid #dcdde1;
+  border-radius: 4px;
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  background-color: #40739e;
+  border-color: #40739e;
+}
+
+.custom-checkbox .checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.custom-checkbox input:checked ~ .checkmark:after {
+  display: block;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Add/Delete buttons */
+.add-row-container {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.btn-travel-add,
+.btn-travel-delete {
+  padding: 8px 18px;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-travel-add {
+  background-color: #001e78;
+  color: #fff;
+}
+
+.btn-travel-add:hover {
+  background-color: #002fff;
+}
+
+.btn-travel-delete {
+  background-color: #e84118;
+  color: #fff;
+}
+
+.btn-travel-delete:hover {
+  background-color: #ff4d4d;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 1000;
 }
 
 .modal-content {
-  background: #fff;
-  padding: 25px 20px;
-  border-radius: 10px;
-  min-width: 280px;
-  max-width: 350px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.modal-content h4 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 20px;
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
 }
 
 .modal-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  justify-content: center;
-  margin-bottom: 15px;
+  margin-top: 15px;
 }
 
 .modal-btn {
   flex: 1 1 40%;
-  background-color: #1f3b73;
-  color: white;
+  padding: 8px 12px;
   border: none;
   border-radius: 6px;
-  padding: 8px 12px;
   cursor: pointer;
-  font-size: 0.85rem;
-  transition: background 0.2s ease;
+  background-color: #40739e;
+  color: #fff;
+  font-weight: 600;
+  transition: 0.2s all;
 }
 
 .modal-btn:hover {
-  background-color: #0f2955;
+  background-color: #3498db;
 }
 
 .modal-cancel {
-  background-color: #b02a37;
-  color: white;
+  margin-top: 15px;
+  padding: 8px 12px;
   border: none;
   border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 0.85rem;
   cursor: pointer;
-  transition: background 0.2s ease;
+  background-color: #e84118;
+  color: #fff;
+  font-weight: 600;
+  transition: 0.2s all;
 }
 
-.modal-cancel:hover {
-  background-color: #92242b;
+/* Responsive */
+@media (max-width: 992px) {
+  .family-compact-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-/* =========================
-   DELETE ROW CHECKBOX
-========================= */
-.family-compact-card .delete-checkbox-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-
-.family-compact-card .delete-checkbox-wrapper input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}
-
-/* Optional: simple custom checkbox style */
-.family-compact-card .delete-checkbox-wrapper .checkmark {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
-  position: relative;
-}
-
-.family-compact-card
-  .delete-checkbox-wrapper
-  input:checked
-  + .checkmark::after {
-  content: "";
-  position: absolute;
-  left: 4px;
-  top: 0px;
-  width: 5px;
-  height: 10px;
-  border: solid #1f3b73;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-/* Make long Type text fully visible and scrollable */
-.type-textarea {
+/* ========================================
+   EXISTING OR PENDING INSURANCE MODULE
+======================================== */
+.existing-section {
   width: 100%;
-  min-height: 60px; /* adjust for readability */
-  resize: none;
-  border: none;
-  background-color: transparent;
-  font-size: 0.9rem;
-  line-height: 1.2rem;
-  overflow-x: auto; /* horizontal scroll if text too long */
-}
-
-/* Scrollable table wrapper */
-.table-container {
-  overflow-x: auto;
-}
-
-/* Modal-specific Add/Delete buttons */
-.modal-add-btn {
-  width: 170px !important;
-  height: 40px !important;
-  margin-right: 15px !important;
-  background-color: #1f3b73 !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 6px !important;
-  cursor: pointer !important;
-}
-
-.modal-delete-btn {
-  width: 150px !important;
-  height: 40px !important;
-  background-color: #dc2626 !important; /* red like delete */
-  color: white !important;
-  border: none !important;
-  border-radius: 6px !important;
-  cursor: pointer !important;
-}
-
-.add-row-container {
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
   display: flex;
-  justify-content: flex-end; /* pushes buttons to the right */
-  gap: 10px; /* space between buttons */
-  margin-top: 10px;
+  flex-direction: column;
+  gap: 25px;
+  margin-bottom: 30px;
 }
 
+.existing-section .section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000000;
+  border-bottom: 2px solid #40739e;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+  position: relative;
+  bottom: 30px;
+}
+
+/* Grid layout for each insurance row */
+.existing-section .form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Input group styling */
+.existing-section .input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.existing-section .input-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #2f3640;
+}
+
+.existing-section .box-input {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 0.875rem;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  outline: none;
+  transition: 0.2s all;
+}
+
+.existing-section .box-input:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 5px rgba(64, 115, 158, 0.3);
+}
+
+/* Add/Delete buttons */
 .adds-deletes-container-cis {
   display: flex;
-  justify-content: flex-end; /* moves buttons to the RIGHT */
-  gap: 15px; /* space between buttons */
+  gap: 15px;
   margin-top: 15px;
 }
 
-.add-btn {
-  margin-top: 10px;
-  padding: 8px 16px;
-  background: #2c7be5;
-  color: white;
+.adds-deletes-container-cis .btn-add-member-cis,
+.adds-deletes-container-cis .btn-delete-member-cis {
+  padding: 8px 18px;
+  font-size: 0.875rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
 }
 
-.delete-btn {
-  margin-top: 10px;
-  padding: 6px 14px;
-  background: #e55353;
-  color: white;
-  border: none;
+.adds-deletes-container-cis .btn-add-member-cis {
+  background-color: #001e78;
+  color: #fff;
+}
+
+.adds-deletes-container-cis .btn-add-member-cis:hover {
+  background-color: #002fff;
+}
+
+.adds-deletes-container-cis .btn-delete-member-cis {
+  background-color: #e84118;
+  color: #fff;
+}
+
+.adds-deletes-container-cis .btn-delete-member-cis:hover {
+  background-color: #ff4d4d;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .existing-section .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .adds-deletes-container-cis {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .existing-section {
+    padding: 20px;
+  }
+}
+
+/* ========================================
+   BUSINESS / EMPLOYMENT INFORMATION MODULE (2x2)
+======================================== */
+.employment-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.employment-section .section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000000;
+  border-bottom: 2px solid #40739e;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+  position: relative;
+  bottom: 30px;
+}
+
+/* 2x2 Grid for compact fields */
+.employment-section .form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+/* Input group styling */
+.employment-section .input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.employment-section .input-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #2f3640;
+}
+
+/* Inputs and textarea styling */
+.employment-section .box-input,
+.employment-section textarea {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 0.875rem;
+  border: 1px solid #dcdde1;
   border-radius: 6px;
-  cursor: pointer;
+  outline: none;
+  transition: 0.2s all;
+}
+
+.employment-section .box-input:focus,
+.employment-section textarea:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 5px rgba(64, 115, 158, 0.3);
+}
+
+/* Full-width for long textarea fields */
+.employment-section .full-width {
+  grid-column: 1 / -1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .employment-section .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .employment-section {
+    padding: 20px;
+  }
+}
+
+/* ========================================
+   PERSONAL INCOME STATEMENT MODULE
+======================================== */
+.income-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.income-section .section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000000;
+  border-bottom: 2px solid #40739e;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+  position: relative;
+  bottom: 20px;
+}
+
+/* ===============================
+   TABLE STYLING
+=============================== */
+.income-section .income-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  position: relative;
+  bottom: 18px;
+}
+
+.income-section .income-table th,
+.income-section .income-table td {
+  border: 1px solid #dcdde1;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.income-section .income-table th {
+  background-color: #f5f6fa;
+  font-weight: 600;
+  color: #2f3640;
+}
+
+.income-section .income-table input,
+.income-section .income-table select {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 0.875rem;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  outline: none;
+  transition: 0.2s all;
+  box-sizing: border-box;
+}
+
+.income-section .income-table input:focus,
+.income-section .income-table select:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 5px rgba(64, 115, 158, 0.3);
+}
+
+.income-section .income-table tbody tr:hover {
+  background-color: #f1f2f6;
+}
+
+/* Bold totals */
+.income-section .income-table tbody tr td b {
+  font-weight: 700;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .income-section .income-table th,
+  .income-section .income-table td {
+    font-size: 0.825rem;
+    padding: 8px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .income-section {
+    padding: 20px;
+  }
+
+  .income-section .income-table th,
+  .income-section .income-table td {
+    font-size: 0.8rem;
+    padding: 6px 4px;
+  }
+}
+
+/* ========================================
+   ASSETS & LIABILITIES MODULE
+======================================== */
+.assets-liabilities-section {
+  width: 100%; /* full width */
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 30px;
+}
+
+.assets-liabilities-section .form-box {
+  width: 104%; /* full width of section */
+  max-width: 1205px; /* same max-width as other modules */
+  margin: 0 auto; /* center horizontally */
+  padding: 25px; /* consistent padding */
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  position: relative;
+  right: 20px;
+}
+
+/* Section Title */
+.assets-liabilities-section .section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000000;
+  border-bottom: 2px solid #40739e;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Table Styling */
+.assets-liabilities-section .income-table {
+  width: 100%; /* full width of form-box */
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.assets-liabilities-section .income-table th,
+.assets-liabilities-section .income-table td {
+  border: 1px solid #dcdde1;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.assets-liabilities-section .income-table th {
+  background-color: #f5f6fa;
+  font-weight: 600;
+  color: #2f3640;
+}
+
+.assets-liabilities-section .income-table input {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 0.875rem;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  outline: none;
+  transition: 0.2s all;
+  box-sizing: border-box;
+}
+
+.assets-liabilities-section .income-table input:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 5px rgba(64, 115, 158, 0.3);
+}
+
+.assets-liabilities-section .income-table tbody tr:hover {
+  background-color: #f1f2f6;
+}
+
+.assets-liabilities-section .income-table tbody tr td b {
+  font-weight: 700;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+  .assets-liabilities-section .income-table th,
+  .assets-liabilities-section .income-table td {
+    font-size: 0.825rem;
+    padding: 8px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .assets-liabilities-section .form-box {
+    padding: 20px;
+  }
+  .assets-liabilities-section .income-table th,
+  .assets-liabilities-section .income-table td {
+    font-size: 0.8rem;
+    padding: 6px 4px;
+  }
 }
 
 /* =========================
-   BUSINESS / EMPLOYMENT LONG LABEL FIX
+   PROPERTY DETAILS UNIQUE
 ========================= */
-.employment-section .form-grid-2 .input-group {
+.propdet-section {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+.propdet-form-box {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.propdet-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #1f3b73;
+}
+
+.propdet-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.propdet-input-group {
   display: flex;
   flex-direction: column;
 }
 
-.employment-section .form-grid-2 .input-group label {
-  font-weight: 700;
-  font-size: 11px;
-  line-height: 1.2;
-  white-space: normal; /* allow wrapping for long labels */
-  margin-top: 15px;
-}
-
-.employment-section .form-grid-2 .input-group label.long-label {
-  display: inline-block;
-  font-weight: 600;
+.propdet-input-group label {
   font-size: 0.85rem;
-  line-height: 1.2;
-  word-break: break-word; /* break long text to next line */
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #374151;
 }
 
-.employment-section .form-grid-2 .input-group input.box-input,
-.employment-section .form-grid-2 .input-group textarea.box-input {
-  width: 100%;
-  min-width: 0;
-  padding: 10px 10px;
+.propdet-input {
+  padding: 8px 10px;
+  border: 1px solid #3b82f6;
+  border-radius: 4px;
+  background-color: #f9f9f9;
   font-size: 0.9rem;
+  transition:
+    border 0.2s,
+    background 0.2s;
+}
+
+.propdet-input:focus {
+  outline: none;
+  border-color: #1f3b73;
+  background-color: #fff;
+}
+
+.propdet-btn-container {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.propdet-btn-add,
+.propdet-btn-delete {
+  padding: 10px 16px;
   border-radius: 6px;
-  border: 1px solid #c5d1e0;
-  box-sizing: border-box;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-/* Optional: make textarea scrollable if content is long */
-.employment-section .form-grid-2 .input-group textarea.box-input {
-  resize: vertical;
-  min-height: 60px;
+.propdet-btn-add {
+  background-color: #1f3b73;
+  color: #fff;
 }
 
-/* Scoped grid for spouse addresses only */
-.spouse-address-grid {
-  display: grid;
-  grid-template-columns: 250px 200px 120px; /* City | Country | Postal */
-  gap: 20px;
+.propdet-btn-add:hover {
+  background-color: #15275c;
+}
+
+.propdet-btn-delete {
+  background-color: #ef4444;
+  color: #fff;
+}
+
+.propdet-btn-delete:hover {
+  background-color: #b91c1c;
+}
+
+/* Modal */
+.propdet-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(31, 59, 115, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.propdet-modal-content {
+  background-color: #fff;
+  padding: 20px 25px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.propdet-modal-content h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #1f3b73;
+}
+
+.propdet-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.propdet-modal-btn {
+  flex: 1 1 45%;
+  min-width: 120px;
+  height: 36px;
+  background-color: #1f3b73;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.propdet-modal-btn:hover {
+  background-color: #15275c;
+}
+
+.propdet-modal-cancel {
+  margin-top: 15px;
+  width: 120px;
+  height: 36px;
+  background-color: #6b7280;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.propdet-modal-cancel:hover {
+  background-color: #4b5563;
 }
 
 /* Responsive */
-@media (max-width: 900px) {
-  .spouse-address-grid {
-    grid-template-columns: 1fr 1fr 1fr; /* shrink for mobile */
-    gap: 15px;
+@media (max-width: 500px) {
+  .propdet-modal-btn {
+    flex: 1 1 100%;
+  }
+
+  .propdet-form-grid {
+    grid-template-columns: 1fr;
   }
 }
+
+/* ========================================
+   BANK DETAILS (PAYOR DETAILS) MODULE
+======================================== */
+.bank-details {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* smaller gap between this and other modules */
+  margin-bottom: 10px; /* reduced bottom space */
+}
+
+.bank-details .form-box {
+  background-color: #ffffff;
+  padding: 20px; /* slightly smaller padding than main modules */
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* softer shadow */
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* small gap between section title and grid */
+}
+
+.bank-details .section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000000;
+  border-bottom: 2px solid #40739e;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.bank-details .form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px; /* smaller gap between input fields */
+}
+
+.bank-details .input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* tighter spacing between label and input */
+}
+
+.bank-details .input-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2f3640;
+}
+
+.bank-details .box-input {
+  padding: 8px 10px; /* slightly smaller input */
+  font-size: 0.85rem;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  outline: none;
+  transition: 0.2s all;
+}
+
+.bank-details .box-input:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 4px rgba(64, 115, 158, 0.2);
+}
+
+/* ===============================
+   RESPONSIVE
+=============================== */
+@media (max-width: 992px) {
+  .bank-details .form-grid-2 {
+    grid-template-columns: 1fr; /* stack inputs for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .bank-details .form-box {
+    padding: 15px; /* tighter padding on mobile */
+  }
+
+  .bank-details .section-title {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+  }
+
+  .bank-details .box-input {
+    font-size: 0.8rem;
+  }
+}
+
+/* ========================================
+   POLICY BENEFICIARY MODULE
+======================================== */
+
+/* Container */
+.form-box {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+/* Section Title */
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 15px;
+  text-align: center;
+  border-bottom: 2px solid #40739e;
+  padding-bottom: 8px;
+}
+
+/* Table Container */
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+/* Table Styles */
+.income-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.income-table th,
+.income-table td {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.income-table th {
+  background-color: #f4f4f4;
+  font-weight: 600;
+}
+
+.income-table td input,
+.income-table td select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+/* Checkbox Column */
+.delete-col {
+  width: 50px;
+  text-align: center;
+}
+
+/* Buttons */
+.form-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-travel-add,
+.btn-travel-delete {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.btn-travel-add {
+  background-color: #001e78;
+  color: #fff;
+}
+
+.btn-travel-add:hover {
+  background-color: #002fff;
+}
+
+.btn-travel-delete {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.btn-travel-delete:hover {
+  background-color: #e53935;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .income-table th,
+  .income-table td {
+    padding: 8px 6px;
+  }
+
+  .btn-travel-add,
+  .btn-travel-delete {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ========================================
+   SPOUSE DETAILS MODULE (Personal Info Style)
+======================================== */
+.spouse-section {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); /* updated valid box-shadow */
+}
+
+.spouse-section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 15px;
+  text-align: center;
+  border-bottom: 2px solid #40739e;
+  padding-bottom: 8px;
+}
+
+/* ===============================
+   FORM GRID
+=============================== */
+.spouse-form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.spouse-form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.spouse-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.spouse-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #2f3640;
+}
+
+/* ===============================
+   INPUT FIELDS
+=============================== */
+.spouse-input {
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  outline: none;
+  transition:
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+
+.spouse-input:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 6px rgba(64, 115, 158, 0.3);
+}
+
+/* ===============================
+   TEXTAREAS
+=============================== */
+textarea.spouse-input {
+  resize: vertical;
+}
+
+/* ===============================
+   ADDRESS GRID SPACING
+=============================== */
+.spouse-address-grid {
+  margin-top: 10px;
+}
+
+/* ===============================
+   MOBILE INPUT WRAPPER (if needed)
+=============================== */
+.spouse-mobile-input-wrapper {
+  display: flex;
+  gap: 10px;
+}
+
+.spouse-mobile-country-code {
+  padding: 10px 12px;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  background-color: #f5f6fa;
+  cursor: pointer;
+  min-width: 130px;
+}
+
+.spouse-mobile-number-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  outline: none;
+  transition:
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+
+.spouse-mobile-number-input:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 6px rgba(64, 115, 158, 0.3);
+}
+
+/* ===============================
+   SELECT FIELDS
+=============================== */
+select.spouse-input {
+  appearance: none;
+  background-color: #f5f6fa;
+  cursor: pointer;
+}
+
+select.spouse-input:focus {
+  border-color: #40739e;
+  box-shadow: 0 0 6px rgba(64, 115, 158, 0.3);
+}
+
+/* ===============================
+   RESPONSIVE
+=============================== */
+@media (max-width: 992px) {
+  .spouse-form-grid-2,
+  .spouse-form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .spouse-mobile-input-wrapper {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .spouse-section {
+    padding: 20px;
+  }
+
+  .spouse-section-title {
+    font-size: 1.5rem;
+  }
+
+  .spouse-input,
+  .spouse-mobile-number-input,
+  .spouse-mobile-country-code {
+    font-size: 0.85rem;
+  }
+}
+
+/* ========================================
+   DEPENDENT DETAILS FORM
+======================================== */
+
+.dependent-section {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.dependent-form-box {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dependent-section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 15px;
+  text-align: center;
+  border-bottom: 2px solid #40739e;
+  padding-bottom: 8px;
+}
+
+/* Grid Layouts */
+.dependent-form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.dependent-entry {
+  position: relative;
+  margin-bottom: 20px;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd; /* visually separate each dependent */
+}
+
+/* Input Groups */
+.dependent-input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.dependent-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+.dependent-input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition:
+    border 0.2s,
+    box-shadow 0.2s;
+}
+
+.dependent-input:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 3px rgba(74, 144, 226, 0.5);
+  outline: none;
+}
+
+/* Delete button inside dependent entry */
+.remove-dependent-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border: none;
+  background: #e74c3c;
+  color: #fff;
+  font-size: 1rem;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  line-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.remove-dependent-btn:hover {
+  background: #c0392b;
+}
+
+/* Add & Delete Buttons */
+.dependent-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.add-btn,
+.delete-dependent-btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.add-btn {
+  background-color: #4a90e2;
+  color: #fff;
+}
+
+.add-btn:hover {
+  background-color: #357abd;
+}
+
+.delete-dependent-btn {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.delete-dependent-btn:hover {
+  background-color: #c0392b;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dependent-form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .dependent-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+

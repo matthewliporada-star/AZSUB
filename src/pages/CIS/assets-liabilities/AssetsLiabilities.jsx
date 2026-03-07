@@ -151,7 +151,7 @@ function AssetsLiabilities() {
       </div>
 
       {/* Liabilities Table */}
-      <div className="form-box">
+      <div className="form-box" style={{ marginTop: "50px" }}>
         <h3 className="section-title">Liabilities</h3>
         <table className="income-table">
           <thead>

@@ -168,25 +168,11 @@ function PropertyDetails() {
         ))}
 
         {/* Add/Delete Buttons */}
-        <div
-          className="adds-deletes-container-cis"
-          style={{
-            display: "flex",
-            gap: "10px", // space between buttons
-            justifyContent: "flex-end", // aligns buttons to the right
-            alignItems: "center", // keeps buttons their original height
-            marginTop: "15px",
-          }}
-        >
+        <div className="adds-deletes-container-cis">
           <button
             type="button"
             className="btn-add-member-cis"
             onClick={() => setShowModal(true)}
-            style={{
-              width: "170px",
-              height: "40px",
-              flex: "0 0 auto", // prevents button from stretching
-            }}
           >
             Add Property
           </button>
@@ -195,11 +181,6 @@ function PropertyDetails() {
             type="button"
             className="btn-delete-member-cis"
             onClick={deleteProperty}
-            style={{
-              width: "150px",
-              height: "40px",
-              flex: "0 0 auto", // prevents button from stretching
-            }}
           >
             Delete Last
           </button>

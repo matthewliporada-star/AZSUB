@@ -30,14 +30,15 @@ const BusinessEmployment = () => {
       <div className="form-box">
         <h3 className="section-title">Business / Employment Information</h3>
         <div className="form-grid-2">
-
           <div className="input-group">
             <label>Name of Business</label>
             <input
               type="text"
               className="box-input"
               value={employment.businessName}
-              onChange={(e) => handleEmploymentChange("businessName", e.target.value)}
+              onChange={(e) =>
+                handleEmploymentChange("businessName", e.target.value)
+              }
             />
           </div>
 
@@ -62,24 +63,14 @@ const BusinessEmployment = () => {
           </div>
 
           <div className="input-group">
-            <label>
-              Type of Business (Employment / Sole Proprietor / LLC / PJSC / Offshore / Partnership)
-            </label>
-            <input
-              type="text"
-              className="box-input"
-              value={employment.businessType}
-              onChange={(e) => handleEmploymentChange("businessType", e.target.value)}
-            />
-          </div>
-
-          <div className="input-group">
             <label>Percentage of Ownership</label>
             <input
               type="number"
               className="box-input"
               value={employment.ownership}
-              onChange={(e) => handleEmploymentChange("ownership", e.target.value)}
+              onChange={(e) =>
+                handleEmploymentChange("ownership", e.target.value)
+              }
             />
           </div>
 
@@ -89,7 +80,9 @@ const BusinessEmployment = () => {
               type="text"
               className="box-input"
               value={employment.address}
-              onChange={(e) => handleEmploymentChange("address", e.target.value)}
+              onChange={(e) =>
+                handleEmploymentChange("address", e.target.value)
+              }
             />
           </div>
 
@@ -99,7 +92,9 @@ const BusinessEmployment = () => {
               type="text"
               className="box-input"
               value={employment.website}
-              onChange={(e) => handleEmploymentChange("website", e.target.value)}
+              onChange={(e) =>
+                handleEmploymentChange("website", e.target.value)
+              }
             />
           </div>
 
@@ -109,7 +104,9 @@ const BusinessEmployment = () => {
               type="text"
               className="box-input"
               value={employment.telephone}
-              onChange={(e) => handleEmploymentChange("telephone", e.target.value)}
+              onChange={(e) =>
+                handleEmploymentChange("telephone", e.target.value)
+              }
             />
           </div>
 
@@ -119,22 +116,41 @@ const BusinessEmployment = () => {
               type="date"
               className="box-input"
               value={employment.incorporationDate}
-              onChange={(e) => handleEmploymentChange("incorporationDate", e.target.value)}
+              onChange={(e) =>
+                handleEmploymentChange("incorporationDate", e.target.value)
+              }
+            />
+          </div>
+          
+          <div className="input-group">
+            <label>
+              Type of Business (Employment / Sole Proprietor / LLC / PJSC /
+              Offshore / Partnership)
+            </label>
+            <input
+              type="text"
+              className="box-input"
+              value={employment.businessType}
+              onChange={(e) =>
+                handleEmploymentChange("businessType", e.target.value)
+              }
             />
           </div>
 
-          <div className="input-group">
+          <div className="input-group full-width">
             <label>
-              Previous Work Experience (Last 15 years) – Kindly specify role, organization name and years
+              Previous Work Experience (Last 15 years) – Kindly specify role,
+              organization name and years
             </label>
             <textarea
               className="box-input"
               rows="3"
               value={employment.previousExperience}
-              onChange={(e) => handleEmploymentChange("previousExperience", e.target.value)}
+              onChange={(e) =>
+                handleEmploymentChange("previousExperience", e.target.value)
+              }
             />
           </div>
-
         </div>
       </div>
     </div>

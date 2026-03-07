@@ -70,7 +70,7 @@ function PersonalMedical({ medical, handleMedicalChange }) {
             <label>
               Any health disorders{" "}
               <span className="label-parenthesis">
-                (Please provide full details with the last medical report)
+                (Provide full details with the latest medical report.)
               </span>
             </label>
             <input

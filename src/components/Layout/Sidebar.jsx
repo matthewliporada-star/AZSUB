@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
 import { useApp } from "../../context/AppContext";
 // [CHANGE] Import the new logo
 import logoLight from "../../assets/logo1.png";
@@ -7,6 +8,7 @@ import logoDark from "../../assets/White logo.png";
 const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
   const location = useLocation();
   const { userRole, loading, darkMode } = useApp();
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   // Add near the top, after other imports
   const cisIcon = (
@@ -187,9 +189,15 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
       ),
     },
     {
-      path: "/mp/cis", // <-- location path
+      path: "#cis",
       label: "Client Information System",
       icon: cisIcon,
+      isDropdown: true,
+      subItems: [
+        { path: "/mp/cis/CISDashboard", label: "Dashboard" },
+        { path: "/mp/cis", label: "Fill Out" },
+        { path: "/mp/cis/record", label: "Record" },
+      ],
     },
   ];
 
@@ -319,20 +327,15 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
       ),
     },
     {
-      path: "/al/cis",
+      path: "#cis",
       label: "Client Information System",
-      icon: (
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg>
-      ),
+      icon: cisIcon,
+      isDropdown: true,
+      subItems: [
+        { path: "/al/cis/CISDashboard", label: "Dashboard" },
+        { path: "/al/cis", label: "Fill Out" },
+        { path: "/al/cis/record", label: "Record" },
+      ],
     },
   ];
 
@@ -434,6 +437,40 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
     },
   ];
 
+  // MD Menu Items
+  const mdMenuItems = [
+    {
+      path: "/md/dashboard",
+      label: "Dashboard",
+      icon: (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+      ),
+    },
+    {
+      path: "#cis",
+      label: "Client Information System",
+      icon: cisIcon,
+      isDropdown: true,
+      subItems: [
+        { path: "/md/cis/CISDashboard", label: "Dashboard" },
+        { path: "/md/cis", label: "Fill Out" },
+        { path: "/md/cis/record", label: "Record" },
+      ],
+    },
+  ];
+
   if (loading) {
     return (
       <div
@@ -447,6 +484,7 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
   let menuItems = apMenuItems;
   if (userRole === "MP") menuItems = mpMenuItems;
   else if (userRole === "AL") menuItems = alMenuItems;
+  else if (userRole === "MD") menuItems = mdMenuItems;
   else if (userRole === "ADMIN") menuItems = adminMenuItems;
 
   return (
@@ -494,15 +532,58 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
       </div>
       <div className="sidebar-menu">
         {menuItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={`sidebar-item ${location.pathname === item.path ? "active" : ""}`}
-            title={!sidebarOpen ? item.label : ""}
-          >
-            <div className="sidebar-icon">{item.icon}</div>
-            {sidebarOpen && <span>{item.label}</span>}
-          </Link>
+          <div key={item.path}>
+            {item.isDropdown ? (
+              <>
+                <div
+                  className={`sidebar-item dropdown-toggle ${
+                    openDropdown === item.path ? "active" : ""
+                  } ${location.pathname.startsWith(item.path.replace("#", "")) ? "active" : ""}`}
+                  onClick={() => {
+                    setOpenDropdown(
+                      openDropdown === item.path ? null : item.path,
+                    );
+                  }}
+                  title={!sidebarOpen ? item.label : ""}
+                  style={{ cursor: "pointer" }}
+                >
+                  <div className="sidebar-icon">{item.icon}</div>
+                  {sidebarOpen && <span>{item.label}</span>}
+                  {sidebarOpen && (
+                    <span
+                      className="dropdown-arrow"
+                      style={{ marginLeft: "auto" }}
+                    >
+                      {openDropdown === item.path ? "▾" : "▸"}
+                    </span>
+                  )}
+                </div>
+
+                {openDropdown === item.path &&
+                  item.subItems.map((sub) => (
+                    <Link
+                      key={sub.path}
+                      to={sub.path}
+                      className={`sidebar-item sub-item ${
+                        location.pathname === sub.path ? "active" : ""
+                      }`}
+                      title={!sidebarOpen ? sub.label : ""}
+                    >
+                      {sidebarOpen && <span>{sub.label}</span>}
+                    </Link>
+                  ))}
+              </>
+            ) : (
+              <Link
+                to={item.path}
+                className={`sidebar-item ${location.pathname === item.path ? "active" : ""}`}
+                title={!sidebarOpen ? item.label : ""}
+              >
+                <div className="sidebar-icon">{item.icon}</div>
+                {sidebarOpen && <span>{item.label}</span>}
+              </Link>
+            )}
+          </div>
         ))}
       </div>
     </aside>

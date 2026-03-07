@@ -9,7 +9,7 @@ import FamilyMedical from "./family-medical/FamilyMedical";
 import ExistingOrPending from "./existing-or-pending/ExistingOrPending";
 import BusinessEmployment from "./business-employment/BusinessEmployment";
 import PersonalIncome from "./personal-income/PersonalIncome";
-import AssetsLiabilities from "./assets-liabilities/AssetsLiabilities"; // your table
+import AssetsLiabilities from "./assets-liabilities/AssetsLiabilities";
 import PropertyDetails from "./property-details/PropertyDetails";
 import BankDetails from "./bank-details/BankDetails";
 import PolicyBeneficiary from "./policy-beneficiary/PolicyBeneficiary";
@@ -17,8 +17,6 @@ import DependentDetails from "./dependent-details/DependentDetails";
 import SpouseDetails from "./spouse-details/SpouseDetails";
 
 function CIS({ userRole }) {
-  const [step, setStep] = useState(1);
-  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
 
   const [personalInfo, setPersonalInfo] = useState({
@@ -84,9 +82,6 @@ function CIS({ userRole }) {
   });
   const [dependents, setDependents] = useState({ dependents: [] });
 
-  // ========================
-  // Handle Travel Changes
-  // ========================
   const handleTravelChange = (index, field, value) => {
     setTravelDetails((prev) => {
       const updated = [...prev];
@@ -95,8 +90,8 @@ function CIS({ userRole }) {
     });
   };
 
-  // Replace your existing countries array with this full list
-  const countries = [
+  // Full countries list
+ const countries = [
     { code: "AF", name: "Afghanistan" },
     { code: "AL", name: "Albania" },
     { code: "DZ", name: "Algeria" },
@@ -329,153 +324,6 @@ function CIS({ userRole }) {
     { code: "ZW", name: "Zimbabwe" },
   ];
 
-  const handleNext = () => setStep((prev) => prev + 1);
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setUploading(true);
-    setTimeout(() => setUploading(false), 1000);
-  };
-
-  const handleDropZoneClick = () => fileInputRef.current?.click();
-
-  const handleSearch = () => {
-    console.log("Searching for:", personalInfo.full_name);
-    setStep(2);
-  };
-
-  const renderStep = () => {
-    switch (step) {
-      case 1:
-        return (
-          <div className="step-fade">
-            <h3>Client Information System</h3>
-            <h2 className="step-title">Search for your information sheet</h2>
-            <div className="search-container centered">
-              <input
-                type="text"
-                className="search-bar"
-                placeholder="Enter full name..."
-                onChange={(e) =>
-                  setPersonalInfo((prev) => ({
-                    ...prev,
-                    full_name: e.target.value,
-                  }))
-                }
-              />
-              <button onClick={handleSearch} className="search-btn-cis">
-                Search
-              </button>
-            </div>
-            <div className="upload-container">
-              <p>Upload your client information sheet here!</p>
-              <input
-                type="file"
-                accept="application/pdf"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                style={{ display: "none" }}
-              />
-              <div className="drop-zone" onClick={handleDropZoneClick}>
-                <div className="cloud-symbol">☁</div>
-                <p>{uploading ? "Uploading..." : "Click to upload PDF"}</p>
-              </div>
-              <p className="footer-link">
-                Don't have one?{" "}
-                <span
-                  style={{ cursor: "pointer", color: "blue" }}
-                  onClick={handleNext}
-                >
-                  Fill up here
-                </span>
-              </p>
-            </div>
-          </div>
-        );
-      case 2:
-        return (
-          <div className="step-fade">
-            <div className="instruction-box">
-              <p
-                style={{
-                  color: "red",
-                  textAlign: "center",
-                  fontWeight: "bold",
-                }}
-              >
-                Kindly ensure that each and every section of the form is fully
-                completed.
-                <br />
-                If any section is not applicable, please indicate 'N/A'.
-                <br />
-                Kindly convert all amounts to USD.
-              </p>
-              <div className="step-footer">
-                <button
-                  className="btn-navy-cis step2-next-btn"
-                  onClick={handleNext}
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          </div>
-        );
-      case 3:
-        return (
-          <form className="insurance-form">
-            <PersonalInformation
-              personalInfo={personalInfo}
-              setPersonalInfo={setPersonalInfo}
-              countries={countries}
-            />
-            <TravelDetails
-              travelDetails={travelDetails}
-              setTravelDetails={setTravelDetails}
-              handleTravelChange={handleTravelChange} // ✅ added
-              deleteMode={deleteMode}
-              setDeleteMode={setDeleteMode}
-              selectedRows={selectedRows}
-              setSelectedRows={setSelectedRows}
-              countries={countries}
-            />
-            <SmokingAndAlcohol
-              habits={habits}
-              handleHabitsChange={(field, value) => {
-                setHabits((prev) => ({ ...prev, [field]: value }));
-              }}
-            />
-
-            <PersonalMedical
-              medical={medical}
-              handleMedicalChange={(field, value) => {
-                setMedical((prev) => ({
-                  ...prev,
-                  [field]: value,
-                }));
-              }}
-            />
-            <FamilyMedical data={{}} />
-            <ExistingOrPending data={{}} />
-            <BusinessEmployment data={{}} />
-            <PersonalIncome data={{}} />
-            <AssetsLiabilities /> 
-            <PropertyDetails data={{}} />
-            <BankDetails data={{}} />
-            <PolicyBeneficiary data={{}} />
-            <SpouseDetails spouse={spouse} setSpouse={setSpouse} />
-            <DependentDetails
-              dependents={dependents}
-              setDependents={setDependents}
-            />
-          </form>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className={`cis-page-wrapper ${userRole === "MP" ? "mp-top" : ""}`}>
       <main className="cis-page">
@@ -484,7 +332,53 @@ function CIS({ userRole }) {
             <h1>Client Information Sheet</h1>
           </header>
         )}
-        <div className="view-window">{renderStep()}</div>
+        <form className="insurance-form">
+          <PersonalInformation
+            personalInfo={personalInfo}
+            setPersonalInfo={setPersonalInfo}
+            countries={countries}
+          />
+          <TravelDetails
+            travelDetails={travelDetails}
+            setTravelDetails={setTravelDetails}
+            handleTravelChange={handleTravelChange}
+            deleteMode={deleteMode}
+            setDeleteMode={setDeleteMode}
+            selectedRows={selectedRows}
+            setSelectedRows={setSelectedRows}
+            countries={countries}
+          />
+          <SmokingAndAlcohol
+            habits={habits}
+            handleHabitsChange={(field, value) =>
+              setHabits((prev) => ({ ...prev, [field]: value }))
+            }
+          />
+          <PersonalMedical
+            medical={medical}
+            handleMedicalChange={(field, value) =>
+              setMedical((prev) => ({ ...prev, [field]: value }))
+            }
+          />
+          <FamilyMedical data={{}} />
+          <ExistingOrPending data={{}} />
+          <BusinessEmployment data={{}} />
+          <PersonalIncome data={{}} />
+          <AssetsLiabilities />
+          <PropertyDetails data={{}} />
+          <BankDetails data={{}} />
+          <PolicyBeneficiary data={{}} />
+          <SpouseDetails
+            spouse={spouse}
+            handleSpouseChange={(field, value) =>
+              setSpouse((prev) => ({ ...prev, [field]: value }))
+            }
+          />
+          <DependentDetails
+            dependents={dependents}
+            setDependents={setDependents}
+          />
+        </form>
       </main>
     </div>
   );

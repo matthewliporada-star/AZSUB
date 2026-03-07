@@ -1,5 +1,5 @@
 // MPLayout.jsx - Admin-styled layout for Management Partners
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import "./MP_Styles.css";
@@ -13,6 +13,16 @@ const MPLayout = ({ children, title = "Dashboard" }) => {
   const { currentUser, userRole, darkMode, toggleDarkMode } = useApp();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [cisOpen, setCisOpen] = useState(false);
+  const [selectedPath, setSelectedPath] = useState(location.pathname);
+
+  // Keep the active highlight in sync with routing
+  useEffect(() => {
+    setSelectedPath(location.pathname);
+    setCisOpen(location.pathname.startsWith("/mp/cis"));
+  }, [location.pathname]);
+
+  const isActive = (path) => selectedPath === path;
 
   const mpMenuItems = [
     {
@@ -31,9 +41,15 @@ const MPLayout = ({ children, title = "Dashboard" }) => {
       icon: <i className="fa-solid fa-user-group"></i>,
     },
     {
-      path: "/mp/cis",
+      path: "#cis",
       label: "Client Information System",
       icon: <i className="fa-solid fa-file-lines"></i>,
+      isDropdown: true,
+      subItems: [
+        { path: "/mp/cis/CISDashboard", label: "Dashboard" },
+        { path: "/mp/cis", label: "Fill Out" },
+        { path: "/mp/cis/record", label: "Record" },
+      ],
     },
   ];
 
@@ -80,14 +96,55 @@ const MPLayout = ({ children, title = "Dashboard" }) => {
 
         <div className="sidebar-menu">
           {mpMenuItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`sidebar-item ${location.pathname === item.path ? "active" : ""}`}
-            >
-              <div className="sidebar-icon">{item.icon}</div>
-              {sidebarOpen && <span>{item.label}</span>}
-            </Link>
+            <div key={item.path}>
+              {item.isDropdown ? (
+                <>
+                  <div
+                    className={`sidebar-item dropdown-toggle ${
+                      selectedPath === "#cis" ? "active" : ""
+                    }`}
+                    onClick={() => {
+                      setCisOpen((o) => !o);
+                      setSelectedPath("#cis");
+                    }}
+                    title={!sidebarOpen ? item.label : ""}
+                  >
+                    <div className="sidebar-icon">{item.icon}</div>
+                    {sidebarOpen && <span>{item.label}</span>}
+                    {sidebarOpen && (
+                      <span className="dropdown-arrow">
+                        {cisOpen ? "▾" : "▸"}
+                      </span>
+                    )}
+                  </div>
+
+                  {cisOpen &&
+                    item.subItems.map((sub) => (
+                      <Link
+                        key={sub.path}
+                        to={sub.path}
+                        className={`sidebar-item sub-item ${
+                          isActive(sub.path) ? "active" : ""
+                        }`}
+                        onClick={() => setSelectedPath(sub.path)}
+                      >
+                        {sidebarOpen && <span>{sub.label}</span>}
+                      </Link>
+                    ))}
+                </>
+              ) : (
+                <Link
+                  to={item.path}
+                  className={`sidebar-item ${
+                    isActive(item.path) ? "active" : ""
+                  }`}
+                  onClick={() => setSelectedPath(item.path)}
+                >
+                  <div className="sidebar-icon">{item.icon}</div>
+                  {sidebarOpen && <span>{item.label}</span>}
+                </Link>
+              )}
+            </div>
           ))}
         </div>
 

@@ -95,8 +95,15 @@ function App() {
           <Route path="/mp/dashboard" element={<MPLayout><MPDashboard /></MPLayout>} />
           <Route path="/mp/al-performance" element={<MPLayout><ALPerformance /></MPLayout>} />
           <Route path="/mp/ap-performance" element={<MPLayout><APPerformance /></MPLayout>} />
-          <Route path="/mp/cis" element={<MPLayout><CIS /></MPLayout>} />  {/* Wrap CIS with MPLayout */}
           </Route>
+
+           {/* Nested CIS routes */}
+          <Route path="/mp/cis" element={<MPLayout><CIS /></MPLayout>}>
+          <Route path="CISDashboard" element={<CIS />} />
+          <Route path="record" element={<CIS />} />
+          <Route index element={<CIS />} /> {/* default for /mp/cis */}
+          </Route>
+
 
           {/* MD Routes */}
           <Route path="/md/dashboard" element={<MDDashboard />} />
