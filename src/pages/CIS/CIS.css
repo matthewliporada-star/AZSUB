@@ -1,4 +1,53 @@
 /* ========================================
+   THEME VARIABLES
+======================================== */
+
+:root {
+  --bg-main: #f5f7fb;
+
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+  --bg-table-header: #f1f2f6; /* light mode table header */
+  --bg-hover: #f1f2f6;
+
+  --text-main: #2f3640;
+  --text-title: #000000;
+  --text-muted: #718093;
+
+  --border-color: #dcdde1;
+
+  --accent: #40739e;
+  --accent-dark: #001e78;
+}
+
+/* DARK MODE */
+
+body.dark-mode {
+  --bg-main: #0f172a;
+  --bg-card: #1e293b;
+  --bg-input: #111827;
+  --bg-table-header: #1f3b73; /* blue header */
+  --bg-hover: #273449;
+
+  --text-main: #e5e7eb;
+  --text-title: #ffffff;
+  --text-muted: #94a3b8;
+
+  --border-color: #374151;
+
+  --accent: #60a5fa;
+  --accent-dark: #3b82f6;
+}
+
+input,
+textarea,
+select {
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+
+/* ========================================
    GLOBAL LAYOUT
 ======================================== */
 * {
@@ -11,7 +60,7 @@
 .cis-page-wrapper {
   width: 100%;
   min-height: 100vh;
-  background-color: #f5f6fa;
+  background-color: var(--bg-main);
   padding: 20px;
 }
 
@@ -35,7 +84,7 @@
 .content-header h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #2f3640;
+  color: var(--text-main);
 }
 
 /* ========================================
@@ -43,7 +92,7 @@
 ======================================== */
 .module-box {
   width: 100%;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
@@ -55,7 +104,7 @@
 .module-box .section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #000000;
+  color: var(--text-title);
   border-bottom: 2px solid #40739e;
   padding-bottom: 8px;
   margin-bottom: 15px;
@@ -86,7 +135,7 @@
 .input-group label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #2f3640;
+  color: var(--text-main);
 }
 
 .input-group .label-parenthesis {
@@ -121,8 +170,9 @@
 
 .box-input:disabled,
 .habit-input:disabled {
-  background-color: #f5f6fa;
-  color: #7f8fa6;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
   cursor: not-allowed;
 }
 
@@ -147,9 +197,10 @@
 }
 
 .module-box th {
-  background-color: #f5f6fa;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
   font-weight: 600;
-  color: #2f3640;
+  color: var(--text-main);
 }
 
 .module-box tr:hover {
@@ -178,8 +229,9 @@
   left: 0;
   height: 20px;
   width: 20px;
-  background-color: #f5f6fa;
-  border: 1px solid #dcdde1;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
   border-radius: 4px;
 }
 
@@ -296,7 +348,7 @@
 ======================================== */
 .personal-info-section {
   width: 100%;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   padding: 25px;
   border-radius: 10px;
   display: flex;
@@ -307,13 +359,12 @@
 .personal-info-section .section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #000000;
+  color: var(--text-title);
   margin-bottom: 15px;
   text-align: center;
   border-bottom: 2px solid #40739e;
   padding-bottom: 8px;
   position: relative;
-  
 }
 
 /* ===============================
@@ -340,7 +391,7 @@
 .input-group label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #2f3640;
+  color: var(--text-main);
 }
 
 .input-group .label-parenthesis {
@@ -374,24 +425,31 @@
 .mobile-input-wrapper {
   display: flex;
   gap: 10px;
+  align-items: stretch; /* Ensures they stay the same height */
 }
 
 .mobile-country-code {
   padding: 10px 12px;
-  border: 1px solid #dcdde1;
   border-radius: 6px;
-  background-color: #f5f6fa;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
   cursor: pointer;
-  min-width: 130px;
+  /* Reduced min-width so it doesn't take half the space */
+  min-width: 100px;
+  /* Limits how wide the dropdown can get with long country names */
+  max-width: 160px;
+  flex-shrink: 0; /* Prevents the dropdown from collapsing too much */
 }
 
 .mobile-number-input-cis {
-  flex: 1;
+  flex: 2; /* Give the number input more "weight" than the dropdown */
   padding: 10px 12px;
   border: 1px solid #dcdde1;
   border-radius: 6px;
   font-size: 0.9rem;
   outline: none;
+  min-width: 0; /* Important fix for flexbox children */
   transition:
     border-color 0.2s ease-in-out,
     box-shadow 0.2s ease-in-out;
@@ -407,7 +465,9 @@
 =============================== */
 select.box-input {
   appearance: none;
-  background-color: #f5f6fa;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
   cursor: pointer;
 }
 
@@ -451,7 +511,7 @@ select.box-input:focus {
 ======================================== */
 .travel-section {
   width: 100%;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
@@ -464,7 +524,7 @@ select.box-input:focus {
 .travel-section .section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #000000;
+  color: var(--text-title);
   border-bottom: 2px solid #40739e;
   padding-bottom: 8px;
   margin-bottom: 15px;
@@ -479,7 +539,7 @@ select.box-input:focus {
   border-collapse: separate; /* separate borders so it looks like a standalone table */
   border-spacing: 0 8px; /* add vertical spacing between rows */
   font-size: 0.9rem;
-  background-color: #fdfdfd; /* subtle contrast from section */
+  background-color: var(--bg-card); /* subtle contrast from section */
   border-radius: 8px; /* rounded corners for table */
 }
 
@@ -491,21 +551,23 @@ select.box-input:focus {
 }
 
 .travel-table th {
-  background-color: #f5f6fa;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
   font-weight: 600;
-  color: #2f3640;
+  color: var(--text-main);
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 }
 
 .travel-table tr {
-  background-color: #ffffff;
+   background-color: var(--bg-card);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   border-radius: 8px;
 }
 
 .travel-table tr:hover {
-  background-color: #f1f2f6;
+  background-color: var(--bg-hover);
 }
 
 .travel-table select,
@@ -547,8 +609,9 @@ select.box-input:focus {
   left: 0;
   height: 20px;
   width: 20px;
-  background-color: #f5f6fa;
-  border: 1px solid #dcdde1;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
   border-radius: 4px;
 }
 
@@ -643,7 +706,7 @@ select.box-input:focus {
 .smoking-section .section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #000000;
+  color: var(--text-title);
   border-bottom: 2px solid #40739e;
   padding-bottom: 8px;
   margin-bottom: 15px;
@@ -655,7 +718,7 @@ select.box-input:focus {
 /* MODULE CONTAINER */
 .smoking-section {
   width: 100%;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
@@ -684,7 +747,7 @@ select.box-input:focus {
 .smoking-section .input-group label {
   font-weight: 600;
   font-size: 0.9rem;
-  color: #2f3640;
+  color: var(--text-main);
 }
 
 .smoking-section .input-group .label-parenthesis {
@@ -717,8 +780,9 @@ select.box-input:focus {
    DISABLED INPUTS
 =============================== */
 .habit-input:disabled {
-  background-color: #f5f6fa;
-  color: #7f8fa6;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
   cursor: not-allowed;
 }
 
@@ -743,7 +807,7 @@ select.box-input:focus {
 ======================================== */
 .personal-medical-section {
   width: 100%;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
@@ -756,7 +820,7 @@ select.box-input:focus {
 .personal-medical-section .section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #000000;
+  color: var(--text-title);
   border-bottom: 2px solid #40739e;
   padding-bottom: 8px;
   margin-bottom: 15px;
@@ -788,7 +852,7 @@ select.box-input:focus {
   display: block;
   font-weight: 600;
   font-size: 0.9rem;
-  color: #2f3640;
+  color: var(--text-main);
   line-height: 1.2; /* allows multi-line wrapping without breaking layout */
   word-break: break-word; /* wrap long text */
 }
@@ -820,8 +884,9 @@ select.box-input:focus {
    DISABLED INPUTS
 =============================== */
 .personal-medical-section .box-input:disabled {
-  background-color: #f5f6fa;
-  color: #7f8fa6;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
   cursor: not-allowed;
 }
 
@@ -845,7 +910,7 @@ select.box-input:focus {
 ======================================== */
 .family-medical-section {
   width: 100%;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
@@ -858,7 +923,7 @@ select.box-input:focus {
 .family-medical-section .section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #000000;
+  color: var(--text-title);
   border-bottom: 2px solid #40739e;
   padding-bottom: 8px;
   margin-bottom: 15px;
@@ -875,7 +940,7 @@ select.box-input:focus {
 }
 
 .family-compact-card {
-  background-color: #f8f9fa;
+  background-color: var(--bg-card);
   padding: 15px;
   border-radius: 8px;
   display: flex;
@@ -893,7 +958,7 @@ select.box-input:focus {
 .family-compact-card .compact-title {
   font-weight: 600;
   font-size: 1.1rem;
-  color: #2f3640;
+  color: var(--text-main);
 }
 
 /* Fields */
@@ -937,8 +1002,9 @@ select.box-input:focus {
   left: 0;
   height: 20px;
   width: 20px;
-  background-color: #f5f6fa;
-  border: 1px solid #dcdde1;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
   border-radius: 4px;
 }
 
@@ -1066,7 +1132,7 @@ select.box-input:focus {
 ======================================== */
 .existing-section {
   width: 100%;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
@@ -1079,7 +1145,7 @@ select.box-input:focus {
 .existing-section .section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #000000;
+  color: var(--text-title);
   border-bottom: 2px solid #40739e;
   padding-bottom: 8px;
   margin-bottom: 15px;
@@ -1105,7 +1171,7 @@ select.box-input:focus {
 .existing-section .input-group label {
   font-weight: 600;
   font-size: 0.9rem;
-  color: #2f3640;
+  color: var(--text-main);
 }
 
 .existing-section .box-input {
@@ -1182,7 +1248,7 @@ select.box-input:focus {
 ======================================== */
 .employment-section {
   width: 100%;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
@@ -1195,7 +1261,7 @@ select.box-input:focus {
 .employment-section .section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #000000;
+  color: var(--text-title);
   border-bottom: 2px solid #40739e;
   padding-bottom: 8px;
   margin-bottom: 15px;
@@ -1222,7 +1288,7 @@ select.box-input:focus {
 .employment-section .input-group label {
   font-weight: 600;
   font-size: 0.9rem;
-  color: #2f3640;
+  color: var(--text-main);
 }
 
 /* Inputs and textarea styling */
@@ -1231,10 +1297,12 @@ select.box-input:focus {
   width: 100%;
   padding: 9px 12px;
   font-size: 0.875rem;
-  border: 1px solid #dcdde1;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   outline: none;
   transition: 0.2s all;
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
 }
 
 .employment-section .box-input:focus,
@@ -1266,7 +1334,7 @@ select.box-input:focus {
 ======================================== */
 .income-section {
   width: 100%;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
@@ -1279,7 +1347,7 @@ select.box-input:focus {
 .income-section .section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #000000;
+  color: var(--text-title);
   border-bottom: 2px solid #40739e;
   padding-bottom: 8px;
   margin-bottom: 15px;
@@ -1307,9 +1375,10 @@ select.box-input:focus {
 }
 
 .income-section .income-table th {
-  background-color: #f5f6fa;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
   font-weight: 600;
-  color: #2f3640;
+  color: var(--text-main);
 }
 
 .income-section .income-table input,
@@ -1376,7 +1445,7 @@ select.box-input:focus {
   max-width: 1205px; /* same max-width as other modules */
   margin: 0 auto; /* center horizontally */
   padding: 25px; /* consistent padding */
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   border-radius: 12px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
   display: flex;
@@ -1390,7 +1459,7 @@ select.box-input:focus {
 .assets-liabilities-section .section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #000000;
+  color: var(--text-title);
   border-bottom: 2px solid #40739e;
   padding-bottom: 8px;
   margin-bottom: 15px;
@@ -1412,9 +1481,10 @@ select.box-input:focus {
 }
 
 .assets-liabilities-section .income-table th {
-  background-color: #f5f6fa;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
   font-weight: 600;
-  color: #2f3640;
 }
 
 .assets-liabilities-section .income-table input {
@@ -1472,16 +1542,16 @@ select.box-input:focus {
 }
 
 .propdet-form-box {
-  background-color: #fff;
+  background-color: var(--bg-card);
   border-radius: 8px;
   padding: 20px;
 }
 
 .propdet-section-title {
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 16px;
-  color: #1f3b73;
+  color: var(--text-title);
 }
 
 .propdet-form-grid {
@@ -1500,24 +1570,21 @@ select.box-input:focus {
   font-size: 0.85rem;
   font-weight: 600;
   margin-bottom: 6px;
-  color: #374151;
+  color: var(--text-main);
 }
 
 .propdet-input {
   padding: 8px 10px;
-  border: 1px solid #3b82f6;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  background-color: #f9f9f9;
-  font-size: 0.9rem;
-  transition:
-    border 0.2s,
-    background 0.2s;
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
+  font-size: 0.7rem;
 }
 
 .propdet-input:focus {
-  outline: none;
-  border-color: #1f3b73;
-  background-color: #fff;
+  border-color: var(--accent);
+  background-color: var(--bg-table-header);
 }
 
 .propdet-btn-container {
@@ -1571,7 +1638,8 @@ select.box-input:focus {
 }
 
 .propdet-modal-content {
-  background-color: #fff;
+  background-color: var(--bg-card);
+  color: var(--text-main);
   padding: 20px 25px;
   border-radius: 8px;
   width: 90%;
@@ -1641,6 +1709,12 @@ select.box-input:focus {
   }
 }
 
+.type-field {
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
+}
+
 /* ========================================
    BANK DETAILS (PAYOR DETAILS) MODULE
 ======================================== */
@@ -1653,7 +1727,7 @@ select.box-input:focus {
 }
 
 .bank-details .form-box {
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   padding: 20px; /* slightly smaller padding than main modules */
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* softer shadow */
@@ -1665,7 +1739,7 @@ select.box-input:focus {
 .bank-details .section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #000000;
+  color: var(--text-title);
   border-bottom: 2px solid #40739e;
   padding-bottom: 8px;
   margin-bottom: 15px;
@@ -1687,7 +1761,7 @@ select.box-input:focus {
 .bank-details .input-group label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #2f3640;
+  color: var(--text-main);
 }
 
 .bank-details .box-input {
@@ -1734,7 +1808,7 @@ select.box-input:focus {
 
 /* Container */
 .form-box {
-  background-color: #fff;
+  background-color: var(--bg-card);
   border-radius: 8px;
   padding: 20px;
   margin: 20px 0;
@@ -1744,7 +1818,7 @@ select.box-input:focus {
 .section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #000000;
+  color: var(--text-title);
   margin-bottom: 15px;
   text-align: center;
   border-bottom: 2px solid #40739e;
@@ -1847,7 +1921,7 @@ select.box-input:focus {
 ======================================== */
 .spouse-section {
   width: 100%;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   padding: 25px;
   border-radius: 10px;
   display: flex;
@@ -1859,7 +1933,7 @@ select.box-input:focus {
 .spouse-section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #000000;
+  color: var(--text-title);
   margin-bottom: 15px;
   text-align: center;
   border-bottom: 2px solid #40739e;
@@ -1890,7 +1964,7 @@ select.box-input:focus {
 .spouse-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #2f3640;
+  color: var(--text-main);
 }
 
 /* ===============================
@@ -1936,11 +2010,12 @@ textarea.spouse-input {
 
 .spouse-mobile-country-code {
   padding: 10px 12px;
-  border: 1px solid #dcdde1;
   border-radius: 6px;
-  background-color: #f5f6fa;
   cursor: pointer;
   min-width: 130px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
 }
 
 .spouse-mobile-number-input {
@@ -1965,7 +2040,9 @@ textarea.spouse-input {
 =============================== */
 select.spouse-input {
   appearance: none;
-  background-color: #f5f6fa;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-table-header);
+  color: var(--text-main);
   cursor: pointer;
 }
 
@@ -2023,7 +2100,7 @@ select.spouse-input:focus {
 .dependent-section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #000000;
+  color: var(--text-title);
   margin-bottom: 15px;
   text-align: center;
   border-bottom: 2px solid #40739e;
@@ -2144,3 +2221,231 @@ select.spouse-input:focus {
   }
 }
 
+/* ===============================
+   PDF ACTION BUTTONS
+================================ */
+.cis-pdf-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.generate-pdf-btn,
+.upload-pdf-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.generate-pdf-btn {
+  background-color: #2563eb;
+  color: white;
+}
+
+.generate-pdf-btn:hover {
+  background-color: #1d4ed8;
+}
+
+.upload-pdf-btn {
+  background-color: #16a34a;
+  color: white;
+}
+
+.upload-pdf-btn:hover {
+  background-color: #15803d;
+}
+
+/* ========================================
+   CIS DASHBOARD CONTAINER
+======================================== */
+.cis-container {
+  width: 100%;
+  padding: 30px;
+  background-color: var(--bg-main);
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* ========================================
+   HEADER
+======================================== */
+.cis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.cis-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* ========================================
+   SEARCH BAR
+======================================== */
+.cis-search-wrapper {
+  position: relative;
+  width: 280px;
+}
+
+.cis-search-wrapper .cis-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none; /* allows clicks to focus input */
+}
+
+.cis-search-input {
+  width: 100%;
+  padding: 10px 14px 10px 38px; /* left padding for icon */
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.cis-search-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+/* ========================================
+   GRID
+======================================== */
+.cis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+/* ========================================
+   CARD
+======================================== */
+.cis-card {
+  background: #ffffff;
+  padding: 22px;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.cis-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* ========================================
+   CARD TEXT
+======================================== */
+.cis-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+.cis-card-value {
+  font-size: 34px;
+  font-weight: 700;
+  margin-top: 6px;
+  color: #0f172a;
+}
+
+.cis-card-subtext {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* ========================================
+   TREND BADGE
+======================================== */
+.cis-trend-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background-color: #e2e8f0;
+  color: #334155;
+}
+
+/* ========================================
+   ICON BACKGROUND
+======================================== */
+.cis-icon-bg {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background-color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #334155;
+}
+
+/* TABLE SECTION */
+.cis-table-container {
+  margin-top: 35px;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.cis-table-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.cis-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cis-table th {
+  text-align: left;
+  background: #f1f5f9;
+  padding: 12px;
+  font-size: 13px;
+}
+
+.cis-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+}
+
+.cis-table tr:hover {
+  background: #f8fafc;
+}
+
+/* ACTION BUTTON */
+.cis-action-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.cis-action-btn:hover {
+  background: #1d4ed8;
+}

@@ -36,15 +36,21 @@ const CISDashboard = () => {
     },
   ];
 
+  // SAMPLE TABLE DATA
+  const inquiries = [
+    { id: 1, fullname: "Juan Dela Cruz", agent: "Agent Maria", date: "2026-03-08" },
+    { id: 2, fullname: "Ana Santos", agent: "Agent Carlo", date: "2026-03-07" },
+    { id: 3, fullname: "Mark Reyes", agent: "Agent John", date: "2026-03-06" },
+    { id: 4, fullname: "Lisa Ramos", agent: "Agent Marie", date: "2026-03-05" },
+  ];
+
   return (
     <div className="cis-container">
       <div className="cis-header">
         <h1 className="text-2xl font-bold text-slate-800">CIS Dashboard</h1>
-        
+
         <div className="cis-search-wrapper">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-gray-400" />
-          </div>
+          <Search className="cis-search-icon" />
           <input
             type="text"
             className="cis-search-input"
@@ -55,27 +61,56 @@ const CISDashboard = () => {
         </div>
       </div>
 
+      {/* DASHBOARD CARDS */}
       <div className="cis-grid">
         {stats.map((stat, index) => (
           <div key={index} className="cis-card">
-            <div className="flex justify-between items-start">
+            <div className="cis-card-top">
               <div>
                 <p className="cis-card-title">{stat.title}</p>
                 <h2 className="cis-card-value">{stat.value}</h2>
               </div>
-              <div className="cis-trend-badge">
-                {stat.trend}
-              </div>
+              <div className="cis-trend-badge">{stat.trend}</div>
             </div>
-            
+
             <p className="cis-card-subtext">{stat.subtext}</p>
-            
-            <div className="cis-icon-bg">
-              {stat.icon}
-            </div>
+
+            <div className="cis-icon-bg">{stat.icon}</div>
           </div>
         ))}
       </div>
+
+      {/* TABLE SECTION */}
+      <div className="cis-table-container">
+        <h2 className="cis-table-title">Recent Inquiries</h2>
+
+        <table className="cis-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Full Name</th>
+              <th>Agent Submitted</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {inquiries.map((item) => (
+              <tr key={item.id}>
+                <td>{item.id}</td>
+                <td>{item.fullname}</td>
+                <td>{item.agent}</td>
+                <td>{item.date}</td>
+                <td>
+                  <button className="cis-action-btn">View</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
     </div>
   );
 };

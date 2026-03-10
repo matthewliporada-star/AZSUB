@@ -70,26 +70,6 @@ function PersonalInformation({ personalInfo, setPersonalInfo, countries }) {
         <div className="input-group">
           <label>Mobile No.</label>
           <div className="mobile-input-wrapper">
-            <select
-              className="mobile-country-code"
-              value={personalInfo.mobile_code.code}
-              onChange={(e) => {
-                const selected = countries.find(
-                  (c) => c.code === e.target.value,
-                );
-                if (!selected) return;
-                handlePersonalInfoChange("mobile_code", {
-                  code: selected.code,
-                  country: selected.name,
-                });
-              }}
-            >
-              {countries.map((c) => (
-                <option key={c.code} value={c.code}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
 
             <input
               type="tel"

@@ -21,7 +21,7 @@ function PropertyDetails() {
         },
         {
           id: 2,
-          type: "Real Estate (Please list all properties of which you are a full or partial owner. If you are a partial owner of a property, please specify thepercentage of ownership for thatparticular property.",
+          type: "Real Estate (Please list all properties of which you are a full or partial owner. If you are a partial owner of a property, please specify the percentage of ownership for thatparticular property.",
           completeAddress: "",
           purchaseDate: "",
           purchasePrice: "",
@@ -84,12 +84,6 @@ function PropertyDetails() {
                 className="box-input"
                 value={prop.type}
                 readOnly
-                style={{
-                  border: "1px solid #3b82f6", // blue box line
-                  padding: "8px",
-                  borderRadius: "4px",
-                  backgroundColor: "#f9f9f9",
-                }}
               />
             </div>
 

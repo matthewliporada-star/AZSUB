@@ -1,6 +1,6 @@
 // MPLayout.jsx - Admin-styled layout for Management Partners
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import "./MP_Styles.css";
 // [CHANGE] Import the new logo
@@ -229,7 +229,7 @@ const MPLayout = ({ children, title = "Dashboard" }) => {
               <h1>{title}</h1>
             </div>
           )}
-          {children}
+          {children ? children : <Outlet />}
         </div>
       </main>
     </div>

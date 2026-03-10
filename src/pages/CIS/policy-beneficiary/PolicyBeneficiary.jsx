@@ -49,8 +49,8 @@ const PolicyBeneficiary = () => {
   };
 
   return (
-    <div class="policy-beneficiary-section module-box">
-      <h2 class="section-title">Policy Beneficiary</h2>
+    <div className="policy-beneficiary-section module-box">
+      <h2 className="section-title">Policy Beneficiary</h2>
 
       <div className="table-container">
         <table className="income-table">

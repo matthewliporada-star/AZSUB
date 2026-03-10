@@ -5,7 +5,8 @@ import MainLayout from './components/Layout/MainLayout';
 import ProfileLayout from './components/Layout/ProfileLayout';
 import Login from './pages/Login/Login';
 import MPLayout from './pages/MP/MPLayout';
-import CISForm from "./pages/CIS/CIS";
+import CISDashboard from "./pages/CIS/CISDashboard";
+import CISRecord from "./pages/CIS/CISRecord";
 
 // MP Data Provider
 import { MPDataProvider } from './pages/MP/MPData.jsx';
@@ -87,7 +88,11 @@ function App() {
           <Route path="/al/submission" element={<MainLayout><SubmissionPage /></MainLayout>} />
           <Route path="/al/serial-history" element={<MainLayout><SerialHistoryPage /></MainLayout>} />
           <Route path="/al/doc-history" element={<MainLayout><DocHistoryPage /></MainLayout>} />
-          <Route path="/al/cis" element={<MainLayout><CIS /></MainLayout>} />
+          <Route path="/al/cis" element={<MainLayout><Outlet /></MainLayout>}>
+          <Route index element={<CIS />} />
+          <Route path="CISDashboard" element={<CISDashboard />} />
+          <Route path="record" element={<CISRecord />} />
+          </Route>
           
 
           {/* MD/MP Routes */}
@@ -95,13 +100,14 @@ function App() {
           <Route path="/mp/dashboard" element={<MPLayout><MPDashboard /></MPLayout>} />
           <Route path="/mp/al-performance" element={<MPLayout><ALPerformance /></MPLayout>} />
           <Route path="/mp/ap-performance" element={<MPLayout><APPerformance /></MPLayout>} />
-          </Route>
+         
 
-           {/* Nested CIS routes */}
-          <Route path="/mp/cis" element={<MPLayout><CIS /></MPLayout>}>
-          <Route path="CISDashboard" element={<CIS />} />
-          <Route path="record" element={<CIS />} />
-          <Route index element={<CIS />} /> {/* default for /mp/cis */}
+         {/* FIXED: CIS routes inside provider */}
+          <Route path="/mp/cis" element={<MPLayout />}>
+          <Route index element={<CIS />} />
+          <Route path="CISDashboard" element={<CISDashboard />} />
+          <Route path="record" element={<CISRecord />} />
+          </Route>
           </Route>
 
 
