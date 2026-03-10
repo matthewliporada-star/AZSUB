@@ -32,6 +32,20 @@ function CIS({ userRole }) {
       return m ? m[m.length - 1].trim() : "";
     };
 
+    // 0. Full name (with any title such as Mr., Mrs., Ms., Dr., etc.).
+    // Rather than trying to write an enormous regex we simply look for the
+    // label on a line and then take the rest of that line.  If the parser
+    // accidentally keeps the literal word "of" we strip it here but we leave
+    // any title prefix intact.
+    result.full_name = (() => {
+      const m = fullText.match(/(?:Full\s*name|Name of Client)[^A-Za-z0-9]*(.+?)(?=\n|$)/i);
+      if (!m) return "";
+      let name = m[1].trim();
+      // drop stray leading "of" that might precede the title
+      name = name.replace(/^of\s+/i, "");
+      return name;
+    })();
+
     // 1. Father's Name: Stop before "Mobile No"
     result.fathers_name = match(
       /Father[’'s\s]+Name\.?\s*([A-Za-z\s]+?)(?=\s*Mobile No|$)/i,
@@ -197,14 +211,17 @@ function CIS({ userRole }) {
       // Special handler for Full Name that removes prefix
       // Special handler for Full Name that removes prefix
       const cleanFullName = (value) => {
-        // Add this check: if value is null, undefined, or empty, return empty string
+        // value may come with the label text (eg. "Full name of Mr. /Mrs.") or
+        // with an undesired leading "of" left over after extraction.  We want to
+        // display any title prefix (Mr./Mrs./Ms.) as part of the name, so the
+        // cleaning logic now only strips a stray "of" and trims whitespace.
         if (!value) return "";
 
         return value
-          .replace(/^(of Mr\.\s*\/?\s*Mrs\.?\s*)/gi, "")
-          .replace(/^Mr\.\s*/gi, "")
-          .replace(/^Mrs\.\s*/gi, "")
-          .replace(/^Ms\.\s*/gi, "")
+          // if the extraction left the literal "of" at the start (a common
+          // artifact when the parser grabs the label and the name on the same
+          // line), drop just that word.
+          .replace(/^of\s+/i, "")
           .trim();
       };
 
