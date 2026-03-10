@@ -2,7 +2,7 @@ import React from "react";
 
 const ContactSection = ({ data, onChange }) => (
   <>
-    <h4 style={{ marginTop: "20px", color: "#395998" }}>Contact Information</h4>
+    <h4 style={{ marginTop: "20px", color: "#003266" }}>Contact Information</h4>
     <div className="form-grid">
       <FormInput
         label="Primary Contact No."

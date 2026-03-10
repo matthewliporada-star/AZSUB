@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 const HealthDeclarationSection = ({
   formData,
@@ -13,6 +13,39 @@ const HealthDeclarationSection = ({
   onDependentHealthChange,
   illnessOptions,
 }) => {
+  // Check if ANY checkbox in questions 1-6 is ticked for ANY person
+  const hasAnyHealthIssue = useMemo(() => {
+    // Check all persons: applicantOwner, dependent1, dependent2
+    const persons = ["applicantOwner", "dependent1", "dependent2"];
+
+    for (const person of persons) {
+      const personData = healthQuestions[person];
+      if (!personData) continue;
+
+      // Check q1 (illnesses) - each illness has its own checkbox
+      if (personData.q1) {
+        for (const key in personData.q1) {
+          if (personData.q1[key]) return true;
+        }
+      }
+
+      // Check q2 (a, b, c)
+      if (personData.q2) {
+        for (const key in personData.q2) {
+          if (personData.q2[key]) return true;
+        }
+      }
+
+      // Check q3, q4, q5, q6 (simple booleans)
+      if (personData.q3) return true;
+      if (personData.q4) return true;
+      if (personData.q5) return true;
+      if (personData.q6) return true;
+    }
+
+    return false;
+  }, [healthQuestions]);
+
   return (
     <>
       <PreExistingConditionsBlock
@@ -22,7 +55,7 @@ const HealthDeclarationSection = ({
 
       <ImportantNotice />
 
-      {/* BASIC HEALTH MEASUREMENTS - UPDATED TO TABLE FORMAT */}
+      {/* BASIC HEALTH MEASUREMENTS - WITH DEPENDENT SUPPORT */}
       <BasicHealthMeasurements
         formData={formData}
         dependents={dependents}
@@ -37,6 +70,25 @@ const HealthDeclarationSection = ({
         onHealthChange={onHealthChange}
         onDependentHealthChange={onDependentHealthChange}
       />
+
+      {/* INSTRUCTION TEXT FROM PDF PAGE 6 - ADDED BEFORE QUESTION 1 */}
+      <div
+        style={{
+          marginTop: "30px",
+          marginBottom: "15px",
+          padding: "12px",
+          backgroundColor: "#f0f7ff",
+          borderLeft: "4px solid #003266",
+          borderRadius: "4px",
+          fontStyle: "italic",
+        }}
+      >
+        <p style={{ margin: 0, color: "#003266" }}>
+          <strong>Instructions:</strong> Please check if applicable and provide
+          the full details of the illness or disease in the Additional
+          Information section.
+        </p>
+      </div>
 
       {/* TABLES - MOVED TO BOTTOM */}
       <IllnessTable
@@ -55,19 +107,20 @@ const HealthDeclarationSection = ({
         onChange={onHealthQuestionChange}
       />
 
-      {/* REMOVED: AdditionalInfoBlock component */}
-
-      <AdditionalConditionsTable
-        conditions={additionalConditions}
-        onChange={onAdditionalConditionChange}
-        onAdd={onAddCondition}
-        onRemove={onRemoveCondition}
-      />
+      {/* ADDITIONAL INFORMATION - ONLY SHOWS IF ANY CHECKBOX IS TICKED */}
+      {hasAnyHealthIssue && (
+        <AdditionalConditionsTable
+          conditions={additionalConditions}
+          onChange={onAdditionalConditionChange}
+          onAdd={onAddCondition}
+          onRemove={onRemoveCondition}
+        />
+      )}
     </>
   );
 };
 
-// UPDATED BASIC HEALTH MEASUREMENTS COMPONENT - NOW IN TABLE FORMAT
+// UPDATED BASIC HEALTH MEASUREMENTS COMPONENT - WITH FULL DEPENDENT SUPPORT
 const BasicHealthMeasurements = ({
   formData,
   dependents,
@@ -158,7 +211,7 @@ const BasicHealthMeasurements = ({
                 <input
                   type="number"
                   step="0.01"
-                  value={formData.healthDeclaration.heightFeet}
+                  value={formData.healthDeclaration?.heightFeet || ""}
                   onChange={(e) =>
                     onHealthChange(
                       "healthDeclaration.heightFeet",
@@ -172,17 +225,17 @@ const BasicHealthMeasurements = ({
                 <input
                   type="number"
                   step="0.01"
-                  value={formData.healthDeclaration.heightMeters}
+                  value={formData.healthDeclaration?.heightInches || ""}
                   onChange={(e) =>
                     onHealthChange(
-                      "healthDeclaration.heightMeters",
+                      "healthDeclaration.heightInches",
                       e.target.value,
                     )
                   }
-                  placeholder="m"
+                  placeholder="in"
                   style={{ width: "60px", padding: "5px" }}
                 />
-                <span>m</span>
+                <span>in</span>
               </div>
             </td>
             <td style={{ padding: "12px", border: "1px solid #ddd" }}>
@@ -197,7 +250,7 @@ const BasicHealthMeasurements = ({
                   <input
                     type="number"
                     step="0.01"
-                    value={dependents[0].healthDeclaration?.heightFeet || ""}
+                    value={dependents[0]?.healthDeclaration?.heightFeet || ""}
                     onChange={(e) =>
                       onDependentHealthChange(
                         0,
@@ -212,18 +265,18 @@ const BasicHealthMeasurements = ({
                   <input
                     type="number"
                     step="0.01"
-                    value={dependents[0].healthDeclaration?.heightMeters || ""}
+                    value={dependents[0]?.healthDeclaration?.heightInches || ""}
                     onChange={(e) =>
                       onDependentHealthChange(
                         0,
-                        "healthDeclaration.heightMeters",
+                        "healthDeclaration.heightInches",
                         e.target.value,
                       )
                     }
-                    placeholder="m"
+                    placeholder="in"
                     style={{ width: "60px", padding: "5px" }}
                   />
-                  <span>m</span>
+                  <span>in</span>
                 </div>
               )}
             </td>
@@ -239,7 +292,7 @@ const BasicHealthMeasurements = ({
                   <input
                     type="number"
                     step="0.01"
-                    value={dependents[1].healthDeclaration?.heightFeet || ""}
+                    value={dependents[1]?.healthDeclaration?.heightFeet || ""}
                     onChange={(e) =>
                       onDependentHealthChange(
                         1,
@@ -254,18 +307,18 @@ const BasicHealthMeasurements = ({
                   <input
                     type="number"
                     step="0.01"
-                    value={dependents[1].healthDeclaration?.heightMeters || ""}
+                    value={dependents[1]?.healthDeclaration?.heightInches || ""}
                     onChange={(e) =>
                       onDependentHealthChange(
                         1,
-                        "healthDeclaration.heightMeters",
+                        "healthDeclaration.heightInches",
                         e.target.value,
                       )
                     }
-                    placeholder="m"
+                    placeholder="in"
                     style={{ width: "60px", padding: "5px" }}
                   />
-                  <span>m</span>
+                  <span>in</span>
                 </div>
               )}
             </td>
@@ -293,7 +346,7 @@ const BasicHealthMeasurements = ({
                 <input
                   type="number"
                   step="0.1"
-                  value={formData.healthDeclaration.weightKg}
+                  value={formData.healthDeclaration?.weightKg || ""}
                   onChange={(e) =>
                     onHealthChange("healthDeclaration.weightKg", e.target.value)
                   }
@@ -304,7 +357,7 @@ const BasicHealthMeasurements = ({
                 <input
                   type="number"
                   step="0.1"
-                  value={formData.healthDeclaration.weightLbs}
+                  value={formData.healthDeclaration?.weightLbs || ""}
                   onChange={(e) =>
                     onHealthChange(
                       "healthDeclaration.weightLbs",
@@ -329,7 +382,7 @@ const BasicHealthMeasurements = ({
                   <input
                     type="number"
                     step="0.1"
-                    value={dependents[0].healthDeclaration?.weightKg || ""}
+                    value={dependents[0]?.healthDeclaration?.weightKg || ""}
                     onChange={(e) =>
                       onDependentHealthChange(
                         0,
@@ -344,7 +397,7 @@ const BasicHealthMeasurements = ({
                   <input
                     type="number"
                     step="0.1"
-                    value={dependents[0].healthDeclaration?.weightLbs || ""}
+                    value={dependents[0]?.healthDeclaration?.weightLbs || ""}
                     onChange={(e) =>
                       onDependentHealthChange(
                         0,
@@ -371,7 +424,7 @@ const BasicHealthMeasurements = ({
                   <input
                     type="number"
                     step="0.1"
-                    value={dependents[1].healthDeclaration?.weightKg || ""}
+                    value={dependents[1]?.healthDeclaration?.weightKg || ""}
                     onChange={(e) =>
                       onDependentHealthChange(
                         1,
@@ -386,7 +439,7 @@ const BasicHealthMeasurements = ({
                   <input
                     type="number"
                     step="0.1"
-                    value={dependents[1].healthDeclaration?.weightLbs || ""}
+                    value={dependents[1]?.healthDeclaration?.weightLbs || ""}
                     onChange={(e) =>
                       onDependentHealthChange(
                         1,
@@ -452,7 +505,7 @@ const LifestyleQuestions = ({
             <input
               type="radio"
               name="smokeVape"
-              checked={formData.healthDeclaration.smokeVape === true}
+              checked={formData.healthDeclaration?.smokeVape === true}
               onChange={() =>
                 onHealthChange("healthDeclaration.smokeVape", true)
               }
@@ -463,7 +516,7 @@ const LifestyleQuestions = ({
             <input
               type="radio"
               name="smokeVape"
-              checked={formData.healthDeclaration.smokeVape === false}
+              checked={formData.healthDeclaration?.smokeVape === false}
               onChange={() =>
                 onHealthChange("healthDeclaration.smokeVape", false)
               }
@@ -471,12 +524,12 @@ const LifestyleQuestions = ({
             No
           </label>
         </div>
-        {formData.healthDeclaration.smokeVape && (
+        {formData.healthDeclaration?.smokeVape && (
           <div style={{ marginLeft: "20px" }}>
             <label>If yes, no. of sticks/ml. per day: </label>
             <input
               type="text"
-              value={formData.healthDeclaration.smokeQuantity}
+              value={formData.healthDeclaration?.smokeQuantity || ""}
               onChange={(e) =>
                 onHealthChange(
                   "healthDeclaration.smokeQuantity",
@@ -500,7 +553,7 @@ const LifestyleQuestions = ({
             <input
               type="radio"
               name="alcohol"
-              checked={formData.healthDeclaration.alcohol === true}
+              checked={formData.healthDeclaration?.alcohol === true}
               onChange={() => onHealthChange("healthDeclaration.alcohol", true)}
             />{" "}
             Yes
@@ -509,7 +562,7 @@ const LifestyleQuestions = ({
             <input
               type="radio"
               name="alcohol"
-              checked={formData.healthDeclaration.alcohol === false}
+              checked={formData.healthDeclaration?.alcohol === false}
               onChange={() =>
                 onHealthChange("healthDeclaration.alcohol", false)
               }
@@ -517,12 +570,12 @@ const LifestyleQuestions = ({
             No
           </label>
         </div>
-        {formData.healthDeclaration.alcohol && (
+        {formData.healthDeclaration?.alcohol && (
           <div style={{ marginLeft: "20px" }}>
             <label>If yes, no. of bottles/glass per day: </label>
             <input
               type="text"
-              value={formData.healthDeclaration.alcoholQuantity}
+              value={formData.healthDeclaration?.alcoholQuantity || ""}
               onChange={(e) =>
                 onHealthChange(
                   "healthDeclaration.alcoholQuantity",
@@ -546,7 +599,7 @@ const LifestyleQuestions = ({
             <input
               type="radio"
               name="glassesContacts"
-              checked={formData.healthDeclaration.glassesContacts === true}
+              checked={formData.healthDeclaration?.glassesContacts === true}
               onChange={() =>
                 onHealthChange("healthDeclaration.glassesContacts", true)
               }
@@ -557,7 +610,7 @@ const LifestyleQuestions = ({
             <input
               type="radio"
               name="glassesContacts"
-              checked={formData.healthDeclaration.glassesContacts === false}
+              checked={formData.healthDeclaration?.glassesContacts === false}
               onChange={() =>
                 onHealthChange("healthDeclaration.glassesContacts", false)
               }
@@ -565,12 +618,12 @@ const LifestyleQuestions = ({
             No
           </label>
         </div>
-        {formData.healthDeclaration.glassesContacts && (
+        {formData.healthDeclaration?.glassesContacts && (
           <div style={{ marginLeft: "20px" }}>
             <label>If yes, eye grade: </label>
             <input
               type="text"
-              value={formData.healthDeclaration.eyeGrade}
+              value={formData.healthDeclaration?.eyeGrade || ""}
               onChange={(e) =>
                 onHealthChange("healthDeclaration.eyeGrade", e.target.value)
               }
@@ -608,7 +661,7 @@ const LifestyleQuestions = ({
               <input
                 type="radio"
                 name={`smokeVape-${index}`}
-                checked={dep.healthDeclaration.smokeVape === true}
+                checked={dep.healthDeclaration?.smokeVape === true}
                 onChange={() =>
                   onDependentHealthChange(
                     index,
@@ -623,7 +676,7 @@ const LifestyleQuestions = ({
               <input
                 type="radio"
                 name={`smokeVape-${index}`}
-                checked={dep.healthDeclaration.smokeVape === false}
+                checked={dep.healthDeclaration?.smokeVape === false}
                 onChange={() =>
                   onDependentHealthChange(
                     index,
@@ -635,12 +688,12 @@ const LifestyleQuestions = ({
               No
             </label>
           </div>
-          {dep.healthDeclaration.smokeVape && (
+          {dep.healthDeclaration?.smokeVape && (
             <div style={{ marginLeft: "20px" }}>
               <label>If yes, no. of sticks/ml. per day: </label>
               <input
                 type="text"
-                value={dep.healthDeclaration.smokeQuantity}
+                value={dep.healthDeclaration?.smokeQuantity || ""}
                 onChange={(e) =>
                   onDependentHealthChange(
                     index,
@@ -665,7 +718,7 @@ const LifestyleQuestions = ({
               <input
                 type="radio"
                 name={`alcohol-${index}`}
-                checked={dep.healthDeclaration.alcohol === true}
+                checked={dep.healthDeclaration?.alcohol === true}
                 onChange={() =>
                   onDependentHealthChange(
                     index,
@@ -680,7 +733,7 @@ const LifestyleQuestions = ({
               <input
                 type="radio"
                 name={`alcohol-${index}`}
-                checked={dep.healthDeclaration.alcohol === false}
+                checked={dep.healthDeclaration?.alcohol === false}
                 onChange={() =>
                   onDependentHealthChange(
                     index,
@@ -692,12 +745,12 @@ const LifestyleQuestions = ({
               No
             </label>
           </div>
-          {dep.healthDeclaration.alcohol && (
+          {dep.healthDeclaration?.alcohol && (
             <div style={{ marginLeft: "20px" }}>
               <label>If yes, no. of bottles/glass per day: </label>
               <input
                 type="text"
-                value={dep.healthDeclaration.alcoholQuantity}
+                value={dep.healthDeclaration?.alcoholQuantity || ""}
                 onChange={(e) =>
                   onDependentHealthChange(
                     index,
@@ -722,7 +775,7 @@ const LifestyleQuestions = ({
               <input
                 type="radio"
                 name={`glasses-${index}`}
-                checked={dep.healthDeclaration.glassesContacts === true}
+                checked={dep.healthDeclaration?.glassesContacts === true}
                 onChange={() =>
                   onDependentHealthChange(
                     index,
@@ -737,7 +790,7 @@ const LifestyleQuestions = ({
               <input
                 type="radio"
                 name={`glasses-${index}`}
-                checked={dep.healthDeclaration.glassesContacts === false}
+                checked={dep.healthDeclaration?.glassesContacts === false}
                 onChange={() =>
                   onDependentHealthChange(
                     index,
@@ -749,12 +802,12 @@ const LifestyleQuestions = ({
               No
             </label>
           </div>
-          {dep.healthDeclaration.glassesContacts && (
+          {dep.healthDeclaration?.glassesContacts && (
             <div style={{ marginLeft: "20px" }}>
               <label>If yes, eye grade: </label>
               <input
                 type="text"
-                value={dep.healthDeclaration.eyeGrade}
+                value={dep.healthDeclaration?.eyeGrade || ""}
                 onChange={(e) =>
                   onDependentHealthChange(
                     index,
@@ -788,7 +841,7 @@ const PreExistingConditionsBlock = ({ acknowledged, onChange }) => (
     <p>
       Pre-existing conditions are medical conditions or any related conditions
       for which one or more symptoms have been displayed at some point during
-      the Insured’s lifetime, irrespective of whether any medical treatment or
+      the Insured's lifetime, irrespective of whether any medical treatment or
       advice was sought. Any such condition or related condition which presented
       signs or symptoms which the Insured was aware of or should reasonably have
       been aware will be deemed to be a pre-existing condition. Pre-existing
@@ -819,7 +872,7 @@ const ImportantNotice = () => (
   >
     <p>
       <strong>Important:</strong> Please answer the following questions on the
-      basis of your own and your dependents’ complete medical history. All
+      basis of your own and your dependents' complete medical history. All
       material facts (facts likely to influence our assessment and acceptance of
       this application) must be disclosed. Failure to do so may invalidate the
       policy. If you are in any doubt as to whether a fact is material, then it
@@ -828,9 +881,9 @@ const ImportantNotice = () => (
   </div>
 );
 
-// TABLES (KEPT AT THE BOTTOM)
+// TABLES
 const IllnessTable = ({ illnessOptions, healthQuestions, onChange }) => (
-  <div style={{ marginTop: "30px" }}>
+  <div style={{ marginTop: "15px" }}>
     <p>
       <strong>
         1. Have you ever suffered from or ever had the following illnesses or
@@ -1220,6 +1273,30 @@ const AdditionalConditionsTable = ({
     <h4 style={{ color: "#003266", marginBottom: "15px" }}>
       Additional Information
     </h4>
+
+    {/* Instruction text from PDF Page 7 */}
+    <div
+      style={{
+        marginBottom: "20px",
+        padding: "15px",
+        backgroundColor: "#f8f9fa",
+        borderLeft: "4px solid #003266",
+        fontSize: "14px",
+      }}
+    >
+      <p style={{ margin: 0 }}>
+        <strong>Note:</strong> If you checked any boxes on questions 1 to 6 of
+        the Health Declaration section, please provide details below. We reserve
+        the right to request further medical evidence as part of the full
+        medical underwriting process.
+      </p>
+      <p style={{ margin: "10px 0 0 0" }}>
+        Please advise if a full recovery has been made and if you have any
+        condition or disease related to; or arising from; the original
+        diagnosis. Please enclose up-to-date supporting medical reports/test
+        results if possible.
+      </p>
+    </div>
 
     {conditions.map((condition, index) => (
       <div
