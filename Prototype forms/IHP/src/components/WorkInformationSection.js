@@ -2,7 +2,7 @@ import React from "react";
 
 const WorkInformationSection = ({ data, onChange }) => (
   <>
-    <h4 style={{ marginTop: "20px", color: "#395998" }}>Work Information</h4>
+    <h4 style={{ marginTop: "20px", color: "#003266" }}>Work Information</h4>
 
     <div className="form-grid">
       <FormInput
