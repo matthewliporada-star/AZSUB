@@ -24,6 +24,68 @@ import SpouseDetails from "./spouse-details/SpouseDetails";
 function CIS({ userRole }) {
   const fileInputRef = useRef(null);
 
+  function extractFieldsFromText(fullText) {
+    const result = {};
+
+    const match = (regex) => {
+      const m = fullText.match(regex);
+      return m ? m[m.length - 1].trim() : "";
+    };
+
+    // 1. Father's Name: Stop before "Mobile No"
+    result.fathers_name = match(
+      /Father[’'s\s]+Name\.?\s*([A-Za-z\s]+?)(?=\s*Mobile No|$)/i,
+    );
+
+    // 2. Mobile No: Just digits
+    result.mobile_no = match(/Mobile No\.?\s*([0-9]+)/i);
+
+    // 3. Email
+    result.email = match(
+      /Email\.?\s*([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]+)/i,
+    );
+
+    // 4. Residence Address: Capture everything after the colon but stop before "Email" or "City"
+    result.residence_address = match(
+      /Residence Address\s*\(.*?\)\s*:\s*([\s\S]+?)(?=\s*(?:Email|City|$))/i,
+    );
+
+    // 5. Permanent Address: Stop before "Tax Residency"
+    result.permanent_address = match(
+      /Permanent Address\s*:\s*([\s\S]+?)(?=\s*Tax Residency|$)/i,
+    );
+
+    // 6. Hobbies: Stop before the "Country" table header or next section
+    result.hobbies = match(
+      /Hobbies and Activities\s*:\s*([\s\S]+?)(?=\s*(?:Unit|Country|City|$))/i,
+    );
+
+    // 7. Citizenship: Fix to capture words, not digits
+    result.citizenship = match(
+      /List Countries of Citizenship\s*:\s*([A-Za-z,\s]+)/i,
+    );
+
+    return result;
+  }
+
+  const fieldMap = {
+    full_name: ["Full name of Mr./Mrs", "Full name", "Name of Client"],
+
+    fathers_name: ["Father’s Name", "Father's Name"],
+
+    mobile_no: ["Mobile No.", "Mobile No", "Mobile Number"],
+
+    email: ["Email", "Email Address"],
+
+    residence_address: ["Residence Address", "Residential Address"],
+
+    permanent_address: ["Permanent Address"],
+
+    tax_residency_info: ["Tax Residency Information", "Tax Residency"],
+
+    hobbies: ["Hobbies and Activities"],
+  };
+
   /* ===============================
       STATES
   =============================== */
@@ -110,9 +172,6 @@ function CIS({ userRole }) {
   /* ===============================
       PDF Upload
   =============================== */
-  /* ===============================
-      Improved PDF Upload
-  =============================== */
   const handlePDFUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -126,60 +185,30 @@ function CIS({ userRole }) {
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
-        // Triple space helps RegEx see where one field ends and another begins
-        fullText += content.items.map((item) => item.str).join("   ") + "\n";
+        fullText += content.items.map((item) => item.str).join("\n") + "\n";
       }
 
-      // These MUST match the headers in your PDF exactly to act as "stops"
-      const stopLabels = [
-        "Full name",
-        "Father's Name",
-        "Mobile No",
-        "Email",
-        "Residence Address",
-        "City",
-        "Country",
-        "Postal Code",
-        "How long have you lived",
-        "Previous Residence",
-        "Dates resided",
-        "Provide information",
-        "Permanent Address",
-        "Tax Residency",
-        "TIN/SSN",
-        "List Countries",
-        "Hobbies",
-        "Travel Details",
-      ];
+      // Debug: See raw extracted text in console
+      console.log("Raw extracted text:\n", fullText);
 
-      const getValue = (label) => {
-        const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const regex = new RegExp(
-          `${escapedLabel}[^a-zA-Z0-9]*\\s*(.*?)(?=${stopLabels.map((l) => l.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")}|$)`,
-          "i",
-        );
-        const match = fullText.match(regex);
-        let result = match && match[1] ? match[1].trim() : "";
+      const extracted = extractFieldsFromText(fullText);
+      console.log("Extracted fields:", extracted);
 
-        // Remove common noise and instructions
-        return result
-          .replace(/\(Please provide.*?\)/gi, "")
-          .replace(/\(if any.*?\)/gi, "")
-          .replace(/and previous primary and secondary residences.*/gi, "")
+      // Special handler for Full Name that removes prefix
+      // Special handler for Full Name that removes prefix
+      const cleanFullName = (value) => {
+        // Add this check: if value is null, undefined, or empty, return empty string
+        if (!value) return "";
+
+        return value
+          .replace(/^(of Mr\.\s*\/?\s*Mrs\.?\s*)/gi, "")
+          .replace(/^Mr\.\s*/gi, "")
+          .replace(/^Mrs\.\s*/gi, "")
+          .replace(/^Ms\.\s*/gi, "")
           .trim();
       };
 
-      const sanitize = (val) => {
-        if (
-          !val ||
-          val.length < 2 ||
-          val.toLowerCase().includes("please provide")
-        )
-          return "N/A";
-        return val;
-      };
-
-      // Helper to format dates from MM/DD/YYYY (PDF) to YYYY-MM-DD (HTML Input)
+      // Format date from DD/MM/YYYY or MM/DD/YYYY to YYYY-MM-DD
       const formatDateForInput = (val) => {
         if (!val || val === "N/A") return "";
         const dateParts = val.match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
@@ -189,46 +218,186 @@ function CIS({ userRole }) {
         return "";
       };
 
-      setPersonalInfo({
-        full_name: sanitize(getValue("Full name")),
-        fathers_name: sanitize(getValue("Father's Name")),
-        mobile_no: sanitize(getValue("Mobile No")),
-        email: sanitize(getValue("Email")),
-        residence_address: {
-          address: sanitize(getValue("Residence Address")),
-          city: sanitize(getValue("City")),
-          postal_code: sanitize(getValue("Postal Code")),
+      // Extract address components from lines like "City: QC Country: Philippines Postal Code 0110"
+      const parseAddressLine = (text) => {
+        const cityMatch = text.match(/City:\s*([^C]+?)(?=\s+Country:|$)/i);
+        const countryMatch = text.match(
+          /Country:\s*([^P]+?)(?=\s+Postal|:|$)/i,
+        );
+        const postalMatch = text.match(/Postal Code[:\s]*(\d+)/i);
+
+        return {
+          city: cityMatch ? cityMatch[1].trim() : "",
+          country: countryMatch ? countryMatch[1].trim() : "",
+          postal_code: postalMatch ? postalMatch[1].trim() : "",
+        };
+      };
+
+      // Split text into lines for easier processing
+      // Inside handlePDFUpload, after getting extracted:
+      const lines = fullText.split("\n").map((l) => l.trim());
+
+      const getValAfterLabel = (label, startIndex, searchRange = 5) => {
+        for (
+          let i = startIndex;
+          i < startIndex + searchRange && i < lines.length;
+          i++
+        ) {
+          if (lines[i].toLowerCase().includes(label.toLowerCase())) {
+            // Return the next line if the current line only contains the label
+            if (lines[i].length < label.length + 3 && lines[i + 1])
+              return lines[i + 1];
+            return lines[i].split(/:\s*/)[1] || "";
+          }
+        }
+        return "";
+      };
+
+      // Example for Residence City [cite: 10]
+      const resIdx = lines.findIndex((l) => l.includes("Residence Address"));
+      const residenceCity = getValAfterLabel("City", resIdx);
+      const residencePostal = getValAfterLabel("Postal Code", resIdx);
+
+      // Find residence address line
+      const findAddressInfo = () => {
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (
+            line.includes("Residence Address") ||
+            line.includes("City:") ||
+            line.includes("Country:")
+          ) {
+            const addressText = lines.slice(i, i + 3).join(" ");
+            return parseAddressLine(addressText);
+          }
+        }
+        return { city: "", country: "", postal_code: "" };
+      };
+
+      const addressInfo = findAddressInfo();
+
+      // Find previous residence
+      const findPreviousResidence = () => {
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (line.includes("Previous Residence")) {
+            const prevText = lines.slice(i, i + 5).join(" ");
+            const addrInfo = parseAddressLine(prevText);
+            const dateMatch = prevText.match(/(\d{1,2}[\/-]\d{1,2}[\/-]\d{4})/);
+            return {
+              ...addrInfo,
+              dates: dateMatch ? formatDateForInput(dateMatch[1]) : "",
+            };
+          }
+        }
+        return {
+          address: "",
+          city: "",
+          postal_code: "",
+          dates: "",
           country: "",
-        },
-        previous_residence: {
-          address: sanitize(getValue("Previous Residence")),
-          city: sanitize(getValue("City")),
-          postal_code: sanitize(getValue("Postal Code")),
-          dates: formatDateForInput(getValue("Dates resided")), // FIXED DATE
+        };
+      };
+
+      const previousResidence = findPreviousResidence();
+
+      // Find secondary residence
+      const findSecondaryResidence = () => {
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (
+            line.includes("Provide information") ||
+            line.includes("secondary residence")
+          ) {
+            const secText = lines.slice(i, i + 5).join(" ");
+            const addrInfo = parseAddressLine(secText);
+            const dateMatch = secText.match(/(\d{1,2}[\/-]\d{1,2}[\/-]\d{4})/);
+            return {
+              ...addrInfo,
+              dates: dateMatch ? formatDateForInput(dateMatch[1]) : "",
+            };
+          }
+        }
+        return {
+          address: "",
+          city: "",
+          postal_code: "",
+          dates: "",
           country: "",
-        },
-        secondary_residence: {
-          address: sanitize(getValue("Provide information")),
-          city: sanitize(getValue("City")),
-          postal_code: sanitize(getValue("Postal Code")),
-          dates: formatDateForInput(getValue("Dates resided")), // FIXED DATE
-          country: "",
-        },
-        permanent_address: {
-          address: sanitize(getValue("Permanent Address")),
-          city: sanitize(getValue("City")),
-          postal_code: sanitize(getValue("Postal Code")),
-          country: "",
-        },
-        tax_residency_info: sanitize(getValue("Tax Residency")),
-        tin_ssn: sanitize(getValue("TIN/SSN")),
-        citizenship: sanitize(getValue("List Countries")),
-        hobbies: sanitize(getValue("Hobbies")),
+        };
+      };
+
+      const secondaryResidence = findSecondaryResidence();
+
+      // Extract TIN and Citizenship
+      const extractTINAndCitizenship = () => {
+        const tinMatch = fullText.match(/TIN\/SSN Number:\s*(\d+)/i);
+        const citizenMatch = fullText.match(
+          /List Countries of Citizenship:\s*(\d+)/i,
+        );
+        return {
+          tin: tinMatch ? tinMatch[1] : "",
+          citizenship: citizenMatch ? citizenMatch[1] : "",
+        };
+      };
+
+      const { tin, citizenship } = extractTINAndCitizenship();
+
+      // Debug extracted values
+      console.log("Extracted values:", {
+        full_name: cleanFullName(extracted.full_name || ""),
+        fathers_name: extracted.fathers_name,
+        mobile_no: extracted.mobile_no,
+        email: extracted.email,
+        residence_address: extracted.residence_address,
+        permanent_address: extracted.permanent_address,
+        tax_residency_info: extracted.tax_residency_info,
+        hobbies: extracted.hobbies,
+        addressInfo,
+        previousResidence,
+        secondaryResidence,
+        tin,
+        citizenship,
       });
+
+      // ... after all findAddressInfo() and findPreviousResidence() calls ...
+
+      setPersonalInfo((prev) => ({
+        ...prev,
+        full_name: cleanFullName(extracted.full_name || ""),
+        fathers_name: extracted.fathers_name || "",
+        mobile_no: extracted.mobile_no || "",
+        email: extracted.email || "",
+
+        // Ensure the string goes into .address and components go into their respective keys
+        residence_address: {
+          address: extracted.residence_address || "",
+          city: addressInfo.city || "",
+          country: addressInfo.country || "",
+          postal_code: addressInfo.postal_code || "",
+        },
+
+        permanent_address: {
+          address: extracted.permanent_address || "",
+          city: "", // PDF layout usually groups these differently, set defaults if not found
+          country: "",
+          postal_code: "",
+        },
+
+        previous_residence: {
+          ...previousResidence,
+        },
+
+        tax_residency_info: extracted.tax_residency_info || "",
+        tin_ssn: tin || "",
+        citizenship: extracted.citizenship || "",
+        hobbies: extracted.hobbies || "",
+      }));
 
       alert("Upload Success!");
     } catch (error) {
       console.error("PDF Error:", error);
+      alert("Error uploading PDF: " + error.message);
     } finally {
       event.target.value = null;
     }
@@ -286,7 +455,7 @@ function CIS({ userRole }) {
     { code: "CG", name: "Congo" },
     { code: "CD", name: "Congo, Democratic Republic of the" },
     { code: "CR", name: "Costa Rica" },
-    { code: "CI", name: "Côte d’Ivoire" },
+    { code: "CI", name: "Côte d'Ivoire" },
     { code: "HR", name: "Croatia" },
     { code: "CU", name: "Cuba" },
     { code: "CY", name: "Cyprus" },
@@ -459,20 +628,8 @@ function CIS({ userRole }) {
     { code: "AE", name: "United Arab Emirates" },
     { code: "GB", name: "United Kingdom" },
     { code: "US", name: "United States" },
-    { code: "UY", name: "Uruguay" },
-    { code: "UZ", name: "Uzbekistan" },
-    { code: "VU", name: "Vanuatu" },
-    { code: "VE", name: "Venezuela" },
-    { code: "VN", name: "Vietnam" },
-    { code: "EH", name: "Western Sahara" },
-    { code: "YE", name: "Yemen" },
-    { code: "ZM", name: "Zambia" },
-    { code: "ZW", name: "Zimbabwe" },
   ];
 
-  /* ===============================
-      RENDER
-  =============================== */
   return (
     <div className={`cis-page-wrapper ${userRole === "MP" ? "mp-top" : ""}`}>
       <main className="cis-page">

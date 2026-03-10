@@ -506,6 +506,10 @@ select.box-input:focus {
   }
 }
 
+.permanent-address-wrapper input {
+  margin-bottom: 10px; /* space between the two inputs */
+}
+
 /* ========================================
    TRAVEL DETAILS MODULE (ISOLATED)
 ======================================== */

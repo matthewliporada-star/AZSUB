@@ -70,7 +70,6 @@ function PersonalInformation({ personalInfo, setPersonalInfo, countries }) {
         <div className="input-group">
           <label>Mobile No.</label>
           <div className="mobile-input-wrapper">
-
             <input
               type="tel"
               className="mobile-number-input-cis"
@@ -122,7 +121,6 @@ function PersonalInformation({ personalInfo, setPersonalInfo, countries }) {
         },
       ].map(({ key: addrKey, label: labelText }) => {
         const addr = personalInfo[addrKey];
-        const availableCities = cities[addr.country] || [];
 
         return (
           <div className="input-group" key={addrKey}>
@@ -134,74 +132,110 @@ function PersonalInformation({ personalInfo, setPersonalInfo, countries }) {
                 </span>
               )}
             </label>
-            <div className="form-grid-3">
-              {/* Address */}
-              <input
-                placeholder="Address"
-                className="box-input"
-                value={addr.address || ""}
-                onChange={(e) =>
-                  handleNestedChange(addrKey, "address", e.target.value)
-                }
-              />
 
-              {/* Country */}
-              <select
-                className="box-input"
-                value={addr.country || ""}
-                onChange={async (e) => {
-                  const countryCode = e.target.value;
-                  handleNestedChange(addrKey, "country", countryCode);
-                  handleNestedChange(addrKey, "city", "");
-                  if (countryCode && !cities[countryCode]) {
-                    const cityList = await fetchCities(countryCode);
-                    setCities((prev) => ({ ...prev, [countryCode]: cityList }));
-                  }
-                }}
-              >
-                <option value="">Select Country</option>
-                {countries.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+            {addrKey === "permanent_address" ? (
+              <div className="permanent-address-wrapper">
+                {/* Permanent Address */}
+                <div className="input-group">
+                  <input
+                    className="box-input"
+                    value={addr.address || ""}
+                    onChange={(e) =>
+                      handleNestedChange(addrKey, "address", e.target.value)
+                    }
+                  />
+                </div>
 
-              {/* City */}
-              <input
-                type="text"
-                className="box-input"
-                placeholder="Enter City"
-                value={addr.city || ""}
-                onChange={(e) =>
-                  handleNestedChange(addrKey, "city", e.target.value)
-                }
-              />
-
-              {/* Postal Code */}
-              <input
-                placeholder="Postal Code"
-                className="box-input"
-                value={addr.postal_code || ""}
-                onChange={(e) =>
-                  handleNestedChange(addrKey, "postal_code", e.target.value)
-                }
-              />
-
-              {/* Dates (only for previous/secondary residence) */}
-              {["previous_residence", "secondary_residence"].includes(
-                addrKey,
-              ) && (
+                {/* How long lived at current address & country */}
+                <div className="input-group">
+                  <label>
+                    How long have you lived at your current address & in current
+                    country?
+                  </label>
+                  <input
+                    className="box-input"
+                    value={addr.duration || ""}
+                    onChange={(e) =>
+                      handleNestedChange(addrKey, "duration", e.target.value)
+                    }
+                  />
+                </div>
+              </div>
+            ) : (
+              // NORMAL ADDRESS FIELDS (unchanged)
+              <div className="form-grid-3">
+                {/* Address */}
                 <input
-                  type="date"
+                  placeholder="Address"
                   className="box-input"
-                  value={addr.dates || ""}
+                  value={addr.address || ""}
                   onChange={(e) =>
-                    handleNestedChange(addrKey, "dates", e.target.value)
+                    handleNestedChange(addrKey, "address", e.target.value)
                   }
                 />
-              )}
-            </div>
+
+                {/* Country */}
+                <select
+                  className="box-input"
+                  value={addr.country || ""}
+                  onChange={async (e) => {
+                    const countryCode = e.target.value;
+                    handleNestedChange(addrKey, "country", countryCode);
+                    handleNestedChange(addrKey, "city", "");
+                    if (countryCode && !cities[countryCode]) {
+                      const cityList = await fetchCities(countryCode);
+                      setCities((prev) => ({
+                        ...prev,
+                        [countryCode]: cityList,
+                      }));
+                    }
+                  }}
+                >
+                  <option value="">Select Country</option>
+                  {countries.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* City */}
+                <input
+                  type="text"
+                  className="box-input"
+                  placeholder="Enter City"
+                  value={addr.city || ""}
+                  onChange={(e) =>
+                    handleNestedChange(addrKey, "city", e.target.value)
+                  }
+                />
+
+                {/* Postal Code */}
+                <input
+                  placeholder="Postal Code"
+                  className="box-input"
+                  value={addr.postal_code || ""}
+                  onChange={(e) =>
+                    handleNestedChange(addrKey, "postal_code", e.target.value)
+                  }
+                />
+
+                {/* Dates (only for previous/secondary residence) */}
+                {["previous_residence", "secondary_residence"].includes(
+                  addrKey,
+                ) && (
+                  <input
+                    type="date"
+                    className="box-input"
+                    value={addr.dates || ""}
+                    onChange={(e) =>
+                      handleNestedChange(addrKey, "dates", e.target.value)
+                    }
+                  />
+                )}
+              </div>
+            )}
+            {/* How long lived at current address & country */}
           </div>
         );
       })}
