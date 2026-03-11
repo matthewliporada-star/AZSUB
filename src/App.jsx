@@ -11,6 +11,9 @@ import CISRecord from "./pages/CIS/CISRecord";
 // MP Data Provider
 import { MPDataProvider } from './pages/MP/MPData.jsx';
 
+// MD Data Provider
+import { MDDataProvider } from './pages/MD/MDData.jsx';
+
 // AP Pages
 import APDashboard from './pages/AP/DashboardPage';
 import MonitoringPage from './pages/AP/MonitoringPage';
@@ -43,8 +46,11 @@ import MPDashboard from './pages/MP/MP-Dashboard';
 import ALPerformance from './pages/MP/ALPerformance';
 import APPerformance from './pages/MP/APPerformance';
 
-// MP Pages
+// MD Pages
 import MDDashboard from './pages/MD/MD-Dashboard';
+import MDMPPerformance from './pages/MD/MPPerformance';
+import MDALPerformance from './pages/MD/ALPerformance';
+import MDAPPerformance from './pages/MD/APPerformance';
 
 function App() {
   return (
@@ -111,8 +117,14 @@ function App() {
           </Route>
 
 
-          {/* MD Routes */}
-          <Route path="/md/dashboard" element={<MDDashboard />} />
+          {/* MD Routes with MD Data Provider */}
+          <Route element={<MDDataProvider><Outlet /></MDDataProvider>}>
+            <Route path="/md/dashboard" element={<MDDashboard />} />
+            <Route path="/md/mp-performance" element={<MDMPPerformance />} />
+            <Route path="/md/al-performance" element={<MDALPerformance />} />
+            <Route path="/md/ap-performance" element={<MDAPPerformance />} />
+          </Route>
+
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/login" replace />} />
