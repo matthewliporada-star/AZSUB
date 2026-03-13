@@ -1,153 +1,33 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
+import { createClient } from "@supabase/supabase-js";
+
 import "./CIS.css";
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
-import pdfjsWorker from "pdfjs-dist/legacy/build/pdf.worker.mjs?url";
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 import PersonalInformation from "./personal-information/PersonalInformation";
 import TravelDetails from "./travel-details/TravelDetails";
 import SmokingAndAlcohol from "./smoking-and-alcohol/SmokingAndAlcohol";
 import PersonalMedical from "./personal-medical/PersonalMedical";
-import FamilyMedical from "./family-medical/FamilyMedical";
-import ExistingOrPending from "./existing-or-pending/ExistingOrPending";
-import BusinessEmployment from "./business-employment/BusinessEmployment";
-import PersonalIncome from "./personal-income/PersonalIncome";
-import AssetsLiabilities from "./assets-liabilities/AssetsLiabilities";
-import PropertyDetails from "./property-details/PropertyDetails";
-import BankDetails from "./bank-details/BankDetails";
-import PolicyBeneficiary from "./policy-beneficiary/PolicyBeneficiary";
-import DependentDetails from "./dependent-details/DependentDetails";
 import SpouseDetails from "./spouse-details/SpouseDetails";
+import DependentDetails from "./dependent-details/DependentDetails";
+
+// ---------------- SUPABASE CLIENT ----------------
+const supabaseUrl = "https://ibbjsjvjfeymglpsvgap.supabase.co";
+const supabaseKey = "sb_publishable_8Thh-CJ8S73w4TMy_W4uGw_N3bw5wru";
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 function CIS({ userRole }) {
-  const fileInputRef = useRef(null);
   const formRef = useRef(null);
-  /* ===============================
-      PDF GENERATION HANDLER
-  =============================== */
-  const handleGeneratePDF = () => {
-    // Hide interactive elements temporarily
-    document.querySelectorAll("input, select, textarea").forEach((el) => {
-      el.dataset.originalDisplay = el.style.display;
-      el.style.display = "none";
-    });
 
-    // Create visible value placeholders
-    document.querySelectorAll("input, select, textarea").forEach((el) => {
-      const displayEl = document.createElement("div");
-      displayEl.className = "print-value";
-
-      if (el.type === "checkbox" || el.type === "radio") {
-        displayEl.textContent = el.checked
-          ? "✓ " + el.labels?.[0]?.textContent
-          : "☐ Not selected";
-      } else {
-        displayEl.textContent = el.value || "N/A";
-      }
-
-      el.parentNode.insertBefore(displayEl, el);
-    });
-
-    // Set PDF filename
-    const originalTitle = document.title;
-    const clientName = personalInfo.full_name?.replace(/\s+/g, "_") || "Client";
-    document.title = `CIS_${clientName}_${new Date().toISOString().split("T")[0]}`;
-
-    // Trigger print
-    window.print();
-
-    // Cleanup after printing
-    setTimeout(() => {
-      document.querySelectorAll(".print-value").forEach((el) => el.remove());
-      document.querySelectorAll("input, select, textarea").forEach((el) => {
-        el.style.display = el.dataset.originalDisplay || "";
-      });
-      document.title = originalTitle;
-    }, 1000);
-  };
-
-  /* ===============================
-      HELPER: IMPROVED REGEX
-  =============================== */
-  function extractFieldsFromText(fullText) {
-    const result = {};
-
-    const match = (regex) => {
-      const m = fullText.match(regex);
-      return m ? m[1].trim() : "";
-    };
-
-    // Basic Info
-    result.full_name = match(
-      /Full\s*name\s*of\s*Mr\.\s*\/Mrs\.\s*(.+?)(?=\n|$|Father)/i,
-    );
-    result.fathers_name = match(
-      /Father[’'s\s]+Name\.?\s*(.+?)(?=\n|$|Mobile)/i,
-    );
-    result.mobile_no = match(/Mobile\s*No\.?\s*(\d+)/i);
-    result.email = match(
-      /Email\.?\s*([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]+)/i,
-    );
-
-    // Address Components (Improved targeting)
-    // These look for the label, skip whitespace/colons, and grab text until the next major label
-    result.city = match(
-      /City\s*[:\s]*([A-Za-z\s]+?)(?=\s*(?:Country|Postal|Dates|$))/i,
-    );
-    result.country = match(
-      /Country\s*[:\s]*([A-Za-z\s]+?)(?=\s*(?:Postal|Code|Dates|$))/i,
-    );
-    result.postal = match(/Postal\s*Code\s*[:\s]*(\d+)/i);
-
-    // Date Resided (specific to the format in your image: DD-MM-YY)
-    result.dates_resided = match(
-      /Dates\s*resided\s*at\s*the\s*residence\s*\(DD-MM-YY\)\s*([\d-]{8,10})/i,
-    );
-
-    // Address Lines
-    result.res_addr_raw = match(
-      /Residence\s*Address\s*\(.*?\)\s*:?\s*(.+?)(?=\s*City|$)/i,
-    );
-    result.perm_addr_raw = match(
-      /Permanent\s*Address\s*:?\s*(.+?)(?=\s*Tax|$)/i,
-    );
-
-    // Other Fields
-    result.tax_info = match(/Tax\s*Residency\s*Information\s*(\d+)/i);
-    result.tin_ssn = match(/TIN\s*\/\s*SSN\s*Number\s*(\d+)/i);
-    result.citizenship = match(
-      /List\s*Countries\s*of\s*Citizenship\s*(.+?)(?=\s*Hobbies|$)/i,
-    );
-    result.hobbies = match(/Hobbies\s*and\s*Activities\s*:\s*(.+?)$/i);
-
-    return result;
-  }
-
-  /* ===============================
-      STATES
-  =============================== */
   const [personalInfo, setPersonalInfo] = useState({
     full_name: "",
     fathers_name: "",
     mobile_no: "",
     email: "",
+    residence_address: {},
+    previous_residence: {},
+    provide_information: {},
+    permanent_address: {},
     duration_at_address: "",
-    residence_address: { address: "", country: "", city: "", postal_code: "" },
-    previous_residence: {
-      address: "",
-      country: "",
-      city: "",
-      postal_code: "",
-      dates: "",
-    },
-    provide_information: {
-      address: "",
-      country: "",
-      city: "",
-      postal_code: "",
-      dates: "",
-    },
-    permanent_address: { address: "", country: "", city: "", postal_code: "" },
     tax_residency_info: "",
     tin_ssn: "",
     citizenship: "",
@@ -159,106 +39,334 @@ function CIS({ userRole }) {
       id: Date.now(),
       country: "",
       city: "",
-      length: "",
+      length_of_stay: "",
       frequency: "",
-      date: "",
+      date_travel: "",
       reason: "",
     },
   ]);
+
   const [habits, setHabits] = useState({
     smoking: "",
     smokingPerDay: "",
     alcohol: "",
     alcoholPerWeek: "",
   });
+
   const [medical, setMedical] = useState({
     majorIllness: "",
     illnessDetails: "",
     underMedication: "",
     medicationDetails: "",
   });
+
   const [spouse, setSpouse] = useState({
     name: "",
     relationship: "",
     contact: "",
     email: "",
   });
-  const [dependents, setDependents] = useState({ dependents: [] });
-  const [deleteMode, setDeleteMode] = useState(false);
-  const [selectedRows, setSelectedRows] = useState([]);
 
-  /* ===============================
-      PDF HANDLER
-  =============================== */
-  const handlePDFUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+  // ✅ Dependents state lifted here
+  const [dependents, setDependents] = useState([
+    { name: "", relation: "", nationality: "", dob: "" },
+  ]);
+
+  const countries = [
+    { code: "AF", name: "Afghanistan" },
+    { code: "AL", name: "Albania" },
+    { code: "DZ", name: "Algeria" },
+    { code: "AS", name: "American Samoa" },
+    { code: "AD", name: "Andorra" },
+    { code: "AO", name: "Angola" },
+    { code: "AI", name: "Anguilla" },
+    { code: "AQ", name: "Antarctica" },
+    { code: "AG", name: "Antigua and Barbuda" },
+    { code: "AR", name: "Argentina" },
+    { code: "AM", name: "Armenia" },
+    { code: "AW", name: "Aruba" },
+    { code: "AU", name: "Australia" },
+    { code: "AT", name: "Austria" },
+    { code: "AZ", name: "Azerbaijan" },
+    { code: "BS", name: "Bahamas" },
+    { code: "BH", name: "Bahrain" },
+    { code: "BD", name: "Bangladesh" },
+    { code: "BB", name: "Barbados" },
+    { code: "BY", name: "Belarus" },
+    { code: "BE", name: "Belgium" },
+    { code: "BZ", name: "Belize" },
+    { code: "BJ", name: "Benin" },
+    { code: "BM", name: "Bermuda" },
+    { code: "BT", name: "Bhutan" },
+    { code: "BO", name: "Bolivia" },
+    { code: "BA", name: "Bosnia and Herzegovina" },
+    { code: "BW", name: "Botswana" },
+    { code: "BR", name: "Brazil" },
+    { code: "IO", name: "British Indian Ocean Territory" },
+    { code: "BN", name: "Brunei Darussalam" },
+    { code: "BG", name: "Bulgaria" },
+    { code: "BF", name: "Burkina Faso" },
+    { code: "BI", name: "Burundi" },
+    { code: "KH", name: "Cambodia" },
+    { code: "CM", name: "Cameroon" },
+    { code: "CA", name: "Canada" },
+    { code: "CV", name: "Cape Verde" },
+    { code: "KY", name: "Cayman Islands" },
+    { code: "CF", name: "Central African Republic" },
+    { code: "TD", name: "Chad" },
+    { code: "CL", name: "Chile" },
+    { code: "CN", name: "China" },
+    { code: "CO", name: "Colombia" },
+    { code: "KM", name: "Comoros" },
+    { code: "CG", name: "Congo" },
+    { code: "CD", name: "Congo, Democratic Republic of the" },
+    { code: "CR", name: "Costa Rica" },
+    { code: "CI", name: "Côte d’Ivoire" },
+    { code: "HR", name: "Croatia" },
+    { code: "CU", name: "Cuba" },
+    { code: "CY", name: "Cyprus" },
+    { code: "CZ", name: "Czech Republic" },
+    { code: "DK", name: "Denmark" },
+    { code: "DJ", name: "Djibouti" },
+    { code: "DM", name: "Dominica" },
+    { code: "DO", name: "Dominican Republic" },
+    { code: "EC", name: "Ecuador" },
+    { code: "EG", name: "Egypt" },
+    { code: "SV", name: "El Salvador" },
+    { code: "GQ", name: "Equatorial Guinea" },
+    { code: "ER", name: "Eritrea" },
+    { code: "EE", name: "Estonia" },
+    { code: "SZ", name: "Eswatini" },
+    { code: "ET", name: "Ethiopia" },
+    { code: "FK", name: "Falkland Islands (Malvinas)" },
+    { code: "FO", name: "Faroe Islands" },
+    { code: "FJ", name: "Fiji" },
+    { code: "FI", name: "Finland" },
+    { code: "FR", name: "France" },
+    { code: "GF", name: "French Guiana" },
+    { code: "PF", name: "French Polynesia" },
+    { code: "GA", name: "Gabon" },
+    { code: "GM", name: "Gambia" },
+    { code: "GE", name: "Georgia" },
+    { code: "DE", name: "Germany" },
+    { code: "GH", name: "Ghana" },
+    { code: "GR", name: "Greece" },
+    { code: "GL", name: "Greenland" },
+    { code: "GD", name: "Grenada" },
+    { code: "GP", name: "Guadeloupe" },
+    { code: "GU", name: "Guam" },
+    { code: "GT", name: "Guatemala" },
+    { code: "GG", name: "Guernsey" },
+    { code: "GN", name: "Guinea" },
+    { code: "GW", name: "Guinea-Bissau" },
+    { code: "GY", name: "Guyana" },
+    { code: "HT", name: "Haiti" },
+    { code: "HN", name: "Honduras" },
+    { code: "HK", name: "Hong Kong" },
+    { code: "HU", name: "Hungary" },
+    { code: "IS", name: "Iceland" },
+    { code: "IN", name: "India" },
+    { code: "ID", name: "Indonesia" },
+    { code: "IR", name: "Iran" },
+    { code: "IQ", name: "Iraq" },
+    { code: "IE", name: "Ireland" },
+    { code: "IM", name: "Isle of Man" },
+    { code: "IL", name: "Israel" },
+    { code: "IT", name: "Italy" },
+    { code: "JM", name: "Jamaica" },
+    { code: "JP", name: "Japan" },
+    { code: "JE", name: "Jersey" },
+    { code: "JO", name: "Jordan" },
+    { code: "KZ", name: "Kazakhstan" },
+    { code: "KE", name: "Kenya" },
+    { code: "KI", name: "Kiribati" },
+    { code: "KP", name: "Korea, Democratic People's Republic of" },
+    { code: "KR", name: "Korea, Republic of" },
+    { code: "KW", name: "Kuwait" },
+    { code: "KG", name: "Kyrgyzstan" },
+    { code: "LA", name: "Lao People's Democratic Republic" },
+    { code: "LV", name: "Latvia" },
+    { code: "LB", name: "Lebanon" },
+    { code: "LS", name: "Lesotho" },
+    { code: "LR", name: "Liberia" },
+    { code: "LY", name: "Libya" },
+    { code: "LI", name: "Liechtenstein" },
+    { code: "LT", name: "Lithuania" },
+    { code: "LU", name: "Luxembourg" },
+    { code: "MO", name: "Macao" },
+    { code: "MG", name: "Madagascar" },
+    { code: "MW", name: "Malawi" },
+    { code: "MY", name: "Malaysia" },
+    { code: "MV", name: "Maldives" },
+    { code: "ML", name: "Mali" },
+    { code: "MT", name: "Malta" },
+    { code: "MH", name: "Marshall Islands" },
+    { code: "MQ", name: "Martinique" },
+    { code: "MR", name: "Mauritania" },
+    { code: "MU", name: "Mauritius" },
+    { code: "YT", name: "Mayotte" },
+    { code: "MX", name: "Mexico" },
+    { code: "FM", name: "Micronesia, Federated States of" },
+    { code: "MD", name: "Moldova" },
+    { code: "MC", name: "Monaco" },
+    { code: "MN", name: "Mongolia" },
+    { code: "ME", name: "Montenegro" },
+    { code: "MS", name: "Montserrat" },
+    { code: "MA", name: "Morocco" },
+    { code: "MZ", name: "Mozambique" },
+    { code: "MM", name: "Myanmar" },
+    { code: "NA", name: "Namibia" },
+    { code: "NR", name: "Nauru" },
+    { code: "NP", name: "Nepal" },
+    { code: "NL", name: "Netherlands" },
+    { code: "NC", name: "New Caledonia" },
+    { code: "NZ", name: "New Zealand" },
+    { code: "NI", name: "Nicaragua" },
+    { code: "NE", name: "Niger" },
+    { code: "NG", name: "Nigeria" },
+    { code: "NU", name: "Niue" },
+    { code: "NF", name: "Norfolk Island" },
+    { code: "MP", name: "Northern Mariana Islands" },
+    { code: "NO", name: "Norway" },
+    { code: "OM", name: "Oman" },
+    { code: "PK", name: "Pakistan" },
+    { code: "PW", name: "Palau" },
+    { code: "PS", name: "Palestine, State of" },
+    { code: "PA", name: "Panama" },
+    { code: "PG", name: "Papua New Guinea" },
+    { code: "PY", name: "Paraguay" },
+    { code: "PE", name: "Peru" },
+    { code: "PH", name: "Philippines" },
+    { code: "PL", name: "Poland" },
+    { code: "PT", name: "Portugal" },
+    { code: "PR", name: "Puerto Rico" },
+    { code: "QA", name: "Qatar" },
+    { code: "RO", name: "Romania" },
+    { code: "RU", name: "Russian Federation" },
+    { code: "RW", name: "Rwanda" },
+    { code: "RE", name: "Réunion" },
+    { code: "BL", name: "Saint Barthélemy" },
+    { code: "SH", name: "Saint Helena" },
+    { code: "KN", name: "Saint Kitts and Nevis" },
+    { code: "LC", name: "Saint Lucia" },
+    { code: "MF", name: "Saint Martin (French part)" },
+    { code: "PM", name: "Saint Pierre and Miquelon" },
+    { code: "VC", name: "Saint Vincent and the Grenadines" },
+    { code: "WS", name: "Samoa" },
+    { code: "SM", name: "San Marino" },
+    { code: "ST", name: "Sao Tome and Principe" },
+    { code: "SA", name: "Saudi Arabia" },
+    { code: "SN", name: "Senegal" },
+    { code: "RS", name: "Serbia" },
+    { code: "SC", name: "Seychelles" },
+    { code: "SL", name: "Sierra Leone" },
+    { code: "SG", name: "Singapore" },
+    { code: "SX", name: "Sint Maarten (Dutch part)" },
+    { code: "SK", name: "Slovakia" },
+    { code: "SI", name: "Slovenia" },
+    { code: "SB", name: "Solomon Islands" },
+    { code: "SO", name: "Somalia" },
+    { code: "ZA", name: "South Africa" },
+    { code: "GS", name: "South Georgia and the South Sandwich Islands" },
+    { code: "SS", name: "South Sudan" },
+    { code: "ES", name: "Spain" },
+    { code: "LK", name: "Sri Lanka" },
+    { code: "SD", name: "Sudan" },
+    { code: "SR", name: "Suriname" },
+    { code: "SE", name: "Sweden" },
+    { code: "CH", name: "Switzerland" },
+    { code: "SY", name: "Syrian Arab Republic" },
+    { code: "TW", name: "Taiwan" },
+    { code: "TJ", name: "Tajikistan" },
+    { code: "TZ", name: "Tanzania, United Republic of" },
+    { code: "TH", name: "Thailand" },
+    { code: "TL", name: "Timor-Leste" },
+    { code: "TG", name: "Togo" },
+    { code: "TK", name: "Tokelau" },
+    { code: "TO", name: "Tonga" },
+    { code: "TT", name: "Trinidad and Tobago" },
+    { code: "TN", name: "Tunisia" },
+    { code: "TR", name: "Turkey" },
+    { code: "TM", name: "Turkmenistan" },
+    { code: "TV", name: "Tuvalu" },
+    { code: "UG", name: "Uganda" },
+    { code: "UA", name: "Ukraine" },
+    { code: "AE", name: "United Arab Emirates" },
+    { code: "GB", name: "United Kingdom" },
+    { code: "US", name: "United States" },
+    { code: "UY", name: "Uruguay" },
+    { code: "UZ", name: "Uzbekistan" },
+    { code: "VU", name: "Vanuatu" },
+    { code: "VE", name: "Venezuela" },
+    { code: "VN", name: "Vietnam" },
+    { code: "EH", name: "Western Sahara" },
+    { code: "YE", name: "Yemen" },
+    { code: "ZM", name: "Zambia" },
+    { code: "ZW", name: "Zimbabwe" },
+  ];
+
+  // ------------------- HANDLERS -------------------
+  const handleTravelChange = (index, field, value) => {
+    setTravelDetails((prev) =>
+      prev.map((t, i) => (i === index ? { ...t, [field]: value } : t)),
+    );
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
     try {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      // 1️⃣ Insert personal information first
+      const { data: personalData, error: personalError } = await supabase
+        .from("personal_information")
+        .insert([personalInfo])
+        .select();
 
-      let fullText = "";
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        fullText += content.items.map((item) => item.str).join("\n") + "\n";
-      }
+      if (personalError) throw personalError;
 
-      const extracted = extractFieldsFromText(fullText);
+      const personalId = personalData[0].id;
 
-      setPersonalInfo((prev) => ({
-        ...prev,
-        full_name: extracted.full_name || prev.full_name,
-        fathers_name: extracted.fathers_name || prev.fathers_name,
-        mobile_no: extracted.mobile_no || prev.mobile_no,
-        email: extracted.email || prev.email,
-        tax_residency_info: extracted.tax_info || prev.tax_residency_info,
-        tin_ssn: extracted.tin_ssn || prev.tin_ssn,
-        citizenship: extracted.citizenship || prev.citizenship,
-        hobbies: extracted.hobbies || prev.hobbies,
-
-        // Current Residence
-        residence_address: {
-          address: extracted.res_addr_raw || prev.residence_address.address,
-          city: extracted.city || prev.residence_address.city,
-          country: extracted.country || prev.residence_address.country,
-          postal_code: extracted.postal || prev.residence_address.postal_code,
-        },
-
-        // Previous Residence (Populating the specific fields you requested)
-        previous_residence: {
-          address: extracted.res_addr_raw, // Often identical if the PDF is a mirror
-          city: extracted.city,
-          country: extracted.country,
-          postal_code: extracted.postal,
-          dates: extracted.dates_resided,
-        },
-
-        // Permanent Address
-        permanent_address: {
-          address: extracted.perm_addr_raw || prev.permanent_address.address,
-          city: extracted.city,
-          country: extracted.country,
-          postal_code: extracted.postal,
-        },
+      // 2️⃣ Insert travel details linked to personal info
+      const travelToInsert = travelDetails.map((t) => ({
+        personal_info_id: personalId,
+        country: t.country,
+        city: t.city,
+        length_of_stay: t.length_of_stay || null,
+        frequency: t.frequency || null,
+        date_travel: t.date_travel || null,
+        reason: t.reason || null,
       }));
 
-      alert("Data successfully imported from PDF!");
-    } catch (error) {
-      console.error("PDF Error:", error);
-      alert("Error parsing PDF. Please ensure it's a valid CIS document.");
-    } finally {
-      event.target.value = null; // Reset file input
+      const { error: travelError } = await supabase
+        .from("travel_details")
+        .insert(travelToInsert);
+      if (travelError) throw travelError;
+
+      // 3️⃣ Insert dependents linked to personal info
+      const dependentsToInsert = dependents
+        .filter((d) => d.name || d.relation || d.nationality || d.dob) // optional: remove completely empty
+        .map((d) => ({
+          personal_info_id: personalId, // must be valid UUID
+          name: d.name || null,
+          relation: d.relation || null,
+          nationality: d.nationality || null,
+          dob: d.dob || null, // convert empty string to null
+        }));
+
+      const { error: depError } = await supabase
+        .from("dependents")
+        .insert(dependentsToInsert);
+
+      if (depError) throw depError;
+
+      alert("Form submitted successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Error submitting form: " + err.message);
     }
   };
 
-  const countries = [
-    { code: "PH", name: "Philippines" },
-    { code: "JP", name: "Japan" },
-    { code: "US", name: "United States" },
-  ]; // ... rest of your list
-
+  /* ================= JSX ================= */
   return (
     <div className={`cis-page-wrapper ${userRole === "MP" ? "mp-top" : ""}`}>
       <main className="cis-page">
@@ -268,98 +376,49 @@ function CIS({ userRole }) {
           </header>
         )}
 
-        <form className="insurance-form" ref={formRef}>
+        <form className="insurance-form" ref={formRef} onSubmit={handleSubmit}>
           <PersonalInformation
             personalInfo={personalInfo}
             setPersonalInfo={setPersonalInfo}
-            countries={countries}
-            className="section-container"
           />
+
           <TravelDetails
             travelDetails={travelDetails}
             setTravelDetails={setTravelDetails}
+            handleTravelChange={handleTravelChange} // ✅ add this
             countries={countries}
           />
+
           <SmokingAndAlcohol
             habits={habits}
             handleHabitsChange={(f, v) => setHabits((p) => ({ ...p, [f]: v }))}
           />
+
           <PersonalMedical
             medical={medical}
             handleMedicalChange={(f, v) =>
               setMedical((p) => ({ ...p, [f]: v }))
             }
           />
-          <FamilyMedical data={{}} />
-          <ExistingOrPending data={{}} />
-          <BusinessEmployment data={{}} />
-          <PersonalIncome data={{}} />
-          <AssetsLiabilities />
-          <PropertyDetails data={{}} />
-          <BankDetails data={{}} />
-          <PolicyBeneficiary data={{}} />
+
           <SpouseDetails
             spouse={spouse}
             handleSpouseChange={(f, v) => setSpouse((p) => ({ ...p, [f]: v }))}
           />
+
           <DependentDetails
             dependents={dependents}
             setDependents={setDependents}
           />
 
-          {/* This container is hidden during generation due to the .no-print class in CSS */}
+          {/* ================= SUBMIT BUTTON ================= */}
           <div
-            className="cis-pdf-actions no-print"
-            style={{
-              marginTop: "40px",
-              padding: "20px",
-              borderTop: "2px solid var(--navy-l)",
-              display: "flex",
-              justifyContent: "center",
-              gap: "15px",
-            }}
+            className="form-submit-container"
+            style={{ marginTop: "30px", textAlign: "center" }}
           >
-            <button
-              type="button"
-              className="upload-pdf-btn"
-              onClick={() => fileInputRef.current.click()}
-              style={{
-                backgroundColor: "#4a6fd8",
-                color: "white",
-                padding: "12px 24px",
-                borderRadius: "8px",
-                border: "none",
-                fontWeight: "600",
-                cursor: "pointer",
-              }}
-            >
-              Upload PDF
+            <button type="submit" className="btn-submit">
+              Submit Form
             </button>
-
-            <button
-              type="button"
-              className="generate-pdf-btn"
-              onClick={handleGeneratePDF}
-              style={{
-                backgroundColor: "#2a4899",
-                color: "white",
-                padding: "12px 24px",
-                borderRadius: "8px",
-                border: "none",
-                fontWeight: "600",
-                cursor: "pointer",
-              }}
-            >
-              Generate PDF
-            </button>
-
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept="application/pdf"
-              style={{ display: "none" }}
-              onChange={handlePDFUpload}
-            />
           </div>
         </form>
       </main>

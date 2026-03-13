@@ -16,9 +16,9 @@ function TravelDetails({
     id: Date.now(),
     country: "",
     city: "",
-    length: "",
+    length_of_stay: "",   // matches DB column
     frequency: "",
-    date: "",
+    date_travel: "",      // matches DB column
     reason: "",
   };
 
@@ -52,7 +52,7 @@ function TravelDetails({
                           setSelectedRows((prev) => [...prev, i]);
                         else
                           setSelectedRows((prev) =>
-                            prev.filter((index) => index !== i),
+                            prev.filter((index) => index !== i)
                           );
                       }}
                     />
@@ -93,9 +93,9 @@ function TravelDetails({
                 <input
                   className="box-input"
                   type="text"
-                  value={t.length}
+                  value={t.length_of_stay}
                   onChange={(e) =>
-                    handleTravelChange(i, "length", e.target.value)
+                    handleTravelChange(i, "length_of_stay", e.target.value)
                   }
                 />
               </td>
@@ -115,9 +115,9 @@ function TravelDetails({
                 <input
                   className="box-input"
                   type="date"
-                  value={t.date}
+                  value={t.date_travel}
                   onChange={(e) =>
-                    handleTravelChange(i, "date", e.target.value)
+                    handleTravelChange(i, "date_travel", e.target.value)
                   }
                 />
               </td>
@@ -159,7 +159,7 @@ function TravelDetails({
           onClick={() => {
             if (deleteMode && selectedRows.length > 0) {
               setTravelDetails((prev) =>
-                prev.filter((_, index) => !selectedRows.includes(index)),
+                prev.filter((_, index) => !selectedRows.includes(index))
               );
               setSelectedRows([]);
             }

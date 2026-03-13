@@ -1,14 +1,16 @@
 import React from "react";
 import "../CIS.css";
 
-function PersonalInformation({ personalInfo, setPersonalInfo }) {
+function PersonalInformation({ personalInfo = {}, setPersonalInfo }) {
+  // Update top-level fields
   const handlePersonalInfoChange = (field, value) =>
     setPersonalInfo((prev) => ({ ...prev, [field]: value }));
 
+  // Update nested objects like addresses
   const handleNestedChange = (section, field, value) =>
     setPersonalInfo((prev) => ({
       ...prev,
-      [section]: { ...prev[section], [field]: value },
+      [section]: { ...(prev[section] || {}), [field]: value },
     }));
 
   const formatPhone = (value) => {
@@ -36,11 +38,19 @@ function PersonalInformation({ personalInfo, setPersonalInfo }) {
       <div className="form-grid-2">
         <div className="input-group">
           <label>Full name of Mr. /Mrs.</label>
-          <input className="box-input" value={personalInfo.full_name} onChange={(e) => handlePersonalInfoChange("full_name", e.target.value)} />
+          <input
+            className="box-input"
+            value={personalInfo.full_name || ""}
+            onChange={(e) => handlePersonalInfoChange("full_name", e.target.value)}
+          />
         </div>
         <div className="input-group">
           <label>Father's Name</label>
-          <input className="box-input" value={personalInfo.fathers_name} onChange={(e) => handlePersonalInfoChange("fathers_name", e.target.value)} />
+          <input
+            className="box-input"
+            value={personalInfo.fathers_name || ""}
+            onChange={(e) => handlePersonalInfoChange("fathers_name", e.target.value)}
+          />
         </div>
       </div>
 
@@ -48,77 +58,126 @@ function PersonalInformation({ personalInfo, setPersonalInfo }) {
       <div className="form-grid-2">
         <div className="input-group">
           <label>Mobile No.</label>
-          <input type="tel" className="box-input" value={personalInfo.mobile_no} onChange={(e) => handlePersonalInfoChange("mobile_no", formatPhone(e.target.value))} />
+          <input
+            type="tel"
+            className="box-input"
+            value={personalInfo.mobile_no || ""}
+            onChange={(e) => handlePersonalInfoChange("mobile_no", formatPhone(e.target.value))}
+          />
         </div>
         <div className="input-group">
           <label>Email Address</label>
-          <input type="email" className="box-input" value={personalInfo.email} onChange={(e) => handlePersonalInfoChange("email", e.target.value)} />
+          <input
+            type="email"
+            className="box-input"
+            value={personalInfo.email || ""}
+            onChange={(e) => handlePersonalInfoChange("email", e.target.value)}
+          />
         </div>
       </div>
 
-      {/* Address Mapping */}
-      {addressConfigs.map(({ key: addrKey, label: labelText }) => (
-        <React.Fragment key={addrKey}>
-          <div className="input-group address-group-box">
-            <label className="section-subtitle-label">{labelText}</label>
-            
-            {/* Address Grid - Permanent address is simplified, others are 3-column grids */}
-            <div className={addrKey === "permanent_address" ? "permanent-address-layout" : "form-grid-3 address-subgrid"}>
-              <input 
-                placeholder="Address" 
-                className={`box-input ${addrKey !== "permanent_address" ? "grid-col-span-2" : ""}`} 
-                value={personalInfo[addrKey].address || ""} 
-                onChange={(e) => handleNestedChange(addrKey, "address", e.target.value)} 
-              />
-              
-              {addrKey !== "permanent_address" && (
-                <>
-                  <input placeholder="Country" className="box-input" value={personalInfo[addrKey].country || ""} onChange={(e) => handleNestedChange(addrKey, "country", e.target.value)} />
-                  <input placeholder="City" className="box-input" value={personalInfo[addrKey].city || ""} onChange={(e) => handleNestedChange(addrKey, "city", e.target.value)} />
-                  <input placeholder="Postal Code" className="box-input" value={personalInfo[addrKey].postal_code || ""} onChange={(e) => handleNestedChange(addrKey, "postal_code", e.target.value)} />
-                  {["previous_residence", "provide_information"].includes(addrKey) && (
-                    <input type="text" placeholder="Dates Resided" className="box-input" value={personalInfo[addrKey].dates || ""} onChange={(e) => handleNestedChange(addrKey, "dates", e.target.value)} />
-                  )}
-                </>
-              )}
-            </div>
-          </div>
+      {/* Addresses */}
+      {addressConfigs.map(({ key: addrKey, label: labelText }) => {
+        const section = personalInfo[addrKey] || {};
 
-          {/* This renders specifically OUTSIDE the container after Residence Address */}
-          {addrKey === "residence_address" && (
-            <div className="input-group mt-3 mb-4 duration-field-container">
-              <label>How long have you lived at your current address & in current country?</label>
-              <input
-                className="box-input"
-                placeholder="e.g. 5 Years"
-                value={personalInfo.duration_at_address || ""}
-                onChange={(e) => handlePersonalInfoChange("duration_at_address", e.target.value)}
-              />
-            </div>
-          )}
-        </React.Fragment>
-      ))}
+        return (
+          <React.Fragment key={addrKey}>
+            <div className="input-group address-group-box">
+              <label className="section-subtitle-label">{labelText}</label>
 
-      {/* Bottom Information */}
+              <div className={addrKey === "permanent_address" ? "permanent-address-layout" : "form-grid-3 address-subgrid"}>
+                <input
+                  placeholder="Address"
+                  className={`box-input ${addrKey !== "permanent_address" ? "grid-col-span-2" : ""}`}
+                  value={section.address || ""}
+                  onChange={(e) => handleNestedChange(addrKey, "address", e.target.value)}
+                />
+
+                {addrKey !== "permanent_address" && (
+                  <>
+                    <input
+                      placeholder="Country"
+                      className="box-input"
+                      value={section.country || ""}
+                      onChange={(e) => handleNestedChange(addrKey, "country", e.target.value)}
+                    />
+                    <input
+                      placeholder="City"
+                      className="box-input"
+                      value={section.city || ""}
+                      onChange={(e) => handleNestedChange(addrKey, "city", e.target.value)}
+                    />
+                    <input
+                      placeholder="Postal Code"
+                      className="box-input"
+                      value={section.postal_code || ""}
+                      onChange={(e) => handleNestedChange(addrKey, "postal_code", e.target.value)}
+                    />
+                    {["previous_residence", "provide_information"].includes(addrKey) && (
+                      <input
+                        type="text"
+                        placeholder="Dates Resided"
+                        className="box-input"
+                        value={section.dates || ""}
+                        onChange={(e) => handleNestedChange(addrKey, "dates", e.target.value)}
+                      />
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+
+            {addrKey === "residence_address" && (
+              <div className="input-group mt-3 mb-4 duration-field-container">
+                <label>How long have you lived at your current address & in current country?</label>
+                <input
+                  className="box-input"
+                  placeholder="e.g. 5 Years"
+                  value={personalInfo.duration_at_address || ""}
+                  onChange={(e) => handlePersonalInfoChange("duration_at_address", e.target.value)}
+                />
+              </div>
+            )}
+          </React.Fragment>
+        );
+      })}
+
+      {/* Bottom Info */}
       <div className="form-grid-2 mt-4">
         <div className="input-group">
           <label>Tax Residency Information</label>
-          <input className="box-input" value={personalInfo.tax_residency_info} onChange={(e) => handlePersonalInfoChange("tax_residency_info", e.target.value)} />
+          <input
+            className="box-input"
+            value={personalInfo.tax_residency_info || ""}
+            onChange={(e) => handlePersonalInfoChange("tax_residency_info", e.target.value)}
+          />
         </div>
         <div className="input-group">
           <label>TIN / SSN Number</label>
-          <input className="box-input" value={personalInfo.tin_ssn} onChange={(e) => handlePersonalInfoChange("tin_ssn", e.target.value)} />
+          <input
+            className="box-input"
+            value={personalInfo.tin_ssn || ""}
+            onChange={(e) => handlePersonalInfoChange("tin_ssn", e.target.value)}
+          />
         </div>
       </div>
 
       <div className="form-grid-2">
         <div className="input-group">
           <label>List Countries of Citizenship</label>
-          <input className="box-input" value={personalInfo.citizenship} onChange={(e) => handlePersonalInfoChange("citizenship", e.target.value)} />
+          <input
+            className="box-input"
+            value={personalInfo.citizenship || ""}
+            onChange={(e) => handlePersonalInfoChange("citizenship", e.target.value)}
+          />
         </div>
         <div className="input-group">
           <label>Hobbies and Activities</label>
-          <input className="box-input" value={personalInfo.hobbies} onChange={(e) => handlePersonalInfoChange("hobbies", e.target.value)} />
+          <input
+            className="box-input"
+            value={personalInfo.hobbies || ""}
+            onChange={(e) => handlePersonalInfoChange("hobbies", e.target.value)}
+          />
         </div>
       </div>
     </div>

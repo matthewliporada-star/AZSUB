@@ -2,11 +2,7 @@
 import React, { useState } from "react";
 import "../CIS.css";
 
-const DependentDetails = () => {
-  const [dependents, setDependents] = useState([
-    { name: "", relation: "", nationality: "", dob: "" },
-  ]);
-
+const DependentDetails = ({ dependents, setDependents }) => {
   const [showDeleteBtns, setShowDeleteBtns] = useState(false);
 
   const handleDependentsChange = (index, field, value) => {
