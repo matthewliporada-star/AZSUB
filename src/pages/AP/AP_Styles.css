@@ -8,11 +8,7 @@
 }
 
 .ap-layout {
-  font-family:
-    "Segoe UI",
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
+  font-family: var(--font-family-base);
   background: #f5f7fa;
   min-height: 100vh;
   color: #2c3e50;
@@ -20,6 +16,29 @@
   width: 100%;
   flex-direction: row;
   overflow-x: hidden;
+}
+
+.ap-layout .main-content {
+  flex-grow: 1;
+  padding: 20px; /* Reduced from 30px */
+  padding-top: 20px; /* Explicitly reduced top padding */
+  transition: margin-left 0.3s ease;
+  margin-left: 260px; /* Default sidebar width */
+}
+
+.stat-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 12px; /* Reduced from 16px */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #f1f5f9;
 }
 
 .ap-layout .sidebar {
@@ -147,8 +166,7 @@ body.dark-mode .monitoring-input::placeholder {
 }
 
 /* Special fix for date input icon in dark mode */
-body.dark-mode
-  .monitoring-input[type="date"]::-webkit-calendar-picker-indicator {
+body.dark-mode .monitoring-input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
   cursor: pointer;
 }
@@ -402,7 +420,7 @@ body.dark-mode .ap-layout .sidebar.collapsed .sidebar-toggle {
   padding: 14px 15px;
   margin-bottom: 10px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
   color: white;
   border-radius: 10px;
@@ -412,6 +430,7 @@ body.dark-mode .ap-layout .sidebar.collapsed .sidebar-toggle {
   transition: all 0.25s ease;
   text-decoration: none;
   background: transparent;
+  font-family: var(--font-family-base);
 }
 
 .ap-layout .sidebar-item:hover {
@@ -475,7 +494,6 @@ body.dark-mode .ap-layout .sidebar-item.active {
 /* --- MAIN CONTENT STYLES --- */
 .ap-layout .main-content {
   margin-left: 260px;
-  padding: 90px 40px 30px 40px;
   flex: 1;
   min-height: 100vh;
   overflow-y: auto;
@@ -485,7 +503,8 @@ body.dark-mode .ap-layout .sidebar-item.active {
   display: block;
   width: calc(100% - 260px);
   margin-top: 0 !important;
-  padding-top: 90px !important;
+  padding: 0 !important;
+  padding-top: 72px !important; /* Header Height */
 }
 
 .ap-layout .main-content.expanded {
@@ -540,6 +559,7 @@ body.dark-mode .ap-layout .sidebar-item.active {
   color: #003266;
   /* Match MP Title Color */
   text-transform: uppercase;
+  font-family: var(--font-family-heading);
 }
 
 .ap-layout .logo {
@@ -547,6 +567,7 @@ body.dark-mode .ap-layout .sidebar-item.active {
   font-size: 24px;
   font-weight: 600;
   letter-spacing: 0.5px;
+  font-family: var(--font-family-heading);
 }
 
 .ap-layout .connection-indicator {
@@ -576,9 +597,7 @@ body.dark-mode .ap-layout .sidebar-item.active {
   width: 100%;
   max-width: 1600px;
   margin: 0 auto;
-  margin: 0 auto;
-  margin: 0 auto;
-  padding: 90px 30px 30px 30px;
+  padding: 30px;
 }
 
 .ap-layout .content-container {
@@ -601,15 +620,17 @@ body.dark-mode .ap-layout .sidebar-item.active {
 .ap-layout .stat-card {
   background: #fff;
   border-radius: 12px;
-  padding: 24px;
+  padding: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   border: 1px solid #eaecf0;
+  gap: 15px;
 }
 
 .ap-layout .stat-card:hover {
@@ -623,14 +644,14 @@ body.dark-mode .ap-layout .sidebar-item.active {
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 8px;
 }
 
 .ap-layout .stat-value {
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 22px;
+  font-weight: 600;
   color: #1e293b;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
+  font-family: var(--font-family-heading);
 }
 
 .ap-layout .stat-subtext {
@@ -684,6 +705,7 @@ body.dark-mode .ap-layout .stat-subtext {
   font-size: 18px;
   font-weight: 600;
   color: #2c3e50;
+  font-family: var(--font-family-heading);
 }
 
 .ap-layout .card-body {
@@ -933,16 +955,28 @@ body.dark-mode .ap-layout .stat-subtext {
   text-transform: uppercase;
 }
 
+.ap-layout .dashboard-header h1 {
+  font-size: 32px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #003266 0%, #0052a3 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 20px;
+  letter-spacing: -0.5px;
+  font-family: var(--font-family-heading);
+}
+
 .ap-layout .stat-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 8px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 2px;
 }
 
 .ap-layout .stat-subtext {
   font-size: 12px;
-  color: #6c757d;
+  color: #4b5563;
   font-weight: 500;
 }
 
@@ -967,6 +1001,7 @@ body.dark-mode .ap-layout .stat-subtext {
   margin-bottom: 20px;
   padding-bottom: 12px;
   border-bottom: 2px solid #e9ecef;
+  font-family: var(--font-family-heading);
 }
 
 .ap-layout .chart-wrapper {
@@ -1580,7 +1615,7 @@ body.dark-mode .ap-layout .status-badge.status-rejected {
   font-size: 13px;
 }
 
-.ap-layout .submission-details > div {
+.ap-layout .submission-details>div {
   color: #495057;
 }
 
@@ -2430,27 +2465,30 @@ body.dark-mode .ap-layout .day-note-preview {
 
 /* --- DARK MODE STATUS BADGES --- */
 body.dark-mode .ap-layout .status-badge.status-pending {
-  background: var(--warning-color) !important;
-  color: #fff !important;
+  background: #451a03 !important;
+  color: #fbbf24 !important;
+  border-color: #92400e !important;
   font-weight: 700;
 }
 
 body.dark-mode .ap-layout .status-badge.status-issued {
-  background: var(--success-emerald) !important;
-  color: #fff !important;
+  background: #064e3b !important;
+  color: #34d399 !important;
+  border-color: #065f46 !important;
   font-weight: 700;
 }
 
 body.dark-mode .ap-layout .status-badge.status-declined {
-  background: var(--error-rose) !important;
-  color: #fff !important;
+  background: #450a0a !important;
+  color: #f87171 !important;
+  border-color: #991b1b !important;
   font-weight: 700;
 }
 
 /* --- DARK MODE CLIENT PAYMENT BOARD --- */
 /* Main card background */
-body.dark-mode .ap-layout > div > div:has(h2:contains("Client Payment Board")),
-body.dark-mode .ap-layout > div[style*="background: white"] {
+body.dark-mode .ap-layout>div>div:has(h2:contains("Client Payment Board")),
+body.dark-mode .ap-layout>div[style*="background: white"] {
   background: var(--dark-surface) !important;
   border: 1px solid var(--border-subtle-dark) !important;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4) !important;
@@ -2468,9 +2506,7 @@ body.dark-mode .ap-layout input[type="text"][placeholder*="Search"] {
   color: var(--text-primary-dark) !important;
 }
 
-body.dark-mode
-  .ap-layout
-  input[type="text"][placeholder*="Search"]::placeholder {
+body.dark-mode .ap-layout input[type="text"][placeholder*="Search"]::placeholder {
   color: #888 !important;
 }
 
@@ -2482,22 +2518,13 @@ body.dark-mode .ap-layout select {
 }
 
 /* Month container borders */
-body.dark-mode
-  .ap-layout
-  > div
-  > div
-  > div[style*="border: 1px solid #e0e0e0"] {
+body.dark-mode .ap-layout>div>div>div[style*="border: 1px solid #e0e0e0"] {
   border: 1px solid var(--border-subtle-dark) !important;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Month headers - keep the blue but darken slightly */
-body.dark-mode
-  .ap-layout
-  > div
-  > div
-  > div
-  > div[style*="backgroundColor: #004481"] {
+body.dark-mode .ap-layout>div>div>div>div[style*="backgroundColor: #004481"] {
   background-color: #003366 !important;
 }
 
@@ -2525,13 +2552,13 @@ body.dark-mode .ap-layout td div[style*="color: #888"] {
 }
 
 /* No data message */
-body.dark-mode .ap-layout > div > div[style*="background: #f9f9f9"] {
+body.dark-mode .ap-layout>div>div[style*="background: #f9f9f9"] {
   background: #2a2a2a !important;
   color: #999 !important;
 }
 
 /* Loading message */
-body.dark-mode .ap-layout > div > div[style*="color: #666"] {
+body.dark-mode .ap-layout>div>div[style*="color: #666"] {
   color: #999 !important;
 }
 
@@ -2555,7 +2582,7 @@ body.dark-mode .modal-content h3 {
 }
 
 /* Modal grid backgrounds */
-body.dark-mode .modal-content > div > div[style*="backgroundColor: #f8f9fa"] {
+body.dark-mode .modal-content>div>div[style*="backgroundColor: #f8f9fa"] {
   background-color: #2a2a2a !important;
   border-color: #444 !important;
 }
@@ -2566,15 +2593,15 @@ body.dark-mode .modal-content small[style*="color: #666"] {
 }
 
 /* Modal date boxes */
-body.dark-mode .modal-content > div > div > div[style*="background: #e3f2fd"] {
+body.dark-mode .modal-content>div>div>div[style*="background: #e3f2fd"] {
   background: #1e3a5f !important;
 }
 
-body.dark-mode .modal-content > div > div > div[style*="background: #d4edda"] {
+body.dark-mode .modal-content>div>div>div[style*="background: #d4edda"] {
   background: #1e4d2b !important;
 }
 
-body.dark-mode .modal-content > div > div > div[style*="background: #fff3cd"] {
+body.dark-mode .modal-content>div>div>div[style*="background: #fff3cd"] {
   background: #1e293b !important;
 }
 

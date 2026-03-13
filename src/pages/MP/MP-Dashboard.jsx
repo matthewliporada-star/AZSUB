@@ -813,20 +813,20 @@ const MPDashboard = () => {
               (e.currentTarget.style.transform = "translateY(0)")
             }
           >
-            <div className="stat-header">
-              <div className="stat-label">Activity Ratio</div>
-              <div
-                className={`stat-trend ${formatStatTrend("activityRatio").className}`}
-              >
-                {formatStatTrend("activityRatio").arrow}{" "}
-                {formatStatTrend("activityRatio").percentage}
+            <div className="stat-info">
+              <div className="stat-header">
+                <div className="stat-label">Activity Ratio</div>
+                <div
+                  className={`stat-trend ${formatStatTrend("activityRatio").className}`}
+                >
+                  {formatStatTrend("activityRatio").arrow}{" "}
+                  {formatStatTrend("activityRatio").percentage}
+                </div>
               </div>
-            </div>
-            <div className="stat-value">
-              {monthSpecificStats.activityRatio}%
-            </div>
-            <div className="stat-subtext">
-              {stats.activeAPs} of {mpStats.totalAPs} APs active
+              <div className="stat-value">
+                {monthSpecificStats.activityRatio}%
+              </div>
+              <div className="stat-subtext">Active APs vs Total APs</div>
             </div>
             <Sparkline
               data={[10, 15, 12, 18, 14, monthSpecificStats.activityRatio]}
@@ -845,19 +845,21 @@ const MPDashboard = () => {
               (e.currentTarget.style.transform = "translateY(0)")
             }
           >
-            <div className="stat-header">
-              <div className="stat-label">Total ANP</div>
-              <div
-                className={`stat-trend ${formatStatTrend("totalANP").className}`}
-              >
-                {formatStatTrend("totalANP").arrow}{" "}
-                {formatStatTrend("totalANP").percentage}
+            <div className="stat-info">
+              <div className="stat-header">
+                <div className="stat-label">Total ANP</div>
+                <div
+                  className={`stat-trend ${formatStatTrend("totalANP").className}`}
+                >
+                  {formatStatTrend("totalANP").arrow}{" "}
+                  {formatStatTrend("totalANP").percentage}
+                </div>
               </div>
+              <div className="stat-value">
+                ₱ {(mpStats.totalANP || 0).toLocaleString()}
+              </div>
+              <div className="stat-subtext">All-time annual premium</div>
             </div>
-            <div className="stat-value">
-              ₱ {(mpStats.totalANP / 1000000).toFixed(1)}M
-            </div>
-            <div className="stat-subtext">All-time Annual Premium</div>
             <Sparkline
               data={
                 mpStats.monthlyTrend?.map((m) => m.anp) || [5, 8, 12, 10, 15]
@@ -1747,8 +1749,8 @@ const MPDashboard = () => {
                       className="text-dark"
                     >
                       {policyDetailsData &&
-                      policyDetailsData.policyDistribution &&
-                      policyDetailsData.policyDistribution.length > 0
+                        policyDetailsData.policyDistribution &&
+                        policyDetailsData.policyDistribution.length > 0
                         ? policyDetailsData.policyDistribution[0].policy_name
                         : "N/A"}
                     </div>
@@ -1774,8 +1776,8 @@ const MPDashboard = () => {
                 </thead>
                 <tbody>
                   {policyDetailsData &&
-                  policyDetailsData.policyDistribution &&
-                  policyDetailsData.policyDistribution.length > 0 ? (
+                    policyDetailsData.policyDistribution &&
+                    policyDetailsData.policyDistribution.length > 0 ? (
                     policyDetailsData.policyDistribution.map(
                       (policy, index) => {
                         const estimatedANP = Math.floor(policy.count * 50000);

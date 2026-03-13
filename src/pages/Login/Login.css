@@ -159,6 +159,25 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
+@keyframes cfsFloat {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-15px) scale(1.02);
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-cfs {
+  animation: cfsFloat 4s ease-in-out infinite;
+  display: block;
+}
+
 /* RESPONSIVE */
 @media(max-width: 900px) {
   .login-container {

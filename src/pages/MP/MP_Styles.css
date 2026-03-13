@@ -17,11 +17,7 @@
 }
 
 .mp-layout {
-  font-family:
-    "Segoe UI",
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
+  font-family: var(--font-family-base);
   background: var(--mp-light-bg);
   min-height: 100vh;
   color: #2c3e50;
@@ -182,7 +178,7 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
   padding: 14px 15px;
   margin-bottom: 10px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
   color: white;
   border-radius: 10px;
@@ -192,6 +188,7 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
   transition: all 0.25s ease;
   text-decoration: none;
   background: transparent;
+  font-family: var(--font-family-base);
 }
 
 .mp-layout .sidebar-item:hover {
@@ -362,11 +359,9 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 50, 102, 0.2),
-    rgba(0, 50, 102, 0.1)
-  );
+  background: linear-gradient(135deg,
+      rgba(0, 50, 102, 0.2),
+      rgba(0, 50, 102, 0.1));
   border: 2px solid rgba(0, 50, 102, 0.3);
   border-radius: 50%;
   transition: all 0.3s ease;
@@ -375,11 +370,9 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
 }
 
 .mp-layout .mp-user-profile-btn:hover .mp-user-avatar {
-  background: linear-gradient(
-    135deg,
-    rgba(0, 50, 102, 0.3),
-    rgba(0, 50, 102, 0.15)
-  );
+  background: linear-gradient(135deg,
+      rgba(0, 50, 102, 0.3),
+      rgba(0, 50, 102, 0.15));
   border-color: rgba(0, 50, 102, 0.5);
   transform: scale(1.1);
 }
@@ -436,15 +429,15 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
 /* --- MAIN CONTENT --- */
 .mp-layout .main-content {
   margin-left: 260px;
-  padding: 90px 40px 30px 40px;
   flex: 1;
   min-height: 100vh;
   overflow-y: auto;
-  transition:
-    margin-left 0.3s ease,
-    padding 0.3s ease;
+  transition: margin-left 0.3s ease, padding 0.3s ease;
   display: block;
   width: calc(100% - 260px);
+  padding-top: 82px !important;
+  padding-left: 25px !important;
+  padding-right: 25px !important;
 }
 
 .mp-layout .main-content.expanded {
@@ -471,12 +464,12 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
 .mp-layout .mp-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 12px;
   align-items: flex-end;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   background: white;
-  padding: 15px 20px;
-  border-radius: 12px;
+  padding: 12px 18px;
+  border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -600,20 +593,20 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
 
 .stat-card {
   background: #fff;
-  /* Unified card background */
   border-radius: 12px;
-  padding: 20px 130px 20px 20px;
+  padding: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border-left: 4px solid transparent;
-  /* Default, overridden by specific classes */
   transition: all 0.3s ease;
   min-width: 0;
   position: relative;
   overflow: hidden;
   color: #1e293b;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
 }
 
 .stat-card:hover {
@@ -656,11 +649,10 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
 }
 
 .stat-value {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 600;
   color: #1e293b;
-  /* White text for dark background (gradient) */
-  margin-bottom: 8px;
+  margin-bottom: 2px;
 }
 
 .stat-subtext {
@@ -671,16 +663,13 @@ body.dark-mode .mp-layout .mp-sidebar.collapsed .mp-sidebar-toggle {
 
 /* Sparkline Container */
 .sparkline-container {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 100px;
-  height: 40px;
-  opacity: 0.8;
+  width: 90px;
+  height: 35px;
+  opacity: 0.9;
   pointer-events: none;
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 /* Dark Mode Overrides for Cards (Dark Blue Theme) */
@@ -2081,37 +2070,29 @@ body.dark-mode .category-badge.system {
 
 /* Top Performers Highlight */
 .top-performer-row {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 215, 0, 0.05) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 215, 0, 0.05) 0%,
+      rgba(255, 255, 255, 0) 100%);
   border-left: 4px solid #ffd700;
 }
 
 .top-performer-row:hover {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 215, 0, 0.1) 0%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 215, 0, 0.1) 0%,
+      rgba(255, 255, 255, 0.1) 100%);
 }
 
 .second-performer-row {
-  background: linear-gradient(
-    90deg,
-    rgba(192, 192, 192, 0.05) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(192, 192, 192, 0.05) 0%,
+      rgba(255, 255, 255, 0) 100%);
   border-left: 4px solid #c0c0c0;
 }
 
 .third-performer-row {
-  background: linear-gradient(
-    90deg,
-    rgba(205, 127, 50, 0.05) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(205, 127, 50, 0.05) 0%,
+      rgba(255, 255, 255, 0) 100%);
   border-left: 4px solid #cd7f32;
 }
 
@@ -2383,6 +2364,7 @@ body.dark-mode .category-badge.system {
 
 /* Print Styles */
 @media print {
+
   .mp-modal,
   .mp-view-tabs,
   .filter-buttons,
@@ -2952,6 +2934,7 @@ body.dark-mode .mp-modal-body table td {
 
 /* Responsive adjustments for smaller buttons */
 @media (max-width: 768px) {
+
   .view-button,
   .details-button {
     padding: 3px 6px !important;

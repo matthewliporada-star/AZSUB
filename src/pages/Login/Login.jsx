@@ -266,7 +266,7 @@ function Login() {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="login-wrapper">
       <button
@@ -294,7 +294,7 @@ function Login() {
       </button>
       <div className="login-container">
         <div className="login-left-panel">
-          <img src={LeftImage} alt="Insurance Image" />
+          <img src={LeftImage} alt="Insurance Image" className="animate-cfs" />
           <h2>Explore Our Insurance Solutions</h2>
           <p>
             At Caelum, we offer insurance plans in the Philippines to address Filipinos' most common financial needs. Whatever your financial need, we are with you in your journey to a more secure tomorrow.

@@ -380,7 +380,7 @@ const SubmissionPage = () => {
 
                 <div className="submission-section form-grid">
                     <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                        <label style={{ color: darkMode ? '#94a3b8' : '#475467' }}>Serial Number <span className="required">*</span></label>
+                        <label style={{ color: darkMode ? '#94a3b8' : '#475467', fontWeight: '600' }}>Serial Number <span className="required">*</span></label>
                         <div style={{ display: 'flex', gap: '10px' }}>
                             <input
                                 type="text"
@@ -393,19 +393,19 @@ const SubmissionPage = () => {
                                 required
                                 style={{ flexGrow: 1 }}
                             />
-                            <button className="btn-primary" onClick={handleSerialBlur} disabled={loading} style={{ height: '42px', padding: '0 24px' }}>
+                            <button className="btn-primary" onClick={handleSerialBlur} disabled={loading} style={{ height: '42px', padding: '0 24px', background: 'linear-gradient(135deg, #003781 0%, #0055b8 100%)' }}>
                                 {loading ? '...' : 'LOAD'}
                             </button>
                         </div>
                     </div>
 
                     <div className="form-group">
-                        <label style={{ color: darkMode ? '#94a3b8' : '#475467' }}>Policy Type</label>
+                        <label style={{ color: darkMode ? '#94a3b8' : '#475467', fontWeight: '600' }}>Policy Type</label>
                         <input className="monitoring-input readonly" value={formData.policyType} readOnly />
                     </div>
 
                     <div className="form-group">
-                        <label style={{ color: darkMode ? '#94a3b8' : '#475467' }}>Form Category</label>
+                        <label style={{ color: darkMode ? '#94a3b8' : '#475467', fontWeight: '600' }}>Form Category</label>
                         <input
                             className="monitoring-input readonly"
                             value={formData.formType ? `${formData.formType} Requirements` : ''}
@@ -416,7 +416,7 @@ const SubmissionPage = () => {
                     </div>
 
                     <div className="form-group">
-                        <label style={{ color: darkMode ? '#94a3b8' : '#475467' }}>Client Name</label>
+                        <label style={{ color: darkMode ? '#94a3b8' : '#475467', fontWeight: '600' }}>Client Name</label>
                         <input className="monitoring-input readonly" value={`${formData.clientFirstName} ${formData.clientLastName}`} readOnly />
                     </div>
 
@@ -686,25 +686,35 @@ const SubmissionPage = () => {
                     </div>
                 )}
 
-                <div className="btn-group" style={{ marginTop: '30px', display: 'flex', gap: '15px', justifyContent: 'flex-end' }}>
+                <div className="btn-group" style={{
+                    marginTop: '40px',
+                    display: 'flex',
+                    gap: '20px',
+                    justifyContent: 'flex-end',
+                    padding: '24px',
+                    backgroundColor: darkMode ? 'rgba(255,255,255,0.02)' : '#f8f9fa',
+                    borderRadius: '16px',
+                    border: `1px solid ${darkMode ? 'rgba(255,255,255,0.05)' : '#eee'}`
+                }}>
                     <button
                         type="button"
                         onClick={handlePreview}
                         disabled={loading || !formData.formType}
                         style={{
-                            padding: '12px 28px',
-                            background: darkMode ? '#312e81' : '#1e3a8a',
+                            padding: '14px 32px',
+                            background: darkMode ? '#1e1b4b' : '#1e3a8a',
                             color: 'white',
                             border: 'none',
-                            borderRadius: '10px',
+                            borderRadius: '12px',
                             fontWeight: '700',
                             cursor: 'pointer',
-                            fontSize: '14px',
-                            transition: 'all 0.3s ease',
-                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                            fontSize: '15px',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                            letterSpacing: '0.5px'
                         }}
-                        onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.2)'; }}
-                        onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'; }}
+                        onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px) scale(1.02)'; e.target.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.2)'; e.target.style.filter = 'brightness(1.1)'; }}
+                        onMouseLeave={(e) => { e.target.style.transform = 'translateY(0) scale(1)'; e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'; e.target.style.filter = 'none'; }}
                     >
                         PREVIEW SUMMARY
                     </button>
@@ -713,19 +723,20 @@ const SubmissionPage = () => {
                         onClick={handleSubmit}
                         disabled={loading || !formData.formType}
                         style={{
-                            padding: '12px 28px',
+                            padding: '14px 32px',
                             background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
                             color: 'white',
                             border: 'none',
-                            borderRadius: '10px',
+                            borderRadius: '12px',
                             fontWeight: '700',
                             cursor: 'pointer',
-                            fontSize: '14px',
-                            transition: 'all 0.3s ease',
-                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                            fontSize: '15px',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.3), 0 2px 4px -1px rgba(16, 185, 129, 0.2)',
+                            letterSpacing: '0.5px'
                         }}
-                        onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.2)'; }}
-                        onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'; }}
+                        onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px) scale(1.02)'; e.target.style.boxShadow = '0 10px 15px -3px rgba(16, 185, 129, 0.4)'; e.target.style.filter = 'brightness(1.1)'; }}
+                        onMouseLeave={(e) => { e.target.style.transform = 'translateY(0) scale(1)'; e.target.style.boxShadow = '0 4px 6px -1px rgba(16, 185, 129, 0.3)'; e.target.style.filter = 'none'; }}
                     >
                         {loading ? 'Submitting...' : 'SUBMIT APPLICATION'}
                     </button>

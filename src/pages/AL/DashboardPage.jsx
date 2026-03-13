@@ -37,11 +37,11 @@ const SparklineTrend = ({ data, color, percentage }) => {
     };
 
     return (
-        <div style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', width: '90px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', pointerEvents: 'none', zIndex: 10 }}>
-            <div style={{ fontSize: '13px', fontWeight: '800', color: percentage >= 0 ? '#22c55e' : '#ef4444', marginBottom: '2px', letterSpacing: '0.2px' }}>
+        <div style={{ width: '100px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', pointerEvents: 'none', zIndex: 10, flexShrink: 0 }}>
+            <div style={{ fontSize: '12px', fontWeight: '700', color: percentage >= 0 ? '#22c55e' : '#ef4444', marginBottom: '2px', letterSpacing: '0.2px' }}>
                 {percentage >= 0 ? '↑' : '↓'} {Math.abs(percentage)}%
             </div>
-            <div style={{ width: '100%', height: '40px', position: 'relative' }}>
+            <div style={{ width: '100%', height: '35px', position: 'relative' }}>
                 <Line data={chartData} options={options} />
             </div>
         </div>
@@ -389,24 +389,24 @@ const DashboardPage = () => {
 
             <div className="dashboard-grid">
                 {/* TOP ROW */}
-                <div className="stat-card animate-spring delay-1" style={{ position: 'relative' }}>
-                    <SparklineTrend data={[12, 19, 15, 25, 22, 30, 28]} color="#3b82f6" percentage={12.4} />
-                    <div className="stat-header">
+                <div className="stat-card animate-spring delay-1">
+                    <div className="stat-info">
                         <div className="stat-label">Total ANP</div>
+                        <div className="stat-value">PHP {stats.totalANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                        <div className="stat-subtext" style={{ color: '#22c55e', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <span>▲</span> All-time annual premium
+                        </div>
                     </div>
-                    <div className="stat-value">PHP {stats.totalANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                    <div className="stat-subtext" style={{ color: '#22c55e', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <span>▲</span> All-time annual premium
-                    </div>
+                    <SparklineTrend data={[12, 19, 15, 25, 22, 30, 28]} color="#3b82f6" percentage={12.4} />
                 </div>
 
-                <div className="stat-card animate-spring delay-2" style={{ position: 'relative' }}>
-                    <SparklineTrend data={[5, 12, 8, 18, 15, 22, 25]} color="#22c55e" percentage={8.1} />
-                    <div className="stat-header">
+                <div className="stat-card animate-spring delay-2">
+                    <div className="stat-info">
                         <div className="stat-label">Monthly ANP</div>
+                        <div className="stat-value">PHP {stats.monthlyANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                        <div className="stat-subtext">This Month</div>
                     </div>
-                    <div className="stat-value">PHP {stats.monthlyANP.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                    <div className="stat-subtext">This Month</div>
+                    <SparklineTrend data={[5, 12, 8, 18, 15, 22, 25]} color="#22c55e" percentage={8.1} />
                 </div>
 
                 <div className="stat-card animate-spring delay-3">
@@ -436,40 +436,40 @@ const DashboardPage = () => {
                 </div>
 
                 {/* BOTTOM ROW */}
-                <div className="stat-card animate-spring delay-5" style={{ position: 'relative' }}>
-                    <SparklineTrend data={[10, 15, 13, 22, 20, 28, 25]} color="#f59e0b" percentage={4.3} />
-                    <div className="stat-header">
+                <div className="stat-card animate-spring delay-5">
+                    <div className="stat-info">
                         <div className="stat-label">Submitted</div>
+                        <div className="stat-value">{stats.submitted}</div>
+                        <div className="stat-subtext">Applications</div>
                     </div>
-                    <div className="stat-value">{stats.submitted}</div>
-                    <div className="stat-subtext">Applications</div>
+                    <SparklineTrend data={[10, 15, 13, 22, 20, 28, 25]} color="#f59e0b" percentage={4.3} />
                 </div>
 
-                <div className="stat-card animate-spring delay-1" style={{ position: 'relative' }}>
-                    <SparklineTrend data={[2, 8, 5, 15, 12, 20, 18]} color="#22c55e" percentage={15.2} />
-                    <div className="stat-header">
+                <div className="stat-card animate-spring delay-1">
+                    <div className="stat-info">
                         <div className="stat-label">Issued</div>
+                        <div className="stat-value">{stats.issued}</div>
+                        <div className="stat-subtext" style={{ color: '#22c55e' }}>{stats.submitted ? ((stats.issued / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
                     </div>
-                    <div className="stat-value">{stats.issued}</div>
-                    <div className="stat-subtext" style={{ color: '#22c55e' }}>{stats.submitted ? ((stats.issued / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
+                    <SparklineTrend data={[2, 8, 5, 15, 12, 20, 18]} color="#22c55e" percentage={15.2} />
                 </div>
 
-                <div className="stat-card animate-spring delay-2" style={{ position: 'relative' }}>
-                    <SparklineTrend data={[5, 4, 6, 3, 5, 4, 3]} color="#06b6d4" percentage={-2.4} />
-                    <div className="stat-header">
+                <div className="stat-card animate-spring delay-2">
+                    <div className="stat-info">
                         <div className="stat-label">Pending</div>
+                        <div className="stat-value">{stats.pending}</div>
+                        <div className="stat-subtext">Awaiting Action</div>
                     </div>
-                    <div className="stat-value">{stats.pending}</div>
-                    <div className="stat-subtext">Awaiting Action</div>
+                    <SparklineTrend data={[5, 4, 6, 3, 5, 4, 3]} color="#06b6d4" percentage={-2.4} />
                 </div>
 
-                <div className="stat-card animate-spring delay-3" style={{ position: 'relative' }}>
-                    <SparklineTrend data={[0, 1, 0, 2, 1, 0, 0]} color="#ef4444" percentage={1.1} />
-                    <div className="stat-header">
+                <div className="stat-card animate-spring delay-3">
+                    <div className="stat-info">
                         <div className="stat-label">Declined</div>
+                        <div className="stat-value">{stats.declined}</div>
+                        <div className="stat-subtext" style={{ color: '#ef4444' }}>{stats.submitted ? ((stats.declined / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
                     </div>
-                    <div className="stat-value">{stats.declined}</div>
-                    <div className="stat-subtext" style={{ color: '#ef4444' }}>{stats.submitted ? ((stats.declined / stats.submitted) * 100).toFixed(1) : 0}% Rate</div>
+                    <SparklineTrend data={[0, 1, 0, 2, 1, 0, 0]} color="#ef4444" percentage={1.1} />
                 </div>
             </div>
 

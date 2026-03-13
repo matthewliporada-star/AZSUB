@@ -49,7 +49,7 @@ const MDDashboard = () => {
     const { darkMode } = useApp();
     const { mpPerformance, alPerformance, apPerformance, mdStats, refreshData, fetchMonthlyHistory, fetchPolicyDetails, loading, error } = useMDData();
     const navigate = useNavigate();
-    
+
     const [viewMode, setViewMode] = useState('overview');
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -175,7 +175,7 @@ const MDDashboard = () => {
         const activeMPs = safeMPPerformance.filter(mp => mp.status === 'ACTIVE' || mp.status === 'PERFORMING').length;
         const totalMPANP = safeMPPerformance.reduce((sum, mp) => sum + (mp.totalANP || 0), 0);
         const totalMPPolicies = safeMPPerformance.reduce((sum, mp) => sum + (mp.totalCases || 0), 0);
-        
+
         const totalActivityRatioSum = safeMPPerformance.reduce((sum, mp) => sum + (mp.activityRatio || 0), 0);
         const avgActivityRatio = totalMPs > 0 ? totalActivityRatioSum / totalMPs : 0;
 
@@ -571,14 +571,16 @@ const MDDashboard = () => {
                         onClick={() => handleStatCardClick('totalMPs')}
                         style={{ cursor: 'pointer' }}
                     >
-                        <div className="stat-header">
-                            <div className="stat-label">Total Management Partners</div>
-                            <div className={`stat-trend ${formatStatTrend('totalMPs').className}`}>
-                                {formatStatTrend('totalMPs').arrow} {formatStatTrend('totalMPs').percentage}
+                        <div className="stat-info">
+                            <div className="stat-header">
+                                <div className="stat-label">Total Management Partners</div>
+                                <div className={`stat-trend ${formatStatTrend('totalMPs').className}`}>
+                                    {formatStatTrend('totalMPs').arrow} {formatStatTrend('totalMPs').percentage}
+                                </div>
                             </div>
+                            <div className="stat-value">{stats.totalMPs}</div>
+                            <div className="stat-subtext">{stats.activeMPs} Active ({stats.totalMPs > 0 ? ((stats.activeMPs / stats.totalMPs) * 100).toFixed(0) : 0}%)</div>
                         </div>
-                        <div className="stat-value">{stats.totalMPs}</div>
-                        <div className="stat-subtext">{stats.activeMPs} Active ({stats.totalMPs > 0 ? ((stats.activeMPs / stats.totalMPs) * 100).toFixed(0) : 0}%)</div>
                         <Sparkline data={[6, 7, 7, 8, 8, stats.totalMPs]} color="#3b82f6" />
                     </div>
 
@@ -587,14 +589,16 @@ const MDDashboard = () => {
                         onClick={() => handleStatCardClick('totalMPANP')}
                         style={{ cursor: 'pointer' }}
                     >
-                        <div className="stat-header">
-                            <div className="stat-label">Total MP ANP</div>
-                            <div className={`stat-trend ${formatStatTrend('totalMPANP').className}`}>
-                                {formatStatTrend('totalMPANP').arrow} {formatStatTrend('totalMPANP').percentage}
+                        <div className="stat-info">
+                            <div className="stat-header">
+                                <div className="stat-label">Total MP ANP</div>
+                                <div className={`stat-trend ${formatStatTrend('totalMPANP').className}`}>
+                                    {formatStatTrend('totalMPANP').arrow} {formatStatTrend('totalMPANP').percentage}
+                                </div>
                             </div>
+                            <div className="stat-value">₱ {(stats.totalMPANP / 1000000).toFixed(1)}M</div>
+                            <div className="stat-subtext">All-time Annual Premium</div>
                         </div>
-                        <div className="stat-value">₱ {(stats.totalMPANP / 1000000).toFixed(1)}M</div>
-                        <div className="stat-subtext">All-time Annual Premium</div>
                         <Sparkline data={[8.5, 9.2, 10.1, 11.8, 12.5, stats.totalMPANP / 1000000]} color="#27ae60" />
                     </div>
 
@@ -603,14 +607,16 @@ const MDDashboard = () => {
                         onClick={() => handleStatCardClick('totalMPPolicies')}
                         style={{ cursor: 'pointer' }}
                     >
-                        <div className="stat-header">
-                            <div className="stat-label">Total MP Policies</div>
-                            <div className={`stat-trend ${formatStatTrend('totalMPPolicies').className}`}>
-                                {formatStatTrend('totalMPPolicies').arrow} {formatStatTrend('totalMPPolicies').percentage}
+                        <div className="stat-info">
+                            <div className="stat-header">
+                                <div className="stat-label">Total MP Policies</div>
+                                <div className={`stat-trend ${formatStatTrend('totalMPPolicies').className}`}>
+                                    {formatStatTrend('totalMPPolicies').arrow} {formatStatTrend('totalMPPolicies').percentage}
+                                </div>
                             </div>
+                            <div className="stat-value">{stats.totalMPPolicies.toLocaleString()}</div>
+                            <div className="stat-subtext">All-time policies issued</div>
                         </div>
-                        <div className="stat-value">{stats.totalMPPolicies.toLocaleString()}</div>
-                        <div className="stat-subtext">All-time policies issued</div>
                         <Sparkline data={[420, 480, 520, 590, 630, stats.totalMPPolicies / 100]} color="#60a5fa" />
                     </div>
 
@@ -619,14 +625,16 @@ const MDDashboard = () => {
                         onClick={() => handleStatCardClick('avgActivityRatio')}
                         style={{ cursor: 'pointer' }}
                     >
-                        <div className="stat-header">
-                            <div className="stat-label">Avg Activity Ratio</div>
-                            <div className={`stat-trend ${formatStatTrend('avgActivityRatio').className}`}>
-                                {formatStatTrend('avgActivityRatio').arrow} {formatStatTrend('avgActivityRatio').percentage}
+                        <div className="stat-info">
+                            <div className="stat-header">
+                                <div className="stat-label">Avg Activity Ratio</div>
+                                <div className={`stat-trend ${formatStatTrend('avgActivityRatio').className}`}>
+                                    {formatStatTrend('avgActivityRatio').arrow} {formatStatTrend('avgActivityRatio').percentage}
+                                </div>
                             </div>
+                            <div className="stat-value">{monthSpecificStats.activityRatio}%</div>
+                            <div className="stat-subtext">Average across all MPs</div>
                         </div>
-                        <div className="stat-value">{monthSpecificStats.activityRatio}%</div>
-                        <div className="stat-subtext">Average across all MPs</div>
                         <Sparkline data={[68, 71, 70, 73, 72, monthSpecificStats.activityRatio]} color="#f59e0b" />
                     </div>
                 </div>
@@ -638,14 +646,16 @@ const MDDashboard = () => {
                         onClick={() => handleStatCardClick('totalALs')}
                         style={{ cursor: 'pointer' }}
                     >
-                        <div className="stat-header">
-                            <div className="stat-label">Total Agency Leaders</div>
-                            <div className="stat-trend stable">
-                                {stats.totalALs > 0 ? ((stats.performingALs / stats.totalALs) * 100).toFixed(0) + '%' : '0%'}
+                        <div className="stat-info">
+                            <div className="stat-header">
+                                <div className="stat-label">Total Agency Leaders</div>
+                                <div className="stat-trend stable">
+                                    {stats.totalALs > 0 ? ((stats.performingALs / stats.totalALs) * 100).toFixed(0) + '%' : '0%'}
+                                </div>
                             </div>
+                            <div className="stat-value">{stats.totalALs}</div>
+                            <div className="stat-subtext">{stats.performingALs} Performing</div>
                         </div>
-                        <div className="stat-value">{stats.totalALs}</div>
-                        <div className="stat-subtext">{stats.performingALs} Performing</div>
                         <Sparkline data={[28, 32, 35, 38, 40, stats.totalALs]} color="#8b5cf6" />
                     </div>
 
@@ -654,14 +664,16 @@ const MDDashboard = () => {
                         onClick={() => handleStatCardClick('totalMPAPs')}
                         style={{ cursor: 'pointer' }}
                     >
-                        <div className="stat-header">
-                            <div className="stat-label">Total Agency Partners</div>
-                            <div className="stat-trend stable">
-                                {stats.totalAPs > 0 ? ((stats.activeAPs / stats.totalAPs) * 100).toFixed(0) + '%' : '0%'}
+                        <div className="stat-info">
+                            <div className="stat-header">
+                                <div className="stat-label">Total Agency Partners</div>
+                                <div className="stat-trend stable">
+                                    {stats.totalAPs > 0 ? ((stats.activeAPs / stats.totalAPs) * 100).toFixed(0) + '%' : '0%'}
+                                </div>
                             </div>
+                            <div className="stat-value">{stats.totalAPs}</div>
+                            <div className="stat-subtext">{stats.activeAPs} Active</div>
                         </div>
-                        <div className="stat-value">{stats.totalAPs}</div>
-                        <div className="stat-subtext">{stats.activeAPs} Active</div>
                         <Sparkline data={[95, 102, 110, 118, 125, stats.totalAPs]} color="#ec4899" />
                     </div>
 
@@ -670,14 +682,16 @@ const MDDashboard = () => {
                         onClick={() => handleStatCardClick('monthlyANP')}
                         style={{ cursor: 'pointer' }}
                     >
-                        <div className="stat-header">
-                            <div className="stat-label">{months[appliedFilters.month]} ANP</div>
-                            <div className={`stat-trend ${formatStatTrend('totalMPANP').className}`}>
-                                {formatStatTrend('totalMPANP').arrow} {formatStatTrend('totalMPANP').percentage}
+                        <div className="stat-info">
+                            <div className="stat-header">
+                                <div className="stat-label">{months[appliedFilters.month]} ANP</div>
+                                <div className={`stat-trend ${formatStatTrend('totalMPANP').className}`}>
+                                    {formatStatTrend('totalMPANP').arrow} {formatStatTrend('totalMPANP').percentage}
+                                </div>
                             </div>
+                            <div className="stat-value">₱ {(monthSpecificStats.monthlyANP / 1000).toFixed(1)}K</div>
+                            <div className="stat-subtext">{selectedMonthYear} Performance</div>
                         </div>
-                        <div className="stat-value">₱ {(monthSpecificStats.monthlyANP / 1000).toFixed(1)}K</div>
-                        <div className="stat-subtext">{selectedMonthYear} Performance</div>
                         <Sparkline data={[180, 210, 195, 230, 245, monthSpecificStats.monthlyANP / 1000]} color="#14b8a6" />
                     </div>
 
@@ -686,14 +700,16 @@ const MDDashboard = () => {
                         onClick={() => handleStatCardClick('totalCases')}
                         style={{ cursor: 'pointer' }}
                     >
-                        <div className="stat-header">
-                            <div className="stat-label">Monthly Cases</div>
-                            <div className={`stat-trend ${formatStatTrend('totalMPPolicies').className}`}>
-                                {formatStatTrend('totalMPPolicies').arrow} {formatStatTrend('totalMPPolicies').percentage}
+                        <div className="stat-info">
+                            <div className="stat-header">
+                                <div className="stat-label">Monthly Cases</div>
+                                <div className={`stat-trend ${formatStatTrend('totalMPPolicies').className}`}>
+                                    {formatStatTrend('totalMPPolicies').arrow} {formatStatTrend('totalMPPolicies').percentage}
+                                </div>
                             </div>
+                            <div className="stat-value">{(monthSpecificStats.totalPolicies + (monthSpecificStats.monthlyDeclined || 0)).toLocaleString()}</div>
+                            <div className="stat-subtext">{monthSpecificStats.totalPolicies} Issued · {monthSpecificStats.monthlyDeclined || 0} Declined</div>
                         </div>
-                        <div className="stat-value">{(monthSpecificStats.totalPolicies + (monthSpecificStats.monthlyDeclined || 0)).toLocaleString()}</div>
-                        <div className="stat-subtext">{monthSpecificStats.totalPolicies} Issued · {monthSpecificStats.monthlyDeclined || 0} Declined</div>
                         <Sparkline data={[32, 38, 35, 42, 40, monthSpecificStats.totalPolicies]} color="#64748b" />
                     </div>
                 </div>
