@@ -353,7 +353,7 @@ select {
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px; /* Increased gap for better breathing room */
 }
 
 .personal-info-section .section-title {
@@ -364,11 +364,20 @@ select {
   text-align: center;
   border-bottom: 2px solid #40739e;
   padding-bottom: 8px;
-  position: relative;
+}
+
+/* Subtitles for Address Groups */
+.section-subtitle-label {
+  font-size: 0.95rem !important;
+  color: #2f3640;
+  margin-bottom: 10px;
+  display: block;
+  border-left: 3px solid #40739e;
+  padding-left: 10px;
 }
 
 /* ===============================
-   FORM GRID
+   FORM GRID & LAYOUT
 =============================== */
 .form-grid-2 {
   display: grid;
@@ -376,10 +385,16 @@ select {
   gap: 20px;
 }
 
+/* The address subgrid handles City, Country, Postal, and Dates */
 .form-grid-3 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+/* Utility to make the main Address input span two columns */
+.grid-col-span-2 {
+  grid-column: span 2;
 }
 
 .input-group {
@@ -388,30 +403,31 @@ select {
   gap: 6px;
 }
 
+.address-group-box {
+  background: rgba(0, 0, 0, 0.02);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px dashed #dcdde1;
+}
+
 .input-group label {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-main);
 }
 
-.input-group .label-parenthesis {
-  font-weight: 400;
-  font-size: 0.8rem;
-  color: #718093;
-}
-
 /* ===============================
    INPUT FIELDS
 =============================== */
 .box-input {
+  width: 100%;
   padding: 10px 12px;
   font-size: 0.9rem;
   border: 1px solid #dcdde1;
   border-radius: 6px;
   outline: none;
-  transition:
-    border-color 0.2s ease-in-out,
-    box-shadow 0.2s ease-in-out;
+  background-color: #ffffff;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .box-input:focus {
@@ -419,62 +435,9 @@ select {
   box-shadow: 0 0 6px rgba(64, 115, 158, 0.3);
 }
 
-/* ===============================
-   MOBILE INPUT WRAPPER
-=============================== */
-.mobile-input-wrapper {
-  display: flex;
-  gap: 10px;
-  align-items: stretch; /* Ensures they stay the same height */
-}
-
-.mobile-country-code {
-  padding: 10px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-table-header);
-  color: var(--text-main);
-  cursor: pointer;
-  /* Reduced min-width so it doesn't take half the space */
-  min-width: 100px;
-  /* Limits how wide the dropdown can get with long country names */
-  max-width: 160px;
-  flex-shrink: 0; /* Prevents the dropdown from collapsing too much */
-}
-
-.mobile-number-input-cis {
-  flex: 2; /* Give the number input more "weight" than the dropdown */
-  padding: 10px 12px;
-  border: 1px solid #dcdde1;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  outline: none;
-  min-width: 0; /* Important fix for flexbox children */
-  transition:
-    border-color 0.2s ease-in-out,
-    box-shadow 0.2s ease-in-out;
-}
-
-.mobile-number-input-cis:focus {
-  border-color: #40739e;
-  box-shadow: 0 0 6px rgba(64, 115, 158, 0.3);
-}
-
-/* ===============================
-   SELECT FIELDS
-=============================== */
-select.box-input {
-  appearance: none;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-table-header);
-  color: var(--text-main);
-  cursor: pointer;
-}
-
-select.box-input:focus {
-  border-color: #40739e;
-  box-shadow: 0 0 6px rgba(64, 115, 158, 0.3);
-}
+.mb-2 { margin-bottom: 0.5rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
 
 /* ===============================
    RESPONSIVE
@@ -484,30 +447,19 @@ select.box-input:focus {
   .form-grid-3 {
     grid-template-columns: 1fr;
   }
-
-  .mobile-input-wrapper {
-    flex-direction: column;
+  
+  .grid-col-span-2 {
+    grid-column: span 1;
   }
 }
 
 @media (max-width: 480px) {
   .personal-info-section {
-    padding: 20px;
+    padding: 15px;
   }
-
   .section-title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
-
-  .box-input,
-  .mobile-number-input-cis,
-  .mobile-country-code {
-    font-size: 0.85rem;
-  }
-}
-
-.permanent-address-wrapper input {
-  margin-bottom: 10px; /* space between the two inputs */
 }
 
 /* ========================================
@@ -2452,4 +2404,47 @@ select.spouse-input:focus {
 
 .cis-action-btn:hover {
   background: #1d4ed8;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media print {
+  .no-print, button, header, footer, .cis-pdf-actions {
+    display: none !important;
+  }
+  
+  /* Make form elements look like plain text */
+  input, textarea, select {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+  }
+  
+  /* Show checkbox/radio selections as text */
+  input[type="checkbox"]:checked::before,
+  input[type="radio"]:checked::before {
+    content: "✓ Selected";
+    display: inline-block;
+    margin-right: 5px;
+  }
+  
+  /* Remove empty sections */
+  .section-container:empty {
+    display: none;
+  }
 }
