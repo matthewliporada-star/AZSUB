@@ -5,7 +5,7 @@ export const INITIAL_DEPENDENT = {
   middleName: "",
   suffix: "",
   otherLegalName: "",
-  dob: "", // Make sure this is properly initialized
+  dob: "",
   gender: "",
   placeOfBirth: "",
   civilStatus: "",
@@ -47,7 +47,7 @@ export const INITIAL_DEPENDENT = {
 
   healthDeclaration: {
     heightFeet: "",
-    heightMeters: "",
+    heightInches: "",
     weightKg: "",
     weightLbs: "",
     smokeVape: false,
@@ -66,8 +66,8 @@ export const INITIAL_HEALTH_QUESTIONS = {
 };
 
 export const INITIAL_POLICY_INFO = {
-  basePlan: "",
-  amountInsured: "",
+  basePlan: "Alianz Well",
+  amountInsured: "100,000,000",
   amountOfPaymentDeposit: "",
   deductible: "",
   coPayment: "",
@@ -157,33 +157,36 @@ export const INITIAL_FORM_DATA = {
     productName: "",
     date: "",
     mode: "",
+    intermediaryDate: "",
+    intermediaryMode: "",
   },
 };
 
 export const ILLNESS_OPTIONS = [
-  { key: "a", label: "Cancer or any other oncological diseases" },
-  { key: "b", label: "Heart or Blood vessel diseases" },
-  { key: "c", label: "Stroke or any other neurological diseases" },
-  { key: "d", label: "Rheumatoid Arthritis" },
+  { key: "a", label: "a. Cancer or any other oncological diseases" },
+  { key: "b", label: "b. Heart or Blood vessel diseases" },
+  { key: "c", label: "c. Stroke or any other neurological diseases" },
+  { key: "d", label: "d. Rheumatoid Arthritis" },
   {
     key: "e",
     label:
-      "Systemic Lupus Erythematous (lupus) or any other autoimmune diseases",
+      "e. Systemic Lupus Erythematous (lupus) or any other autoimmune diseases",
   },
-  { key: "f", label: "Psychiatric or psychological illness" },
-  { key: "g", label: "Liver diseases" },
-  { key: "h", label: "Kidney diseases" },
-  { key: "i", label: "Lung or respiratory diseases" },
-  { key: "j", label: "Diabetes Mellitus or any other endocrine diseases" },
-  { key: "k", label: "Gastrointestinal Tract disorders" },
-  { key: "l", label: "Reproductive, gynecological or genital disorders" },
-  { key: "m", label: "Anemia or any other blood diseases" },
-  { key: "n", label: "Urinary or Prostate conditions" },
+  { key: "f", label: "f. Psychiatric or psychological illness" },
+  { key: "g", label: "g. Liver diseases" },
+  { key: "h", label: "h. Kidney diseases" },
+  { key: "i", label: "i. Lung or respiratory diseases" },
+  { key: "j", label: "j. Diabetes Mellitus or any other endocrine diseases" },
+  { key: "k", label: "k. Gastrointestinal Tract disorders" },
+  { key: "l", label: "l.Reproductive, gynecological or genital disorders" },
+  { key: "m", label: "m. Anemia or any other blood diseases" },
+  { key: "n", label: "n. Urinary or Prostate conditions" },
   {
     key: "o",
-    label: "Glaucoma, cataract or any other eye, ear, nose and throat diseases",
+    label:
+      "o. Glaucoma, cataract or any other eye, ear, nose and throat diseases",
   },
-  { key: "p", label: "Muscular and skeletal disorders" },
+  { key: "p", label: "p. Muscular and skeletal disorders" },
 ];
 
 // Helper functions
@@ -280,7 +283,6 @@ function createProposedInsured() {
     },
     relationshipToOwner: "",
     currentInsurance: { provider: "", effectiveDate: "", policyNumber: "" },
-    // New signature fields for proposed insured
     signature: "",
     signatureDate: "",
   };
@@ -289,7 +291,7 @@ function createProposedInsured() {
 function createHealthDeclaration() {
   return {
     heightFeet: "",
-    heightMeters: "",
+    heightInches: "",
     weightKg: "",
     weightLbs: "",
     smokeVape: false,

@@ -240,8 +240,8 @@ function IHPForm({ sharedData, updateSharedData }) {
           </thead>
           <tbody>
             ${fieldNames
-        .map(
-          (field, index) => `
+              .map(
+                (field, index) => `
                 <tr style="${index % 2 === 0 ? "background: #fff;" : "background: #f8f9fa;"}">
                   <td style="padding: 6px 8px; border-bottom: 1px solid #dee2e6;">${index + 1}</td>
                   <td style="padding: 6px 8px; border-bottom: 1px solid #dee2e6;">
@@ -249,8 +249,8 @@ function IHPForm({ sharedData, updateSharedData }) {
                   </td>
                 </tr>
               `,
-        )
-        .join("")}
+              )
+              .join("")}
           </tbody>
         </table>
       </div>
@@ -581,12 +581,12 @@ function IHPForm({ sharedData, updateSharedData }) {
       }
 
       // Section E - Health Declaration Lifestyle
-      fillCheckbox(form, "yes2", formData.healthDeclaration.smokeVape);
-      fillCheckbox(form, "no2", !formData.healthDeclaration.smokeVape);
-      fillCheckbox(form, "yes5", formData.healthDeclaration.alcohol);
-      fillCheckbox(form, "no5", !formData.healthDeclaration.alcohol);
-      fillCheckbox(form, "yes8", formData.healthDeclaration.glassesContacts);
-      fillCheckbox(form, "no8", !formData.healthDeclaration.glassesContacts);
+      fillCheckbox(form, "yes2", formData.healthDeclaration?.smokeVape);
+      fillCheckbox(form, "no2", !formData.healthDeclaration?.smokeVape);
+      fillCheckbox(form, "yes5", formData.healthDeclaration?.alcohol);
+      fillCheckbox(form, "no5", !formData.healthDeclaration?.alcohol);
+      fillCheckbox(form, "yes8", formData.healthDeclaration?.glassesContacts);
+      fillCheckbox(form, "no8", !formData.healthDeclaration?.glassesContacts);
 
       // Health Questions - Applicant Owner
       fillCheckbox(form, "c1", healthQuestions.applicantOwner.q1.a);
@@ -615,19 +615,19 @@ function IHPForm({ sharedData, updateSharedData }) {
 
       // Health Questions - Dependent 1
       if (dependents[0]) {
-        fillCheckbox(form, "yes3", dependents[0].healthDeclaration.smokeVape);
-        fillCheckbox(form, "no3", !dependents[0].healthDeclaration.smokeVape);
-        fillCheckbox(form, "yes6", dependents[0].healthDeclaration.alcohol);
-        fillCheckbox(form, "no6", !dependents[0].healthDeclaration.alcohol);
+        fillCheckbox(form, "yes3", dependents[0].healthDeclaration?.smokeVape);
+        fillCheckbox(form, "no3", !dependents[0].healthDeclaration?.smokeVape);
+        fillCheckbox(form, "yes6", dependents[0].healthDeclaration?.alcohol);
+        fillCheckbox(form, "no6", !dependents[0].healthDeclaration?.alcohol);
         fillCheckbox(
           form,
           "yes9",
-          dependents[0].healthDeclaration.glassesContacts,
+          dependents[0].healthDeclaration?.glassesContacts,
         );
         fillCheckbox(
           form,
           "no9",
-          !dependents[0].healthDeclaration.glassesContacts,
+          !dependents[0].healthDeclaration?.glassesContacts,
         );
 
         fillCheckbox(form, "c2", healthQuestions.dependent1.q1.a);
@@ -657,19 +657,19 @@ function IHPForm({ sharedData, updateSharedData }) {
 
       // Health Questions - Dependent 2
       if (dependents[1]) {
-        fillCheckbox(form, "yes4", dependents[1].healthDeclaration.smokeVape);
-        fillCheckbox(form, "no4", !dependents[1].healthDeclaration.smokeVape);
-        fillCheckbox(form, "yes7", dependents[1].healthDeclaration.alcohol);
-        fillCheckbox(form, "no7", !dependents[1].healthDeclaration.alcohol);
+        fillCheckbox(form, "yes4", dependents[1].healthDeclaration?.smokeVape);
+        fillCheckbox(form, "no4", !dependents[1].healthDeclaration?.smokeVape);
+        fillCheckbox(form, "yes7", dependents[1].healthDeclaration?.alcohol);
+        fillCheckbox(form, "no7", !dependents[1].healthDeclaration?.alcohol);
         fillCheckbox(
           form,
           "yes10",
-          dependents[1].healthDeclaration.glassesContacts,
+          dependents[1].healthDeclaration?.glassesContacts,
         );
         fillCheckbox(
           form,
           "no10",
-          !dependents[1].healthDeclaration.glassesContacts,
+          !dependents[1].healthDeclaration?.glassesContacts,
         );
 
         fillCheckbox(form, "c3", healthQuestions.dependent2.q1.a);
@@ -929,6 +929,45 @@ function IHPForm({ sharedData, updateSharedData }) {
           "pn3",
           dependents[0].currentInsurance?.policyNumber,
         );
+
+        // ===== DEPENDENT 1 HEALTH MEASUREMENTS =====
+        fillTextField(
+          form,
+          "ft2",
+          dependents[0].healthDeclaration?.heightFeet || "",
+        );
+        fillTextField(
+          form,
+          "in2",
+          dependents[0].healthDeclaration?.heightInches || "",
+        );
+        fillTextField(
+          form,
+          "kg2",
+          dependents[0].healthDeclaration?.weightKg || "",
+        );
+        fillTextField(
+          form,
+          "lbs2",
+          dependents[0].healthDeclaration?.weightLbs || "",
+        );
+
+        // Dependent 1 lifestyle quantities
+        fillTextField(
+          form,
+          "stick2",
+          dependents[0].healthDeclaration?.smokeQuantity || "",
+        );
+        fillTextField(
+          form,
+          "bottle2",
+          dependents[0].healthDeclaration?.alcoholQuantity || "",
+        );
+        fillTextField(
+          form,
+          "grade2",
+          dependents[0].healthDeclaration?.eyeGrade || "",
+        );
       }
 
       // Dependent 2
@@ -983,85 +1022,176 @@ function IHPForm({ sharedData, updateSharedData }) {
           "pn4",
           dependents[1].currentInsurance?.policyNumber,
         );
+
+        // ===== DEPENDENT 2 HEALTH MEASUREMENTS =====
+        fillTextField(
+          form,
+          "ft3",
+          dependents[1].healthDeclaration?.heightFeet || "",
+        );
+        fillTextField(
+          form,
+          "in3",
+          dependents[1].healthDeclaration?.heightInches || "",
+        );
+        fillTextField(
+          form,
+          "kg3",
+          dependents[1].healthDeclaration?.weightKg || "",
+        );
+        fillTextField(
+          form,
+          "lbs3",
+          dependents[1].healthDeclaration?.weightLbs || "",
+        );
+
+        // Dependent 2 lifestyle quantities
+        fillTextField(
+          form,
+          "stick3",
+          dependents[1].healthDeclaration?.smokeQuantity || "",
+        );
+        fillTextField(
+          form,
+          "bottle3",
+          dependents[1].healthDeclaration?.alcoholQuantity || "",
+        );
+        fillTextField(
+          form,
+          "grade3",
+          dependents[1].healthDeclaration?.eyeGrade || "",
+        );
       }
 
-      // Health Declaration
-      fillTextField(form, "ft1", formData.healthDeclaration.heightFeet);
-      fillTextField(form, "m1", formData.healthDeclaration.heightMeters);
-      fillTextField(form, "kg1", formData.healthDeclaration.weightKg);
-      fillTextField(form, "lbs1", formData.healthDeclaration.weightLbs);
-      fillTextField(form, "stick1", formData.healthDeclaration.smokeQuantity);
+      // Health Declaration - Applicant
+      fillTextField(form, "ft1", formData.healthDeclaration?.heightFeet || "");
+      fillTextField(
+        form,
+        "in1",
+        formData.healthDeclaration?.heightInches || "",
+      );
+      fillTextField(form, "kg1", formData.healthDeclaration?.weightKg || "");
+      fillTextField(form, "lbs1", formData.healthDeclaration?.weightLbs || "");
+      fillTextField(
+        form,
+        "stick1",
+        formData.healthDeclaration?.smokeQuantity || "",
+      );
       fillTextField(
         form,
         "bottle1",
-        formData.healthDeclaration.alcoholQuantity,
+        formData.healthDeclaration?.alcoholQuantity || "",
       );
-      fillTextField(form, "grade1", formData.healthDeclaration.eyeGrade);
+      fillTextField(form, "grade1", formData.healthDeclaration?.eyeGrade || "");
       fillTextField(
         form,
         "appn7",
         healthQuestions.applicantOwner.additionalInfo,
       );
 
-      // Signatures
-      fillTextField(form, "sign2", formData.applicantSignature);
-
-      // Financial Advisor Signature (NEW)
-      fillTextField(form, "sign1", formData.financialAdvisor?.signature);
-      fillTextField(form, "code1", formData.financialAdvisor?.code);
+      // ===== INTERMEDIARY ATTESTATION =====
+      fillTextField(form, "nc1", formData.attestation?.intermediaryName || "");
+      fillTextField(form, "ni1", formData.attestation?.intermediaryName || "");
+      fillTextField(form, "ni2", formData.attestation?.intermediaryName || "");
       fillTextField(
         form,
-        "signd1",
-        formatDate(formData.financialAdvisor?.signedDate),
-      );
-
-      // Proposed Insured Signature (if different from Applicant Owner)
-      if (!formData.proposedInsured?.sameAsApplicant) {
-        fillTextField(form, "sign_pi", formData.proposedInsured?.signature);
-        fillTextField(
-          form,
-          "signd_pi",
-          formatDate(formData.proposedInsured?.signatureDate),
-        );
-      }
-
-      // Authorized Representative
-      fillTextField(form, "name9", formData.authorizedRepresentative.name);
-      fillTextField(
-        form,
-        "relation2",
-        formData.authorizedRepresentative.relationship,
-      );
-      fillTextField(
-        form,
-        "sign11",
-        formData.authorizedRepresentative.signature,
-      );
-      fillTextField(
-        form,
-        "signd3",
-        formatDate(formData.authorizedRepresentative.date),
-      );
-
-      // Policy Receipt
-      fillTextField(form, "pn5", formData.policyReceipt.policyNo);
-      fillTextField(form, "sign12", formData.policyReceipt.signature);
-      fillTextField(form, "signd4", formatDate(formData.policyReceipt.date));
-      fillTextField(form, "time1", formData.policyReceipt.time);
-
-      const remoteAppNumber = `REM-${new Date().getTime().toString().slice(-6)}`;
-      fillTextField(form, "appn11", remoteAppNumber);
-      fillTextField(
-        form,
-        "appn12",
-        formData.remoteCommunication.productName || policyInfo.basePlan,
+        "date16",
+        formatDate(formData.attestation?.intermediaryDate || ""),
       );
       fillTextField(
         form,
         "date17",
-        formatDate(formData.remoteCommunication.date),
+        formatDate(formData.attestation?.intermediaryDate || ""),
       );
-      fillTextField(form, "mode1", formData.remoteCommunication.mode);
+
+      // Intermediary Remote Communication
+      const intermediaryCombined =
+        formData.remoteCommunication?.intermediaryDate ||
+        formData.remoteCommunication?.intermediaryMode
+          ? `${formatDate(formData.remoteCommunication?.intermediaryDate || "")} ${formData.remoteCommunication?.intermediaryMode ? `- ${formData.remoteCommunication?.intermediaryMode}` : ""}`.trim()
+          : "";
+      fillTextField(form, "rc1", intermediaryCombined);
+
+      // ===== CLIENT ATTESTATION =====
+      fillTextField(form, "nao1", formData.attestation?.clientName || "");
+      fillTextField(form, "nc2", formData.attestation?.clientName || "");
+      fillTextField(
+        form,
+        "date18",
+        formatDate(formData.attestation?.clientDate || ""),
+      );
+
+      const clientCombined =
+        formData.remoteCommunication?.date || formData.remoteCommunication?.mode
+          ? `${formatDate(formData.remoteCommunication?.date || "")} ${formData.remoteCommunication?.mode ? `- ${formData.remoteCommunication?.mode}` : ""}`.trim()
+          : "";
+      const remoteAppNumber = `REM-${new Date().getTime().toString().slice(-6)}`;
+      fillTextField(form, "appn11", remoteAppNumber);
+      fillTextField(
+        form,
+        "np1",
+        formData.remoteCommunication?.productName || policyInfo.basePlan || "",
+      );
+      fillTextField(form, "rc2", clientCombined);
+
+      // Signatures
+      fillTextField(form, "sign2", formData.applicantSignature || "");
+      fillTextField(form, "signd2", formatDate(formData.applicantDate || ""));
+
+      // Financial Advisor Signature
+      fillTextField(form, "sign1", formData.financialAdvisor?.signature || "");
+      fillTextField(form, "code1", formData.financialAdvisor?.code || "");
+      fillTextField(
+        form,
+        "signd1",
+        formatDate(formData.financialAdvisor?.signedDate || ""),
+      );
+
+      // Proposed Insured Signature (if different from Applicant Owner)
+      if (!formData.proposedInsured?.sameAsApplicant) {
+        fillTextField(
+          form,
+          "sign_pi",
+          formData.proposedInsured?.signature || "",
+        );
+        fillTextField(
+          form,
+          "signd_pi",
+          formatDate(formData.proposedInsured?.signatureDate || ""),
+        );
+      }
+
+      // Authorized Representative
+      fillTextField(
+        form,
+        "authname1",
+        formData.authorizedRepresentative?.name || "",
+      );
+      fillTextField(
+        form,
+        "relation2",
+        formData.authorizedRepresentative?.relationship || "",
+      );
+      fillTextField(
+        form,
+        "sign11",
+        formData.authorizedRepresentative?.signature || "",
+      );
+      fillTextField(
+        form,
+        "signd3",
+        formatDate(formData.authorizedRepresentative?.date || ""),
+      );
+
+      // Policy Receipt
+      fillTextField(form, "pn5", formData.policyReceipt?.policyNo || "");
+      fillTextField(form, "sign12", formData.policyReceipt?.signature || "");
+      fillTextField(
+        form,
+        "signd4",
+        formatDate(formData.policyReceipt?.date || ""),
+      );
+      fillTextField(form, "time1", formData.policyReceipt?.time || "");
 
       // Additional Conditions
       additionalConditions.forEach((condition, index) => {

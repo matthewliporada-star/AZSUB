@@ -8,15 +8,12 @@ const PlanInfoSection = ({ data, onChange }) => {
   return (
     <>
       <div className="form-grid">
-        <FormInput
-          label="Base Plan"
-          value={data.basePlan}
-          onChange={(v) => handleChange("basePlan", v)}
-        />
+        <FormInput label="Base Plan" value="Alianz Well" readOnly disabled />
         <FormInput
           label="Amount Insured"
-          value={data.amountInsured}
-          onChange={(v) => handleChange("amountInsured", v)}
+          value="100,000,000"
+          readOnly
+          disabled
         />
         <FormInput
           label="Amount of Payment Deposit"
@@ -26,10 +23,15 @@ const PlanInfoSection = ({ data, onChange }) => {
       </div>
 
       <div className="form-grid">
-        <FormInput
+        <FormSelect
           label="Deductible"
           value={data.deductible}
           onChange={(v) => handleChange("deductible", v)}
+          options={[
+            { value: "", label: "Select Deductible" },
+            { value: "None", label: "None" },
+            { value: "50000", label: "₱50,000.00" },
+          ]}
         />
         <FormInput
           label="Co Payment"
@@ -38,18 +40,27 @@ const PlanInfoSection = ({ data, onChange }) => {
         />
         <FormInput
           label="Commencement of Cover Note"
+          type="date"
           value={data.commencementOfCoverNote}
           onChange={(v) => handleChange("commencementOfCoverNote", v)}
         />
       </div>
 
-      <FormInput
+      <FormSelect
         label="Area of Cover"
         value={data.areaOfCover}
         onChange={(v) => handleChange("areaOfCover", v)}
+        options={[
+          { value: "", label: "Select Area of Cover" },
+          { value: "Worldwide", label: "Worldwide" },
+          {
+            value: "Worldwide excluding USA",
+            label: "Worldwide excluding USA",
+          },
+        ]}
       />
 
-      <h4 style={{ marginTop: "20px", color: "#395998" }}>Payment Details</h4>
+      <h4 style={{ marginTop: "20px", color: "#003266" }}>Payment Details</h4>
       <div className="form-grid">
         <FormSelect
           label="Mode of Payment"
@@ -80,13 +91,27 @@ const PlanInfoSection = ({ data, onChange }) => {
   );
 };
 
-const FormInput = ({ label, value, onChange }) => (
+const FormInput = ({
+  label,
+  type = "text",
+  value,
+  onChange,
+  readOnly,
+  disabled,
+}) => (
   <div className="form-group">
     <label>{label}</label>
     <input
-      type="text"
+      type={type}
       value={value || ""}
       onChange={(e) => onChange(e.target.value)}
+      readOnly={readOnly}
+      disabled={disabled}
+      style={
+        readOnly || disabled
+          ? { backgroundColor: "#f5f5f5", cursor: "not-allowed" }
+          : {}
+      }
     />
   </div>
 );
