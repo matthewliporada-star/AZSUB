@@ -1,54 +1,28 @@
-import React, { useState } from "react";
+import React from "react";
 import "../CIS.css";
 
-function ExistingOrPending({
-  insuranceList = [],
-  handleInsuranceChange = () => {},
-}) {
-  // Initialize with one empty row
-  const [insurances, setInsurances] = useState(
-    insuranceList.length > 0
-      ? insuranceList
-      : [
-          {
-            companyName: "",
-            type: "",
-            countryYear: "",
-            amount: "",
-            premium: "",
-          },
-        ],
-  );
+function ExistingOrPending({ insurance = [], handleInsuranceChange = () => {} }) {
+  // ✅ Controlled inputs: no internal state
 
   // Handle change for a specific row
   const handleRowChange = (index, field, value) => {
-    const updated = [...insurances];
+    const updated = [...insurance];
     updated[index][field] = value;
-    setInsurances(updated);
     handleInsuranceChange(updated);
   };
 
   // Add new insurance row
   const addRow = () => {
-    setInsurances([
-      ...insurances,
-      {
-        companyName: "",
-        type: "",
-        countryYear: "",
-        amount: "",
-        premium: "",
-      },
+    handleInsuranceChange([
+      ...insurance,
+      { companyName: "", type: "", countryYear: "", amount: "", premium: "" },
     ]);
   };
 
   // Delete last insurance row
   const deleteRow = () => {
-    if (insurances.length > 1) {
-      const updated = [...insurances];
-      updated.pop();
-      setInsurances(updated);
-      handleInsuranceChange(updated);
+    if (insurance.length > 1) {
+      handleInsuranceChange(insurance.slice(0, insurance.length - 1));
     }
   };
 
@@ -57,7 +31,7 @@ function ExistingOrPending({
       <div className="form-box">
         <h3 className="section-title">Existing or Pending Insurance</h3>
 
-        {insurances.map((ins, index) => (
+        {insurance.map((ins, index) => (
           <div key={index} className="form-grid-2">
             <div className="input-group">
               <label>Name of Insurance Co.</label>
@@ -68,6 +42,7 @@ function ExistingOrPending({
                 onChange={(e) =>
                   handleRowChange(index, "companyName", e.target.value)
                 }
+                autoComplete="off"
               />
             </div>
 
@@ -78,6 +53,7 @@ function ExistingOrPending({
                 className="box-input"
                 value={ins.type}
                 onChange={(e) => handleRowChange(index, "type", e.target.value)}
+                autoComplete="off"
               />
             </div>
 
@@ -91,6 +67,7 @@ function ExistingOrPending({
                 onChange={(e) =>
                   handleRowChange(index, "countryYear", e.target.value)
                 }
+                autoComplete="off"
               />
             </div>
 
@@ -103,6 +80,7 @@ function ExistingOrPending({
                 onChange={(e) =>
                   handleRowChange(index, "amount", e.target.value)
                 }
+                autoComplete="off"
               />
             </div>
 
@@ -115,6 +93,7 @@ function ExistingOrPending({
                 onChange={(e) =>
                   handleRowChange(index, "premium", e.target.value)
                 }
+                autoComplete="off"
               />
             </div>
           </div>
