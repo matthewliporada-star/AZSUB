@@ -1,30 +1,8 @@
 // BusinessEmployment.jsx
-import React, { useState } from "react";
+import React from "react";
 import "../CIS.css";
 
-const BusinessEmployment = () => {
-  // ✅ Internal state
-  const [employment, setEmployment] = useState({
-    businessName: "",
-    nature: "",
-    duties: "",
-    businessType: "",
-    ownership: "",
-    address: "",
-    website: "",
-    telephone: "",
-    incorporationDate: "",
-    previousExperience: "",
-  });
-
-  // ✅ Internal handler
-  const handleEmploymentChange = (field, value) => {
-    setEmployment((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
+const BusinessEmployment = ({ employment, handleEmploymentChange }) => {
   return (
     <div className="employment-section">
       <div className="form-box">
@@ -121,7 +99,7 @@ const BusinessEmployment = () => {
               }
             />
           </div>
-          
+
           <div className="input-group">
             <label>
               Type of Business (Employment / Sole Proprietor / LLC / PJSC /
