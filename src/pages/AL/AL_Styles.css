@@ -476,7 +476,7 @@ body.dark-mode .al-layout .logo {
   max-width: none;
   margin: 0;
   /* Allow full width utilization - let inner content control max-width */
-  padding: 30px 20px 30px 20px;
+  padding: 110px 20px 30px 20px;
 }
 
 .al-layout .content-container {
@@ -1409,7 +1409,7 @@ body.dark-mode .al-layout .status-badge.status-rejected {
   font-size: 13px;
 }
 
-.al-layout .submission-details>div {
+.al-layout .submission-details > div {
   color: #495057;
 }
 
@@ -2460,7 +2460,6 @@ body.dark-mode .al-layout .ap-text-primary {
 body.dark-mode .al-layout .ap-text-secondary {
   color: #b0b0b0;
 }
-
 
 body.dark-mode .al-layout .ap-table-row:hover {
   background-color: #333 !important;

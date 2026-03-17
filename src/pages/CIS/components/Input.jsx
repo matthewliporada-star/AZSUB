@@ -12,13 +12,13 @@ function Input({
 }) {
   return (
     <input
-      {...(value !== undefined && { value })}
-      {...(onChange && { onChange })}
       type={type}
       placeholder={placeholder}
       className={className}
       inputMode={inputMode}
       pattern={pattern}
+      value={value ?? ""}
+      onChange={onChange || (() => {})}
     />
   );
 }

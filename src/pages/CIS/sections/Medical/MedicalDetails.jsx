@@ -6,8 +6,11 @@ import Input from "../../components/Input";
 import Textarea from "../../components/Textarea";
 import TableHeader from "../../components/TableHeader";
 import TableRow from "../../components/TableRow";
+import { useForm } from "../../context/FormContext";
 
 export default function MedicalDetails() {
+  const { formData, updateFormData } = useForm();
+
   const familyMembers = [
     "Father",
     "Mother",
@@ -17,6 +20,19 @@ export default function MedicalDetails() {
     "Sister 1",
     "Spouse",
   ];
+
+  const handleChange = (key) => (e) => {
+    updateFormData(key, e.target.value);
+  };
+
+  // Helper for family table to keep keys clean
+  const handleFamilyChange = (member, field) => (e) => {
+    updateFormData(
+      `family_${member.replace(/\s+/g, "")}_${field}`,
+      e.target.value,
+    );
+  };
+
   return (
     <Section
       number={4}
@@ -25,10 +41,18 @@ export default function MedicalDetails() {
       <div className="sub-header">Personal Medical Details</div>
       <FormRow>
         <FormCell label="Weight">
-          <Input placeholder="e.g. 75 kg" />
+          <Input
+            placeholder="e.g. 75 kg"
+            value={formData.weight || ""}
+            onChange={handleChange("weight")}
+          />
         </FormCell>
         <FormCell label="Height">
-          <Input placeholder="e.g. 175 cm" />
+          <Input
+            placeholder="e.g. 175 cm"
+            value={formData.height || ""}
+            onChange={handleChange("height")}
+          />
         </FormCell>
       </FormRow>
       <FormRow>
@@ -36,16 +60,23 @@ export default function MedicalDetails() {
           className="cell-full"
           label="Do you exercise? If Yes, please give details"
         >
-          <Input />
+          <Input
+            value={formData.exerciseDetails || ""}
+            onChange={handleChange("exerciseDetails")}
+          />
         </FormCell>
       </FormRow>
       <FormRow>
         <FormCell
           className="cell-full"
           isRed
-          label="Any health disorders — Please provide full details with last medical report"
+          label="Any health disorders — Full details"
         >
-          <Textarea rows={2} />
+          <Textarea
+            rows={2}
+            value={formData.healthDisorders || ""}
+            onChange={handleChange("healthDisorders")}
+          />
         </FormCell>
       </FormRow>
       <FormRow>
@@ -54,35 +85,53 @@ export default function MedicalDetails() {
           isRed
           label="Any medication taken — Please specify"
         >
-          <Input />
+          <Input
+            value={formData.medications || ""}
+            onChange={handleChange("medications")}
+          />
         </FormCell>
       </FormRow>
       <FormRow>
         <FormCell
           className="cell-2"
-          label="Name of Family Physician / Last Visited Doctor or Specialist"
+          label="Family Physician / Last Visited Doctor"
         >
-          <Input />
+          <Input
+            value={formData.physicianName || ""}
+            onChange={handleChange("physicianName")}
+          />
         </FormCell>
         <FormCell className="cell-2" label="Physician Address">
-          <Input />
+          <Input
+            value={formData.physicianAddress || ""}
+            onChange={handleChange("physicianAddress")}
+          />
         </FormCell>
       </FormRow>
       <FormRow>
         <FormCell label="Telephone No.">
-          <Input type="tel" />
+          <Input
+            type="tel"
+            value={formData.physicianPhone || ""}
+            onChange={handleChange("physicianPhone")}
+          />
         </FormCell>
         <FormCell label="No. of Years Attended">
-          <Input />
+          <Input
+            value={formData.yearsAttended || ""}
+            onChange={handleChange("yearsAttended")}
+          />
         </FormCell>
         <FormCell className="cell-2" label="Last Visited (Date & Reason)">
-          <Input placeholder="DD-MM-YYYY / Reason" />
+          <Input
+            placeholder="DD-MM-YYYY / Reason"
+            value={formData.lastVisitDetails || ""}
+            onChange={handleChange("lastVisitDetails")}
+          />
         </FormCell>
       </FormRow>
-      <div className="sub-header">
-        {" "}
-        Family Medical History (mention all family members){" "}
-      </div>
+
+      <div className="sub-header">Family Medical History</div>
       <TableHeader
         spans={[
           { text: "Relationship", style: { flex: "0.8" } },
@@ -100,10 +149,50 @@ export default function MedicalDetails() {
               content: <span className="rel-label">{member}</span>,
               style: { flex: "0.8" },
             },
-            { content: <Input /> },
-            { content: <Input />, style: { flex: "0.5" } },
-            { content: <Input />, style: { flex: "1.5" } },
-            { content: <Input /> },
+            {
+              content: (
+                <Input
+                  value={
+                    formData[`family_${member.replace(/\s+/g, "")}_name`] || ""
+                  }
+                  onChange={handleFamilyChange(member, "name")}
+                />
+              ),
+            },
+            {
+              content: (
+                <Input
+                  value={
+                    formData[`family_${member.replace(/\s+/g, "")}_age`] || ""
+                  }
+                  onChange={handleFamilyChange(member, "age")}
+                />
+              ),
+              style: { flex: "0.5" },
+            },
+            {
+              content: (
+                <Input
+                  value={
+                    formData[`family_${member.replace(/\s+/g, "")}_history`] ||
+                    ""
+                  }
+                  onChange={handleFamilyChange(member, "history")}
+                />
+              ),
+              style: { flex: "1.5" },
+            },
+            {
+              content: (
+                <Input
+                  value={
+                    formData[`family_${member.replace(/\s+/g, "")}_status`] ||
+                    ""
+                  }
+                  onChange={handleFamilyChange(member, "status")}
+                />
+              ),
+            },
           ]}
         />
       ))}

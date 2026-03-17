@@ -133,7 +133,7 @@ body {
   flex-shrink: 0;
 }
 .header-badge {
-  background: linear-gradient(135deg, var(--gold) 0%, #FBD045 100%);
+  background: linear-gradient(135deg, var(--gold) 0%, #fbd045 100%);
   color: var(--navy);
   padding: 6px 16px;
   font-size: 10.5px;
@@ -907,4 +907,195 @@ body {
 @page {
   margin: 14mm 12mm;
   size: A4;
+}
+
+/* ========================================
+   CIS DASHBOARD CONTAINER
+======================================== */
+.cis-container {
+  width: 100%;
+  padding: 110px 30px 30px 30px;
+  background-color: var(--bg-main);
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* ========================================
+   HEADER
+======================================== */
+.cis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.cis-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* ========================================
+   SEARCH BAR
+======================================== */
+.cis-search-wrapper {
+  position: relative;
+  width: 280px;
+}
+
+.cis-search-wrapper .cis-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none; /* allows clicks to focus input */
+}
+
+.cis-search-input {
+  width: 100%;
+  padding: 10px 14px 10px 38px; /* left padding for icon */
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.cis-search-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+/* ========================================
+   GRID
+======================================== */
+.cis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+/* ========================================
+   CARD
+======================================== */
+.cis-card {
+  background: #ffffff;
+  padding: 22px;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.cis-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* ========================================
+   CARD TEXT
+======================================== */
+.cis-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+.cis-card-value {
+  font-size: 34px;
+  font-weight: 700;
+  margin-top: 6px;
+  color: #0f172a;
+}
+
+.cis-card-subtext {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* ========================================
+   TREND BADGE
+======================================== */
+.cis-trend-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background-color: #e2e8f0;
+  color: #334155;
+}
+
+/* ========================================
+   ICON BACKGROUND
+======================================== */
+.cis-icon-bg {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background-color: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #334155;
+}
+
+/* TABLE SECTION */
+.cis-table-container {
+  margin-top: 35px;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.cis-table-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.cis-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cis-table th {
+  text-align: left;
+  background: #f1f5f9;
+  padding: 12px;
+  font-size: 13px;
+}
+
+.cis-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+}
+
+.cis-table tr:hover {
+  background: #f8fafc;
+}
+
+/* ACTION BUTTON */
+.cis-action-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.cis-action-btn:hover {
+  background: #1d4ed8;
 }

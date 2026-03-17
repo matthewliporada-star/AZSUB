@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import supabase from "../../config/supabaseClient.js";
 import "./CIS.css";
 
 // Components
@@ -21,28 +22,32 @@ import PolicyBeneficiary from "./sections/PolicyBeneficiary/PolicyBeneficiary";
 import SpouseDetails from "./sections/Spouse/SpouseDetails";
 import DependentDetails from "./sections/Dependent/DependentDetails";
 
+import { FormProvider } from "./context/FormContext.jsx";
+
 export default function App() {
   return (
-    <div className="page-wrapper">
-      <Header />
-      <Notice />
-      <div className="progress-bar">
-        <div className="progress-fill" style={{ width: "60%" }}></div>
+    <FormProvider>
+      <div className="page-wrapper">
+        <Header />
+        <Notice />
+        <div className="progress-bar">
+          <div className="progress-fill" style={{ width: "60%" }}></div>
+        </div>
+        <PersonalInformation />
+        <TravelDetails />
+        <SmokingAlcohol />
+        <MedicalDetails />
+        <Insurance />
+        <BusinessEmployment />
+        <IncomeStatement />
+        <AssetsLiabilities />
+        <PropertyDetails />
+        <BankDetails />
+        <PolicyBeneficiary />
+        <SpouseDetails />
+        <DependentDetails />
+        <PrintBar />
       </div>
-      <PersonalInformation />
-      <TravelDetails />
-      <SmokingAlcohol />
-      <MedicalDetails />
-      <Insurance />
-      <BusinessEmployment />
-      <IncomeStatement />
-      <AssetsLiabilities />
-      <PropertyDetails />
-      <BankDetails />
-      <PolicyBeneficiary />
-      <SpouseDetails />
-      <DependentDetails />
-      <PrintBar />
-    </div>
+    </FormProvider>
   );
 }
