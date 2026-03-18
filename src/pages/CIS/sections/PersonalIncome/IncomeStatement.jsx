@@ -23,22 +23,36 @@ export default function IncomeStatement() {
     updateFormData(key, value);
   };
 
-  // Memoized calculations for Totals
+  // Memoized calculations for Totals and Disposable Income
   const totals = useMemo(() => {
-    let self = 0;
-    let spouse = 0;
+    let selfInc = 0;
+    let spouseInc = 0;
 
+    // Calculate Total Income
     incomeSources.forEach((_, idx) => {
-      self += parseFloat(formData[`inc_${idx}_self`]) || 0;
-      spouse += parseFloat(formData[`inc_${idx}_spouse`]) || 0;
+      selfInc += parseFloat(formData[`inc_${idx}_self`]) || 0;
+      spouseInc += parseFloat(formData[`inc_${idx}_spouse`]) || 0;
     });
 
+    // Get Expenditure values
+    const selfExp = parseFloat(formData.exp_self) || 0;
+    const spouseExp = parseFloat(formData.exp_spouse) || 0;
+
     return {
-      self: self.toFixed(2),
-      spouse: spouse.toFixed(2),
-      joint: (self + spouse).toFixed(2),
+      // Income Totals
+      incomeSelf: selfInc.toFixed(2),
+      incomeSpouse: spouseInc.toFixed(2),
+      incomeJoint: (selfInc + spouseInc).toFixed(2),
+
+      // Expenditure Totals
+      expJoint: (selfExp + spouseExp).toFixed(2),
+
+      // Disposable Income (Income - Expenditure)
+      dispSelf: (selfInc - selfExp).toFixed(2),
+      dispSpouse: (spouseInc - spouseExp).toFixed(2),
+      dispJoint: (selfInc + spouseInc - (selfExp + spouseExp)).toFixed(2),
     };
-  }, [formData]);
+  }, [formData, incomeSources]);
 
   return (
     <Section number={7} title="Personal Income Statement" isTable>
@@ -50,6 +64,7 @@ export default function IncomeStatement() {
         <span>Joint (USD)</span>
       </div>
 
+      {/* Income Rows */}
       {incomeSources.map((source, idx) => {
         const selfVal = parseFloat(formData[`inc_${idx}_self`]) || 0;
         const spouseVal = parseFloat(formData[`inc_${idx}_spouse`]) || 0;
@@ -111,17 +126,17 @@ export default function IncomeStatement() {
         </div>
         <div className="income-cell"></div>
         <div className="income-cell">
-          <Input value={totals.self} readOnly />
+          <Input value={totals.incomeSelf} readOnly />
         </div>
         <div className="income-cell">
-          <Input value={totals.spouse} readOnly />
+          <Input value={totals.incomeSpouse} readOnly />
         </div>
         <div className="income-cell">
-          <Input value={totals.joint} readOnly />
+          <Input value={totals.incomeJoint} readOnly />
         </div>
       </div>
 
-      {/* Total Monthly Expenditure */}
+      {/* Total Monthly Expenditure Row */}
       <div className="income-row">
         <div className="income-cell">
           <label>Total Monthly Expenditure</label>
@@ -144,22 +159,40 @@ export default function IncomeStatement() {
           <Input
             value={formData.exp_self || ""}
             onChange={(e) => handleChange("exp_self", e.target.value)}
+            placeholder="0.00"
           />
         </div>
         <div className="income-cell">
           <Input
             value={formData.exp_spouse || ""}
             onChange={(e) => handleChange("exp_spouse", e.target.value)}
+            placeholder="0.00"
           />
         </div>
         <div className="income-cell">
-          <Input
-            value={(
-              parseFloat(formData.exp_self || 0) +
-              parseFloat(formData.exp_spouse || 0)
-            ).toFixed(2)}
-            readOnly
-          />
+          <Input value={totals.expJoint} readOnly placeholder="0.00" />
+        </div>
+      </div>
+
+      {/* Estimated Monthly Disposable Income Row */}
+      <div
+        className="income-row total-row"
+        
+      >
+        <div className="income-cell">
+          <label>
+            Estimated Monthly Disposable Income
+          </label>
+        </div>
+        <div className="income-cell"></div>
+        <div className="income-cell">
+          <Input value={totals.dispSelf} readOnly />
+        </div>
+        <div className="income-cell">
+          <Input value={totals.dispSpouse} readOnly />
+        </div>
+        <div className="income-cell">
+          <Input value={totals.dispJoint} readOnly />
         </div>
       </div>
     </Section>

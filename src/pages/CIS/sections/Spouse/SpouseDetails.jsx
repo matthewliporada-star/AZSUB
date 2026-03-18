@@ -57,6 +57,8 @@ export default function SpouseDetails() {
           />
         </FormCell>
       </FormRow>
+
+      {/* Current Residential Address */}
       <FormRow>
         <FormCell className="cell-3" label="Current Residential Address">
           <Input
@@ -89,6 +91,35 @@ export default function SpouseDetails() {
           />
         </FormCell>
       </FormRow>
+
+      {/* Permanent Address */}
+      <FormRow>
+        <FormCell className="cell-3" label="Permanent Address">
+          <Input
+            value={formData.spouse_perm_addr || ""}
+            onChange={handleChange("spouse_perm_addr")}
+          />
+        </FormCell>
+        <FormCell label="City">
+          <Input
+            value={formData.spouse_perm_city || ""}
+            onChange={handleChange("spouse_perm_city")}
+          />
+        </FormCell>
+        <FormCell label="Country">
+          <Input
+            value={formData.spouse_perm_country || ""}
+            onChange={handleChange("spouse_perm_country")}
+          />
+        </FormCell>
+        <FormCell label="Postal Code">
+          <Input
+            value={formData.spouse_perm_zip || ""}
+            onChange={handleChange("spouse_perm_zip")}
+          />
+        </FormCell>
+      </FormRow>
+
       <FormRow>
         <FormCell label="Smoking Status">
           <Select
@@ -97,8 +128,10 @@ export default function SpouseDetails() {
             onChange={handleChange("spouse_smoking")}
           />
         </FormCell>
-        <FormCell className="cell-2" label="Employment Role">
+        {/* Updated Employment Details Section */}
+        <FormCell className="cell-2" label="Employment Details">
           <Input
+            placeholder="Role"
             value={formData.spouse_job || ""}
             onChange={handleChange("spouse_job")}
           />

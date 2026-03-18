@@ -45,21 +45,21 @@ export default function SmokingAlcohol() {
         </FormCell>
       </FormRow>
       <FormRow>
-        <FormCell label="Alcohol Type">
+        <FormCell label="Alcohol Consumption - Type">
           <Input
             placeholder="e.g. Wine, Beer"
             value={formData.alcoholType || ""}
             onChange={handleChange("alcoholType")}
           />
         </FormCell>
-        <FormCell label="Measurement">
+        <FormCell label="Alcohol Consumption - Measurement">
           <Input
             placeholder="e.g. Units/glasses"
             value={formData.alcoholMeasurement || ""}
             onChange={handleChange("alcoholMeasurement")}
           />
         </FormCell>
-        <FormCell label="Frequency">
+        <FormCell label="Alcohol Consumption - Frequency">
           <Input
             placeholder="e.g. Daily, Weekly"
             value={formData.alcoholFrequency || ""}

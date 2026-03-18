@@ -115,7 +115,7 @@ function BusinessEmployment() {
         <FormCell
           className="cell-full"
           isRed
-          label="Previous Work Experience (last 15 years)"
+          label="Previous Work Experience (last 15 years). Kindly specify role, organization name and years"
         >
           <Input
             placeholder="1. Role | Organization | Years"

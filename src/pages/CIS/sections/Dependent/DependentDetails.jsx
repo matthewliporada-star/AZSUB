@@ -14,6 +14,7 @@ export default function DependentDetails() {
       {[1, 2].map((num) => (
         <React.Fragment key={num}>
           <div className="sub-header">Dependent {num}</div>
+
           <FormRow>
             <FormCell className="cell-2" label={`Dependent Name ${num}`}>
               <Input
@@ -28,6 +29,7 @@ export default function DependentDetails() {
               />
             </FormCell>
           </FormRow>
+
           <FormRow>
             <FormCell label="Nationality">
               <Input
@@ -42,13 +44,7 @@ export default function DependentDetails() {
                 onChange={handleChange(`dep_${num}_dob`)}
               />
             </FormCell>
-            <FormCell className="cell-2" label="Email Address">
-              <Input
-                type="email"
-                value={formData[`dep_${num}_email`] || ""}
-                onChange={handleChange(`dep_${num}_email`)}
-              />
-            </FormCell>
+            {/* Email FormCell removed from here */}
           </FormRow>
         </React.Fragment>
       ))}

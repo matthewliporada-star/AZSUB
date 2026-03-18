@@ -8,7 +8,6 @@ import { useForm } from "../../context/FormContext";
 export default function PersonalInformation() {
   const { formData, updateFormData } = useForm();
 
-  // Helper to reduce repetitive code
   const handleChange = (key) => (e) => {
     updateFormData(key, e.target.value);
   };
@@ -53,8 +52,13 @@ export default function PersonalInformation() {
         </FormCell>
       </FormRow>
 
+      {/* Current Residence */}
       <FormRow>
-        <FormCell className="cell-3" isRed label="Residence Address">
+        <FormCell
+          className="cell-3"
+          isRed
+          label=" Residence Address(Please provide complete address)"
+        >
           <Input
             placeholder="Street address"
             value={formData.residenceAddress}
@@ -81,14 +85,116 @@ export default function PersonalInformation() {
         </FormCell>
       </FormRow>
 
+      {/* NEW: Previous Residence and Dates */}
       <FormRow>
         <FormCell
-          className="cell-full"
-          label="How long have you lived at your current address?"
+          className="cell-3"
+          label="Previous Residence and dates resided (if any, please provide complete address)"
+        >
+          <Input
+            placeholder="Street address"
+            value={formData.prevResidenceComplete}
+            onChange={handleChange("prevResidenceComplete")}
+          />
+        </FormCell>
+        <FormCell label="City">
+          <Input
+            value={formData.prevResidenceCity}
+            onChange={handleChange("prevResidenceCity")}
+          />
+        </FormCell>
+        <FormCell label="Country">
+          <Input
+            value={formData.prevResidenceCountry}
+            onChange={handleChange("prevResidenceCountry")}
+          />
+        </FormCell>
+        <FormCell label="Postal Code">
+          <Input
+            value={formData.prevResidenceZip}
+            onChange={handleChange("prevResidenceZip")}
+          />
+        </FormCell>
+      </FormRow>
+
+      <FormRow>
+        <FormCell
+          className="cell-2"
+          label="Dates resided at the residence (DD-MM-YY)"
+        >
+          <Input
+            placeholder="DD-MM-YY to DD-MM-YY"
+            value={formData.prevResidenceDatesResided}
+            onChange={handleChange("prevResidenceDatesResided")}
+          />
+        </FormCell>
+      </FormRow>
+
+      <FormRow>
+        <FormCell
+          className="cell-2"
+          label="How long have you lived at your current address & in current country ??"
         >
           <Input
             value={formData.residenceDuration}
             onChange={handleChange("residenceDuration")}
+          />
+        </FormCell>
+      </FormRow>
+
+      {/* Previous/Secondary Residences (Past 10 Years) */}
+      {/* Previous/Secondary Residences (Past 10 Years) */}
+      <FormRow>
+        <FormCell
+          className="cell-3"
+          label="Provide information for any current secondary residence and previous primary and secondary residences you have had in the past 10 years (Complete Address)"
+        >
+          <Input
+            placeholder="Street address"
+            value={formData.previousResidenceAddress}
+            onChange={handleChange("previousResidenceAddress")}
+          />
+        </FormCell>
+        <FormCell label="City">
+          <Input
+            value={formData.permanentCity}
+            onChange={handleChange("permanentCity")}
+          />
+        </FormCell>
+        <FormCell label="Country">
+          <Input
+            value={formData.permanentCountry}
+            onChange={handleChange("permanentCountry")}
+          />
+        </FormCell>
+        <FormCell label="Postal Code">
+          <Input
+            value={formData.permanentZip}
+            onChange={handleChange("permanentZip")}
+          />
+        </FormCell>
+      </FormRow>
+
+      <FormRow>
+        <FormCell
+          className="cell-2"
+          label="Dates Resided (DD-MM-YY to DD-MM-YY)"
+        >
+          <Input
+            placeholder="01-01-15 to 01-01-20"
+            value={formData.previousResidenceDates}
+            onChange={handleChange("previousResidenceDates")}
+          />
+        </FormCell>
+      </FormRow>
+
+      {/* Permanent Address */}
+      <FormRow>
+        <FormCell className="cell-3" label="Permanent Address">
+          <Input
+            placeholder="Street address"
+            value={formData.permanentAddress}
+            onChange={handleChange("permanentAddress")}
           />
         </FormCell>
       </FormRow>
