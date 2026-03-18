@@ -16,19 +16,19 @@ const AdminRecord = () => {
     const [editingRecord, setEditingRecord] = useState(null);
     const [selectedPolicy, setSelectedPolicy] = useState(null);
     const [viewMode, setViewMode] = useState('active'); // 'active', 'archived', 'all'
-    const [formData, setFormData] = useState({
-        policy_id: '',
-        client_name: '',
-        serial_number: '',
-        intermediary: '',
-        intermediary_email: '',
-        submission_type: '',
-        agency: '',
-        date_submitted: '',
-        date_processed: '',
-        date_issued: '',
-        is_archived: false
-    });
+const [formData, setFormData] = useState({
+    policy_id: '',
+    client_name: '',
+    serial_number: '',
+    intermediary_profile_id: '',  // ✅ Keep this for DB
+    intermediary_email: '',        // ✅ Keep this for UI display only
+    submission_type: '',
+    agency: '',
+    date_submitted: '',
+    date_processed: '',
+    date_issued: '',
+    is_archived: false
+});
     const [stats, setStats] = useState({
         totalRecords: 0,
         uniqueClients: 0,
@@ -209,148 +209,145 @@ const AdminRecord = () => {
         setSelectedPolicy(policy);
     };
 
-    const handleIntermediaryChange = (e) => {
-        const intermediaryId = e.target.value;
-        
-        if (!intermediaryId) {
-            setFormData(prev => ({
-                ...prev,
-                intermediary: '',
-                intermediary_email: ''
-            }));
-            return;
-        }
+const handleIntermediaryChange = (e) => {
+    const intermediaryId = e.target.value;
+    
+    if (!intermediaryId) {
+        setFormData(prev => ({
+            ...prev,
+            intermediary_profile_id: '',  // ✅ Clear UUID
+            intermediary_email: ''
+        }));
+        return;
+    }
 
-        const intermediary = intermediaries.find(i => i.id === intermediaryId);
-        if (intermediary) {
-            const fullName = `${intermediary.first_name} ${intermediary.last_name}`.trim();
-            setFormData(prev => ({
-                ...prev,
-                intermediary: fullName,
-                intermediary_email: intermediary.email || ''
-            }));
-        }
-    };
+    const intermediary = intermediaries.find(i => i.id === intermediaryId);
+    if (intermediary) {
+        setFormData(prev => ({
+            ...prev,
+            intermediary_profile_id: intermediary.id,  // ✅ Store UUID
+            intermediary_email: intermediary.email || ''
+        }));
+    }
+};
 
-    const openCreateModal = () => {
-        setEditingRecord(null);
-        setSelectedPolicy(null);
-        setFormData({
-            policy_id: '',
-            client_name: '',
-            serial_number: '',
-            intermediary: '',
-            intermediary_email: '',
-            submission_type: '',
-            agency: '',
-            date_submitted: '',
-            date_processed: '',
-            date_issued: '',
-            is_archived: false
-        });
-        setShowModal(true);
-    };
+const openCreateModal = () => {
+    setEditingRecord(null);
+    setSelectedPolicy(null);
+    setFormData({
+        policy_id: '',
+        client_name: '',
+        serial_number: '',
+        intermediary_profile_id: '',  // ✅ Use this
+        intermediary_email: '',        // ✅ Keep for UI
+        submission_type: '',
+        agency: '',
+        date_submitted: '',
+        date_processed: '',
+        date_issued: '',
+        is_archived: false
+    });
+    setShowModal(true);
+};
 
     const openEditModal = (record) => {
         setEditingRecord(record);
         setSelectedPolicy(record.policy);
-        setFormData({
-            policy_id: record.policy_id || '',
-            client_name: record.client_name || '',
-            serial_number: record.serial_number || '',
-            intermediary: record.intermediary || '',
-            intermediary_email: record.intermediary_email || '',
-            submission_type: record.submission_type || '',
-            agency: record.agency || '',
-            date_submitted: record.date_submitted || '',
-            date_processed: record.date_processed || '',
-            date_issued: record.date_issued || '',
-            is_archived: record.is_archived || false
-        });
-        setShowModal(true);
+    setFormData({
+        policy_id: record.policy_id || '',
+        client_name: record.client_name || '',
+        serial_number: record.serial_number || '',
+        intermediary_profile_id: record.intermediary_profile_id || '', 
+        intermediary_email: record.intermediary_email || '',
+        submission_type: record.submission_type || '',
+        agency: record.agency || '',
+        date_submitted: record.date_submitted || '',
+        date_processed: record.date_processed || '',
+        date_issued: record.date_issued || '',
+        is_archived: record.is_archived || false
+    });
+    setShowModal(true);
     };
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-
-        try {
-            if (!formData.client_name || !formData.policy_id) {
-                alert("Client Name and Policy are required");
-                setLoading(false);
-                return;
-            }
-
-            if (editingRecord) {
-                const { error } = await supabase
-                    .from("record")
-                    .update({
-                        policy_id: formData.policy_id,
-                        client_name: formData.client_name,
-                        serial_number: formData.serial_number ? parseInt(formData.serial_number) : null,
-                        intermediary: formData.intermediary,
-                        intermediary_email: formData.intermediary_email,
-                        submission_type: formData.submission_type,
-                        agency: formData.agency,
-                        date_submitted: formData.date_submitted || null,
-                        date_processed: formData.date_processed || null,
-                        date_issued: formData.date_issued || null,
-                        is_archived: formData.is_archived,
-                        updated_at: new Date()
-                    })
-                    .eq('id', editingRecord.id);
-
-                if (error) throw error;
-
-                await supabase
-                    .from("activity_logs")
-                    .insert([{
-                        action: 'POLICY_UPDATE',
-                        performed_by: user.id,
-                        details: `Updated record for ${formData.client_name}`,
-                        created_at: new Date()
-                    }]);
-
-            } else {
-                const { data, error } = await supabase
-                    .from("record")
-                    .insert([{
-                        policy_id: formData.policy_id,
-                        client_name: formData.client_name,
-                        serial_number: formData.serial_number ? parseInt(formData.serial_number) : null,
-                        intermediary: formData.intermediary,
-                        intermediary_email: formData.intermediary_email,
-                        submission_type: formData.submission_type,
-                        agency: formData.agency,
-                        date_submitted: formData.date_submitted || null,
-                        date_processed: formData.date_processed || null,
-                        date_issued: formData.date_issued || null,
-                        is_archived: false
-                    }])
-                    .select();
-
-                if (error) throw error;
-
-                await supabase
-                    .from("activity_logs")
-                    .insert([{
-                        action: 'POLICY_CREATE',
-                        performed_by: user.id,
-                        details: `Created new record for ${formData.client_name}`,
-                        created_at: new Date()
-                    }]);
-            }
-
-            await fetchRecords();
-            setShowModal(false);
-            alert(`Record ${editingRecord ? 'updated' : 'created'} successfully!`);
-        } catch (err) {
-            console.error("Error saving record:", err);
-            alert("Error saving record: " + err.message);
-        } finally {
+    try {
+        if (!formData.client_name || !formData.policy_id) {
+            alert("Client Name and Policy are required");
             setLoading(false);
+            return;
         }
-    };
+
+        if (editingRecord) {
+            // UPDATE - Remove intermediary_email
+            const { error } = await supabase
+                .from("record")
+                .update({
+                    policy_id: formData.policy_id,
+                    client_name: formData.client_name,
+                    serial_number: formData.serial_number ? parseInt(formData.serial_number) : null,
+                    intermediary_profile_id: formData.intermediary_profile_id || null,
+                    // REMOVE THIS LINE:
+                    // intermediary_email: formData.intermediary_email,  // ❌ This column doesn't exist
+                    submission_type: formData.submission_type,
+                    agency: formData.agency,
+                    date_submitted: formData.date_submitted || null,
+                    date_processed: formData.date_processed || null,
+                    date_issued: formData.date_issued || null,
+                    is_archived: formData.is_archived,
+                    updated_at: new Date()
+                })
+                .eq('id', editingRecord.id);
+
+            if (error) throw error;
+
+        } else {
+            // CREATE - Remove intermediary_email
+            const { data, error } = await supabase
+                .from("record")
+                .insert([{
+                    policy_id: formData.policy_id,
+                    client_name: formData.client_name,
+                    serial_number: formData.serial_number ? parseInt(formData.serial_number) : null,
+                    intermediary_profile_id: formData.intermediary_profile_id || null,
+                    // REMOVE THIS LINE:
+                    // intermediary_email: formData.intermediary_email,  // ❌ This column doesn't exist
+                    submission_type: formData.submission_type,
+                    agency: formData.agency,
+                    date_submitted: formData.date_submitted || null,
+                    date_processed: formData.date_processed || null,
+                    date_issued: formData.date_issued || null,
+                    is_archived: false
+                }])
+                .select();
+
+            if (error) {
+                console.error("Supabase error:", error);
+                throw error;
+            }
+        }
+
+        await supabase
+            .from("activity_logs")
+            .insert([{
+                action: editingRecord ? 'POLICY_UPDATE' : 'POLICY_CREATE',
+                performed_by: user.id,
+                details: `${editingRecord ? 'Updated' : 'Created'} record for ${formData.client_name}`,
+                created_at: new Date()
+            }]);
+
+        await fetchRecords();
+        setShowModal(false);
+        alert(`Record ${editingRecord ? 'updated' : 'created'} successfully!`);
+        
+    } catch (err) {
+        console.error("Error saving record:", err);
+        alert("Error saving record: " + err.message);
+    } finally {
+        setLoading(false);
+    }
+};
 
     const handleArchive = async (id, clientName, currentArchiveStatus) => {
         const action = currentArchiveStatus ? "restore" : "archive";
@@ -717,20 +714,20 @@ const AdminRecord = () => {
                                     />
                                 </div>
 
-                                <div className="form-group">
-                                    <label>Intermediary</label>
-                                    <select
-                                        value={formData.intermediary ? intermediaries.find(i => `${i.first_name} ${i.last_name}`.trim() === formData.intermediary)?.id || '' : ''}
-                                        onChange={handleIntermediaryChange}
-                                    >
-                                        <option value="">Select Intermediary (AL/AP)</option>
-                                        {intermediaries.map((intermediary) => (
-                                            <option key={intermediary.id} value={intermediary.id}>
-                                                {intermediary.first_name} {intermediary.last_name} ({intermediary.account_type})
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+<div className="form-group">
+    <label>Intermediary</label>
+    <select
+        value={formData.intermediary_profile_id}  // ✅ Use the UUID field
+        onChange={handleIntermediaryChange}
+    >
+        <option value="">Select Intermediary (AL/AP)</option>
+        {intermediaries.map((intermediary) => (
+            <option key={intermediary.id} value={intermediary.id}>
+                {intermediary.first_name} {intermediary.last_name} ({intermediary.account_type})
+            </option>
+        ))}
+    </select>
+</div>
 
                                 <div className="form-group">
                                     <label>Intermediary Email</label>

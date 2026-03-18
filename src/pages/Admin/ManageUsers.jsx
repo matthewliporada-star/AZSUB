@@ -39,6 +39,7 @@ const ManageUsers = () => {
     position: "MD",
     password: "",
     reportsTo: "",
+    intermediary_code: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [modalError, setModalError] = useState("");
@@ -204,19 +205,24 @@ const ManageUsers = () => {
   }, [formData.position, showAddModal, isEditMode, selectedUser, fetchPotentialUplines]);
 
   // -- Form Handlers --
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    let finalValue = value;
+const handleFormChange = (e) => {
+  const { name, value } = e.target;
+  let finalValue = value;
 
-    if (name === "firstName" || name === "lastName") {
-      finalValue = value.charAt(0).toUpperCase() + value.slice(1);
-    }
+  if (name === "firstName" || name === "lastName") {
+    finalValue = value.charAt(0).toUpperCase() + value.slice(1);
+  }
+  
+  // For intermediary_code, ensure it's numeric and max 8 digits
+  if (name === "intermediary_code") {
+    finalValue = value.replace(/[^0-9]/g, '').slice(0, 8);
+  }
 
-    setFormData({
-      ...formData,
-      [name]: finalValue
-    });
-  };
+  setFormData({
+    ...formData,
+    [name]: finalValue
+  });
+};
 
   const generatePassword = () => {
     if (!formData.lastName.trim()) {
@@ -249,37 +255,44 @@ const ManageUsers = () => {
     setViewingSubordinates([]);
   };
 
-  const openAddModal = () => {
-    setIsEditMode(false);
-    setFormData({
-      firstName: "", lastName: "", email: "", position: "MD", password: "", reportsTo: ""
-    });
-    setShowAddModal(true);
-  };
+const openAddModal = () => {
+  setIsEditMode(false);
+  setFormData({
+    firstName: "", 
+    lastName: "", 
+    email: "", 
+    position: "MD", 
+    password: "", 
+    reportsTo: "",
+    intermediary_code: "", // Add this line
+  });
+  setShowAddModal(true);
+};
 
-  const openEditModal = async (u) => {
-    setIsEditMode(true);
-    setSelectedUser(u);
-    setFormData({
-      firstName: u.first_name,
-      lastName: u.last_name,
-      email: u.email,
-      position: u.account_type,
-      password: "",
-      reportsTo: "",
-    });
+const openEditModal = async (u) => {
+  setIsEditMode(true);
+  setSelectedUser(u);
+  setFormData({
+    firstName: u.first_name,
+    lastName: u.last_name,
+    email: u.email,
+    position: u.account_type,
+    password: "",
+    reportsTo: "",
+    intermediary_code: u.intermediary_code || "", // Add this line
+  });
 
-    const { data } = await supabase
-      .from("user_hierarchy")
-      .select("report_to_id")
-      .eq("user_id", u.id)
-      .eq("is_active", true)
-      .maybeSingle();
+  const { data } = await supabase
+    .from("user_hierarchy")
+    .select("report_to_id")
+    .eq("user_id", u.id)
+    .eq("is_active", true)
+    .maybeSingle();
 
-    if (data) setFormData(prev => ({ ...prev, reportsTo: data.report_to_id }));
+  if (data) setFormData(prev => ({ ...prev, reportsTo: data.report_to_id }));
 
-    setShowAddModal(true);
-  };
+  setShowAddModal(true);
+};
 
   const openViewModal = async (u) => {
     setSelectedUser(u);
@@ -294,60 +307,63 @@ const ManageUsers = () => {
     setViewingSubordinates(subRes.data?.map(d => d.profiles).filter(Boolean) || []);
   };
 
-  const submitUser = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setModalError("");
-    setSuccessMsg("");
+const submitUser = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setModalError("");
+  setSuccessMsg("");
 
-    try {
-      let userIdToProcess = selectedUser?.id;
+  try {
+    let userIdToProcess = selectedUser?.id;
 
-      if (isEditMode) {
-        const { error } = await supabase
-          .from("profiles")
-          .update({
+    if (isEditMode) {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          account_type: formData.position,
+          intermediary_code: formData.intermediary_code ? parseInt(formData.intermediary_code) : null, // Add this line
+        })
+        .eq("id", userIdToProcess);
+
+      if (error) throw error;
+      await logActivity("USER_UPDATE", `Updated user details for ${formData.firstName} ${formData.lastName}`);
+      setSuccessMsg("User updated successfully!");
+    } else {
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
-            account_type: formData.position
-          })
-          .eq("id", userIdToProcess);
-
-        if (error) throw error;
-        await logActivity("USER_UPDATE", `Updated user details for ${formData.firstName} ${formData.lastName}`);
-        setSuccessMsg("User updated successfully!");
-      } else {
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: formData.email,
-          password: formData.password,
-          options: {
-            data: {
-              first_name: formData.firstName,
-              last_name: formData.lastName,
-              account_type: formData.position,
-              status: "Active"
-            },
-          },
-        });
-
-        if (authError) throw authError;
-        userIdToProcess = authData.user?.id;
-
-        if (userIdToProcess) {
-          const { error: profileError } = await supabase.from("profiles").insert([{
-            id: userIdToProcess,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email,
             account_type: formData.position,
-            status: "Active"
-          }]);
-          if (profileError) throw profileError;
-        }
+            status: "Active",
+            intermediary_code: formData.intermediary_code, // Add this line
+          },
+        },
+      });
 
-        await logActivity("USER_CREATE", `Created new user ${formData.firstName} ${formData.lastName} (${formData.position})`);
-        setSuccessMsg("User created successfully!");
+      if (authError) throw authError;
+      userIdToProcess = authData.user?.id;
+
+      if (userIdToProcess) {
+        const { error: profileError } = await supabase.from("profiles").insert([{
+          id: userIdToProcess,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          account_type: formData.position,
+          status: "Active",
+          intermediary_code: formData.intermediary_code ? parseInt(formData.intermediary_code) : null, // Add this line
+        }]);
+        if (profileError) throw profileError;
       }
+
+      await logActivity("USER_CREATE", `Created new user ${formData.firstName} ${formData.lastName} (${formData.position})`);
+      setSuccessMsg("User created successfully!");
+    }
 
       if (formData.reportsTo && userIdToProcess) {
         await supabase.from("user_hierarchy").update({ is_active: false }).eq("user_id", userIdToProcess);
@@ -876,7 +892,30 @@ const ManageUsers = () => {
                   </select>
                 </div>
               </div>
-
+{(formData.position === 'AL' || formData.position === 'AP') && (
+  <div className="input-group">
+    <label>Intermediary Code</label>
+    <input
+      type="text"
+      name="intermediary_code"
+      value={formData.intermediary_code}
+      onChange={handleFormChange}
+      placeholder="Enter 8-digit code"
+      maxLength="8"
+      inputMode="numeric"
+      pattern="[0-9]*"
+      title="Please enter numbers only (max 8 digits)"
+    />
+    <small style={{ 
+      color: '#6b7280', 
+      fontSize: '11px', 
+      marginTop: '4px',
+      display: 'block'
+    }}>
+      Max 8 digits, numbers only
+    </small>
+  </div>
+)}
               {(formData.position === 'AP' || formData.position === 'AL') && (
                 <div className="input-group">
                   <label>Reports To</label>

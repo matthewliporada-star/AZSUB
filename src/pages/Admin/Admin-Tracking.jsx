@@ -1,4 +1,4 @@
-// MP-Dashboard.jsx - UPDATED VERSION with clickable stat cards and history feature
+
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
