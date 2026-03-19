@@ -318,20 +318,20 @@ function Login() {
 
           <h2 className="signin-prompt">SIGN IN</h2>
 
-          <form onSubmit={handleLogin}>
-            <div className="form-group">
-              <label className="form-label">Email</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Enter your username or email"
-                value={identifier}
-                onChange={handleIdentifierChange}
-                disabled={cooldown > 0}
-                required
-              />
-            </div>
-
+<form onSubmit={handleLogin}>
+  <div className="form-group">
+    <label className="form-label">Email</label>
+    <input
+      type="text"
+      className="form-input"
+      placeholder="Enter your username or email"
+      value={identifier}
+      onChange={handleIdentifierChange}
+      // Fix: Either remove "disabled=" or give it a boolean value
+      disabled={true} 
+      required
+    />
+  </div>
             <div className="form-group">
               <label className="form-label">Password</label>
               <div className="password-wrapper">

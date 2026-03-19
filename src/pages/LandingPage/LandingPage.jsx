@@ -28,10 +28,8 @@ function LandingPage() {
 
     try {
       // Temporary hardcoded bypass for requested code
-      if (code === "2026100") {
-        localStorage.setItem("is_verified", "true");
-        navigate("/login");
-        return;
+      if (code === "") {
+      return;
       }
 
       // Search for the code in profiles
