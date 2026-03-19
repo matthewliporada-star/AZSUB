@@ -34,6 +34,7 @@ import AdminTracking from './pages/Admin/Admin-Tracking';
 
 // Common Pages
 import ProfilePage from './pages/Common/ProfilePage';
+import LandingPage from './pages/LandingPage/LandingPage';
 
 // AL Pages
 import ALDashboard from './pages/AL/DashboardPage';
@@ -57,9 +58,10 @@ function App() {
     <AppProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
-          {/* Public Routes */}
+           {/* Public Routes */}
+          <Route path="/verify-identity" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/verify-identity" replace />} />
 
           {/* AP Routes */}
           <Route path="/ap/dashboard" element={<MainLayout><APDashboard /></MainLayout>} />

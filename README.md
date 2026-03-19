@@ -10,8 +10,9 @@ backend
 - npm install nodemai
 ler
 - npm install pdf-lib
-Credentials
 
+Credentials
+intermediary code - (Temporary)2026100 
 -MP
 archieverania1130@gmail.com
 #Ve8080
