@@ -9,8 +9,10 @@ export default function PersonalInformation() {
   const { formData, updateFormData } = useForm();
 
   const handleChange = (key) => (e) => {
-    updateFormData(key, e.target.value);
+    updateFormData("personalInformation", key, e.target.value);
   };
+
+  const pi = formData.personalInformation;
 
   return (
     <Section number={1} title="Personal Information">
@@ -18,7 +20,7 @@ export default function PersonalInformation() {
         <FormCell className="cell-full" label="Full Name of Mr./Mrs.">
           <Input
             placeholder="Full legal name"
-            value={formData.fullName}
+            value={pi.fullName || ""}
             onChange={handleChange("fullName")}
           />
         </FormCell>
@@ -27,8 +29,8 @@ export default function PersonalInformation() {
       <FormRow>
         <FormCell className="cell-full" label="Father's Name">
           <Input
-            value={formData.fathersName}
-            onChange={handleChange("fathersName")}
+            value={pi.fatherName || ""}
+            onChange={handleChange("fatherName")}
           />
         </FormCell>
       </FormRow>
@@ -38,162 +40,150 @@ export default function PersonalInformation() {
           <Input
             type="tel"
             placeholder="+1 000 000 0000"
-            value={formData.mobileNo}
-            onChange={handleChange("mobileNo")}
+            value={pi.mobile || ""}
+            onChange={handleChange("mobile")}
           />
         </FormCell>
         <FormCell className="cell-2" label="Email">
           <Input
             type="email"
             placeholder="email@example.com"
-            value={formData.email}
+            value={pi.email || ""}
             onChange={handleChange("email")}
           />
         </FormCell>
       </FormRow>
 
-      {/* Current Residence */}
+      {/* CURRENT RESIDENCE */}
+      <h3 className="section-subtitle">Current Residence</h3>
       <FormRow>
-        <FormCell
-          className="cell-3"
-          isRed
-          label=" Residence Address(Please provide complete address)"
-        >
+        <FormCell className="cell-3" isRed label="Residence Address">
           <Input
             placeholder="Street address"
-            value={formData.residenceAddress}
-            onChange={handleChange("residenceAddress")}
+            value={pi.currentAddress || ""}
+            onChange={handleChange("currentAddress")}
           />
         </FormCell>
         <FormCell label="City">
           <Input
-            value={formData.residenceCity}
-            onChange={handleChange("residenceCity")}
+            value={pi.currentCity || ""}
+            onChange={handleChange("currentCity")}
           />
         </FormCell>
         <FormCell label="Country">
           <Input
-            value={formData.residenceCountry}
-            onChange={handleChange("residenceCountry")}
+            value={pi.currentCountry || ""}
+            onChange={handleChange("currentCountry")}
           />
         </FormCell>
         <FormCell label="Postal Code">
           <Input
-            value={formData.residenceZip}
-            onChange={handleChange("residenceZip")}
+            value={pi.currentPostalCode || ""}
+            onChange={handleChange("currentPostalCode")}
           />
         </FormCell>
       </FormRow>
 
-      {/* NEW: Previous Residence and Dates */}
       <FormRow>
         <FormCell
-          className="cell-3"
-          label="Previous Residence and dates resided (if any, please provide complete address)"
+          className="cell-full"
+          label="How long have you lived at your current address?"
         >
           <Input
-            placeholder="Street address"
-            value={formData.prevResidenceComplete}
-            onChange={handleChange("prevResidenceComplete")}
+            value={pi.currentAddressDuration || ""}
+            onChange={handleChange("currentAddressDuration")}
+          />
+        </FormCell>
+      </FormRow>
+
+      {/* PREVIOUS RESIDENCE */}
+      <h3 className="section-subtitle">Previous Residence</h3>
+      <FormRow>
+        <FormCell className="cell-3" label="Previous Residence and dates resided">
+          <Input
+            placeholder="Previous street address"
+            value={pi.previousAddress || ""}
+            onChange={handleChange("previousAddress")}
           />
         </FormCell>
         <FormCell label="City">
           <Input
-            value={formData.prevResidenceCity}
-            onChange={handleChange("prevResidenceCity")}
+            value={pi.previousCity || ""}
+            onChange={handleChange("previousCity")}
           />
         </FormCell>
         <FormCell label="Country">
           <Input
-            value={formData.prevResidenceCountry}
-            onChange={handleChange("prevResidenceCountry")}
+            value={pi.previousCountry || ""}
+            onChange={handleChange("previousCountry")}
           />
         </FormCell>
         <FormCell label="Postal Code">
           <Input
-            value={formData.prevResidenceZip}
-            onChange={handleChange("prevResidenceZip")}
+            value={pi.previousPostalCode || ""}
+            onChange={handleChange("previousPostalCode")}
           />
         </FormCell>
       </FormRow>
 
       <FormRow>
-        <FormCell
-          className="cell-2"
-          label="Dates resided at the residence (DD-MM-YY)"
-        >
+        <FormCell className="cell-full" label="Dates resided (DD-MM-YY)">
           <Input
-            placeholder="DD-MM-YY to DD-MM-YY"
-            value={formData.prevResidenceDatesResided}
-            onChange={handleChange("prevResidenceDatesResided")}
+            placeholder="e.g., 01-01-2020 to 12-31-2022"
+            value={pi.previousDates || ""}
+            onChange={handleChange("previousDates")}
           />
         </FormCell>
       </FormRow>
 
+      {/* SECONDARY/OTHER RESIDENCE */}
+      <h3 className="section-subtitle">Secondary/Other Residence (if any)</h3>
       <FormRow>
-        <FormCell
-          className="cell-2"
-          label="How long have you lived at your current address & in current country ??"
-        >
+        <FormCell className="cell-3" label="Provide information for any current secondary residence and previous primary and secondary residences you have had in the past 10 years">
           <Input
-            value={formData.residenceDuration}
-            onChange={handleChange("residenceDuration")}
-          />
-        </FormCell>
-      </FormRow>
-
-      {/* Previous/Secondary Residences (Past 10 Years) */}
-      {/* Previous/Secondary Residences (Past 10 Years) */}
-      <FormRow>
-        <FormCell
-          className="cell-3"
-          label="Provide information for any current secondary residence and previous primary and secondary residences you have had in the past 10 years (Complete Address)"
-        >
-          <Input
-            placeholder="Street address"
-            value={formData.previousResidenceAddress}
-            onChange={handleChange("previousResidenceAddress")}
+            placeholder="Secondary address"
+            value={pi.secondaryAddress || ""}
+            onChange={handleChange("secondaryAddress")}
           />
         </FormCell>
         <FormCell label="City">
           <Input
-            value={formData.permanentCity}
-            onChange={handleChange("permanentCity")}
+            value={pi.secondaryCity || ""}
+            onChange={handleChange("secondaryCity")}
           />
         </FormCell>
         <FormCell label="Country">
           <Input
-            value={formData.permanentCountry}
-            onChange={handleChange("permanentCountry")}
+            value={pi.secondaryCountry || ""}
+            onChange={handleChange("secondaryCountry")}
           />
         </FormCell>
         <FormCell label="Postal Code">
           <Input
-            value={formData.permanentZip}
-            onChange={handleChange("permanentZip")}
+            value={pi.secondaryPostalCode || ""}
+            onChange={handleChange("secondaryPostalCode")}
           />
         </FormCell>
       </FormRow>
 
+      <FormRow>
+        <FormCell className="cell-full" label="Dates resided (DD-MM-YY)">
+          <Input
+            placeholder="e.g., 01-01-2018 to 12-31-2019"
+            value={pi.secondaryDates || ""}
+            onChange={handleChange("secondaryDates")}
+          />
+        </FormCell>
+      </FormRow>
+
+      {/* OTHER INFORMATION */}
       <FormRow>
         <FormCell
-          className="cell-2"
-          label="Dates Resided (DD-MM-YY to DD-MM-YY)"
+          className="cell-full"
+          label="Permanent Address (if different)"
         >
           <Input
-            placeholder="01-01-15 to 01-01-20"
-            value={formData.previousResidenceDates}
-            onChange={handleChange("previousResidenceDates")}
-          />
-        </FormCell>
-      </FormRow>
-
-      {/* Permanent Address */}
-      <FormRow>
-        <FormCell className="cell-3" label="Permanent Address">
-          <Input
-            placeholder="Street address"
-            value={formData.permanentAddress}
+            value={pi.permanentAddress || ""}
             onChange={handleChange("permanentAddress")}
           />
         </FormCell>
@@ -202,16 +192,16 @@ export default function PersonalInformation() {
       <FormRow>
         <FormCell label="Tax Residency Information">
           <Input
-            value={formData.taxResidency}
+            value={pi.taxResidency || ""}
             onChange={handleChange("taxResidency")}
           />
         </FormCell>
         <FormCell label="TIN / SSN Number">
-          <Input value={formData.tinSsn} onChange={handleChange("tinSsn")} />
+          <Input value={pi.tinSsn || ""} onChange={handleChange("tinSsn")} />
         </FormCell>
         <FormCell className="cell-2" label="List Countries of Citizenship">
           <Input
-            value={formData.citizenship}
+            value={pi.citizenship || ""}
             onChange={handleChange("citizenship")}
           />
         </FormCell>
@@ -219,7 +209,7 @@ export default function PersonalInformation() {
 
       <FormRow>
         <FormCell className="cell-full" label="Hobbies and Activities">
-          <Input value={formData.hobbies} onChange={handleChange("hobbies")} />
+          <Input value={pi.hobbies || ""} onChange={handleChange("hobbies")} />
         </FormCell>
       </FormRow>
     </Section>

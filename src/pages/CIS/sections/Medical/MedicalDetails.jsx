@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Section from "../../components/Section";
 import FormRow from "../../components/FormRow";
 import FormCell from "../../components/FormCell";
@@ -22,15 +22,36 @@ export default function MedicalDetails() {
   ];
 
   const handleChange = (key) => (e) => {
-    updateFormData(key, e.target.value);
+    console.log(`Updating medical.${key} to:`, e.target.value);
+    updateFormData("medical", key, e.target.value);
   };
 
-  const handleFamilyChange = (member, field) => (e) => {
-    const memberKey = member.replace(/\s+/g, "");
-    updateFormData(`family_${memberKey}_${field}`, e.target.value);
+  const handleFamilyChange = (index, field) => (e) => {
+    const updatedHistory = [...formData.familyMedicalHistory];
+    if (!updatedHistory[index]) {
+      updatedHistory[index] = {
+        relationship: familyMembers[index],
+        name: "",
+        age: "",
+        medicalHistory: "",
+        healthStatus: "",
+      };
+    }
+    updatedHistory[index][field] = e.target.value;
+    updateFormData("familyMedicalHistory", updatedHistory);
   };
 
   const gridLayout = "140px 1.2fr 70px 1.8fr 1.5fr";
+
+  // Get medical data from formData
+  const medical = formData.medical || {};
+
+  // Debug: Log medical data on each render
+  useEffect(() => {
+    console.log("MedicalDetails - Current medical data:", medical);
+  }, [medical]);
+
+  
 
   return (
     <Section
@@ -64,13 +85,13 @@ export default function MedicalDetails() {
       <FormRow>
         <FormCell label="Weight">
           <Input
-            value={formData.weight || ""}
+            value={medical.weight || ""}
             onChange={handleChange("weight")}
           />
         </FormCell>
         <FormCell label="Height">
           <Input
-            value={formData.height || ""}
+            value={medical.height || ""}
             onChange={handleChange("height")}
           />
         </FormCell>
@@ -81,10 +102,9 @@ export default function MedicalDetails() {
           className="cell-full"
           label="Do you exercise? If Yes, please give details"
         >
-          {/* UPDATED KEY: exercise_details */}
           <Input
-            value={formData.exercise_details || ""}
-            onChange={handleChange("exercise_details")}
+            value={medical.exercise || ""}
+            onChange={handleChange("exercise")}
           />
         </FormCell>
       </FormRow>
@@ -95,11 +115,10 @@ export default function MedicalDetails() {
           isRed
           label="Any health disorders (Please provide full details)"
         >
-          {/* UPDATED KEY: health_disorders (This was the issue) */}
           <Textarea
             rows={2}
-            value={formData.health_disorders || ""}
-            onChange={handleChange("health_disorders")}
+            value={medical.disorders || ""}
+            onChange={handleChange("disorders")}
           />
         </FormCell>
       </FormRow>
@@ -107,8 +126,8 @@ export default function MedicalDetails() {
       <FormRow>
         <FormCell className="cell-full" isRed label="Any medication taken">
           <Input
-            value={formData.medications || ""}
-            onChange={handleChange("medications")}
+            value={medical.medication || ""}
+            onChange={handleChange("medication")}
           />
         </FormCell>
       </FormRow>
@@ -116,14 +135,14 @@ export default function MedicalDetails() {
       <FormRow>
         <FormCell className="cell-2" label="Family Physician">
           <Input
-            value={formData.physician_name || ""}
-            onChange={handleChange("physician_name")}
+            value={medical.familyPhysician || ""}
+            onChange={handleChange("familyPhysician")}
           />
         </FormCell>
         <FormCell className="cell-2" label="Physician Address">
           <Input
-            value={formData.physician_address || ""}
-            onChange={handleChange("physician_address")}
+            value={medical.physicianAddress || ""}
+            onChange={handleChange("physicianAddress")}
           />
         </FormCell>
       </FormRow>
@@ -131,20 +150,20 @@ export default function MedicalDetails() {
       <FormRow>
         <FormCell label="Telephone No.">
           <Input
-            value={formData.physician_phone || ""}
-            onChange={handleChange("physician_phone")}
+            value={medical.physicianPhone || ""}
+            onChange={handleChange("physicianPhone")}
           />
         </FormCell>
         <FormCell label="No. of Years Attended">
           <Input
-            value={formData.years_attended || ""}
-            onChange={handleChange("years_attended")}
+            value={medical.yearsAttended || ""}
+            onChange={handleChange("yearsAttended")}
           />
         </FormCell>
         <FormCell className="cell-2" label="Last Visited (Date & Reason)">
           <Input
-            value={formData.last_visit_details || ""}
-            onChange={handleChange("last_visit_details")}
+            value={medical.lastVisit || ""}
+            onChange={handleChange("lastVisit")}
           />
         </FormCell>
       </FormRow>
@@ -160,58 +179,109 @@ export default function MedicalDetails() {
             { text: "Current Health Status" },
           ]}
         />
-        {familyMembers.map((member, idx) => (
-          <TableRow
-            key={idx}
-            cells={[
-              { content: <span className="rel-label">{member}</span> },
-              {
-                content: (
-                  <Input
-                    value={
-                      formData[`family_${member.replace(/\s+/g, "")}_name`] ||
-                      ""
-                    }
-                    onChange={handleFamilyChange(member, "name")}
-                  />
-                ),
-              },
-              {
-                content: (
-                  <Input
-                    value={
-                      formData[`family_${member.replace(/\s+/g, "")}_age`] || ""
-                    }
-                    onChange={handleFamilyChange(member, "age")}
-                  />
-                ),
-              },
-              {
-                content: (
-                  <Input
-                    value={
-                      formData[
-                        `family_${member.replace(/\s+/g, "")}_history`
-                      ] || ""
-                    }
-                    onChange={handleFamilyChange(member, "history")}
-                  />
-                ),
-              },
-              {
-                content: (
-                  <Input
-                    value={
-                      formData[`family_${member.replace(/\s+/g, "")}_status`] ||
-                      ""
-                    }
-                    onChange={handleFamilyChange(member, "status")}
-                  />
-                ),
-              },
-            ]}
-          />
-        ))}
+        {familyMembers.map((member, idx) => {
+          const memberData = formData.familyMedicalHistory?.[idx] || {};
+          return (
+            <TableRow
+              key={idx}
+              cells={[
+                { content: <span className="rel-label">{member}</span> },
+                {
+                  content: (
+                    <Input
+                      value={memberData.name || ""}
+                      onChange={(e) => {
+                        const updatedHistory = [
+                          ...formData.familyMedicalHistory,
+                        ];
+                        if (!updatedHistory[idx]) {
+                          updatedHistory[idx] = {
+                            relationship: member,
+                            name: "",
+                            age: "",
+                            medicalHistory: "",
+                            healthStatus: "",
+                          };
+                        }
+                        updatedHistory[idx].name = e.target.value;
+                        updateFormData("familyMedicalHistory", updatedHistory);
+                      }}
+                    />
+                  ),
+                },
+                {
+                  content: (
+                    <Input
+                      value={memberData.age || ""}
+                      onChange={(e) => {
+                        const updatedHistory = [
+                          ...formData.familyMedicalHistory,
+                        ];
+                        if (!updatedHistory[idx]) {
+                          updatedHistory[idx] = {
+                            relationship: member,
+                            name: "",
+                            age: "",
+                            medicalHistory: "",
+                            healthStatus: "",
+                          };
+                        }
+                        updatedHistory[idx].age = e.target.value;
+                        updateFormData("familyMedicalHistory", updatedHistory);
+                      }}
+                    />
+                  ),
+                },
+                {
+                  content: (
+                    <Input
+                      value={memberData.medicalHistory || ""}
+                      onChange={(e) => {
+                        const updatedHistory = [
+                          ...formData.familyMedicalHistory,
+                        ];
+                        if (!updatedHistory[idx]) {
+                          updatedHistory[idx] = {
+                            relationship: member,
+                            name: "",
+                            age: "",
+                            medicalHistory: "",
+                            healthStatus: "",
+                          };
+                        }
+                        updatedHistory[idx].medicalHistory = e.target.value;
+                        updateFormData("familyMedicalHistory", updatedHistory);
+                      }}
+                    />
+                  ),
+                },
+                {
+                  content: (
+                    <Input
+                      value={memberData.healthStatus || ""}
+                      onChange={(e) => {
+                        const updatedHistory = [
+                          ...formData.familyMedicalHistory,
+                        ];
+                        if (!updatedHistory[idx]) {
+                          updatedHistory[idx] = {
+                            relationship: member,
+                            name: "",
+                            age: "",
+                            medicalHistory: "",
+                            healthStatus: "",
+                          };
+                        }
+                        updatedHistory[idx].healthStatus = e.target.value;
+                        updateFormData("familyMedicalHistory", updatedHistory);
+                      }}
+                    />
+                  ),
+                },
+              ]}
+            />
+          );
+        })}
       </div>
     </Section>
   );

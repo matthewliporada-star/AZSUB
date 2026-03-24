@@ -3,20 +3,17 @@ import Section from "../../components/Section";
 import Input from "../../components/Input";
 import TableHeader from "../../components/TableHeader";
 import TableRow from "../../components/TableRow";
-// 1. Import the hook
 import { useForm } from "../../context/FormContext";
 
 export default function TravelDetails() {
-  // 2. Access context
   const { formData, updateFormData } = useForm();
-
   const rows = 3;
 
-  // Helper to handle table input changes
   const handleTableChange = (rowIdx, field) => (e) => {
-    // Saves as "travel_country_0", "travel_city_1", etc.
-    updateFormData(`travel_${field}_${rowIdx}`, e.target.value);
+    updateFormData("travelDetails", { index: rowIdx, field }, e.target.value);
   };
+
+  const travel = formData.travelDetails;
 
   return (
     <Section number={2} title="Travel Details" isTable>
@@ -38,7 +35,7 @@ export default function TravelDetails() {
               {
                 content: (
                   <Input
-                    value={formData[`travel_country_${idx}`]}
+                    value={travel[idx]?.country || ""}
                     onChange={handleTableChange(idx, "country")}
                   />
                 ),
@@ -46,7 +43,7 @@ export default function TravelDetails() {
               {
                 content: (
                   <Input
-                    value={formData[`travel_city_${idx}`]}
+                    value={travel[idx]?.city || ""}
                     onChange={handleTableChange(idx, "city")}
                   />
                 ),
@@ -54,32 +51,32 @@ export default function TravelDetails() {
               {
                 content: (
                   <Input
-                    value={formData[`travel_stay_${idx}`]}
-                    onChange={handleTableChange(idx, "stay")}
+                    value={travel[idx]?.length_of_stay || ""}
+                    onChange={handleTableChange(idx, "length_of_stay")}
                   />
                 ),
               },
               {
                 content: (
                   <Input
-                    value={formData[`travel_freq_${idx}`]}
-                    onChange={handleTableChange(idx, "freq")}
+                    value={travel[idx]?.frequency || ""}
+                    onChange={handleTableChange(idx, "frequency")}
                   />
                 ),
               },
               {
                 content: (
                   <Input
+                    value={travel[idx]?.date_travel || ""}
+                    onChange={handleTableChange(idx, "date_travel")}
                     placeholder="DD-MM-YY"
-                    value={formData[`travel_date_${idx}`]}
-                    onChange={handleTableChange(idx, "date")}
                   />
                 ),
               },
               {
                 content: (
                   <Input
-                    value={formData[`travel_reason_${idx}`]}
+                    value={travel[idx]?.reason || ""}
                     onChange={handleTableChange(idx, "reason")}
                   />
                 ),

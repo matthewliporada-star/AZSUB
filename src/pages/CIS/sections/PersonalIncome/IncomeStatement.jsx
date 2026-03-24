@@ -6,53 +6,44 @@ import { useForm } from "../../context/FormContext";
 export default function IncomeStatement() {
   const { formData, updateFormData } = useForm();
 
-  const incomeSources = [
-    "Income / Salary",
-    "Bonus",
-    "Investment Income",
-    "Interest",
-    "Dividends",
-    "Rental Income",
-    "Other Income Source",
-  ];
-
   const freqOptions = ["Monthly", "Annual"];
+
+  const income = formData.incomeStatement || {};
 
   // Helper to handle input changes
   const handleChange = (key, value) => {
-    updateFormData(key, value);
+    updateFormData("incomeStatement", key, value);
   };
 
-  // Memoized calculations for Totals and Disposable Income
+  // Memoized calculations for Totals
   const totals = useMemo(() => {
-    let selfInc = 0;
-    let spouseInc = 0;
+    let self = 0;
+    let spouse = 0;
 
-    // Calculate Total Income
-    incomeSources.forEach((_, idx) => {
-      selfInc += parseFloat(formData[`inc_${idx}_self`]) || 0;
-      spouseInc += parseFloat(formData[`inc_${idx}_spouse`]) || 0;
-    });
+    // Sum all income sources for self
+    self += parseFloat(income.selfIncome) || 0;
+    self += parseFloat(income.bonus) || 0;
+    self += parseFloat(income.investmentIncome) || 0;
+    self += parseFloat(income.interest) || 0;
+    self += parseFloat(income.dividends) || 0;
+    self += parseFloat(income.rentalIncome) || 0;
+    self += parseFloat(income.otherIncome) || 0;
 
-    // Get Expenditure values
-    const selfExp = parseFloat(formData.exp_self) || 0;
-    const spouseExp = parseFloat(formData.exp_spouse) || 0;
+    // Sum all income sources for spouse
+    spouse += parseFloat(income.spouseIncome) || 0;
+    spouse += parseFloat(income.spouseBonus) || 0;
+    spouse += parseFloat(income.spouseInvestment) || 0;
+    spouse += parseFloat(income.spouseInterest) || 0;
+    spouse += parseFloat(income.spouseDividends) || 0;
+    spouse += parseFloat(income.spouseRental) || 0;
+    spouse += parseFloat(income.spouseOther) || 0;
 
     return {
-      // Income Totals
-      incomeSelf: selfInc.toFixed(2),
-      incomeSpouse: spouseInc.toFixed(2),
-      incomeJoint: (selfInc + spouseInc).toFixed(2),
-
-      // Expenditure Totals
-      expJoint: (selfExp + spouseExp).toFixed(2),
-
-      // Disposable Income (Income - Expenditure)
-      dispSelf: (selfInc - selfExp).toFixed(2),
-      dispSpouse: (spouseInc - spouseExp).toFixed(2),
-      dispJoint: (selfInc + spouseInc - (selfExp + spouseExp)).toFixed(2),
+      self: self.toFixed(2),
+      spouse: spouse.toFixed(2),
+      joint: (self + spouse).toFixed(2),
     };
-  }, [formData, incomeSources]);
+  }, [income]);
 
   return (
     <Section number={7} title="Personal Income Statement" isTable>
@@ -64,90 +55,17 @@ export default function IncomeStatement() {
         <span>Joint (USD)</span>
       </div>
 
-      {/* Income Rows */}
-      {incomeSources.map((source, idx) => {
-        const selfVal = parseFloat(formData[`inc_${idx}_self`]) || 0;
-        const spouseVal = parseFloat(formData[`inc_${idx}_spouse`]) || 0;
-
-        return (
-          <div key={idx} className="income-row">
-            <div className="income-cell">
-              <label>{source}</label>
-            </div>
-            <div className="income-cell">
-              <select
-                value={formData[`inc_${idx}_freq`] || ""}
-                onChange={(e) =>
-                  handleChange(`inc_${idx}_freq`, e.target.value)
-                }
-                className="select-plain"
-              >
-                <option value="">—</option>
-                {freqOptions.map((f) => (
-                  <option key={f} value={f}>
-                    {f}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="income-cell">
-              <Input
-                value={formData[`inc_${idx}_self`] || ""}
-                onChange={(e) =>
-                  handleChange(`inc_${idx}_self`, e.target.value)
-                }
-                placeholder="0.00"
-              />
-            </div>
-            <div className="income-cell">
-              <Input
-                value={formData[`inc_${idx}_spouse`] || ""}
-                onChange={(e) =>
-                  handleChange(`inc_${idx}_spouse`, e.target.value)
-                }
-                placeholder="0.00"
-              />
-            </div>
-            <div className="income-cell">
-              <Input
-                value={(selfVal + spouseVal).toFixed(2)}
-                readOnly
-                placeholder="0.00"
-              />
-            </div>
-          </div>
-        );
-      })}
-
-      {/* Total Income Row */}
-      <div className="income-row total-row">
-        <div className="income-cell">
-          <label style={{ fontWeight: "700" }}>Total Income</label>
-        </div>
-        <div className="income-cell"></div>
-        <div className="income-cell">
-          <Input value={totals.incomeSelf} readOnly />
-        </div>
-        <div className="income-cell">
-          <Input value={totals.incomeSpouse} readOnly />
-        </div>
-        <div className="income-cell">
-          <Input value={totals.incomeJoint} readOnly />
-        </div>
-      </div>
-
-      {/* Total Monthly Expenditure Row */}
+      {/* Income/Salary */}
       <div className="income-row">
         <div className="income-cell">
-          <label>Total Monthly Expenditure</label>
+          <label>Income / Salary</label>
         </div>
         <div className="income-cell">
           <select
-            value={formData.exp_freq || ""}
-            onChange={(e) => handleChange("exp_freq", e.target.value)}
+            value={income.frequency || "Monthly"}
+            onChange={(e) => handleChange("frequency", e.target.value)}
             className="select-plain"
           >
-            <option value="">—</option>
             {freqOptions.map((f) => (
               <option key={f} value={f}>
                 {f}
@@ -157,42 +75,410 @@ export default function IncomeStatement() {
         </div>
         <div className="income-cell">
           <Input
-            value={formData.exp_self || ""}
-            onChange={(e) => handleChange("exp_self", e.target.value)}
+            value={income.selfIncome || ""}
+            onChange={(e) => handleChange("selfIncome", e.target.value)}
             placeholder="0.00"
           />
         </div>
         <div className="income-cell">
           <Input
-            value={formData.exp_spouse || ""}
-            onChange={(e) => handleChange("exp_spouse", e.target.value)}
+            value={income.spouseIncome || ""}
+            onChange={(e) => handleChange("spouseIncome", e.target.value)}
             placeholder="0.00"
           />
         </div>
         <div className="income-cell">
-          <Input value={totals.expJoint} readOnly placeholder="0.00" />
+          <Input
+            value={(
+              parseFloat(income.selfIncome || 0) +
+              parseFloat(income.spouseIncome || 0)
+            ).toFixed(2)}
+            readOnly
+            placeholder="0.00"
+          />
         </div>
       </div>
 
-      {/* Estimated Monthly Disposable Income Row */}
-      <div
-        className="income-row total-row"
-        
-      >
+      {/* Bonus */}
+      <div className="income-row">
         <div className="income-cell">
-          <label>
-            Estimated Monthly Disposable Income
-          </label>
-        </div>
-        <div className="income-cell"></div>
-        <div className="income-cell">
-          <Input value={totals.dispSelf} readOnly />
+          <label>Bonus</label>
         </div>
         <div className="income-cell">
-          <Input value={totals.dispSpouse} readOnly />
+          <select
+            value={income.bonusFrequency || "Monthly"}
+            onChange={(e) => handleChange("bonusFrequency", e.target.value)}
+            className="select-plain"
+          >
+            {freqOptions.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="income-cell">
-          <Input value={totals.dispJoint} readOnly />
+          <Input
+            value={income.bonus || ""}
+            onChange={(e) => handleChange("bonus", e.target.value)}
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.spouseBonus || ""}
+            onChange={(e) => handleChange("spouseBonus", e.target.value)}
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={(
+              parseFloat(income.bonus || 0) +
+              parseFloat(income.spouseBonus || 0)
+            ).toFixed(2)}
+            readOnly
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+
+      {/* Investment Income */}
+      <div className="income-row">
+        <div className="income-cell">
+          <label>Investment Income</label>
+        </div>
+        <div className="income-cell">
+          <select
+            value={income.investmentFrequency || "Monthly"}
+            onChange={(e) =>
+              handleChange("investmentFrequency", e.target.value)
+            }
+            className="select-plain"
+          >
+            {freqOptions.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.investmentIncome || ""}
+            onChange={(e) => handleChange("investmentIncome", e.target.value)}
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.spouseInvestment || ""}
+            onChange={(e) => handleChange("spouseInvestment", e.target.value)}
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={(
+              parseFloat(income.investmentIncome || 0) +
+              parseFloat(income.spouseInvestment || 0)
+            ).toFixed(2)}
+            readOnly
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+
+      {/* Interest */}
+      <div className="income-row">
+        <div className="income-cell">
+          <label>Interest</label>
+        </div>
+        <div className="income-cell">
+          <select
+            value={income.interestFrequency || "Monthly"}
+            onChange={(e) => handleChange("interestFrequency", e.target.value)}
+            className="select-plain"
+          >
+            {freqOptions.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.interest || ""}
+            onChange={(e) => handleChange("interest", e.target.value)}
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.spouseInterest || ""}
+            onChange={(e) => handleChange("spouseInterest", e.target.value)}
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={(
+              parseFloat(income.interest || 0) +
+              parseFloat(income.spouseInterest || 0)
+            ).toFixed(2)}
+            readOnly
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+
+      {/* Dividends */}
+      <div className="income-row">
+        <div className="income-cell">
+          <label>Dividends</label>
+        </div>
+        <div className="income-cell">
+          <select
+            value={income.dividendsFrequency || "Monthly"}
+            onChange={(e) => handleChange("dividendsFrequency", e.target.value)}
+            className="select-plain"
+          >
+            {freqOptions.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.dividends || ""}
+            onChange={(e) => handleChange("dividends", e.target.value)}
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.spouseDividends || ""}
+            onChange={(e) => handleChange("spouseDividends", e.target.value)}
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={(
+              parseFloat(income.dividends || 0) +
+              parseFloat(income.spouseDividends || 0)
+            ).toFixed(2)}
+            readOnly
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+
+      {/* Rental Income */}
+      <div className="income-row">
+        <div className="income-cell">
+          <label>Rental Income</label>
+        </div>
+        <div className="income-cell">
+          <select
+            value={income.rentalFrequency || "Monthly"}
+            onChange={(e) => handleChange("rentalFrequency", e.target.value)}
+            className="select-plain"
+          >
+            {freqOptions.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.rentalIncome || ""}
+            onChange={(e) => handleChange("rentalIncome", e.target.value)}
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.spouseRental || ""}
+            onChange={(e) => handleChange("spouseRental", e.target.value)}
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={(
+              parseFloat(income.rentalIncome || 0) +
+              parseFloat(income.spouseRental || 0)
+            ).toFixed(2)}
+            readOnly
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+
+      {/* Other Income Source */}
+      <div className="income-row">
+        <div className="income-cell">
+          <label>Other Income Source</label>
+        </div>
+        <div className="income-cell">
+          <select
+            value={income.otherFrequency || "Monthly"}
+            onChange={(e) => handleChange("otherFrequency", e.target.value)}
+            className="select-plain"
+          >
+            {freqOptions.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.otherIncome || ""}
+            onChange={(e) => handleChange("otherIncome", e.target.value)}
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.spouseOther || ""}
+            onChange={(e) => handleChange("spouseOther", e.target.value)}
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={(
+              parseFloat(income.otherIncome || 0) +
+              parseFloat(income.spouseOther || 0)
+            ).toFixed(2)}
+            readOnly
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+
+      {/* Total Income Row */}
+      <div className="income-row total-row">
+        <div className="income-cell">
+          <label style={{ fontWeight: "700" }}>Total Income</label>
+        </div>
+        <div className="income-cell">
+          
+        </div>
+        <div className="income-cell">
+          <Input value={totals.self} readOnly />
+        </div>
+        <div className="income-cell">
+          <Input value={totals.spouse} readOnly />
+        </div>
+        <div className="income-cell">
+          <Input value={totals.joint} readOnly />
+        </div>
+      </div>
+
+      {/* Total Monthly Expenditure */}
+      <div className="income-row">
+        <div className="income-cell">
+          <label>Total Monthly Expenditure</label>
+        </div>
+        <div className="income-cell">
+          <select
+            value={income.totalExpenditureFrequency || "Monthly"}
+            onChange={(e) =>
+              handleChange("totalExpenditureFrequency", e.target.value)
+            }
+            className="select-plain"
+          >
+            {freqOptions.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.totalExpenditureSelf || ""}
+            onChange={(e) =>
+              handleChange("totalExpenditureSelf", e.target.value)
+            }
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.totalExpenditureSpouse || ""}
+            onChange={(e) =>
+              handleChange("totalExpenditureSpouse", e.target.value)
+            }
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.totalExpenditureJoint || ""}
+            onChange={(e) =>
+              handleChange("totalExpenditureJoint", e.target.value)
+            }
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+
+      {/* Disposable Income */}
+      <div className="income-row">
+        <div className="income-cell">
+          <label>Disposable Income</label>
+        </div>
+        <div className="income-cell">
+          <select
+            value={income.disposableIncomeFrequency || "Monthly"}
+            onChange={(e) =>
+              handleChange("disposableIncomeFrequency", e.target.value)
+            }
+            className="select-plain"
+          >
+            {freqOptions.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.disposableIncomeSelf || ""}
+            onChange={(e) =>
+              handleChange("disposableIncomeSelf", e.target.value)
+            }
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.disposableIncomeSpouse || ""}
+            onChange={(e) =>
+              handleChange("disposableIncomeSpouse", e.target.value)
+            }
+            placeholder="0.00"
+          />
+        </div>
+        <div className="income-cell">
+          <Input
+            value={income.disposableIncomeJoint || ""}
+            onChange={(e) =>
+              handleChange("disposableIncomeJoint", e.target.value)
+            }
+            placeholder="0.00"
+          />
         </div>
       </div>
     </Section>

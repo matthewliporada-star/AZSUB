@@ -7,47 +7,62 @@ import { useForm } from "../../context/FormContext";
 
 export default function DependentDetails() {
   const { formData, updateFormData } = useForm();
-  const handleChange = (key) => (e) => updateFormData(key, e.target.value);
+  const dependents = formData.dependentDetails || [];
+
+  const handleChange = (idx, field, value) => {
+    const newDependents = [...dependents];
+    if (!newDependents[idx]) {
+      newDependents[idx] = {};
+    }
+    newDependents[idx][field] = value;
+    updateFormData("dependentDetails", newDependents);
+  };
 
   return (
     <Section number={13} title="Dependent Details">
-      {[1, 2].map((num) => (
-        <React.Fragment key={num}>
-          <div className="sub-header">Dependent {num}</div>
-
-          <FormRow>
-            <FormCell className="cell-2" label={`Dependent Name ${num}`}>
-              <Input
-                value={formData[`dep_${num}_name`] || ""}
-                onChange={handleChange(`dep_${num}_name`)}
-              />
-            </FormCell>
-            <FormCell label="Relationship">
-              <Input
-                value={formData[`dep_${num}_rel`] || ""}
-                onChange={handleChange(`dep_${num}_rel`)}
-              />
-            </FormCell>
-          </FormRow>
-
-          <FormRow>
-            <FormCell label="Nationality">
-              <Input
-                value={formData[`dep_${num}_nat`] || ""}
-                onChange={handleChange(`dep_${num}_nat`)}
-              />
-            </FormCell>
-            <FormCell label="Date of Birth">
-              <Input
-                placeholder="DD-MM-YYYY"
-                value={formData[`dep_${num}_dob`] || ""}
-                onChange={handleChange(`dep_${num}_dob`)}
-              />
-            </FormCell>
-            {/* Email FormCell removed from here */}
-          </FormRow>
-        </React.Fragment>
-      ))}
+      {[0, 1].map((num) => {
+        const dep = dependents[num] || {};
+        return (
+          <React.Fragment key={num}>
+            <div className="sub-header">Dependent {num + 1}</div>
+            <FormRow>
+              <FormCell className="cell-2" label={`Dependent Name`}>
+                <Input
+                  value={dep.name || ""}
+                  onChange={(e) => handleChange(num, "name", e.target.value)}
+                />
+              </FormCell>
+              <FormCell label="Relationship">
+                <Input
+                  value={dep.relationship || ""}
+                  onChange={(e) =>
+                    handleChange(num, "relationship", e.target.value)
+                  }
+                />
+              </FormCell>
+            </FormRow>
+            <FormRow>
+              <FormCell label="Nationality">
+                <Input
+                  value={dep.nationality || ""}
+                  onChange={(e) =>
+                    handleChange(num, "nationality", e.target.value)
+                  }
+                />
+              </FormCell>
+              <FormCell label="Date of Birth">
+                <Input
+                  placeholder="DD-MM-YYYY"
+                  value={dep.dateOfBirth || ""}
+                  onChange={(e) =>
+                    handleChange(num, "dateOfBirth", e.target.value)
+                  }
+                />
+              </FormCell>
+            </FormRow>
+          </React.Fragment>
+        );
+      })}
     </Section>
   );
 }

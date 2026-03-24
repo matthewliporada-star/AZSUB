@@ -10,8 +10,15 @@ export default function Insurance() {
   const rows = 3;
 
   const handleTableChange = (rowIdx, field) => (e) => {
-    updateFormData(`insurance_${field}_${rowIdx}`, e.target.value);
+    const newInsurance = [...(formData.insurance || [])];
+    if (!newInsurance[rowIdx]) {
+      newInsurance[rowIdx] = {};
+    }
+    newInsurance[rowIdx][field] = e.target.value;
+    updateFormData("insurance", newInsurance);
   };
+
+  const insurance = formData.insurance || [];
 
   return (
     <Section number={5} title="Existing or Pending Insurance" isTable>
@@ -32,7 +39,7 @@ export default function Insurance() {
               {
                 content: (
                   <Input
-                    value={formData[`insurance_company_${idx}`]}
+                    value={insurance[idx]?.company || ""}
                     onChange={handleTableChange(idx, "company")}
                   />
                 ),
@@ -40,7 +47,7 @@ export default function Insurance() {
               {
                 content: (
                   <Input
-                    value={formData[`insurance_type_${idx}`]}
+                    value={insurance[idx]?.type || ""}
                     onChange={handleTableChange(idx, "type")}
                   />
                 ),
@@ -48,23 +55,23 @@ export default function Insurance() {
               {
                 content: (
                   <Input
-                    value={formData[`insurance_year_${idx}`]}
-                    onChange={handleTableChange(idx, "year")}
+                    value={insurance[idx]?.countryYear || ""}
+                    onChange={handleTableChange(idx, "countryYear")}
                   />
                 ),
               },
               {
                 content: (
                   <Input
-                    value={formData[`insurance_cover_${idx}`]}
-                    onChange={handleTableChange(idx, "cover")}
+                    value={insurance[idx]?.amount || ""}
+                    onChange={handleTableChange(idx, "amount")}
                   />
                 ),
               },
               {
                 content: (
                   <Input
-                    value={formData[`insurance_premium_${idx}`]}
+                    value={insurance[idx]?.premium || ""}
                     onChange={handleTableChange(idx, "premium")}
                   />
                 ),

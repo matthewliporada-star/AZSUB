@@ -10,7 +10,16 @@ export default function SmokingAlcohol() {
   const { formData, updateFormData } = useForm();
 
   const handleChange = (key) => (e) => {
-    updateFormData(key, e.target.value);
+    updateFormData("habits", key, e.target.value);
+  };
+
+  const h = formData.habits;
+
+  // Map the PDF values to dropdown options if needed
+  const getSmokerStatus = (value) => {
+    if (value === "A" || value === "Smoker") return "Smoker";
+    if (value === "B" || value === "Non-Smoker") return "Non-Smoker";
+    return value || "";
   };
 
   return (
@@ -19,7 +28,7 @@ export default function SmokingAlcohol() {
         <FormCell className="cell-2" label="Smoker Status">
           <Select
             options={["", "Smoker", "Non-Smoker"]}
-            value={formData.smokerStatus || ""}
+            value={getSmokerStatus(h.smokerStatus)}
             onChange={handleChange("smokerStatus")}
           />
         </FormCell>
@@ -28,8 +37,9 @@ export default function SmokingAlcohol() {
           label="If Smoker — how many cigarettes/day?"
         >
           <Input
-            value={formData.cigarettesPerDay || ""}
+            value={h.cigarettesPerDay || ""}
             onChange={handleChange("cigarettesPerDay")}
+            placeholder="e.g., 10"
           />
         </FormCell>
       </FormRow>
@@ -39,30 +49,31 @@ export default function SmokingAlcohol() {
           label="If Non-Smoker — Smoking earlier? If yes, since when"
         >
           <Input
-            value={formData.previousSmokingHistory || ""}
+            value={h.previousSmokingHistory || ""}
             onChange={handleChange("previousSmokingHistory")}
+            placeholder="e.g., Quit in 2020"
           />
         </FormCell>
       </FormRow>
       <FormRow>
-        <FormCell label="Alcohol Consumption - Type">
+        <FormCell label="Alcohol Type">
           <Input
             placeholder="e.g. Wine, Beer"
-            value={formData.alcoholType || ""}
+            value={h.alcoholType || ""}
             onChange={handleChange("alcoholType")}
           />
         </FormCell>
-        <FormCell label="Alcohol Consumption - Measurement">
+        <FormCell label="Measurement">
           <Input
             placeholder="e.g. Units/glasses"
-            value={formData.alcoholMeasurement || ""}
+            value={h.alcoholMeasurement || ""}
             onChange={handleChange("alcoholMeasurement")}
           />
         </FormCell>
-        <FormCell label="Alcohol Consumption - Frequency">
+        <FormCell label="Frequency">
           <Input
             placeholder="e.g. Daily, Weekly"
-            value={formData.alcoholFrequency || ""}
+            value={h.alcoholFrequency || ""}
             onChange={handleChange("alcoholFrequency")}
           />
         </FormCell>

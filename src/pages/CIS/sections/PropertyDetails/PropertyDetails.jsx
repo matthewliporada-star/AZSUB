@@ -5,74 +5,74 @@ import { useForm } from "../../context/FormContext";
 
 export default function PropertyDetails() {
   const { formData, updateFormData } = useForm();
+  const propertyDetails = formData.propertyDetails || [];
 
-  const handleUpdate = (key, value) => {
-    updateFormData(key, value);
+  const handleUpdate = (idx, field, value) => {
+    const newProperties = [...propertyDetails];
+    if (!newProperties[idx]) {
+      newProperties[idx] = {};
+    }
+    newProperties[idx][field] = value;
+    updateFormData("propertyDetails", newProperties);
   };
 
-  // 1. DEFINE GRID LAYOUT
-  // Adjust these fractions (fr) or pixels (px) to change column widths
-  const gridLayout = "1.2fr 1.5fr 1fr 1fr 1fr 1fr 1fr";
-
-  const renderPropRow = (type, idx) => {
-    const baseKey = `prop_${type}_${idx}`;
+  const renderPropRow = (idx, isFirstRow = false, sectionType = "") => {
+    const prop = propertyDetails[idx] || {};
     return (
       <div key={idx} className="prop-row">
         <div className="prop-cell">
-          <Input
-            placeholder={
-              idx === 0
-                ? type === "personal"
-                  ? "e.g. Apartment"
-                  : "e.g. Commercial"
-                : ""
-            }
-            value={formData[`${baseKey}_type`] || ""}
-            onChange={(e) => handleUpdate(`${baseKey}_type`, e.target.value)}
-          />
+          {isFirstRow ? (
+            <span
+              style={{ fontWeight: "500", fontSize: "11px", lineHeight: "1.4" }}
+            >
+              {sectionType}
+            </span>
+          ) : (
+            <span>&nbsp;</span>
+          )}
         </div>
         <div className="prop-cell">
           <Input
-            value={formData[`${baseKey}_location`] || ""}
-            onChange={(e) =>
-              handleUpdate(`${baseKey}_location`, e.target.value)
-            }
+            placeholder="Address, City, Country"
+            value={prop.location || ""}
+            onChange={(e) => handleUpdate(idx, "location", e.target.value)}
           />
         </div>
         <div className="prop-cell">
           <Input
             placeholder="dd/mm/yyyy"
-            value={formData[`${baseKey}_date`] || ""}
-            onChange={(e) => handleUpdate(`${baseKey}_date`, e.target.value)}
+            value={prop.purchaseDate || ""}
+            onChange={(e) => handleUpdate(idx, "purchaseDate", e.target.value)}
           />
         </div>
         <div className="prop-cell">
           <Input
             placeholder="0.00"
-            value={formData[`${baseKey}_price`] || ""}
-            onChange={(e) => handleUpdate(`${baseKey}_price`, e.target.value)}
+            value={prop.purchasePrice || ""}
+            onChange={(e) => handleUpdate(idx, "purchasePrice", e.target.value)}
           />
         </div>
         <div className="prop-cell">
           <Input
             placeholder="0.00"
-            value={formData[`${baseKey}_mortgage`] || ""}
+            value={prop.mortgage || ""}
+            onChange={(e) => handleUpdate(idx, "mortgage", e.target.value)}
+          />
+        </div>
+        <div className="prop-cell">
+          <Input
+            placeholder="0.00"
+            value={prop.currentValue || ""}
+            onChange={(e) => handleUpdate(idx, "currentValue", e.target.value)}
+          />
+        </div>
+        <div className="prop-cell">
+          <Input
+            placeholder="e.g., Daily, Weekly"
+            value={prop.frequencyVisits || ""}
             onChange={(e) =>
-              handleUpdate(`${baseKey}_mortgage`, e.target.value)
+              handleUpdate(idx, "frequencyVisits", e.target.value)
             }
-          />
-        </div>
-        <div className="prop-cell">
-          <Input
-            placeholder="0.00"
-            value={formData[`${baseKey}_value`] || ""}
-            onChange={(e) => handleUpdate(`${baseKey}_value`, e.target.value)}
-          />
-        </div>
-        <div className="prop-cell">
-          <Input
-            value={formData[`${baseKey}_visits`] || ""}
-            onChange={(e) => handleUpdate(`${baseKey}_visits`, e.target.value)}
           />
         </div>
       </div>
@@ -81,80 +81,29 @@ export default function PropertyDetails() {
 
   return (
     <Section number={9} title="Property Details" isTable>
-      {/* SCOPED GRID STYLES */}
-      <style>{`
-        .property-grid-container .prop-header,
-        .property-grid-container .prop-row {
-          display: grid !important;
-          grid-template-columns: ${gridLayout} !important;
-          width: 100% !important;
-          align-items: stretch;
-          border-bottom: 1px solid var(--border);
-        }
-
-        .property-grid-container .prop-header {
-          background: var(--navy);
-          border-bottom: none;
-        }
-
-        .property-grid-container .prop-header span,
-        .property-grid-container .prop-cell {
-          padding: 10px 12px !important;
-          display: flex;
-          align-items: center;
-          border-right: 1px solid var(--border) !important;
-          box-sizing: border-box;
-          min-height: 45px;
-        }
-
-        /* Header specific text styles */
-        .property-grid-container .prop-header span {
-          color: white;
-          font-size: 10px;
-          font-weight: 700;
-          text-transform: uppercase;
-          border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
-          line-height: 1.2;
-        }
-
-        /* Remove last border */
-        .property-grid-container .prop-header span:last-child,
-        .property-grid-container .prop-cell:last-child {
-          border-right: none !important;
-        }
-
-        .property-grid-container .sub-header {
-          grid-column: 1 / -1; /* Spans across all columns */
-          background: #f8fafc;
-          padding: 8px 15px;
-          font-weight: 700;
-          font-size: 11px;
-          text-transform: uppercase;
-          color: var(--navy);
-          border-bottom: 1px solid var(--border);
-          border-left: 3px solid var(--gold);
-        }
-      `}</style>
-
-      <div className="property-grid-container">
-        <div className="prop-header">
-          <span>Type</span>
-          <span>Location (Address, City & Country)</span>
-          <span>Date of Purchase</span>
-          <span>Purchase Price (USD)</span>
-          <span>Mortgage (USD)</span>
-          <span>Current Value (USD)</span>
-          <span>Frequency of Visits</span>
-        </div>
-
-        <div className="sub-header">Personal Properties</div>
-        {[...Array(2)].map((_, idx) => renderPropRow("personal", idx))}
-
-        <div className="sub-header">
-          Real Estate (full or partial ownership — specify % if partial)
-        </div>
-        {[...Array(2)].map((_, idx) => renderPropRow("realestate", idx))}
+      <div className="prop-header">
+        <span>Type</span>
+        <span>Location - Complete Address with city & country</span>
+        <span>Date of Purchase (dd/mm/yyyy)</span>
+        <span>Purchase Price (USD)</span>
+        <span>Mortgage (USD)</span>
+        <span>Current Value (USD)</span>
+        <span>Frequency of visits/stays</span>
       </div>
+
+      {/* Personal Properties - 4 rows */}
+      {[0, 1, 2, 3].map((idx) =>
+        renderPropRow(idx, idx === 0, "Personal Properties"),
+      )}
+
+      {/* Real Estate Properties - 4 rows */}
+      {[4, 5, 6, 7].map((idx) =>
+        renderPropRow(
+          idx,
+          idx === 4,
+          "Real Estate (Please list all properties of which you are a full or partial owner. If you are a partial owner of a property, please specify the percentage of ownership for that particular property.)",
+        ),
+      )}
     </Section>
   );
 }

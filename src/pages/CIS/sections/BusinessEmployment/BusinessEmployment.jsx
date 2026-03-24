@@ -10,22 +10,24 @@ function BusinessEmployment() {
   const { formData, updateFormData } = useForm();
 
   const handleChange = (key) => (e) => {
-    updateFormData(key, e.target.value);
+    updateFormData("businessEmployment", key, e.target.value);
   };
+
+  const business = formData.businessEmployment || {};
 
   return (
     <Section number={6} title="Business / Employment Information">
       <FormRow>
         <FormCell className="cell-2" label="Name of Business">
           <Input
-            value={formData.businessName || ""}
+            value={business.businessName || ""}
             onChange={handleChange("businessName")}
           />
         </FormCell>
         <FormCell className="cell-2" label="Nature of Business">
           <Input
-            value={formData.businessNature || ""}
-            onChange={handleChange("businessNature")}
+            value={business.natureOfBusiness || ""}
+            onChange={handleChange("natureOfBusiness")}
           />
         </FormCell>
       </FormRow>
@@ -33,7 +35,7 @@ function BusinessEmployment() {
       <FormRow>
         <FormCell className="cell-2" label="Occupation / Duties">
           <Input
-            value={formData.occupation || ""}
+            value={business.occupation || ""}
             onChange={handleChange("occupation")}
           />
         </FormCell>
@@ -48,7 +50,7 @@ function BusinessEmployment() {
               "Offshore",
               "Partnership",
             ]}
-            value={formData.businessType || ""}
+            value={business.businessType || ""}
             onChange={handleChange("businessType")}
           />
         </FormCell>
@@ -57,32 +59,29 @@ function BusinessEmployment() {
       <FormRow>
         <FormCell label="Percentage of Ownership">
           <Input
-            value={formData.ownershipPercent || ""}
-            onChange={handleChange("ownershipPercent")}
+            value={business.ownership || ""}
+            onChange={handleChange("ownership")}
           />
         </FormCell>
         <FormCell className="cell-2" label="Business Address">
           <Input
-            value={formData.businessAddress || ""}
+            value={business.businessAddress || ""}
             onChange={handleChange("businessAddress")}
           />
         </FormCell>
         <FormCell label="City">
-          <Input
-            value={formData.businessCity || ""}
-            onChange={handleChange("businessCity")}
-          />
+          <Input value={business.city || ""} onChange={handleChange("city")} />
         </FormCell>
         <FormCell label="Country">
           <Input
-            value={formData.businessCountry || ""}
-            onChange={handleChange("businessCountry")}
+            value={business.country || ""}
+            onChange={handleChange("country")}
           />
         </FormCell>
         <FormCell label="Postal Code">
           <Input
-            value={formData.businessZip || ""}
-            onChange={handleChange("businessZip")}
+            value={business.postalCode || ""}
+            onChange={handleChange("postalCode")}
           />
         </FormCell>
       </FormRow>
@@ -91,21 +90,21 @@ function BusinessEmployment() {
         <FormCell label="Website">
           <Input
             type="url"
-            value={formData.businessWebsite || ""}
-            onChange={handleChange("businessWebsite")}
+            value={business.website || ""}
+            onChange={handleChange("website")}
           />
         </FormCell>
         <FormCell label="Business Telephone">
           <Input
             type="tel"
-            value={formData.businessPhone || ""}
-            onChange={handleChange("businessPhone")}
+            value={business.telephone || ""}
+            onChange={handleChange("telephone")}
           />
         </FormCell>
         <FormCell label="Date of Incorporation">
           <Input
             placeholder="DD-MM-YYYY"
-            value={formData.incorporationDate || ""}
+            value={business.incorporationDate || ""}
             onChange={handleChange("incorporationDate")}
           />
         </FormCell>
@@ -115,12 +114,12 @@ function BusinessEmployment() {
         <FormCell
           className="cell-full"
           isRed
-          label="Previous Work Experience (last 15 years). Kindly specify role, organization name and years"
+          label="Previous Work Experience (last 15 years)"
         >
           <Input
             placeholder="1. Role | Organization | Years"
-            value={formData.previousExperience || ""}
-            onChange={handleChange("previousExperience")}
+            value={business.workExperience || ""}
+            onChange={handleChange("workExperience")}
           />
         </FormCell>
       </FormRow>
