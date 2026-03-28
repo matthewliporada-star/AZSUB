@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import LeftImage from "../../assets/1.png";
 import LogoImage from "../../assets/2.png";
@@ -7,11 +7,20 @@ import "./Login.css";
 import supabase from "../../config/supabaseClient";
 
 function Login() {
-  const navigate = useNavigate();
-  const { setUserRole, setCurrentUser, darkMode, toggleDarkMode } = useApp();
+   const navigate = useNavigate();
+   const location = useLocation();
+   const { setUserRole, setCurrentUser, darkMode, toggleDarkMode } = useApp();
 
-  // --- Form States ---
-  const [identifier, setIdentifier] = useState(""); // email or username
+   // --- Forced Verification Check ---
+   useEffect(() => {
+     const isVerified = localStorage.getItem("is_verified") === "true";
+     if (!isVerified) {
+       navigate("/verify-identity", { replace: true });
+     }
+   }, [navigate]);
+
+   // --- Form States ---
+   const [identifier, setIdentifier] = useState(location.state?.email || ""); // email or username
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -309,20 +318,20 @@ function Login() {
 
           <h2 className="signin-prompt">SIGN IN</h2>
 
-          <form onSubmit={handleLogin}>
-            <div className="form-group">
-              <label className="form-label">Email</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Enter your username or email"
-                value={identifier}
-                onChange={handleIdentifierChange}
-                disabled={cooldown > 0}
-                required
-              />
-            </div>
-
+<form onSubmit={handleLogin}>
+  <div className="form-group">
+    <label className="form-label">Email</label>
+    <input
+      type="text"
+      className="form-input"
+      placeholder="Enter your username or email"
+      value={identifier}
+      onChange={handleIdentifierChange}
+      // Fix: Either remove "disabled=" or give it a boolean value
+      disabled={true} 
+      required
+    />
+  </div>
             <div className="form-group">
               <label className="form-label">Password</label>
               <div className="password-wrapper">

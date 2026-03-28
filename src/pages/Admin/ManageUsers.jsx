@@ -247,7 +247,8 @@ const handleFormChange = (e) => {
     setIsEditMode(false);
     setSelectedUser(null);
     setFormData({
-      firstName: "", lastName: "", email: "", position: "MD", password: "", reportsTo: ""
+      firstName: "", lastName: "", email: "", position: "MD", password: "", reportsTo: "",
+      intermediary_code: ""
     });
     setModalError("");
     setSuccessMsg("");
@@ -892,7 +893,7 @@ const submitUser = async (e) => {
                   </select>
                 </div>
               </div>
-{(formData.position === 'AL' || formData.position === 'AP') && (
+{(formData.position) && (
   <div className="input-group">
     <label>Intermediary Code</label>
     <input
@@ -968,6 +969,10 @@ const submitUser = async (e) => {
               <div className="name-row">
                 <div className="input-group"><label>Position</label><input type="text" value={selectedUser.account_type} readOnly /></div>
                 <div className="input-group"><label>Status</label><input type="text" value={selectedUser.status} readOnly /></div>
+              </div>
+              <div className="input-group" style={{ marginTop: '10px' }}>
+                <label>Intermediary Code</label>
+                <input type="text" value={selectedUser.intermediary_code || "N/A"} readOnly />
               </div>
 
               <div className="hierarchy-section" style={{ borderTop: '1px solid var(--border-color)', marginTop: '20px', paddingTop: '20px' }}>

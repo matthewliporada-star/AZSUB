@@ -1164,7 +1164,7 @@ function IHPForm({ sharedData, updateSharedData }) {
       // Authorized Representative
       fillTextField(
         form,
-        "authname1",
+        "name9",
         formData.authorizedRepresentative?.name || "",
       );
       fillTextField(
@@ -1509,7 +1509,7 @@ function IHPForm({ sharedData, updateSharedData }) {
                 border: "none",
                 borderRadius: "8px",
                 cursor: "pointer",
-                fontWeight: "600"
+                fontWeight: "600",
               }}
             >
               Auto Fill
