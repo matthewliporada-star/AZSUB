@@ -16,7 +16,10 @@ import {
 import supabase from "../../config/supabaseClient.js";
 import "./CIS.css";
 
+
+
 const CISDashboard = () => {
+
   const [searchTerm, setSearchTerm] = useState("");
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(true);

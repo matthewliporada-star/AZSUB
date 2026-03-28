@@ -2927,7 +2927,7 @@ body {
 }
 
 .upload-btn {
-  background-color: #2563eb !important; 
+  background-color: #2563eb !important;
   color: white !important;
   padding: 10px 20px !important;
   border-radius: 8px !important;
@@ -2952,8 +2952,6 @@ body {
   margin-top: 0;
 }
 
-
-
 /* Policy button add/delete */
 .add-row-container {
   margin-top: 1rem;
@@ -2962,7 +2960,7 @@ body {
 
 .add-row-btn {
   padding: 0.5rem 1rem;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
   border-radius: 4px;
@@ -3225,19 +3223,317 @@ body {
     position: relative;
     background: white;
   }
-  
+
   .full-review-modal {
     max-width: 100%;
     box-shadow: none;
   }
-  
+
   .modal-header-actions,
   .modal-footer {
     display: none;
   }
-  
+
   .full-review-body {
     overflow: visible;
     max-height: none;
   }
 }
+
+/* ============================================
+   DARK MODE THEME - ADD AT THE END OF YOUR CSS
+   ============================================ */
+
+/* Dark mode variables and styles */
+body.dark-mode {
+  --navy: #0a142e;
+  --navy-light: #121d3f;
+  --gold: #d4a84b;
+  --gold-light: #2a2416;
+  --red: #cf6f6f;
+  --bg: #0f1217;
+  --white: #1e1f2c;
+  --border: #2d2f3e;
+  --border-dark: #3a3d4f;
+  --text: #e8edf2;
+  --text-mid: #b9c3cf;
+  --muted: #8b94a3;
+  --input-bg: #252734;
+  --tbl-head: #1a1c28;
+  --highlight: #1e2a3e;
+  --success: #3cac6a;
+}
+
+/* Apply dark mode styles */
+body.dark-mode {
+  background: var(--bg);
+  color: var(--text);
+}
+
+body.dark-mode .header {
+  background: var(--navy);
+}
+
+body.dark-mode .header-title h1 {
+  color: var(--white);
+}
+
+body.dark-mode .header-subtitle {
+  color: var(--gold) !important;
+}
+
+body.dark-mode .header-badge {
+  background: linear-gradient(135deg, var(--gold) 0%, #e6bd5c 100%);
+  color: var(--navy);
+}
+
+body.dark-mode .notice {
+  background: var(--white);
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+body.dark-mode .notice strong {
+  color: var(--gold);
+}
+
+body.dark-mode .section {
+  background: var(--white);
+  border-color: var(--border);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .section-header {
+  background: var(--navy);
+}
+
+body.dark-mode .section-num {
+  background: var(--gold);
+  color: var(--navy);
+}
+
+body.dark-mode .section-header .section-title {
+  color: var(--white);
+}
+
+body.dark-mode .form-cell label {
+  color: var(--text-mid);
+}
+
+body.dark-mode .form-cell label.red {
+  color: var(--red);
+}
+
+body.dark-mode .form-cell input,
+body.dark-mode .form-cell textarea,
+body.dark-mode .form-cell select {
+  background: var(--input-bg);
+  border-color: var(--border-dark);
+  color: var(--text);
+}
+
+body.dark-mode .form-cell input:focus,
+body.dark-mode .form-cell textarea:focus,
+body.dark-mode .form-cell select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.2);
+}
+
+body.dark-mode .table-header {
+  background: var(--navy);
+}
+
+body.dark-mode .table-header .table-cell,
+body.dark-mode .table-header span {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.dark-mode .table-row {
+  border-bottom-color: var(--border);
+}
+
+body.dark-mode .table-row:nth-child(even) {
+  background: var(--tbl-head);
+}
+
+body.dark-mode .table-cell {
+  border-right-color: var(--border);
+  color: var(--text);
+}
+
+body.dark-mode .income-header {
+  background: var(--navy);
+}
+
+body.dark-mode .income-row {
+  border-bottom-color: var(--border);
+}
+
+body.dark-mode .income-row:nth-child(even) {
+  background: var(--tbl-head);
+}
+
+body.dark-mode .income-cell {
+  border-right-color: var(--border);
+}
+
+body.dark-mode .income-cell label {
+  color: var(--text);
+}
+
+body.dark-mode .row-gold,
+body.dark-mode .income-row.total-row {
+  background: #2a2416 !important;
+}
+
+body.dark-mode .prop-header {
+  background: var(--navy);
+}
+
+body.dark-mode .prop-row {
+  border-bottom-color: var(--border);
+}
+
+body.dark-mode .prop-row:nth-child(even) {
+  background: var(--tbl-head);
+}
+
+body.dark-mode .sub-header {
+  background: var(--tbl-head);
+  color: var(--gold);
+}
+
+body.dark-mode .print-bar {
+  background: var(--white);
+  border-color: var(--border);
+}
+
+body.dark-mode .btn-print {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+}
+
+body.dark-mode .btn-reset {
+  background: var(--input-bg);
+  color: var(--text-mid);
+  border-color: var(--border-dark);
+}
+
+body.dark-mode .btn-reset:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* CIS Dashboard Dark Mode */
+body.dark-mode .cis-container {
+  background-color: var(--bg);
+}
+
+body.dark-mode .cis-header h1 {
+  color: var(--text);
+}
+
+body.dark-mode .cis-search-input {
+  background-color: var(--input-bg) !important;
+  border-color: var(--border-dark) !important;
+  color: var(--text) !important;
+}
+
+body.dark-mode .cis-search-input::placeholder {
+  color: var(--muted) !important;
+}
+
+body.dark-mode .cis-card {
+  background: var(--white);
+}
+
+body.dark-mode .cis-card-title {
+  color: var(--muted);
+}
+
+body.dark-mode .cis-card-value {
+  color: var(--text);
+}
+
+body.dark-mode .cis-card-subtext {
+  color: var(--muted);
+}
+
+body.dark-mode .cis-table-container {
+  background: var(--white);
+}
+
+body.dark-mode .cis-table-title {
+  color: var(--text);
+}
+
+body.dark-mode .cis-table th {
+  background: var(--tbl-head);
+  color: var(--text-mid);
+}
+
+body.dark-mode .cis-table td {
+  border-bottom-color: var(--border);
+  color: var(--text);
+}
+
+body.dark-mode .cis-action-btn {
+  background: var(--navy);
+}
+
+body.dark-mode .modal-content {
+  background: var(--white);
+}
+
+body.dark-mode .modal-header {
+  background: var(--navy);
+  border-bottom-color: var(--border);
+}
+
+body.dark-mode .modal-header h2 {
+  color: var(--white);
+}
+
+body.dark-mode .detail-section {
+  background: var(--white);
+}
+
+body.dark-mode .detail-section h3 {
+  color: var(--gold);
+}
+
+body.dark-mode .full-review-modal {
+  background: var(--white);
+}
+
+body.dark-mode .full-review-section h3 {
+  color: var(--gold);
+}
+
+body.dark-mode .sub-section {
+  background: var(--input-bg);
+}
+
+body.dark-mode .info-grid p {
+  color: var(--text-mid);
+}
+
+body.dark-mode .modal-footer {
+  background: var(--tbl-head);
+  border-top-color: var(--border);
+}
+
+body.dark-mode .btn-primary {
+  background: var(--gold);
+  color: var(--navy);
+}
+
+body.dark-mode .btn-secondary {
+  background: var(--tbl-head);
+  color: var(--text);
+}
+
+/* Fix for select dropdown arrow in dark mode */
+body.dark-mode .form-cell select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b94a3' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+

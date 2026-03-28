@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import supabase from "../../config/supabaseClient.js";
+import { useApp } from "../../context/AppContext"; // Adjust path as needed
 import "./CIS.css";
 
 // Components

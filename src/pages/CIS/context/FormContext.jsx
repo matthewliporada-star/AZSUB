@@ -409,42 +409,73 @@ export const FormProvider = ({ children }) => {
   });
 
   const updateFormData = (section, key, value) => {
+    console.log("updateFormData called with:", { section, key, value });
+
     setFormData((prev) => {
-      // Handle array sections
-      if (
-        section === "travelDetails" ||
-        section === "propertyDetails" ||
-        section === "policyBeneficiary" ||
-        section === "dependentDetails" ||
-        section === "insurance" ||
-        section === "familyMedicalHistory"
-      ) {
-        if (typeof key === "object" && key.index !== undefined && key.field) {
-          const newArr = [...prev[section]];
-          newArr[key.index][key.field] = value;
-          return { ...prev, [section]: newArr };
-        } else if (typeof key === "number") {
-          // If key is a number, treat it as index and value as the whole object
-          const newArr = [...prev[section]];
-          newArr[key] = value;
-          return { ...prev, [section]: newArr };
-        } else {
-          // If we're replacing the entire array
-          return { ...prev, [section]: value };
-        }
+      console.log("Previous formData[section]:", prev[section]);
+
+      // Helper to update nested object
+      const updateNested = (obj, path, val) => {
+        return path.reduce((acc, part, i) => {
+          if (i === path.length - 1) {
+            return { ...acc, [part]: val };
+          }
+          return {
+            ...acc,
+            [part]: {
+              ...acc[part],
+              ...updateNested(acc[part] || {}, path.slice(i + 1), val),
+            },
+          };
+        }, obj);
+      };
+
+      // 1. If value is array and section is array-section → replace entire array (familyMedicalHistory case)
+      const arraySections = [
+        "travelDetails",
+        "propertyDetails",
+        "policyBeneficiary",
+        "dependentDetails",
+        "insurance",
+        "familyMedicalHistory",
+      ];
+      if (arraySections.includes(section) && Array.isArray(value)) {
+        console.log(`✅ Replacing entire ${section} array`);
+        return { ...prev, [section]: value };
       }
-      // Handle object sections
-      else if (typeof key === "string") {
+
+      // 2. Array update with {index, field, value}
+      if (
+        arraySections.includes(section) &&
+        typeof key === "object" &&
+        key !== null &&
+        key.index !== undefined &&
+        key.field
+      ) {
+        const newArr = [...(prev[section] || [])];
+        if (!newArr[key.index]) {
+          newArr[key.index] = {};
+        }
+        newArr[key.index][key.field] = value;
+        console.log(
+          `✅ Updated ${section}[${key.index}].${key.field} =`,
+          value,
+        );
+        return { ...prev, [section]: newArr };
+      }
+
+      // 3. Simple object field update: updateFormData("medical", "weight", value)
+      if (typeof key === "string") {
+        console.log(`✅ Updating ${section}.${key} =`, value);
         return {
           ...prev,
-          [section]: { ...prev[section], [key]: value },
+          [section]: updateNested(prev[section] || {}, key.split("."), value),
         };
       }
-      // If we're replacing the entire section
-      return {
-        ...prev,
-        [section]: value,
-      };
+
+      // 4. Full section replace
+      console.log(`✅ Replacing entire ${section}`);
+      return { ...prev, [section]: value };
     });
   };
 
