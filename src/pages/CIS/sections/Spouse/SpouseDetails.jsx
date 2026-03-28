@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Section from "../../components/Section";
 import FormRow from "../../components/FormRow";
 import FormCell from "../../components/FormCell";
@@ -10,11 +10,23 @@ export default function SpouseDetails() {
   const { formData, updateFormData } = useForm();
   const spouse = formData.spouseDetails || {};
 
+  // Add this useEffect to debug when spouse data changes
+  useEffect(() => {
+    console.log("=== SPOUSE DETAILS COMPONENT UPDATED ===");
+    console.log("Spouse data in component:", spouse);
+  }, [spouse]);
+
+  // Also log when component mounts
+  useEffect(() => {
+    console.log("=== SPOUSE DETAILS COMPONENT MOUNTED ===");
+    console.log("Initial spouse data:", spouse);
+  }, []);
+
   const handleChange = (key) => (e) => {
+    console.log(`Updating spouse.${key} to:`, e.target.value);
     updateFormData("spouseDetails", key, e.target.value);
   };
 
-  // Smoking status options - exactly matching PDF values
   const smokingOptions = ["", "Smoker", "Non-smoker"];
 
   return (

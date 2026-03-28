@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import supabase from "../../config/supabaseClient.js";
 import "./CIS.css";
 
@@ -28,12 +28,619 @@ import { PDFDocument } from "pdf-lib";
 // 🔥 INNER COMPONENT (safe to use useForm)
 function AppContent() {
   const { setFormData } = useForm();
+  const [uploadedFileName, setUploadedFileName] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [loadingEdit, setLoadingEdit] = useState(true);
+
+  // Load edit data from localStorage on component mount
+  useEffect(() => {
+    const loadEditData = async () => {
+      const editData = localStorage.getItem("cis_edit_data");
+      const editModeFlag = localStorage.getItem("edit_mode");
+
+      if (editData && editModeFlag === "true") {
+        try {
+          const data = JSON.parse(editData);
+          console.log("Loading edit data:", data);
+
+          // Map the data to your formData structure
+          const loadedFormData = {
+            // Personal Information
+            personalInformation: {
+              fullName: data.personal?.full_name || "",
+              fatherName: data.personal?.fathers_name || "",
+              mobile: data.personal?.mobile_no || "",
+              email: data.personal?.email || "",
+              currentAddress: data.personal?.residence_address || "",
+              currentCity: data.personal?.residence_city || "",
+              currentCountry: data.personal?.residence_country || "",
+              currentPostalCode: data.personal?.residence_zip || "",
+              currentAddressDuration: data.personal?.residence_duration || "",
+              previousAddress: data.personal?.prev_residence_complete || "",
+              previousCity: data.personal?.prev_residence_city || "",
+              previousCountry: data.personal?.prev_residence_country || "",
+              previousPostalCode: data.personal?.prev_residence_zip || "",
+              previousDates: data.personal?.prev_residence_dates_resided || "",
+              secondaryAddress: data.personal?.secondary_address || "",
+              secondaryCity: data.personal?.secondary_city || "",
+              secondaryCountry: data.personal?.secondary_country || "",
+              secondaryPostalCode: data.personal?.secondary_zip || "",
+              secondaryDates: data.personal?.secondary_dates_resided || "",
+              permanentAddress: data.personal?.permanent_address || "",
+              taxResidency: data.personal?.tax_residency || "",
+              tinSsn: data.personal?.tin_ssn || "",
+              citizenship: data.personal?.citizenship || "",
+              hobbies: data.personal?.hobbies || "",
+            },
+            // Travel Details
+            travelDetails:
+              data.travel && data.travel.length > 0
+                ? data.travel
+                : [
+                    {
+                      country: "",
+                      city: "",
+                      length_of_stay: "",
+                      frequency: "",
+                      date_travel: "",
+                      reason: "",
+                    },
+                    {
+                      country: "",
+                      city: "",
+                      length_of_stay: "",
+                      frequency: "",
+                      date_travel: "",
+                      reason: "",
+                    },
+                    {
+                      country: "",
+                      city: "",
+                      length_of_stay: "",
+                      frequency: "",
+                      date_travel: "",
+                      reason: "",
+                    },
+                  ],
+            // Habits
+            habits: {
+              smokerStatus: data.habits?.smoker_status || "",
+              cigarettesPerDay: data.habits?.cigarettes_per_day || "",
+              previousSmokingHistory:
+                data.habits?.previous_smoking_history || "",
+              alcoholType: data.habits?.alcohol_type || "",
+              alcoholMeasurement: data.habits?.alcohol_measurement || "",
+              alcoholFrequency: data.habits?.alcohol_frequency || "",
+            },
+            // Medical
+            medical: {
+              weight: data.medical?.weight || "",
+              height: data.medical?.height || "",
+              exercise: data.medical?.exercise_details || "",
+              disorders: data.medical?.health_disorders || "",
+              medication: data.medical?.medications || "",
+              familyPhysician: data.medical?.physician_name || "",
+              physicianAddress: data.medical?.physician_address || "",
+              physicianPhone: data.medical?.physician_phone || "",
+              yearsAttended: data.medical?.years_attended || "",
+              lastVisit: data.medical?.last_visit_details || "",
+            },
+            // Family Medical History
+            familyMedicalHistory:
+              data.familyMedical && data.familyMedical.length > 0
+                ? data.familyMedical
+                : [
+                    {
+                      relationship: "Father",
+                      name: "",
+                      age: "",
+                      medicalHistory: "",
+                      healthStatus: "",
+                    },
+                    {
+                      relationship: "Mother",
+                      name: "",
+                      age: "",
+                      medicalHistory: "",
+                      healthStatus: "",
+                    },
+                    {
+                      relationship: "Brother",
+                      name: "",
+                      age: "",
+                      medicalHistory: "",
+                      healthStatus: "",
+                    },
+                    {
+                      relationship: "Sister",
+                      name: "",
+                      age: "",
+                      medicalHistory: "",
+                      healthStatus: "",
+                    },
+                    {
+                      relationship: "Brother 1",
+                      name: "",
+                      age: "",
+                      medicalHistory: "",
+                      healthStatus: "",
+                    },
+                    {
+                      relationship: "Sister 1",
+                      name: "",
+                      age: "",
+                      medicalHistory: "",
+                      healthStatus: "",
+                    },
+                    {
+                      relationship: "Spouse",
+                      name: "",
+                      age: "",
+                      medicalHistory: "",
+                      healthStatus: "",
+                    },
+                  ],
+            // Insurance
+            insurance:
+              data.insurance && data.insurance.length > 0
+                ? data.insurance
+                : [
+                    {
+                      company: "",
+                      type: "",
+                      countryYear: "",
+                      amount: "",
+                      premium: "",
+                    },
+                    {
+                      company: "",
+                      type: "",
+                      countryYear: "",
+                      amount: "",
+                      premium: "",
+                    },
+                    {
+                      company: "",
+                      type: "",
+                      countryYear: "",
+                      amount: "",
+                      premium: "",
+                    },
+                  ],
+            // Business Employment
+            businessEmployment: {
+              businessName: data.business?.business_name || "",
+              natureOfBusiness: data.business?.business_nature || "",
+              occupation: data.business?.occupation || "",
+              businessType: data.business?.business_type || "",
+              ownership: data.business?.ownership_percent || "",
+              businessAddress: data.business?.business_address || "",
+              city: data.business?.business_city || "",
+              country: data.business?.business_country || "",
+              postalCode: data.business?.business_zip || "",
+              website: data.business?.business_website || "",
+              telephone: data.business?.business_phone || "",
+              incorporationDate: data.business?.incorporation_date || "",
+              workExperience: data.business?.previous_experience || "",
+            },
+            // Income Statement
+            incomeStatement: {
+              frequency:
+                data.incomeSources?.find(
+                  (s) => s.source_name === "Income / Salary",
+                )?.frequency || "",
+              selfIncome:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Income / Salary")
+                  ?.self_amount?.toString() || "",
+              spouseIncome:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Income / Salary")
+                  ?.spouse_amount?.toString() || "",
+              jointIncome:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Income / Salary")
+                  ?.joint_amount?.toString() || "",
+              bonus:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Bonus")
+                  ?.self_amount?.toString() || "",
+              spouseBonus:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Bonus")
+                  ?.spouse_amount?.toString() || "",
+              investmentIncome:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Investment Income")
+                  ?.self_amount?.toString() || "",
+              spouseInvestment:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Investment Income")
+                  ?.spouse_amount?.toString() || "",
+              interest:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Interest")
+                  ?.self_amount?.toString() || "",
+              spouseInterest:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Interest")
+                  ?.spouse_amount?.toString() || "",
+              dividends:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Dividends")
+                  ?.self_amount?.toString() || "",
+              spouseDividends:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Dividends")
+                  ?.spouse_amount?.toString() || "",
+              rentalIncome:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Rental Income")
+                  ?.self_amount?.toString() || "",
+              spouseRental:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Rental Income")
+                  ?.spouse_amount?.toString() || "",
+              otherIncome:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Other Income Source")
+                  ?.self_amount?.toString() || "",
+              spouseOther:
+                data.incomeSources
+                  ?.find((s) => s.source_name === "Other Income Source")
+                  ?.spouse_amount?.toString() || "",
+              totalExpenditureSelf:
+                data.financial?.expenditure_self?.toString() || "",
+              totalExpenditureSpouse:
+                data.financial?.expenditure_spouse?.toString() || "",
+              disposableIncomeSelf:
+                data.financial?.disposable_income_self?.toString() || "",
+              disposableIncomeSpouse:
+                data.financial?.disposable_income_spouse?.toString() || "",
+              totalExpenditureJoint:
+                data.financial?.total_expenditure_joint?.toString() || "",
+              disposableIncomeJoint:
+                data.financial?.disposable_income_joint?.toString() || "",
+              totalExpenditureFrequency:
+                data.financial?.expenditure_frequency || "Monthly",
+            },
+            // Assets & Liabilities
+            assetsLiabilities: {
+              asset_0_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Cash")
+                  ?.current_year_val?.toString() || "",
+              asset_1_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Savings")
+                  ?.current_year_val?.toString() || "",
+              asset_2_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Stocks and Bonds")
+                  ?.current_year_val?.toString() || "",
+              asset_3_curr:
+                data.assets
+                  ?.find(
+                    (a) => a.category_name === "Personal/Residential Property",
+                  )
+                  ?.current_year_val?.toString() || "",
+              asset_4_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Investment Property")
+                  ?.current_year_val?.toString() || "",
+              asset_5_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Real Estate")
+                  ?.current_year_val?.toString() || "",
+              asset_6_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Other Parental Property")
+                  ?.current_year_val?.toString() || "",
+              asset_7_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Vehicle")
+                  ?.current_year_val?.toString() || "",
+              asset_8_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Funds/Unit Trusts")
+                  ?.current_year_val?.toString() || "",
+              asset_9_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Pensions")
+                  ?.current_year_val?.toString() || "",
+              asset_10_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Business Shareholding")
+                  ?.current_year_val?.toString() || "",
+              asset_11_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Net Business Interest")
+                  ?.current_year_val?.toString() || "",
+              liab_0_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Personal Loans")
+                  ?.current_year_val?.toString() || "",
+              liab_1_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Margin Account")
+                  ?.current_year_val?.toString() || "",
+              liab_2_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Residential Mortgage(s)")
+                  ?.current_year_val?.toString() || "",
+              liab_3_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Loan Guarantees")
+                  ?.current_year_val?.toString() || "",
+              liab_4_curr:
+                data.assets
+                  ?.find(
+                    (a) =>
+                      a.category_name === "Investment Property Mortgage(s)",
+                  )
+                  ?.current_year_val?.toString() || "",
+              liab_5_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Business Loans/security")
+                  ?.current_year_val?.toString() || "",
+              liab_6_curr:
+                data.assets
+                  ?.find((a) => a.category_name === "Other (Please specify)")
+                  ?.current_year_val?.toString() || "",
+              businessName1:
+                data.assets?.find((a) => a.item_index === 100)
+                  ?.other_description || "",
+              businessName2:
+                data.assets?.find((a) => a.item_index === 101)
+                  ?.other_description || "",
+              businessOther:
+                data.assets?.find((a) => a.item_index === 102)
+                  ?.other_description || "",
+            },
+            // Property Details
+            propertyDetails:
+              data.property && data.property.length > 0
+                ? data.property
+                : [
+                    {
+                      type: "",
+                      location: "",
+                      purchaseDate: "",
+                      purchasePrice: "",
+                      mortgage: "",
+                      currentValue: "",
+                      frequencyVisits: "",
+                    },
+                    {
+                      type: "",
+                      location: "",
+                      purchaseDate: "",
+                      purchasePrice: "",
+                      mortgage: "",
+                      currentValue: "",
+                      frequencyVisits: "",
+                    },
+                    {
+                      type: "",
+                      location: "",
+                      purchaseDate: "",
+                      purchasePrice: "",
+                      mortgage: "",
+                      currentValue: "",
+                      frequencyVisits: "",
+                    },
+                    {
+                      type: "",
+                      location: "",
+                      purchaseDate: "",
+                      purchasePrice: "",
+                      mortgage: "",
+                      currentValue: "",
+                      frequencyVisits: "",
+                    },
+                    {
+                      type: "",
+                      location: "",
+                      purchaseDate: "",
+                      purchasePrice: "",
+                      mortgage: "",
+                      currentValue: "",
+                      frequencyVisits: "",
+                    },
+                    {
+                      type: "",
+                      location: "",
+                      purchaseDate: "",
+                      purchasePrice: "",
+                      mortgage: "",
+                      currentValue: "",
+                      frequencyVisits: "",
+                    },
+                    {
+                      type: "",
+                      location: "",
+                      purchaseDate: "",
+                      purchasePrice: "",
+                      mortgage: "",
+                      currentValue: "",
+                      frequencyVisits: "",
+                    },
+                    {
+                      type: "",
+                      location: "",
+                      purchaseDate: "",
+                      purchasePrice: "",
+                      mortgage: "",
+                      currentValue: "",
+                      frequencyVisits: "",
+                    },
+                  ],
+            // Bank Details
+            bankDetails: {
+              bankName: data.bank?.bank_name || "",
+              accountHeld: data.bank?.account_tenure || "",
+              address: data.bank?.bank_address || "",
+              iban: data.bank?.bank_iban || "",
+              accountNumber: data.bank?.bank_account_number || "",
+              relationship: data.bank?.payor_relationship || "",
+              referenceContact: data.bank?.bank_reference || "",
+              email: data.bank?.bank_email || "",
+            },
+            // Policy Beneficiary
+            policyBeneficiary:
+              data.beneficiary && data.beneficiary.length > 0
+                ? data.beneficiary
+                : [
+                    {
+                      name: "",
+                      type: "",
+                      relationship: "",
+                      dateOfBirth: "",
+                      passportNo: "",
+                      share: "",
+                    },
+                    {
+                      name: "",
+                      type: "",
+                      relationship: "",
+                      dateOfBirth: "",
+                      passportNo: "",
+                      share: "",
+                    },
+                    {
+                      name: "",
+                      type: "",
+                      relationship: "",
+                      dateOfBirth: "",
+                      passportNo: "",
+                      share: "",
+                    },
+                    {
+                      name: "",
+                      type: "",
+                      relationship: "",
+                      dateOfBirth: "",
+                      passportNo: "",
+                      share: "",
+                    },
+                  ],
+            // Spouse Details
+            spouseDetails: {
+              name: data.spouse?.full_name || "",
+              relationship: data.spouse?.relationship || "",
+              nationality: data.spouse?.nationality || "",
+              dateOfBirth: data.spouse?.date_of_birth || "",
+              contactNumber: data.spouse?.phone_number || "",
+              email: data.spouse?.email_address || "",
+              currentAddress: data.spouse?.res_address || "",
+              city: data.spouse?.res_city || "",
+              country: data.spouse?.res_country || "",
+              postalCode: data.spouse?.res_zip || "",
+              countryOfResidence: data.spouse?.res_country_residency || "",
+              permanentAddress: data.spouse?.perm_address || "",
+              permanentCity: data.spouse?.perm_city || "",
+              permanentCountry: data.spouse?.perm_country || "",
+              permanentPostalCode: data.spouse?.perm_zip || "",
+              smokingStatus: data.spouse?.smoking_status || "",
+              employmentRole: data.spouse?.job_role || "",
+              companyName: data.spouse?.company_name || "",
+            },
+            // Dependent Details
+            dependentDetails:
+              data.dependent && data.dependent.length > 0
+                ? data.dependent
+                : [
+                    {
+                      name: "",
+                      relationship: "",
+                      nationality: "",
+                      dateOfBirth: "",
+                    },
+                    {
+                      name: "",
+                      relationship: "",
+                      nationality: "",
+                      dateOfBirth: "",
+                    },
+                  ],
+          };
+
+          // Set the form data
+          setFormData(loadedFormData);
+
+          // Store edit ID for when submitting
+          setEditMode(true);
+          setEditId(data.editId);
+
+          // Show message to user
+          setTimeout(() => {
+            alert(
+              "Loading existing application for editing. Make changes and click 'Update Application' to save.",
+            );
+          }, 500);
+
+          // Clear the stored edit data after loading
+          localStorage.removeItem("cis_edit_data");
+          localStorage.removeItem("edit_mode");
+          localStorage.removeItem("edit_id");
+        } catch (error) {
+          console.error("Error loading edit data:", error);
+          localStorage.removeItem("cis_edit_data");
+          localStorage.removeItem("edit_mode");
+          localStorage.removeItem("edit_id");
+        }
+      }
+      setLoadingEdit(false);
+    };
+
+    loadEditData();
+  }, []);
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    setUploading(true);
+
     try {
+      // 1. UPLOAD PDF TO SUPABASE STORAGE
+      console.log("Uploading PDF to Supabase Storage...");
+
+      // Generate unique filename
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}_${Math.random()
+        .toString(36)
+        .substring(2, 15)}.${fileExt}`;
+      const filePath = `cis_forms/${fileName}`;
+
+      // Upload to Supabase Storage
+      const { data: storageData, error: storageError } = await supabase.storage
+        .from("cis_pdfs")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (storageError) {
+        console.error("Storage upload error:", storageError);
+        throw new Error(`Failed to upload PDF: ${storageError.message}`);
+      }
+
+      // Get public URL
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("cis_pdfs").getPublicUrl(filePath);
+
+      console.log("PDF uploaded successfully. URL:", publicUrl);
+
+      // Store the file URL in localStorage to be used when submitting
+      localStorage.setItem("uploaded_pdf_url", publicUrl);
+      localStorage.setItem("uploaded_pdf_path", filePath);
+      setUploadedFileName(file.name);
+
+      // 2. EXTRACT DATA FROM PDF
       const arrayBuffer = await file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(arrayBuffer);
 
@@ -55,37 +662,16 @@ function AppContent() {
       });
 
       console.log("Extracted PDF Data with Field Names:", extractedData);
+      console.log("PDF URL saved to localStorage:", publicUrl);
 
       // Helper function to check if a value is a placeholder
       const isPlaceholder = (value) => {
         if (!value || typeof value !== "string") return true;
-        // Check if it's exactly a single uppercase letter (G, H, I, J, K, L, M, N, O, P, etc.)
         if (/^[A-Z]$/.test(value)) return true;
-        // Check if it's exactly a single lowercase letter
         if (/^[a-z]$/.test(value)) return true;
-        // Check for exact "Idunno" match or with numbers
         if (value === "Idunno" || /^Idunno\d*$/.test(value)) return true;
-        // Don't filter out valid values that contain numbers or multiple characters
         return false;
       };
-
-      // ========== ADD DEBUG LOGS HERE ==========
-      console.log("=== FINAL CHECK BEFORE SETTING FORM DATA ===");
-      console.log("Medical extracted values:", {
-        weight: extractedData["personal-med_weight"],
-        height: extractedData["personal-med_height"],
-        exercise: extractedData["personal-med_exercise"],
-        disorders: extractedData["personal-med_health-disorder"],
-        medication: extractedData["personal-med_medication-take"],
-        familyPhysician: extractedData["personal-med_family-physician"],
-        physicianAddress: extractedData["personal-med_physician-add"],
-        physicianPhone: extractedData["personal-med_tele"],
-        yearsAttended: extractedData["personal-med_years-attend"],
-        lastVisit: extractedData["personal-med_last-visit"],
-      });
-
-      console.log("=== ABOUT TO CALL setFormData ===");
-      // ========== END DEBUG LOGS ==========
 
       // Update form data with correct field mappings
       setFormData((prev) => ({
@@ -1087,27 +1673,48 @@ function AppContent() {
         },
 
         // ==================== POLICY BENEFICIARY ====================
-        policyBeneficiary: prev.policyBeneficiary.map((beneficiary, index) => ({
-          ...beneficiary,
-          name:
-            extractedData[`policy_beneficiary-name-${index + 1}`] ||
-            beneficiary.name,
-          type:
-            extractedData[`policy_beneficiary-primary-${index + 1}`] ||
-            beneficiary.type,
-          relationship:
-            extractedData[`policy_beneficiary-relationship-${index + 1}`] ||
-            beneficiary.relationship,
-          dateOfBirth:
-            extractedData[`policy_beneficiary-date-${index + 1}`] ||
-            beneficiary.dateOfBirth,
-          passportNo:
-            extractedData[`policy_beneficiary-passport-${index + 1}`] ||
-            beneficiary.passportNo,
-          share:
-            extractedData[`policy_beneficiary-allocate-${index + 1}`] ||
-            beneficiary.share,
-        })),
+        policyBeneficiary: [
+          // Beneficiary 1
+          {
+            name: extractedData["policy_beneficiary-name-1"] || "",
+            type: extractedData["policy_beneficiary-primary-1"] || "",
+            relationship:
+              extractedData["policy_beneficiary-relationship-1"] || "",
+            dateOfBirth: extractedData["policy_beneficiary-date-1"] || "",
+            passportNo: extractedData["policy_beneficiary-passport-1"] || "",
+            share: extractedData["policy_beneficiary-allocate-1"] || "",
+          },
+          // Beneficiary 2
+          {
+            name: extractedData["policy_beneficiary-name-"] || "", // Note: no number for second beneficiary
+            type: extractedData["policy_beneficiary-primary-2"] || "",
+            relationship:
+              extractedData["policy_beneficiary-relationship-2"] || "",
+            dateOfBirth: extractedData["policy_beneficiary-date-"] || "", // Note: no number
+            passportNo: extractedData["policy_beneficiary-passport-"] || "", // Note: no number
+            share: extractedData["policy_beneficiary-allocate-2"] || "",
+          },
+          // Beneficiary 3
+          {
+            name: extractedData["policy_beneficiary-name-3"] || "",
+            type: extractedData["policy_beneficiary-primary-3"] || "",
+            relationship:
+              extractedData["policy_beneficiary-relationship-3"] || "",
+            dateOfBirth: extractedData["policy_beneficiary-date-2"] || "",
+            passportNo: extractedData["policy_beneficiary-passport-3"] || "",
+            share: extractedData["policy_beneficiary-allocate-3"] || "",
+          },
+          // Beneficiary 4
+          {
+            name: extractedData["policy_beneficiary-name-4"] || "",
+            type: extractedData["policy_beneficiary-primary-4"] || "",
+            relationship:
+              extractedData["policy_beneficiary-relationship-4"] || "",
+            dateOfBirth: extractedData["policy_beneficiary-date-4"] || "",
+            passportNo: extractedData["policy_beneficiary-passport-4"] || "",
+            share: extractedData["policy_beneficiary-allocate-4"] || "",
+          },
+        ],
 
         // ==================== SPOUSE DETAILS ====================
         spouseDetails: {
@@ -1122,7 +1729,7 @@ function AppContent() {
           dateOfBirth:
             extractedData["spouse-birth"] || prev.spouseDetails.dateOfBirth,
           contactNumber:
-            extractedData["spouse-contact"] || prev.spouseDetails.contactNumber, // ← ADD THIS LINE
+            extractedData["spouse-contact"] || prev.spouseDetails.contactNumber,
           email: extractedData["spouse-email"] || prev.spouseDetails.email,
           currentAddress:
             extractedData["spouse-current-add"] ||
@@ -1174,32 +1781,83 @@ function AppContent() {
       }));
 
       console.log("Form data updated successfully with PDF values");
+      alert(`PDF uploaded successfully! File saved to: ${publicUrl}`);
     } catch (error) {
-      console.error("Error reading PDF:", error);
+      console.error("Error processing PDF:", error);
+      alert("Error processing PDF: " + error.message);
+    } finally {
+      setUploading(false);
     }
   };
+
+  if (loadingEdit) {
+    return (
+      <div className="page-wrapper">
+        <div style={{ textAlign: "center", padding: "50px" }}>
+          <h3>Loading application data...</h3>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-wrapper">
       <Header />
       <Notice />
 
+      {editMode && (
+        <div
+          style={{
+            background: "#ff9800",
+            color: "white",
+            padding: "10px 20px",
+            textAlign: "center",
+            marginBottom: "20px",
+            borderRadius: "8px",
+            fontWeight: "bold",
+          }}
+        >
+          ✏️ EDIT MODE: You are editing an existing application. Make changes
+          and click "Update Application" to save.
+        </div>
+      )}
+
       <div style={{ margin: "20px 0", textAlign: "center" }}>
-        <label className="upload-btn">
-          Upload PDF
+        <label
+          className="upload-btn"
+          style={{
+            opacity: uploading ? 0.6 : 1,
+            cursor: uploading ? "not-allowed" : "pointer",
+          }}
+        >
+          {uploading
+            ? "Uploading..."
+            : uploadedFileName
+              ? "Change PDF"
+              : "Upload PDF"}
           <input
             type="file"
             accept="application/pdf"
             onChange={handleFileUpload}
             style={{ display: "none" }}
+            disabled={uploading}
           />
         </label>
+        {uploadedFileName && (
+          <span
+            style={{ marginLeft: "10px", color: "green", fontSize: "12px" }}
+          >
+            ✅ Uploaded: {uploadedFileName}
+          </span>
+        )}
+        {uploading && (
+          <span
+            style={{ marginLeft: "10px", color: "#ff9800", fontSize: "12px" }}
+          >
+            ⏳ Uploading PDF...
+          </span>
+        )}
       </div>
-
-      <div className="progress-bar">
-        <div className="progress-fill" style={{ width: "60%" }}></div>
-      </div>
-
       <PersonalInformation />
       <TravelDetails />
       <SmokingAlcohol />
@@ -1213,7 +1871,7 @@ function AppContent() {
       <PolicyBeneficiary />
       <SpouseDetails />
       <DependentDetails />
-      <PrintBar />
+      <PrintBar editMode={editMode} editId={editId} />
     </div>
   );
 }
@@ -1227,5 +1885,4 @@ function App() {
   );
 }
 
-// THIS IS THE CRITICAL PART - MAKE SURE THIS IS AT THE VERY END
 export default App;

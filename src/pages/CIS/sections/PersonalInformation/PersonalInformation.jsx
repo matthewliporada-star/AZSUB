@@ -39,7 +39,7 @@ export default function PersonalInformation() {
         <FormCell className="cell-2" label="Mobile No.">
           <Input
             type="tel"
-            placeholder="+1 000 000 0000"
+            placeholder="+09-----"
             value={pi.mobile || ""}
             onChange={handleChange("mobile")}
           />
@@ -99,7 +99,10 @@ export default function PersonalInformation() {
       {/* PREVIOUS RESIDENCE */}
       <h3 className="section-subtitle">Previous Residence</h3>
       <FormRow>
-        <FormCell className="cell-3" label="Previous Residence and dates resided">
+        <FormCell
+          className="cell-3"
+          label="Previous Residence and dates resided"
+        >
           <Input
             placeholder="Previous street address"
             value={pi.previousAddress || ""}
@@ -139,7 +142,10 @@ export default function PersonalInformation() {
       {/* SECONDARY/OTHER RESIDENCE */}
       <h3 className="section-subtitle">Secondary/Other Residence (if any)</h3>
       <FormRow>
-        <FormCell className="cell-3" label="Provide information for any current secondary residence and previous primary and secondary residences you have had in the past 10 years">
+        <FormCell
+          className="cell-3"
+          label="Provide information for any current secondary residence and previous primary and secondary residences you have had in the past 10 years"
+        >
           <Input
             placeholder="Secondary address"
             value={pi.secondaryAddress || ""}
@@ -176,12 +182,10 @@ export default function PersonalInformation() {
         </FormCell>
       </FormRow>
 
-      {/* OTHER INFORMATION */}
+      {/* PERMANENT ADDRESS */}
+      <h3 className="section-subtitle">Permanent Address</h3>
       <FormRow>
-        <FormCell
-          className="cell-full"
-          label="Permanent Address (if different)"
-        >
+        <FormCell className="cell-full" label="Permanent Address">
           <Input
             value={pi.permanentAddress || ""}
             onChange={handleChange("permanentAddress")}
@@ -189,6 +193,8 @@ export default function PersonalInformation() {
         </FormCell>
       </FormRow>
 
+      {/* TAX & CITIZENSHIP */}
+      <h3 className="section-subtitle">Tax & Citizenship Information</h3>
       <FormRow>
         <FormCell label="Tax Residency Information">
           <Input
@@ -207,6 +213,7 @@ export default function PersonalInformation() {
         </FormCell>
       </FormRow>
 
+      {/* HOBBIES */}
       <FormRow>
         <FormCell className="cell-full" label="Hobbies and Activities">
           <Input value={pi.hobbies || ""} onChange={handleChange("hobbies")} />

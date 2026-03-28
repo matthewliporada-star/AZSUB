@@ -17,6 +17,18 @@ export default function PolicyBeneficiary() {
     updateFormData("policyBeneficiary", newBeneficiaries);
   };
 
+  const addRow = () => {
+    const newBeneficiaries = [...policyBeneficiary, {}];
+    updateFormData("policyBeneficiary", newBeneficiaries);
+  };
+
+  const removeRow = (idx) => {
+    const newBeneficiaries = policyBeneficiary.filter(
+      (_, index) => index !== idx,
+    );
+    updateFormData("policyBeneficiary", newBeneficiaries);
+  };
+
   return (
     <Section number={11} title="Policy Beneficiary" isTable>
       <div className="table-wrap">
@@ -27,10 +39,10 @@ export default function PolicyBeneficiary() {
           <span>Date of Birth</span>
           <span>Passport No.</span>
           <span>Allocated Share (%)</span>
+          <span>Action</span>
         </div>
 
-        {[0, 1].map((idx) => {
-          const bene = policyBeneficiary[idx] || {};
+        {policyBeneficiary.map((bene, idx) => {
           return (
             <div key={idx} className="table-row">
               <div className="table-cell">
@@ -78,9 +90,24 @@ export default function PolicyBeneficiary() {
                   onChange={(e) => handleChange(idx, "share", e.target.value)}
                 />
               </div>
+              <div className="table-cell">
+                <button
+                  type="button"
+                  onClick={() => removeRow(idx)}
+                  className="remove-row-btn"
+                >
+                  Remove
+                </button>
+              </div>
             </div>
           );
         })}
+
+        <div className="add-row-container">
+          <button type="button" onClick={addRow} className="add-row-btn">
+            + Add Beneficiary
+          </button>
+        </div>
       </div>
     </Section>
   );

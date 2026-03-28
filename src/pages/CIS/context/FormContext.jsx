@@ -29,6 +29,8 @@ export const FormProvider = ({ children }) => {
       tinSsn: "",
       citizenship: "",
       hobbies: "",
+      // Note: permanent_city, permanent_country, permanent_zip are not in your form
+      // They are separate fields in Supabase but not in your UI
     },
 
     travelDetails: [
