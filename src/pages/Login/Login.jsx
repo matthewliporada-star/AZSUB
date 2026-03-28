@@ -328,7 +328,7 @@ function Login() {
       value={identifier}
       onChange={handleIdentifierChange}
       // Fix: Either remove "disabled=" or give it a boolean value
-      disabled={true} 
+       disabled={false}
       required
     />
   </div>
