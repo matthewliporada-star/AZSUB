@@ -16,6 +16,7 @@ const ManageUsers = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
+  const [hasCreatedMP, setHasCreatedMP] = useState(false); // Track if current admin already created an MP
 
   // -- UI State --
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -36,7 +37,7 @@ const ManageUsers = () => {
     firstName: "",
     lastName: "",
     email: "",
-    position: "MD",
+    position: "AL", // Default role should be AL (no MD role)
     password: "",
     reportsTo: "",
     intermediary_code: "",
@@ -52,7 +53,7 @@ const ManageUsers = () => {
 
   // -- Role Statistics --
   const [roleCounts, setRoleCounts] = useState({
-    AL: 0, AP: 0, MD: 0, MP: 0, ADMIN: 0
+    AL: 0, AP: 0, MP: 0
   });
 
   // -- Filter State --
@@ -148,14 +149,49 @@ const ManageUsers = () => {
       return;
     }
     setUser(session.user);
-    fetchUsers();
+    await fetchUsers(session.user.id);
+    await checkAdminMPCreation(session.user.id);
   };
 
-  const fetchUsers = async () => {
+  // Check if current admin has already created an MP
+  const checkAdminMPCreation = async (adminId) => {
     try {
       const { data, error } = await supabase
         .from("profiles")
+        .select("id")
+        .eq("created_by", adminId)
+        .ilike("account_type", "mp")
+        .limit(1);
+
+      if (!error) {
+        const hasMP = Array.isArray(data) && data.length > 0;
+        setHasCreatedMP(hasMP);
+
+        if (!hasMP) {
+          // As a fallback, check the users already fetched in this session.
+          const existingMP = users.some((u) => (u.account_type || "").toUpperCase() === "MP");
+          setHasCreatedMP(existingMP);
+        }
+      }
+    } catch (err) {
+      console.error("Error checking MP creation:", err);
+    }
+  };
+
+  const fetchUsers = async (adminIdFromParam) => {
+    try {
+      // Get current admin's ID (UUID). Prefer explicit param to avoid stale state in async flow.
+      const adminId = adminIdFromParam || user?.id;
+      if (!adminId) {
+        console.warn("fetchUsers called without adminId");
+        return;
+      }
+      
+      // Fetch only users created by this admin
+      const { data, error } = await supabase
+        .from("profiles")
         .select("*")
+        .eq("created_by", adminId) // Filter by created_by (UUID)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -170,13 +206,12 @@ const ManageUsers = () => {
   };
 
   const calculateRoleCounts = (userData) => {
-    const counts = { AL: 0, AP: 0, MD: 0, MP: 0, ADMIN: 0 };
+    const counts = { AL: 0, AP: 0, MP: 0 };
     userData.forEach((u) => {
       const role = u.account_type?.toUpperCase();
-      const normalizedRole = role === 'ADMIN' ? 'ADMIN' : role;
-      if (counts.hasOwnProperty(normalizedRole)) {
-        counts[normalizedRole]++;
-      }
+      if (role === 'AL') counts.AL++;
+      else if (role === 'AP') counts.AP++;
+      else if (role === 'MP') counts.MP++;
     });
     setRoleCounts(counts);
   };
@@ -205,24 +240,24 @@ const ManageUsers = () => {
   }, [formData.position, showAddModal, isEditMode, selectedUser, fetchPotentialUplines]);
 
   // -- Form Handlers --
-const handleFormChange = (e) => {
-  const { name, value } = e.target;
-  let finalValue = value;
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    let finalValue = value;
 
-  if (name === "firstName" || name === "lastName") {
-    finalValue = value.charAt(0).toUpperCase() + value.slice(1);
-  }
-  
-  // For intermediary_code, ensure it's numeric and max 8 digits
-  if (name === "intermediary_code") {
-    finalValue = value.replace(/[^0-9]/g, '').slice(0, 8);
-  }
+    if (name === "firstName" || name === "lastName") {
+      finalValue = value.charAt(0).toUpperCase() + value.slice(1);
+    }
+    
+    // For intermediary_code, ensure it's numeric and max 8 digits
+    if (name === "intermediary_code") {
+      finalValue = value.replace(/[^0-9]/g, '').slice(0, 8);
+    }
 
-  setFormData({
-    ...formData,
-    [name]: finalValue
-  });
-};
+    setFormData({
+      ...formData,
+      [name]: finalValue
+    });
+  };
 
   const generatePassword = () => {
     if (!formData.lastName.trim()) {
@@ -256,44 +291,44 @@ const handleFormChange = (e) => {
     setViewingSubordinates([]);
   };
 
-const openAddModal = () => {
-  setIsEditMode(false);
-  setFormData({
-    firstName: "", 
-    lastName: "", 
-    email: "", 
-    position: "MD", 
-    password: "", 
-    reportsTo: "",
-    intermediary_code: "", // Add this line
-  });
-  setShowAddModal(true);
-};
+  const openAddModal = () => {
+    setIsEditMode(false);
+    setFormData({
+      firstName: "", 
+      lastName: "", 
+      email: "", 
+      position: "AL", // MD removed as option
+      password: "", 
+      reportsTo: "",
+      intermediary_code: "",
+    });
+    setShowAddModal(true);
+  };
 
-const openEditModal = async (u) => {
-  setIsEditMode(true);
-  setSelectedUser(u);
-  setFormData({
-    firstName: u.first_name,
-    lastName: u.last_name,
-    email: u.email,
-    position: u.account_type,
-    password: "",
-    reportsTo: "",
-    intermediary_code: u.intermediary_code || "", // Add this line
-  });
+  const openEditModal = async (u) => {
+    setIsEditMode(true);
+    setSelectedUser(u);
+    setFormData({
+      firstName: u.first_name,
+      lastName: u.last_name,
+      email: u.email,
+      position: u.account_type,
+      password: "",
+      reportsTo: "",
+      intermediary_code: u.intermediary_code || "",
+    });
 
-  const { data } = await supabase
-    .from("user_hierarchy")
-    .select("report_to_id")
-    .eq("user_id", u.id)
-    .eq("is_active", true)
-    .maybeSingle();
+    const { data } = await supabase
+      .from("user_hierarchy")
+      .select("report_to_id")
+      .eq("user_id", u.id)
+      .eq("is_active", true)
+      .maybeSingle();
 
-  if (data) setFormData(prev => ({ ...prev, reportsTo: data.report_to_id }));
+    if (data) setFormData(prev => ({ ...prev, reportsTo: data.report_to_id }));
 
-  setShowAddModal(true);
-};
+    setShowAddModal(true);
+  };
 
   const openViewModal = async (u) => {
     setSelectedUser(u);
@@ -308,63 +343,74 @@ const openEditModal = async (u) => {
     setViewingSubordinates(subRes.data?.map(d => d.profiles).filter(Boolean) || []);
   };
 
-const submitUser = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setModalError("");
-  setSuccessMsg("");
+  const submitUser = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setModalError("");
+    setSuccessMsg("");
 
-  try {
-    let userIdToProcess = selectedUser?.id;
+    try {
+      let userIdToProcess = selectedUser?.id;
 
-    if (isEditMode) {
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          account_type: formData.position,
-          intermediary_code: formData.intermediary_code ? parseInt(formData.intermediary_code) : null, // Add this line
-        })
-        .eq("id", userIdToProcess);
+      // Check if trying to create an MP when admin already created one
+      if (!isEditMode && formData.position === "MP" && hasCreatedMP) {
+        throw new Error("You have already created an MP. Each admin can only create one Management Partner (MP).");
+      }
 
-      if (error) throw error;
-      await logActivity("USER_UPDATE", `Updated user details for ${formData.firstName} ${formData.lastName}`);
-      setSuccessMsg("User updated successfully!");
-    } else {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
+      if (isEditMode) {
+        const { error } = await supabase
+          .from("profiles")
+          .update({
             first_name: formData.firstName,
             last_name: formData.lastName,
             account_type: formData.position,
-            status: "Active",
-            intermediary_code: formData.intermediary_code, // Add this line
-          },
-        },
-      });
+            intermediary_code: formData.intermediary_code ? parseInt(formData.intermediary_code) : null,
+          })
+          .eq("id", userIdToProcess);
 
-      if (authError) throw authError;
-      userIdToProcess = authData.user?.id;
-
-      if (userIdToProcess) {
-        const { error: profileError } = await supabase.from("profiles").insert([{
-          id: userIdToProcess,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
+        if (error) throw error;
+        await logActivity("USER_UPDATE", `Updated user details for ${formData.firstName} ${formData.lastName}`);
+        setSuccessMsg("User updated successfully!");
+      } else {
+        const { data: authData, error: authError } = await supabase.auth.signUp({
           email: formData.email,
-          account_type: formData.position,
-          status: "Active",
-          intermediary_code: formData.intermediary_code ? parseInt(formData.intermediary_code) : null, // Add this line
-        }]);
-        if (profileError) throw profileError;
-      }
+          password: formData.password,
+          options: {
+            data: {
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              account_type: formData.position,
+              status: "Active",
+              intermediary_code: formData.intermediary_code,
+            },
+          },
+        });
 
-      await logActivity("USER_CREATE", `Created new user ${formData.firstName} ${formData.lastName} (${formData.position})`);
-      setSuccessMsg("User created successfully!");
-    }
+        if (authError) throw authError;
+        userIdToProcess = authData.user?.id;
+
+        if (userIdToProcess) {
+          const { error: profileError } = await supabase.from("profiles").insert([{
+            id: userIdToProcess,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            account_type: formData.position,
+            status: "Active",
+            intermediary_code: formData.intermediary_code ? parseInt(formData.intermediary_code) : null,
+            created_by: user.id, // Store admin UUID
+          }]);
+          if (profileError) throw profileError;
+        }
+
+        await logActivity("USER_CREATE", `Created new user ${formData.firstName} ${formData.lastName} (${formData.position})`);
+        setSuccessMsg("User created successfully!");
+        
+        // If created an MP, update the flag
+        if (formData.position === "MP") {
+          setHasCreatedMP(true);
+        }
+      }
 
       if (formData.reportsTo && userIdToProcess) {
         await supabase.from("user_hierarchy").update({ is_active: false }).eq("user_id", userIdToProcess);
@@ -438,7 +484,7 @@ const submitUser = async (e) => {
 
         console.log('✅ Backend reset successful:', resetResult);
 
-        // Step 2: Update status to Active (even if status is already Active, this ensures it)
+        // Step 2: Update status to Active
         const { error: statusError } = await supabase
           .from("profiles")
           .update({ status: "Active" })
@@ -447,10 +493,6 @@ const submitUser = async (e) => {
         if (statusError) throw statusError;
         console.log('✅ Status updated to Active');
 
-        // NOTE: backend already sends the reset email (and includes the generated password),
-        // avoid calling `resetPasswordForEmail` again on the client or we'll hit Supabase rate limits.
-        //
-        // Step 4: Log the activity
         const newPassword = resetResult.generatedPassword || resetResult.password;
 
         await logActivity("PASSWORD_RESET", `Password reset to ${newPassword}, account activated and email sent to ${userItem.first_name} ${userItem.last_name}`);
@@ -473,8 +515,6 @@ const submitUser = async (e) => {
         await fetchUsers();
       } catch (err) {
         console.error("❌ Error resetting password:", err);
-
-        // if supabase returns a rate-limit message, just re-display it without the backend-warning
         const msg = err.message || "Unknown error";
         alert("Failed to reset password:\n\n" + msg);
       } finally {
@@ -492,17 +532,14 @@ const submitUser = async (e) => {
       try {
         setLoading(true);
 
-        // Just resend the password reset email without changing status
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(userItem.email, {
           redirectTo: `${window.location.origin}/reset-password`,
         });
 
         if (resetError) throw resetError;
 
-        // Log the activity
         await logActivity("PASSWORD_RESET_RESEND", `Password reset email resent to ${userItem.first_name} ${userItem.last_name}`);
 
-        // Create admin notification
         await supabase.from("admin_notifications").insert({
           user_id: user.id,
           message: `Password reset email resent to ${userItem.first_name} ${userItem.last_name}`,
@@ -709,7 +746,7 @@ const submitUser = async (e) => {
         </div>
       </div>
 
-      {/* ROLE STATISTICS CARDS */}
+      {/* ROLE STATISTICS CARDS - Removed ADMIN and MD */}
       <div className="role-cards-grid">
         <div className="role-card animate-spring delay-1">
           <h3>AGENCY LEADERS (AL)</h3>
@@ -720,16 +757,8 @@ const submitUser = async (e) => {
           <div className="count">{roleCounts.AP}</div>
         </div>
         <div className="role-card animate-spring delay-3">
-          <h3>MANAGING DIRECTORS (MD)</h3>
-          <div className="count">{roleCounts.MD}</div>
-        </div>
-        <div className="role-card animate-spring delay-4">
           <h3>MANAGEMENT PARTNERS (MP)</h3>
           <div className="count">{roleCounts.MP}</div>
-        </div>
-        <div className="role-card animate-spring delay-5">
-          <h3>ADMINS</h3>
-          <div className="count">{roleCounts.ADMIN}</div>
         </div>
       </div>
 
@@ -885,38 +914,43 @@ const submitUser = async (e) => {
                 <div className="input-group">
                   <label>Position</label>
                   <select name="position" value={formData.position} onChange={handleFormChange}>
-                    <option value="Admin">Admin</option>
-                    <option value="MP">Managing Partner (MP)</option>
+                    {!hasCreatedMP && !isEditMode && (
+                      <option value="MP">Management Partner (MP)</option>
+                    )}
                     <option value="AL">Agency Leader (AL)</option>
                     <option value="AP">Agency Partner (AP)</option>
-                    <option value="MD">Managing Director (MD)</option>
                   </select>
+                  {hasCreatedMP && !isEditMode && (
+                    <small style={{ color: '#ef4444', marginTop: '4px', display: 'block' }}>
+                      You have already created an MP, so the MP option is unavailable.
+                    </small>
+                  )}
                 </div>
               </div>
-{(formData.position) && (
-  <div className="input-group">
-    <label>Intermediary Code</label>
-    <input
-      type="text"
-      name="intermediary_code"
-      value={formData.intermediary_code}
-      onChange={handleFormChange}
-      placeholder="Enter 8-digit code"
-      maxLength="8"
-      inputMode="numeric"
-      pattern="[0-9]*"
-      title="Please enter numbers only (max 8 digits)"
-    />
-    <small style={{ 
-      color: '#6b7280', 
-      fontSize: '11px', 
-      marginTop: '4px',
-      display: 'block'
-    }}>
-      Max 8 digits, numbers only
-    </small>
-  </div>
-)}
+              {(formData.position) && (
+                <div className="input-group">
+                  <label>Intermediary Code</label>
+                  <input
+                    type="text"
+                    name="intermediary_code"
+                    value={formData.intermediary_code}
+                    onChange={handleFormChange}
+                    placeholder="Enter 8-digit code"
+                    maxLength="8"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    title="Please enter numbers only (max 8 digits)"
+                  />
+                  <small style={{ 
+                    color: '#6b7280', 
+                    fontSize: '11px', 
+                    marginTop: '4px',
+                    display: 'block'
+                  }}>
+                    Max 8 digits, numbers only
+                  </small>
+                </div>
+              )}
               {(formData.position === 'AP' || formData.position === 'AL') && (
                 <div className="input-group">
                   <label>Reports To</label>
