@@ -32,6 +32,10 @@ import AdminActivityLogs from './pages/Admin/Admin-ActivityLogs';
 import AdminRecord from './pages/Admin/Admin-Record';
 import AdminTracking from './pages/Admin/Admin-Tracking';
 
+// Super-Admin Pages
+import SuperAdminDashboard from './pages/Super-Admin/Super-Admin-Dashboard';
+import SuperAdminManageUsers from './pages/Super-Admin/ManageUsers';
+
 // Common Pages
 import ProfilePage from './pages/Common/ProfilePage';
 import LandingPage from './pages/LandingPage/LandingPage';
@@ -86,6 +90,10 @@ function App() {
             <Route path="/admin/tracking" element={<MainLayout><AdminTracking /></MainLayout>} />
           </Route>
           <Route path="/profile" element={<ProfileLayout><ProfilePage /></ProfileLayout>} />
+
+          {/* Super-Admin Routes */}
+          <Route path="/super-admin/dashboard" element={<MainLayout><SuperAdminDashboard /></MainLayout>} />
+          <Route path="/super-admin/ManageUsers" element={<MainLayout><SuperAdminManageUsers /></MainLayout>} />
 
 
           {/* AL Routes - Same as AP plus Team Performance */}

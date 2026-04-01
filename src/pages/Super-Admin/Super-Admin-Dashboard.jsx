@@ -7,7 +7,7 @@ import "./Style/Dashboard.css";
 import LogoImage from "../../assets/logo1.png";
 import ActivityLog from "../../components/ActivityLog";
 
-const AdminDashboard = () => {
+const SuperDashboard = () => {
   const navigate = useNavigate();
   const { darkMode, toggleDarkMode, currentUser } = useApp();
   const [totalUsers, setTotalUsers] = useState(0);
@@ -29,6 +29,7 @@ const AdminDashboard = () => {
       }
 
       let type = session.user.user_metadata?.account_type;
+
       if (!type) {
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
@@ -42,13 +43,14 @@ const AdminDashboard = () => {
       }
 
       const normalizedType = type?.toString().trim().toUpperCase().replace(/\s+/g, "_");
-      const isAllowed = normalizedType === "ADMIN";
+      const isAllowed = normalizedType === "SUPER_ADMIN";
 
       if (!normalizedType || !isAllowed) {
         alert("You do not have access to this page");
         navigate("/");
         return;
       }
+
       fetchTotalUsers();
       fetchUsers();
       fetchNewSerialNumbers();
@@ -164,7 +166,7 @@ const AdminDashboard = () => {
               <button
                 className="btn-secondary"
                 style={{ fontSize: '12px', padding: '6px 12px' }}
-                onClick={() => navigate("/admin/ManageUsers")}
+                onClick={() => navigate("/super-admin/ManageUsers")}
               >
                 View All
               </button>
@@ -229,4 +231,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default SuperDashboard;

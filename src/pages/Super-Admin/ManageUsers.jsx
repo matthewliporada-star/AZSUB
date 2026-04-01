@@ -16,7 +16,7 @@ const ManageUsers = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
-  const [hasCreatedMP, setHasCreatedMP] = useState(false); // Track if current admin already created an MP
+  const [allUsers, setAllUsers] = useState([]); // store all for counts/cross-check
 
   // -- UI State --
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -37,7 +37,7 @@ const ManageUsers = () => {
     firstName: "",
     lastName: "",
     email: "",
-    position: "AL", // Default role should be AL (no MD role)
+    position: "MD",
     password: "",
     reportsTo: "",
     intermediary_code: "",
@@ -49,17 +49,12 @@ const ManageUsers = () => {
   // -- Hierarchy Helper Data --
   const [potentialUplines, setPotentialUplines] = useState([]);
   const [viewingSupervisor, setViewingSupervisor] = useState(null);
-  const [viewingSubordinates, setViewingSubordinates] = useState([]);
-  const [adminMP, setAdminMP] = useState(null); // current admin's MP if any
+  const [viewingCreatedAccounts, setViewingCreatedAccounts] = useState([]);
 
   // -- Role Statistics --
   const [roleCounts, setRoleCounts] = useState({
-    AL: 0, AP: 0, MP: 0
+    AL: 0, AP: 0, MD: 0, MP: 0, ADMIN: 0, SUPER_ADMIN: 0
   });
-
-  // -- Auto hierarchy state --
-  const [mpSupervisor, setMpSupervisor] = useState(null);
-  const [autoReportsToMP, setAutoReportsToMP] = useState("");
 
   // -- Filter State --
   const [showInactive, setShowInactive] = useState(false);
@@ -67,14 +62,8 @@ const ManageUsers = () => {
   // -- Initialization --
   useEffect(() => {
     checkAdmin();
+    fetchNotifications();
   }, []);
-
-  // Fetch notifications after user is loaded
-  useEffect(() => {
-    if (user?.id) {
-      fetchNotifications();
-    }
-  }, [user]);
 
   // Subscribe to real-time notifications
   useEffect(() => {
@@ -83,18 +72,7 @@ const ManageUsers = () => {
       .on('postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'admin_notifications' },
         (payload) => {
-          const newNotification = payload.new;
-          // Add only notifications for current admin or this admin's managed users
-          const adminId = user?.id;
-          if (!adminId) return;
-
-          const shouldShow = newNotification.user_id === adminId ||
-            (newNotification.target_user_id &&
-              users.some((u) => u.id === newNotification.target_user_id));
-
-          if (shouldShow) {
-            setNotifications(prev => [newNotification, ...prev]);
-          }
+          setNotifications(prev => [payload.new, ...prev]);
         }
       )
       .subscribe();
@@ -102,43 +80,18 @@ const ManageUsers = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [user, users]);
+  }, []);
 
   const fetchNotifications = async () => {
     try {
-      if (!user?.id) return;
-
-      // Get users created by this admin so we can show related notifications.
-      const { data: ownedUsers = [], error: ownedUsersError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('created_by', user.id);
-
-      if (ownedUsersError) {
-        console.error('Error fetching admin-owned users for notifications:', ownedUsersError.message);
-        return;
-      }
-
-      const ownedUserIds = ownedUsers.map((u) => u.id).filter(Boolean);
-
-      let query = supabase
+      const { data, error } = await supabase
         .from('admin_notifications')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (ownedUserIds.length > 0) {
-        query = query.or(`user_id.eq.${user.id},target_user_id.in.(${ownedUserIds.join(',')})`);
-      } else {
-        query = query.eq('user_id', user.id);
-      }
-
-      const { data: notificationsData, error } = await query;
-
       if (!error) {
-        setNotifications(notificationsData || []);
-      } else {
-        console.error('Error fetching notifications:', error.message);
+        setNotifications(data || []);
       }
     } catch (err) {
       console.error('Error fetching notifications:', err);
@@ -189,7 +142,9 @@ const ManageUsers = () => {
       navigate("/");
       return;
     }
+
     let type = session.user.user_metadata?.account_type;
+
     if (!type) {
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
@@ -203,60 +158,35 @@ const ManageUsers = () => {
     }
 
     const normalizedType = type?.toString().trim().toUpperCase().replace(/\s+/g, "_");
-    const isAllowed = normalizedType === "ADMIN";
+    const isAllowed = normalizedType === "SUPER_ADMIN";
+
     if (!normalizedType || !isAllowed) {
       alert("You do not have access to this page");
       navigate("/");
       return;
     }
+
     setUser(session.user);
-    await fetchUsers(session.user.id);
-    await checkAdminMPCreation(session.user.id);
+    fetchUsers();
   };
 
-  // Check if current admin has already created an MP
-  const checkAdminMPCreation = async (adminId) => {
+  const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name")
-        .eq("created_by", adminId)
-        .ilike("account_type", "mp")
-        .limit(1);
-
-      const hasMP = !error && Array.isArray(data) && data.length > 0;
-      const selectedMP = hasMP ? data[0] : null;
-
-      // Only use MP that this admin created.
-      setHasCreatedMP(!!selectedMP);
-      setAdminMP(selectedMP || null);
-      setAutoReportsToMP(selectedMP?.id || "");
-    } catch (err) {
-      console.error("Error checking MP creation:", err);
-    }
-  };
-
-  const fetchUsers = async (adminIdFromParam) => {
-    try {
-      // Get current admin's ID (UUID). Prefer explicit param to avoid stale state in async flow.
-      const adminId = adminIdFromParam || user?.id;
-      if (!adminId) {
-        console.warn("fetchUsers called without adminId");
-        return;
-      }
-      
-      // Fetch only users created by this admin
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("created_by", adminId) // Filter by created_by (UUID)
         .order("created_at", { ascending: false });
 
       if (error) {
         console.error("Error fetching users:", error.message);
       } else {
-        setUsers(data || []);
-        calculateRoleCounts(data || []);
+const allUserData = data || [];
+      setAllUsers(allUserData);
+
+      const adminUserData = allUserData.filter((u) => u.account_type?.toUpperCase() === "ADMIN");
+      setUsers(adminUserData);
+
+      calculateRoleCounts(allUserData);
       }
     } catch (err) {
       console.error("Error fetching users:", err);
@@ -264,113 +194,33 @@ const ManageUsers = () => {
   };
 
   const calculateRoleCounts = (userData) => {
-    const counts = { AL: 0, AP: 0, MP: 0 };
+    const counts = { AL: 0, AP: 0, MD: 0, MP: 0, ADMIN: 0, SUPER_ADMIN: 0 };
     userData.forEach((u) => {
       const role = u.account_type?.toUpperCase();
-      if (role === 'AL') counts.AL++;
-      else if (role === 'AP') counts.AP++;
-      else if (role === 'MP') counts.MP++;
+      const normalizedRole = role === 'ADMIN' ? 'ADMIN' : role === 'SUPER_ADMIN' ? 'SUPER_ADMIN' : role;
+      if (counts.hasOwnProperty(normalizedRole)) {
+        counts[normalizedRole]++;
+      }
     });
     setRoleCounts(counts);
   };
 
-  // -- Hierarchy Logic -- FIXED: Better fetching for AP dropdown
-// -- Hierarchy Logic -- FIXED: AP should only see ALs that are under the admin's MP
-const fetchPotentialUplines = useCallback(async (role, excludeUserId = null) => {
-  const roleMap = { "AP": "AL", "AL": "MP", "MP": "MP" };
-  const uplineRole = roleMap[role];
-
-  if (!uplineRole) {
-    setPotentialUplines([]);
-    return;
-  }
-
-  const adminId = user?.id;
-
-  // For AP, we need to find ALs that report to the admin's MP
-  if (role === "AP" && adminId && adminMP) {
-    try {
-      // First, get all users who report to the admin's MP
-      const { data: alUsers, error: hierarchyError } = await supabase
-        .from("user_hierarchy")
-        .select(`
-          user_id,
-          profiles:user_id (
-            id,
-            first_name,
-            last_name,
-            account_type,
-            created_by
-          )
-        `)
-        .eq("report_to_id", adminMP.id)
-        .eq("is_active", true);
-
-      if (hierarchyError) {
-        console.error("Error fetching AL hierarchy:", hierarchyError);
-        setPotentialUplines([]);
-        return;
-      }
-
-      // Extract the AL profiles from the hierarchy
-      const alProfiles = alUsers
-        .map(item => item.profiles)
-        .filter(profile => 
-          profile && 
-          profile.account_type?.toUpperCase() === "AL" &&
-          profile.id !== excludeUserId
-        );
-
-      console.log(`Found ${alProfiles.length} ALs under MP ${adminMP.first_name} ${adminMP.last_name}:`, alProfiles);
-      setPotentialUplines(alProfiles);
-      return;
-    } catch (err) {
-      console.error("Error in AP hierarchy fetch:", err);
+  // -- Hierarchy Logic --
+  const fetchPotentialUplines = useCallback(async (role, excludeUserId = null) => {
+    const roleMap = { "AP": "AL", "AL": "MP" };
+    const uplineRole = roleMap[role];
+    if (!uplineRole) {
       setPotentialUplines([]);
       return;
     }
-  }
-
-  // For AL, restrict to MPs created by this admin
-  if (role === "AL" && adminId) {
-    let query = supabase
+    const { data, error } = await supabase
       .from("profiles")
       .select("id, first_name, last_name, account_type")
       .eq("account_type", uplineRole)
-      .eq("created_by", adminId)
       .neq("id", excludeUserId || "");
 
-    const { data, error } = await query;
-
-    if (!error && Array.isArray(data)) {
-      setPotentialUplines(data);
-    } else {
-      setPotentialUplines([]);
-    }
-    return;
-  }
-
-  // For MP, show MPs created by this admin (if any)
-  if (role === "MP" && adminId) {
-    let query = supabase
-      .from("profiles")
-      .select("id, first_name, last_name, account_type")
-      .eq("account_type", uplineRole)
-      .eq("created_by", adminId)
-      .neq("id", excludeUserId || "");
-
-    const { data, error } = await query;
-
-    if (!error && Array.isArray(data)) {
-      setPotentialUplines(data);
-    } else {
-      setPotentialUplines([]);
-    }
-    return;
-  }
-
-  setPotentialUplines([]);
-}, [user, adminMP]);
+    if (!error) setPotentialUplines(data || []);
+  }, []);
 
   useEffect(() => {
     if (showAddModal) {
@@ -379,44 +229,24 @@ const fetchPotentialUplines = useCallback(async (role, excludeUserId = null) => 
   }, [formData.position, showAddModal, isEditMode, selectedUser, fetchPotentialUplines]);
 
   // -- Form Handlers --
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    let finalValue = value;
+const handleFormChange = (e) => {
+  const { name, value } = e.target;
+  let finalValue = value;
 
-    if (name === "firstName" || name === "lastName") {
-      finalValue = value.charAt(0).toUpperCase() + value.slice(1);
-    }
-    
-    // For intermediary_code, ensure it's numeric and max 8 digits
-    if (name === "intermediary_code") {
-      finalValue = value.replace(/[^0-9]/g, '').slice(0, 8);
-    }
+  if (name === "firstName" || name === "lastName") {
+    finalValue = value.charAt(0).toUpperCase() + value.slice(1);
+  }
+  
+  // For intermediary_code, ensure it's numeric and max 8 digits
+  if (name === "intermediary_code") {
+    finalValue = value.replace(/[^0-9]/g, '').slice(0, 8);
+  }
 
-    let updatedData = {
-      ...formData,
-      [name]: finalValue
-    };
-
-    if (name === "position") {
-      if (finalValue === "AL") {
-        // Auto-report ALs to the current admin MP if available
-        updatedData.reportsTo = autoReportsToMP || (adminMP ? adminMP.id : "");
-      } else if (finalValue === "MP") {
-        // When creating MP, auto-report to the current admin's MP (if exists)
-        updatedData.reportsTo = adminMP?.id || "";
-      } else if (finalValue === "AP") {
-        // AP can select from AL under this admin
-        updatedData.reportsTo = "";
-      } else {
-        updatedData.reportsTo = "";
-      }
-
-      // refresh upline options immediately when position is changed (AL/AP/MP)
-      fetchPotentialUplines(finalValue, isEditMode ? selectedUser?.id : null);
-    }
-
-    setFormData(updatedData);
-  };
+  setFormData({
+    ...formData,
+    [name]: finalValue
+  });
+};
 
   const generatePassword = () => {
     if (!formData.lastName.trim()) {
@@ -447,161 +277,139 @@ const fetchPotentialUplines = useCallback(async (role, excludeUserId = null) => 
     setModalError("");
     setSuccessMsg("");
     setViewingSupervisor(null);
-    setViewingSubordinates([]);
+    setViewingCreatedAccounts([]);
   };
 
-  const openAddModal = () => {
-    setIsEditMode(false);
-    const initialPosition = hasCreatedMP ? "AL" : "MP";
-    setFormData({
-      firstName: "", 
-      lastName: "", 
-      email: "", 
-      position: initialPosition,
-      password: "", 
-      reportsTo: autoReportsToMP || adminMP?.id || "",
-      intermediary_code: "",
-    });
-    setShowAddModal(true);
-    fetchPotentialUplines(initialPosition);
-  };
+const openAddModal = () => {
+  setIsEditMode(false);
+  setFormData({
+    firstName: "", 
+    lastName: "", 
+    email: "", 
+    position: "MD", 
+    password: "", 
+    reportsTo: "",
+    intermediary_code: "", // Add this line
+  });
+  setShowAddModal(true);
+};
 
-  const openEditModal = async (u) => {
-    setIsEditMode(true);
-    setSelectedUser(u);
-    setFormData({
-      firstName: u.first_name,
-      lastName: u.last_name,
-      email: u.email,
-      position: u.account_type,
-      password: "",
-      reportsTo: "",
-      intermediary_code: u.intermediary_code || "",
-    });
+const openEditModal = async (u) => {
+  setIsEditMode(true);
+  setSelectedUser(u);
+  setFormData({
+    firstName: u.first_name,
+    lastName: u.last_name,
+    email: u.email,
+    position: u.account_type,
+    password: "",
+    reportsTo: "",
+    intermediary_code: u.intermediary_code || "", // Add this line
+  });
 
-    const { data } = await supabase
-      .from("user_hierarchy")
-      .select("report_to_id")
-      .eq("user_id", u.id)
-      .eq("is_active", true)
-      .maybeSingle();
+  const { data } = await supabase
+    .from("user_hierarchy")
+    .select("report_to_id")
+    .eq("user_id", u.id)
+    .eq("is_active", true)
+    .maybeSingle();
 
-    if (data) setFormData(prev => ({ ...prev, reportsTo: data.report_to_id }));
+  if (data) setFormData(prev => ({ ...prev, reportsTo: data.report_to_id }));
 
-    setShowAddModal(true);
-    fetchPotentialUplines(formData.position, u.id);
-  };
+  setShowAddModal(true);
+};
 
   const openViewModal = async (u) => {
     setSelectedUser(u);
     setShowViewModal(true);
 
-    const [supRes, subRes] = await Promise.all([
-      supabase.from("user_hierarchy").select("profiles:report_to_id(first_name, last_name, account_type)").eq("user_id", u.id).eq("is_active", true).maybeSingle(),
-      supabase.from("user_hierarchy").select("profiles:user_id(first_name, last_name, account_type)").eq("report_to_id", u.id).eq("is_active", true)
+    const userId = u.id;
+
+    const [supRes, createdRes] = await Promise.all([
+      supabase.from("user_hierarchy").select("profiles:report_to_id(id, first_name, last_name, account_type)").eq("user_id", userId).eq("is_active", true).maybeSingle(),
+      supabase.from('profiles').select('id, first_name, last_name, account_type, status').eq('created_by', userId).order('created_at', { ascending: false })
     ]);
 
-    setViewingSupervisor(supRes.data?.profiles || null);
-    setViewingSubordinates(subRes.data?.map(d => d.profiles).filter(Boolean) || []);
+    const supervisor = supRes.data?.profiles || null;
+
+    const createdByAccounts = (createdRes.data || [])
+      .filter((p) => p.id && p.id !== userId)
+      .map((p) => ({ ...p }));
+
+    const rolePriority = { MP: 0, AL: 1, AP: 2, MD: 3, ADMIN: 4, SUPER_ADMIN: 5 };
+    const sortedCreatedByAccounts = [...createdByAccounts].sort((a, b) => {
+      const aRole = (a.account_type || "").toUpperCase();
+      const bRole = (b.account_type || "").toUpperCase();
+      return (rolePriority[aRole] ?? 99) - (rolePriority[bRole] ?? 99);
+    });
+
+    setViewingSupervisor(supervisor);
+    setViewingCreatedAccounts(sortedCreatedByAccounts);
   };
 
-  const submitUser = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setModalError("");
-    setSuccessMsg("");
+const submitUser = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setModalError("");
+  setSuccessMsg("");
 
-    try {
-      let userIdToProcess = selectedUser?.id;
+  try {
+    let userIdToProcess = selectedUser?.id;
 
-      // Check if trying to create an MP when admin already created one
-      if (!isEditMode && formData.position === "MP" && hasCreatedMP) {
-        throw new Error("You have already created an MP. Each admin can only create one Management Partner (MP). ");
-      }
+    if (isEditMode) {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          account_type: formData.position,
+          intermediary_code: formData.intermediary_code ? parseInt(formData.intermediary_code) : null, // Add this line
+        })
+        .eq("id", userIdToProcess);
 
-      // AL and AP should only be created if the admin has an MP
-      const mpAvailable = !!adminMP || hasCreatedMP;
-      if (!isEditMode && (formData.position === "AL" || formData.position === "AP") && !mpAvailable) {
-        // This route is hidden in UI when MP doesn't exist, so just exit silently.
-        setModalError("");
-        setLoading(false);
-        return;
-      }
-
-      if (isEditMode) {
-        const { error } = await supabase
-          .from("profiles")
-          .update({
+      if (error) throw error;
+      await logActivity("USER_UPDATE", `Updated user details for ${formData.firstName} ${formData.lastName}`);
+      setSuccessMsg("User updated successfully!");
+    } else {
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
-            account_type: formData.position,
-            intermediary_code: formData.intermediary_code ? parseInt(formData.intermediary_code) : null,
-          })
-          .eq("id", userIdToProcess);
-
-        if (error) throw error;
-        await logActivity("USER_UPDATE", `Updated user details for ${formData.firstName} ${formData.lastName}`);
-        setSuccessMsg("User updated successfully!");
-      } else {
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: formData.email,
-          password: formData.password,
-          options: {
-            data: {
-              first_name: formData.firstName,
-              last_name: formData.lastName,
-              account_type: formData.position,
-              status: "Active",
-              intermediary_code: formData.intermediary_code,
-            },
-          },
-        });
-
-        if (authError) throw authError;
-        userIdToProcess = authData.user?.id;
-
-        if (userIdToProcess) {
-          const { error: profileError } = await supabase.from("profiles").insert([{
-            id: userIdToProcess,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email,
             account_type: formData.position,
             status: "Active",
-            intermediary_code: formData.intermediary_code ? parseInt(formData.intermediary_code) : null,
-            created_by: user.id, // Store admin UUID
-          }]);
-          if (profileError) throw profileError;
-        }
+            intermediary_code: formData.intermediary_code, // Add this line
+          },
+        },
+      });
 
-        await logActivity("USER_CREATE", `Created new user ${formData.firstName} ${formData.lastName} (${formData.position})`);
-        setSuccessMsg("User created successfully!");
-        
-        // If created an MP, update the flag and cached MP context
-        if (formData.position === "MP") {
-          setHasCreatedMP(true);
-          setAdminMP({
-            id: userIdToProcess,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            account_type: "MP"
-          });
-          setAutoReportsToMP(userIdToProcess);
-          await checkAdminMPCreation(user.id);
-        }
+      if (authError) throw authError;
+      userIdToProcess = authData.user?.id;
+
+      if (userIdToProcess) {
+        const { error: profileError } = await supabase.from("profiles").insert([{
+          id: userIdToProcess,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          account_type: formData.position,
+          status: "Active",
+          intermediary_code: formData.intermediary_code ? parseInt(formData.intermediary_code) : null, // Add this line
+        }]);
+        if (profileError) throw profileError;
       }
 
-      const reportsToId = formData.position === "AL"
-        ? (adminMP?.id || formData.reportsTo)
-        : formData.position === "MP"
-          ? (adminMP?.id || formData.reportsTo)
-          : formData.reportsTo;
+      await logActivity("USER_CREATE", `Created new user ${formData.firstName} ${formData.lastName} (${formData.position})`);
+      setSuccessMsg("User created successfully!");
+    }
 
-      if (reportsToId && userIdToProcess) {
+      if (formData.reportsTo && userIdToProcess) {
         await supabase.from("user_hierarchy").update({ is_active: false }).eq("user_id", userIdToProcess);
         await supabase.from("user_hierarchy").insert({
           user_id: userIdToProcess,
-          report_to_id: reportsToId,
+          report_to_id: formData.reportsTo,
           assigned_by: user.id,
           is_active: true
         });
@@ -669,7 +477,7 @@ const fetchPotentialUplines = useCallback(async (role, excludeUserId = null) => 
 
         console.log('✅ Backend reset successful:', resetResult);
 
-        // Step 2: Update status to Active
+        // Step 2: Update status to Active (even if status is already Active, this ensures it)
         const { error: statusError } = await supabase
           .from("profiles")
           .update({ status: "Active" })
@@ -678,6 +486,10 @@ const fetchPotentialUplines = useCallback(async (role, excludeUserId = null) => 
         if (statusError) throw statusError;
         console.log('✅ Status updated to Active');
 
+        // NOTE: backend already sends the reset email (and includes the generated password),
+        // avoid calling `resetPasswordForEmail` again on the client or we'll hit Supabase rate limits.
+        //
+        // Step 4: Log the activity
         const newPassword = resetResult.generatedPassword || resetResult.password;
 
         await logActivity("PASSWORD_RESET", `Password reset to ${newPassword}, account activated and email sent to ${userItem.first_name} ${userItem.last_name}`);
@@ -700,6 +512,8 @@ const fetchPotentialUplines = useCallback(async (role, excludeUserId = null) => 
         await fetchUsers();
       } catch (err) {
         console.error("❌ Error resetting password:", err);
+
+        // if supabase returns a rate-limit message, just re-display it without the backend-warning
         const msg = err.message || "Unknown error";
         alert("Failed to reset password:\n\n" + msg);
       } finally {
@@ -717,14 +531,17 @@ const fetchPotentialUplines = useCallback(async (role, excludeUserId = null) => 
       try {
         setLoading(true);
 
+        // Just resend the password reset email without changing status
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(userItem.email, {
           redirectTo: `${window.location.origin}/reset-password`,
         });
 
         if (resetError) throw resetError;
 
+        // Log the activity
         await logActivity("PASSWORD_RESET_RESEND", `Password reset email resent to ${userItem.first_name} ${userItem.last_name}`);
 
+        // Create admin notification
         await supabase.from("admin_notifications").insert({
           user_id: user.id,
           message: `Password reset email resent to ${userItem.first_name} ${userItem.last_name}`,
@@ -747,7 +564,9 @@ const fetchPotentialUplines = useCallback(async (role, excludeUserId = null) => 
   // -- Render Helpers --
   const filteredUsers = users.filter(u => {
     const status = u.status || "Active";
-    return showInactive ? status === "Inactive" : status === "Active";
+    const isStatusMatch = showInactive ? status === "Inactive" : status === "Active";
+    const isAdmin = u.account_type?.toUpperCase() === "ADMIN";
+    return isStatusMatch && isAdmin;
   });
 
   const unreadNotificationsCount = notifications.filter(n => !n.is_read).length;
@@ -931,7 +750,7 @@ const fetchPotentialUplines = useCallback(async (role, excludeUserId = null) => 
         </div>
       </div>
 
-      {/* ROLE STATISTICS CARDS - Removed ADMIN and MD */}
+      {/* ROLE STATISTICS CARDS */}
       <div className="role-cards-grid">
         <div className="role-card animate-spring delay-1">
           <h3>AGENCY LEADERS (AL)</h3>
@@ -942,8 +761,20 @@ const fetchPotentialUplines = useCallback(async (role, excludeUserId = null) => 
           <div className="count">{roleCounts.AP}</div>
         </div>
         <div className="role-card animate-spring delay-3">
+          <h3>MANAGING DIRECTORS (MD)</h3>
+          <div className="count">{roleCounts.MD}</div>
+        </div>
+        <div className="role-card animate-spring delay-4">
           <h3>MANAGEMENT PARTNERS (MP)</h3>
           <div className="count">{roleCounts.MP}</div>
+        </div>
+        <div className="role-card animate-spring delay-5">
+          <h3>ADMINS</h3>
+          <div className="count">{roleCounts.ADMIN}</div>
+        </div>
+        <div className="role-card animate-spring delay-6">
+          <h3>SUPER ADMINS</h3>
+          <div className="count">{roleCounts.SUPER_ADMIN}</div>
         </div>
       </div>
 
@@ -1099,79 +930,45 @@ const fetchPotentialUplines = useCallback(async (role, excludeUserId = null) => 
                 <div className="input-group">
                   <label>Position</label>
                   <select name="position" value={formData.position} onChange={handleFormChange}>
-                    {!hasCreatedMP && !isEditMode ? (
-                      <option value="MP">Management Partner (MP)</option>
-                    ) : (
-                      <>
-                        <option value="AL">Agency Leader (AL)</option>
-                        <option value="AP">Agency Partner (AP)</option>
-                        {isEditMode && !hasCreatedMP && <option value="MP">Management Partner (MP)</option>}
-                      </>
-                    )}
+                    <option value="ADMIN">Admin</option>
                   </select>
-                  {!hasCreatedMP && !isEditMode && (
-                    <small style={{ color: '#ef4444', marginTop: '4px', display: 'block' }}>
-                      Please create a Management Partner (MP) first before adding AL or AP.
-                    </small>
-                  )}
                 </div>
               </div>
-              {(formData.position) && (
+{(formData.position) && (
+  <div className="input-group">
+    <label>Intermediary Code</label>
+    <input
+      type="text"
+      name="intermediary_code"
+      value={formData.intermediary_code}
+      onChange={handleFormChange}
+      placeholder="Enter 8-digit code"
+      maxLength="8"
+      inputMode="numeric"
+      pattern="[0-9]*"
+      title="Please enter numbers only (max 8 digits)"
+    />
+    <small style={{ 
+      color: '#6b7280', 
+      fontSize: '11px', 
+      marginTop: '4px',
+      display: 'block'
+    }}>
+      Max 8 digits, numbers only
+    </small>
+  </div>
+)}
+              {(formData.position === 'AP' || formData.position === 'AL') && (
                 <div className="input-group">
-                  <label>Intermediary Code</label>
-                  <input
-                    type="text"
-                    name="intermediary_code"
-                    value={formData.intermediary_code}
-                    onChange={handleFormChange}
-                    placeholder="Enter 8-digit code"
-                    maxLength="8"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    title="Please enter numbers only (max 8 digits)"
-                  />
-                  <small style={{ 
-                    color: '#6b7280', 
-                    fontSize: '11px', 
-                    marginTop: '4px',
-                    display: 'block'
-                  }}>
-                    Max 8 digits, numbers only
-                  </small>
-                </div>
-              )}
-              {formData.position === 'AL' && (
-                <div className="input-group">
-                  <label>Reports To (Auto-assigned MP)</label>
-                  <input
-                    type="text"
-                    value={adminMP ? `${adminMP.first_name} ${adminMP.last_name}` : "(No MP found)"}
-                    readOnly
-                  />
-                </div>
-              )}
-
-              {/* FIXED: AP dropdown with better handling */}
-              {formData.position === 'AP' && (
-                <div className="input-group">
-                  <label>Reports To (Select AL)</label>
-                  <select name="reportsTo" value={formData.reportsTo} onChange={handleFormChange} required>
+                  <label>Reports To</label>
+                  <select name="reportsTo" value={formData.reportsTo} onChange={handleFormChange}>
                     <option value="">-- Select Supervisor --</option>
-                    {potentialUplines.length === 0 ? (
-                      <option value="" disabled>No AL users available. Please create an AL first.</option>
-                    ) : (
-                      potentialUplines.map((u) => (
-                        <option key={u.id} value={u.id}>
-                          {u.first_name} {u.last_name} ({u.account_type})
-                        </option>
-                      ))
-                    )}
+                    {potentialUplines.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.first_name} {u.last_name}
+                      </option>
+                    ))}
                   </select>
-                  {potentialUplines.length === 0 && (
-                    <small style={{ color: '#ef4444', marginTop: '4px', display: 'block' }}>
-                      No Agency Leaders (AL) found. Please create an AL first.
-                    </small>
-                  )}
                 </div>
               )}
 
@@ -1221,25 +1018,17 @@ const fetchPotentialUplines = useCallback(async (role, excludeUserId = null) => 
 
               <div className="hierarchy-section" style={{ borderTop: '1px solid var(--border-color)', marginTop: '20px', paddingTop: '20px' }}>
                 <h3 style={{ fontSize: '16px', marginBottom: '15px', color: 'var(--primary-color)' }}>Hierarchy</h3>
-                <div className="hierarchy-item" style={{ marginBottom: '20px' }}>
-                  <label>Reports To</label>
-                  <div className="hierarchy-card">
-                    {viewingSupervisor ? (
-                      <><span>{viewingSupervisor.first_name} {viewingSupervisor.last_name}</span><span className="status-badge active">{viewingSupervisor.account_type}</span></>
-                    ) : <span style={{ color: '#999' }}>No supervisor assigned</span>}
-                  </div>
-                </div>
 
-                <div className="hierarchy-item">
-                  <label>Direct Reports ({viewingSubordinates.length})</label>
+                <div className="hierarchy-item" style={{ marginTop: '20px' }}>
+                  <label>Created Accounts ({viewingCreatedAccounts.length})</label>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
-                    {viewingSubordinates.map((sub, idx) => (
+                    {viewingCreatedAccounts.map((sub, idx) => (
                       <div key={idx} className="hierarchy-card">
                         <span>{sub.first_name} {sub.last_name}</span>
                         <span className="status-badge active" style={{ fontSize: '10px' }}>{sub.account_type}</span>
                       </div>
                     ))}
-                    {viewingSubordinates.length === 0 && <div className="hierarchy-card"><span style={{ color: '#999' }}>No direct reports found</span></div>}
+                    {viewingCreatedAccounts.length === 0 && <div className="hierarchy-card"><span style={{ color: '#999' }}>No created accounts found</span></div>}
                   </div>
                 </div>
 

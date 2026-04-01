@@ -17,12 +17,13 @@ const MainLayout = ({ children }) => {
     const isAP = location.pathname.startsWith('/ap');
     const isAL = location.pathname.startsWith('/al');
     const isAdmin = location.pathname.startsWith('/admin');
+    const isSuperAdmin = location.pathname.startsWith('/super-admin');
 
     // Specific wrapper class - Fallback to userRole if no path prefix
     let layoutClass = 'default-layout';
     if (isAP || userRole === 'AP') layoutClass = 'ap-layout';
     else if (isAL || userRole === 'AL') layoutClass = 'al-layout';
-    else if (isAdmin || userRole === 'ADMIN') layoutClass = 'admin-layout';
+    else if ((isAdmin || userRole === 'ADMIN') || (isSuperAdmin || userRole === 'SUPER_ADMIN')) layoutClass = 'admin-layout';
 
     // Sidebar State
     const [sidebarOpen, setSidebarOpen] = useState(true);

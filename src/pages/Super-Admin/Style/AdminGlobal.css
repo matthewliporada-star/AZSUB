@@ -1,0 +1,587 @@
+/* ADMIN LAYOUT STYLES - Integrated with MainLayout */
+/* Ported from AP_Styles.css for exact visual match */
+
+.admin-layout * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.admin-layout {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f5f7fa;
+    min-height: 100vh;
+    color: #2c3e50;
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    overflow-x: hidden;
+}
+
+/* --- SIDEBAR STYLES --- */
+.admin-layout .sidebar {
+    width: 260px;
+    background: #003266;
+    /* Admin Dark Blue */
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #e5e5e5;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+    height: 100vh;
+    z-index: 100;
+    flex-shrink: 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+    transition: width 0.3s ease;
+}
+
+/* Sidebar Toggle */
+.admin-layout .sidebar-toggle {
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #003266;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 102;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    color: #003266;
+    font-size: 12px;
+    padding: 0;
+}
+
+.admin-layout .sidebar-toggle:hover {
+    background: #003266;
+    color: white;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.admin-layout .sidebar.collapsed .sidebar-toggle {
+    right: -15px;
+    left: auto;
+    background: #003266;
+    color: white;
+    border-color: #003266;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Sidebar Collapsed State */
+.admin-layout .sidebar.collapsed {
+    width: 0;
+    padding: 0;
+    overflow: visible;
+}
+
+.admin-layout .sidebar.collapsed .sidebar-header,
+.admin-layout .sidebar.collapsed .sidebar-menu,
+.admin-layout .sidebar.collapsed .sidebar-footer {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Sidebar Logo */
+.admin-layout .sidebar-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+    margin-bottom: 20px;
+}
+
+.admin-layout .sidebar-logo-img {
+    max-width: 180px;
+    width: 80%;
+    height: auto;
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.admin-layout .sidebar-logo-img.collapsed {
+    max-width: 40px;
+}
+
+/* Sidebar Menu */
+.admin-layout .sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.admin-layout .sidebar-item {
+    padding: 14px 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    color: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    background: transparent;
+    transition: all 0.25s ease;
+}
+
+.admin-layout .sidebar-item:hover {
+    background: #0052a3;
+    color: white;
+    transform: translateX(5px);
+}
+
+.admin-layout .sidebar-item.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.admin-layout .sidebar-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- MAIN CONTENT & TOPBAR --- */
+.admin-layout .main-content {
+    margin-left: 260px;
+    padding: 90px 40px 30px 40px;
+    flex: 1;
+    min-height: 100vh;
+    overflow-y: auto;
+    transition: margin-left 0.3s ease, padding 0.3s ease;
+    display: block;
+    width: calc(100% - 260px);
+    margin-top: 0 !important;
+    padding-top: 90px !important;
+}
+
+.admin-layout .main-content.expanded {
+    margin-left: 0 !important;
+    width: 100%;
+}
+
+/* TopBar Styling to match AP */
+.admin-layout .top-bar {
+    background: #ffffff;
+    height: 72px;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #eaecf0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 260px;
+    z-index: 99;
+    width: auto;
+    transition: left 0.3s ease;
+    color: #1e293b;
+}
+
+
+
+.admin-layout .main-content.expanded .top-bar {
+    left: 0;
+}
+
+.admin-layout .top-bar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    color: #1e293b !important;
+}
+
+/* Profile name, role, and avatar styles are now handled globally in TopBar.css */
+
+
+
+.admin-layout .top-bar-content .profile-dropdown {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-top: 15px;
+    color: #333 !important;
+}
+
+.admin-layout .top-bar-content .dropdown-item {
+    color: #333 !important;
+    padding: 10px 16px;
+    font-size: 14px;
+}
+
+.admin-layout .top-bar-content .dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.admin-layout .top-bar-content .logout-item {
+    color: #ff4b4b !important;
+}
+
+/* Fix CSS specificity overrides breaking Dark Mode legibility in TopBar */
+body.dark-mode .admin-layout .top-bar-content .profile-dropdown {
+    background-color: #1e293b !important;
+}
+
+body.dark-mode .admin-layout .top-bar-content .dropdown-item {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .admin-layout .top-bar-content .dropdown-item:hover {
+    background-color: #334155 !important;
+}
+
+body.dark-mode .admin-layout .top-bar-content .logout-item:hover {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+}
+
+/* === ENHANCED ADMIN LAYOUT DARK MODE (Sidebar, TopBar, Body) === */
+body.dark-mode .admin-layout {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .admin-layout .sidebar {
+    background: #1e293b !important;
+    border-right: 1px solid #334155 !important;
+}
+
+body.dark-mode .admin-layout .top-bar {
+    background: #1e293b !important;
+    border-bottom: 1px solid #334155 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .admin-layout .sidebar-item {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .admin-layout .sidebar-item:hover,
+body.dark-mode .admin-layout .sidebar-item.active {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .admin-layout .sidebar-toggle {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .admin-layout .sidebar-toggle:hover {
+    background: #334155 !important;
+    color: #ffffff !important;
+}
+
+
+.admin-layout .top-bar-logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: #003266;
+    text-transform: uppercase;
+}
+
+/* Container */
+.admin-layout .container {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0;
+    /* Padding is handled by main-content */
+}
+
+/* --- DARK MODE OVERRIDES --- */
+body.dark-mode .admin-layout .sidebar {
+    background: #0d1117 !important;
+    border-right: 1px solid #30363d !important;
+}
+
+body.dark-mode .admin-layout .sidebar-toggle {
+    background: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+}
+
+body.dark-mode .admin-layout .sidebar.collapsed .sidebar-toggle {
+    background: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .admin-layout .sidebar-item.active {
+    background: rgba(96, 165, 250, 0.1);
+    color: #ffffff;
+}
+
+body.dark-mode .admin-layout .top-bar {
+    background: #161b22 !important;
+    /* Slightly lighter than sidebar */
+    border-bottom: 1px solid #30363d !important;
+    color: #c9d1d9 !important;
+}
+
+body.dark-mode .admin-layout {
+    background: #0d1117 !important;
+    color: #c9d1d9 !important;
+}
+
+/* Dark mode profile name and role are now handled in TopBar.css */
+
+
+body.dark-mode .admin-layout .top-bar-content i {
+    color: #c9d1d9 !important;
+}
+
+
+/* --- GLOBAL MODAL & FORM STYLES --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 30, 60, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 1000;
+    backdrop-filter: blur(6px);
+}
+
+.modal-content {
+    background: #fff;
+    width: 725px;
+    max-height: 87vh;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+
+
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-title {
+    padding: 24px 35px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #003266;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-form {
+    padding: 30px 35px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-buttons {
+    padding: 20px 35px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.modal-close,
+.modal-submit {
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-close {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+}
+
+.modal-close:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #475569;
+}
+
+.modal-submit {
+    background: #003266;
+    color: #ffffff;
+    border: none;
+}
+
+.modal-submit:hover {
+    background: #004080;
+    box-shadow: 0 4px 12px rgba(0, 50, 102, 0.2);
+}
+
+.modal-submit:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+
+/* Form Elements */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    font-size: 15px;
+    color: #1e293b;
+    transition: all 0.2s ease;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.input-group input[readOnly] {
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: default;
+    border-color: #e2e8f0;
+}
+
+.name-row,
+.input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Hierarchy Card Style */
+.hierarchy-card {
+    background: #f8fafc;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #334155;
+    transition: background 0.2s;
+}
+
+.hierarchy-card:hover {
+    background: #f1f5f9;
+}
+
+/* Dark Mode Modal */
+body.dark-mode .modal-content {
+    background: #161b22;
+    border: 1px solid #30363d;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .modal-title,
+body.dark-mode .modal-buttons {
+    background: #21262d;
+    border-color: #30363d;
+    color: #c9d1d9;
+}
+
+body.dark-mode .input-group label {
+    color: #8b949e;
+}
+
+body.dark-mode .input-group input,
+body.dark-mode .input-group select {
+    background: #0d1117;
+    border-color: #30363d;
+    color: #c9d1d9;
+}
+
+body.dark-mode .input-group input[readOnly] {
+    background: #21262d;
+    color: #8b949e;
+}
+
+body.dark-mode .hierarchy-card {
+    background: #0d1117;
+    border-color: #30363d;
+    color: #c9d1d9;
+}
+
+body.dark-mode .hierarchy-card:hover {
+    background: #21262d;
+}
+
+body.dark-mode .modal-close {
+    background: #21262d;
+    border-color: #30363d;
+    color: #c9d1d9;
+}
+
+body.dark-mode .modal-close:hover {
+    background: #30363d;
+    border-color: #484f58;
+}
+
+body.dark-mode .modal-submit {
+    background: #3b82f6;
+}
+
+body.dark-mode .modal-submit:hover {
+    background: #4b92ff;
+}

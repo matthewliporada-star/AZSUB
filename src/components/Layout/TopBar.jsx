@@ -13,13 +13,21 @@ const TopBar = ({ sidebarOpen = true }) => {
     const navigate = useNavigate();
     const [showDropdown, setShowDropdown] = useState(false);
 
-    // Check if on AP, AL, MP, MD, Admin, or Profile pages
+    // Role normalization helper
+    const normalizedRole = currentUser?.role?.toString()?.trim()?.toUpperCase()?.replace(/\s+/g, '_');
+    const isSuperAdmin = normalizedRole === 'SUPER_ADMIN';
+    const isAdmin = normalizedRole === 'ADMIN';
+
+    // Check if on AP, AL, MP, MD, Admin, Super-Admin, or Profile pages
     const isDashboardPage = location.pathname.startsWith('/ap') ||
         location.pathname.startsWith('/al') ||
         location.pathname.startsWith('/mp') ||
         location.pathname.startsWith('/md') ||
         location.pathname.startsWith('/admin') ||
+        location.pathname.startsWith('/super-admin') ||
         location.pathname === '/profile';
+
+    const isAdminSection = isAdmin || isSuperAdmin;
 
     const handleLogout = async () => {
         try {
@@ -107,11 +115,21 @@ const TopBar = ({ sidebarOpen = true }) => {
                             {showDropdown && (
                                 <div className="profile-dropdown">
                                     <div className="dropdown-item" onClick={() => navigate('/profile')}>Profile</div>
-                                    {location.pathname.startsWith('/admin') && (
-                                        <div className="dropdown-item" onClick={() => navigate('/admin/SerialNumber')}>Serial Number</div>
+                                    {isAdmin && (
+                                        <div
+                                            className="dropdown-item"
+                                            onClick={() => navigate('/admin/SerialNumber')}
+                                        >
+                                            Serial Number
+                                        </div>
                                     )}
-                                    {location.pathname.startsWith('/admin') && (
-                                        <div className="dropdown-item" onClick={() => navigate('/admin/tracking')}>Sales Tracker</div>
+                                    {isAdmin && (
+                                        <div
+                                            className="dropdown-item"
+                                            onClick={() => navigate('/admin/tracking')}
+                                        >
+                                            Sales Tracker
+                                        </div>
                                     )}
                                     <div className="dropdown-item logout-item" onClick={handleLogout}>Logout</div>
                                 </div>

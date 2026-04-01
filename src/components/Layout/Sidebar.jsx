@@ -437,6 +437,48 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
     },
   ];
 
+  // Super-Admin Menu Items
+  const superAdminMenuItems = [
+    {
+      path: "/super-admin/dashboard",
+      label: "Dashboard",
+      icon: (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+      ),
+    },
+    {
+      path: "/super-admin/ManageUsers",
+      label: "Manage Users",
+      icon: (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      ),
+    },
+  ];
+
   // MD Menu Items
   const mdMenuItems = [
     {
@@ -486,6 +528,7 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
   else if (userRole === "AL") menuItems = alMenuItems;
   else if (userRole === "MD") menuItems = mdMenuItems;
   else if (userRole === "ADMIN") menuItems = adminMenuItems;
+  else if (userRole === "SUPER_ADMIN") menuItems = superAdminMenuItems;
 
   return (
     <aside className={`sidebar ${sidebarOpen ? "" : "collapsed"}`}>
