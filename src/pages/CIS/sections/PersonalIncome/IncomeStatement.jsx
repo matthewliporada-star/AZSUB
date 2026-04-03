@@ -45,6 +45,28 @@ export default function IncomeStatement() {
     };
   }, [income]);
 
+  const totalExpenditureSelf = parseFloat(income.totalExpenditureSelf) || 0;
+  const totalExpenditureSpouse = parseFloat(income.totalExpenditureSpouse) || 0;
+  const totalSelfIncome = parseFloat(totals.self) || 0;
+  const totalSpouseIncome = parseFloat(totals.spouse) || 0;
+
+  const computedTotalExpenditureJoint = (
+    totalExpenditureSelf + totalExpenditureSpouse
+  ).toFixed(2);
+
+  const computedDisposableIncomeSelf = (
+    totalSelfIncome - totalExpenditureSelf
+  ).toFixed(2);
+  const computedDisposableIncomeSpouse = (
+    totalSpouseIncome - totalExpenditureSpouse
+  ).toFixed(2);
+  const computedDisposableIncomeJoint = (
+    totalSelfIncome +
+    totalSpouseIncome -
+    totalExpenditureSelf -
+    totalExpenditureSpouse
+  ).toFixed(2);
+
   return (
     <Section number={7} title="Personal Income Statement" isTable>
       <div className="income-header">
@@ -370,9 +392,7 @@ export default function IncomeStatement() {
         <div className="income-cell">
           <label style={{ fontWeight: "700" }}>Total Income</label>
         </div>
-        <div className="income-cell">
-          
-        </div>
+        <div className="income-cell"></div>
         <div className="income-cell">
           <Input value={totals.self} readOnly />
         </div>
@@ -424,10 +444,8 @@ export default function IncomeStatement() {
         </div>
         <div className="income-cell">
           <Input
-            value={income.totalExpenditureJoint || ""}
-            onChange={(e) =>
-              handleChange("totalExpenditureJoint", e.target.value)
-            }
+            value={computedTotalExpenditureJoint}
+            readOnly
             placeholder="0.00"
           />
         </div>
@@ -455,28 +473,22 @@ export default function IncomeStatement() {
         </div>
         <div className="income-cell">
           <Input
-            value={income.disposableIncomeSelf || ""}
-            onChange={(e) =>
-              handleChange("disposableIncomeSelf", e.target.value)
-            }
+            value={computedDisposableIncomeSelf}
+            readOnly
             placeholder="0.00"
           />
         </div>
         <div className="income-cell">
           <Input
-            value={income.disposableIncomeSpouse || ""}
-            onChange={(e) =>
-              handleChange("disposableIncomeSpouse", e.target.value)
-            }
+            value={computedDisposableIncomeSpouse}
+            readOnly
             placeholder="0.00"
           />
         </div>
         <div className="income-cell">
           <Input
-            value={income.disposableIncomeJoint || ""}
-            onChange={(e) =>
-              handleChange("disposableIncomeJoint", e.target.value)
-            }
+            value={computedDisposableIncomeJoint}
+            readOnly
             placeholder="0.00"
           />
         </div>

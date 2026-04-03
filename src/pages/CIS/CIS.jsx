@@ -27,6 +27,7 @@ import { FormProvider, useForm } from "./context/FormContext";
 import { PDFDocument } from "pdf-lib";
 
 // 🔥 INNER COMPONENT (safe to use useForm)
+// 🔥 INNER COMPONENT (safe to use useForm)
 function AppContent() {
   const { setFormData } = useForm();
   const [uploadedFileName, setUploadedFileName] = useState(null);
@@ -47,525 +48,606 @@ function AppContent() {
           console.log("Loading edit data:", data);
 
           // Map the data to your formData structure
+          // The dashboard now sends data with keys like personalInformation, travelDetails, etc.
           const loadedFormData = {
-            // Personal Information
+            // Personal Information - data.personalInformation
             personalInformation: {
-              fullName: data.personal?.full_name || "",
-              fatherName: data.personal?.fathers_name || "",
-              mobile: data.personal?.mobile_no || "",
-              email: data.personal?.email || "",
-              currentAddress: data.personal?.residence_address || "",
-              currentCity: data.personal?.residence_city || "",
-              currentCountry: data.personal?.residence_country || "",
-              currentPostalCode: data.personal?.residence_zip || "",
-              currentAddressDuration: data.personal?.residence_duration || "",
-              previousAddress: data.personal?.prev_residence_complete || "",
-              previousCity: data.personal?.prev_residence_city || "",
-              previousCountry: data.personal?.prev_residence_country || "",
-              previousPostalCode: data.personal?.prev_residence_zip || "",
-              previousDates: data.personal?.prev_residence_dates_resided || "",
-              secondaryAddress: data.personal?.secondary_address || "",
-              secondaryCity: data.personal?.secondary_city || "",
-              secondaryCountry: data.personal?.secondary_country || "",
-              secondaryPostalCode: data.personal?.secondary_zip || "",
-              secondaryDates: data.personal?.secondary_dates_resided || "",
-              permanentAddress: data.personal?.permanent_address || "",
-              taxResidency: data.personal?.tax_residency || "",
-              tinSsn: data.personal?.tin_ssn || "",
-              citizenship: data.personal?.citizenship || "",
-              hobbies: data.personal?.hobbies || "",
+              fullName:
+                data.personalInformation?.fullName ||
+                data.personal?.full_name ||
+                "",
+              fatherName:
+                data.personalInformation?.fatherName ||
+                data.personal?.fathers_name ||
+                "",
+              mobile:
+                data.personalInformation?.mobile ||
+                data.personal?.mobile_no ||
+                "",
+              email:
+                data.personalInformation?.email || data.personal?.email || "",
+              currentAddress:
+                data.personalInformation?.currentAddress ||
+                data.personal?.residence_address ||
+                "",
+              currentCity:
+                data.personalInformation?.currentCity ||
+                data.personal?.residence_city ||
+                "",
+              currentCountry:
+                data.personalInformation?.currentCountry ||
+                data.personal?.residence_country ||
+                "",
+              currentPostalCode:
+                data.personalInformation?.currentPostalCode ||
+                data.personal?.residence_zip ||
+                "",
+              currentAddressDuration:
+                data.personalInformation?.currentAddressDuration ||
+                data.personal?.residence_duration ||
+                "",
+              previousAddress:
+                data.personalInformation?.previousAddress ||
+                data.personal?.prev_residence_complete ||
+                "",
+              previousCity:
+                data.personalInformation?.previousCity ||
+                data.personal?.prev_residence_city ||
+                "",
+              previousCountry:
+                data.personalInformation?.previousCountry ||
+                data.personal?.prev_residence_country ||
+                "",
+              previousPostalCode:
+                data.personalInformation?.previousPostalCode ||
+                data.personal?.prev_residence_zip ||
+                "",
+              previousDates:
+                data.personalInformation?.previousDates ||
+                data.personal?.prev_residence_dates_resided ||
+                "",
+              secondaryAddress:
+                data.personalInformation?.secondaryAddress ||
+                data.personal?.secondary_address ||
+                "",
+              secondaryCity:
+                data.personalInformation?.secondaryCity ||
+                data.personal?.secondary_city ||
+                "",
+              secondaryCountry:
+                data.personalInformation?.secondaryCountry ||
+                data.personal?.secondary_country ||
+                "",
+              secondaryPostalCode:
+                data.personalInformation?.secondaryPostalCode ||
+                data.personal?.secondary_zip ||
+                "",
+              secondaryDates:
+                data.personalInformation?.secondaryDates ||
+                data.personal?.secondary_dates_resided ||
+                "",
+              permanentAddress:
+                data.personalInformation?.permanentAddress ||
+                data.personal?.permanent_address ||
+                "",
+              taxResidency:
+                data.personalInformation?.taxResidency ||
+                data.personal?.tax_residency ||
+                "",
+              tinSsn:
+                data.personalInformation?.tinSsn ||
+                data.personal?.tin_ssn ||
+                "",
+              citizenship:
+                data.personalInformation?.citizenship ||
+                data.personal?.citizenship ||
+                "",
+              hobbies:
+                data.personalInformation?.hobbies ||
+                data.personal?.hobbies ||
+                "",
             },
-            // Travel Details
-            travelDetails:
-              data.travel && data.travel.length > 0
-                ? data.travel
-                : [
-                    {
-                      country: "",
-                      city: "",
-                      length_of_stay: "",
-                      frequency: "",
-                      date_travel: "",
-                      reason: "",
-                    },
-                    {
-                      country: "",
-                      city: "",
-                      length_of_stay: "",
-                      frequency: "",
-                      date_travel: "",
-                      reason: "",
-                    },
-                    {
-                      country: "",
-                      city: "",
-                      length_of_stay: "",
-                      frequency: "",
-                      date_travel: "",
-                      reason: "",
-                    },
-                  ],
-            // Habits
+
+            // Travel Details - data.travelDetails or data.travel
+            travelDetails: data.travelDetails ||
+              data.travel || [
+                {
+                  country: "",
+                  city: "",
+                  length_of_stay: "",
+                  frequency: "",
+                  date_travel: "",
+                  reason: "",
+                },
+                {
+                  country: "",
+                  city: "",
+                  length_of_stay: "",
+                  frequency: "",
+                  date_travel: "",
+                  reason: "",
+                },
+                {
+                  country: "",
+                  city: "",
+                  length_of_stay: "",
+                  frequency: "",
+                  date_travel: "",
+                  reason: "",
+                },
+              ],
+
+            // Habits - data.habits
             habits: {
-              smokerStatus: data.habits?.smoker_status || "",
-              cigarettesPerDay: data.habits?.cigarettes_per_day || "",
+              smokerStatus:
+                data.habits?.smokerStatus || data.habits?.smoker_status || "",
+              cigarettesPerDay:
+                data.habits?.cigarettesPerDay ||
+                data.habits?.cigarettes_per_day ||
+                "",
               previousSmokingHistory:
-                data.habits?.previous_smoking_history || "",
-              alcoholType: data.habits?.alcohol_type || "",
-              alcoholMeasurement: data.habits?.alcohol_measurement || "",
-              alcoholFrequency: data.habits?.alcohol_frequency || "",
+                data.habits?.previousSmokingHistory ||
+                data.habits?.previous_smoking_history ||
+                "",
+              alcoholType:
+                data.habits?.alcoholType || data.habits?.alcohol_type || "",
+              alcoholMeasurement:
+                data.habits?.alcoholMeasurement ||
+                data.habits?.alcohol_measurement ||
+                "",
+              alcoholFrequency:
+                data.habits?.alcoholFrequency ||
+                data.habits?.alcohol_frequency ||
+                "",
             },
-            // Medical
+
+            // Medical - data.medical
             medical: {
               weight: data.medical?.weight || "",
               height: data.medical?.height || "",
-              exercise: data.medical?.exercise_details || "",
-              disorders: data.medical?.health_disorders || "",
-              medication: data.medical?.medications || "",
-              familyPhysician: data.medical?.physician_name || "",
-              physicianAddress: data.medical?.physician_address || "",
-              physicianPhone: data.medical?.physician_phone || "",
-              yearsAttended: data.medical?.years_attended || "",
-              lastVisit: data.medical?.last_visit_details || "",
+              exercise:
+                data.medical?.exercise || data.medical?.exercise_details || "",
+              disorders:
+                data.medical?.disorders || data.medical?.health_disorders || "",
+              medication:
+                data.medical?.medication || data.medical?.medications || "",
+              familyPhysician:
+                data.medical?.familyPhysician ||
+                data.medical?.physician_name ||
+                "",
+              physicianAddress:
+                data.medical?.physicianAddress ||
+                data.medical?.physician_address ||
+                "",
+              physicianPhone:
+                data.medical?.physicianPhone ||
+                data.medical?.physician_phone ||
+                "",
+              yearsAttended:
+                data.medical?.yearsAttended ||
+                data.medical?.years_attended ||
+                "",
+              lastVisit:
+                data.medical?.lastVisit ||
+                data.medical?.last_visit_details ||
+                "",
             },
-            // Family Medical History
-            familyMedicalHistory:
-              data.familyMedical && data.familyMedical.length > 0
-                ? data.familyMedical
-                : [
-                    {
-                      relationship: "Father",
-                      name: "",
-                      age: "",
-                      medicalHistory: "",
-                      healthStatus: "",
-                    },
-                    {
-                      relationship: "Mother",
-                      name: "",
-                      age: "",
-                      medicalHistory: "",
-                      healthStatus: "",
-                    },
-                    {
-                      relationship: "Brother",
-                      name: "",
-                      age: "",
-                      medicalHistory: "",
-                      healthStatus: "",
-                    },
-                    {
-                      relationship: "Sister",
-                      name: "",
-                      age: "",
-                      medicalHistory: "",
-                      healthStatus: "",
-                    },
-                    {
-                      relationship: "Brother 1",
-                      name: "",
-                      age: "",
-                      medicalHistory: "",
-                      healthStatus: "",
-                    },
-                    {
-                      relationship: "Sister 1",
-                      name: "",
-                      age: "",
-                      medicalHistory: "",
-                      healthStatus: "",
-                    },
-                    {
-                      relationship: "Spouse",
-                      name: "",
-                      age: "",
-                      medicalHistory: "",
-                      healthStatus: "",
-                    },
-                  ],
-            // Insurance
-            insurance:
-              data.insurance && data.insurance.length > 0
-                ? data.insurance
-                : [
-                    {
-                      company: "",
-                      type: "",
-                      countryYear: "",
-                      amount: "",
-                      premium: "",
-                    },
-                    {
-                      company: "",
-                      type: "",
-                      countryYear: "",
-                      amount: "",
-                      premium: "",
-                    },
-                    {
-                      company: "",
-                      type: "",
-                      countryYear: "",
-                      amount: "",
-                      premium: "",
-                    },
-                  ],
-            // Business Employment
+
+            // Family Medical History - data.familyMedicalHistory or data.familyMedical
+            familyMedicalHistory: data.familyMedicalHistory ||
+              data.familyMedical || [
+                {
+                  relationship: "Father",
+                  name: "",
+                  age: "",
+                  medicalHistory: "",
+                  healthStatus: "",
+                },
+                {
+                  relationship: "Mother",
+                  name: "",
+                  age: "",
+                  medicalHistory: "",
+                  healthStatus: "",
+                },
+                {
+                  relationship: "Brother",
+                  name: "",
+                  age: "",
+                  medicalHistory: "",
+                  healthStatus: "",
+                },
+                {
+                  relationship: "Sister",
+                  name: "",
+                  age: "",
+                  medicalHistory: "",
+                  healthStatus: "",
+                },
+                {
+                  relationship: "Brother 1",
+                  name: "",
+                  age: "",
+                  medicalHistory: "",
+                  healthStatus: "",
+                },
+                {
+                  relationship: "Sister 1",
+                  name: "",
+                  age: "",
+                  medicalHistory: "",
+                  healthStatus: "",
+                },
+                {
+                  relationship: "Spouse",
+                  name: "",
+                  age: "",
+                  medicalHistory: "",
+                  healthStatus: "",
+                },
+              ],
+
+            // Insurance - data.insurance
+            insurance: data.insurance || [
+              {
+                company: "",
+                type: "",
+                countryYear: "",
+                amount: "",
+                premium: "",
+              },
+              {
+                company: "",
+                type: "",
+                countryYear: "",
+                amount: "",
+                premium: "",
+              },
+              {
+                company: "",
+                type: "",
+                countryYear: "",
+                amount: "",
+                premium: "",
+              },
+            ],
+
+            // Business Employment - data.businessEmployment or data.business
             businessEmployment: {
-              businessName: data.business?.business_name || "",
-              natureOfBusiness: data.business?.business_nature || "",
-              occupation: data.business?.occupation || "",
-              businessType: data.business?.business_type || "",
-              ownership: data.business?.ownership_percent || "",
-              businessAddress: data.business?.business_address || "",
-              city: data.business?.business_city || "",
-              country: data.business?.business_country || "",
-              postalCode: data.business?.business_zip || "",
-              website: data.business?.business_website || "",
-              telephone: data.business?.business_phone || "",
-              incorporationDate: data.business?.incorporation_date || "",
-              workExperience: data.business?.previous_experience || "",
+              businessName:
+                data.businessEmployment?.businessName ||
+                data.business?.business_name ||
+                "",
+              natureOfBusiness:
+                data.businessEmployment?.natureOfBusiness ||
+                data.business?.business_nature ||
+                "",
+              occupation:
+                data.businessEmployment?.occupation ||
+                data.business?.occupation ||
+                "",
+              businessType:
+                data.businessEmployment?.businessType ||
+                data.business?.business_type ||
+                "",
+              ownership:
+                data.businessEmployment?.ownership ||
+                data.business?.ownership_percent ||
+                "",
+              businessAddress:
+                data.businessEmployment?.businessAddress ||
+                data.business?.business_address ||
+                "",
+              city:
+                data.businessEmployment?.city ||
+                data.business?.business_city ||
+                "",
+              country:
+                data.businessEmployment?.country ||
+                data.business?.business_country ||
+                "",
+              postalCode:
+                data.businessEmployment?.postalCode ||
+                data.business?.business_zip ||
+                "",
+              website:
+                data.businessEmployment?.website ||
+                data.business?.business_website ||
+                "",
+              telephone:
+                data.businessEmployment?.telephone ||
+                data.business?.business_phone ||
+                "",
+              incorporationDate:
+                data.businessEmployment?.incorporationDate ||
+                data.business?.incorporation_date ||
+                "",
+              workExperience:
+                data.businessEmployment?.workExperience ||
+                data.business?.previous_experience ||
+                "",
             },
-            // Income Statement
+
+            // Income Statement - data.incomeStatement
             incomeStatement: {
-              frequency:
-                data.incomeSources?.find(
-                  (s) => s.source_name === "Income / Salary",
-                )?.frequency || "",
-              selfIncome:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Income / Salary")
-                  ?.self_amount?.toString() || "",
+              frequency: data.incomeStatement?.frequency || "Monthly",
+              selfIncome: data.incomeStatement?.selfIncome?.toString() || "",
               spouseIncome:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Income / Salary")
-                  ?.spouse_amount?.toString() || "",
-              jointIncome:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Income / Salary")
-                  ?.joint_amount?.toString() || "",
-              bonus:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Bonus")
-                  ?.self_amount?.toString() || "",
-              spouseBonus:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Bonus")
-                  ?.spouse_amount?.toString() || "",
+                data.incomeStatement?.spouseIncome?.toString() || "",
+              bonus: data.incomeStatement?.bonus?.toString() || "",
+              spouseBonus: data.incomeStatement?.spouseBonus?.toString() || "",
               investmentIncome:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Investment Income")
-                  ?.self_amount?.toString() || "",
+                data.incomeStatement?.investmentIncome?.toString() || "",
               spouseInvestment:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Investment Income")
-                  ?.spouse_amount?.toString() || "",
-              interest:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Interest")
-                  ?.self_amount?.toString() || "",
+                data.incomeStatement?.spouseInvestment?.toString() || "",
+              interest: data.incomeStatement?.interest?.toString() || "",
               spouseInterest:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Interest")
-                  ?.spouse_amount?.toString() || "",
-              dividends:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Dividends")
-                  ?.self_amount?.toString() || "",
+                data.incomeStatement?.spouseInterest?.toString() || "",
+              dividends: data.incomeStatement?.dividends?.toString() || "",
               spouseDividends:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Dividends")
-                  ?.spouse_amount?.toString() || "",
+                data.incomeStatement?.spouseDividends?.toString() || "",
               rentalIncome:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Rental Income")
-                  ?.self_amount?.toString() || "",
+                data.incomeStatement?.rentalIncome?.toString() || "",
               spouseRental:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Rental Income")
-                  ?.spouse_amount?.toString() || "",
-              otherIncome:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Other Income Source")
-                  ?.self_amount?.toString() || "",
-              spouseOther:
-                data.incomeSources
-                  ?.find((s) => s.source_name === "Other Income Source")
-                  ?.spouse_amount?.toString() || "",
+                data.incomeStatement?.spouseRental?.toString() || "",
+              otherIncome: data.incomeStatement?.otherIncome?.toString() || "",
+              spouseOther: data.incomeStatement?.spouseOther?.toString() || "",
               totalExpenditureSelf:
-                data.financial?.expenditure_self?.toString() || "",
+                data.incomeStatement?.totalExpenditureSelf?.toString() || "",
               totalExpenditureSpouse:
-                data.financial?.expenditure_spouse?.toString() || "",
-              disposableIncomeSelf:
-                data.financial?.disposable_income_self?.toString() || "",
-              disposableIncomeSpouse:
-                data.financial?.disposable_income_spouse?.toString() || "",
+                data.incomeStatement?.totalExpenditureSpouse?.toString() || "",
               totalExpenditureJoint:
-                data.financial?.total_expenditure_joint?.toString() || "",
+                data.incomeStatement?.totalExpenditureJoint?.toString() || "",
+              disposableIncomeSelf:
+                data.incomeStatement?.disposableIncomeSelf?.toString() || "",
+              disposableIncomeSpouse:
+                data.incomeStatement?.disposableIncomeSpouse?.toString() || "",
               disposableIncomeJoint:
-                data.financial?.disposable_income_joint?.toString() || "",
+                data.incomeStatement?.disposableIncomeJoint?.toString() || "",
               totalExpenditureFrequency:
-                data.financial?.expenditure_frequency || "Monthly",
+                data.incomeStatement?.totalExpenditureFrequency || "Monthly",
             },
-            // Assets & Liabilities
+
+            // Assets & Liabilities - data.assetsLiabilities
             assetsLiabilities: {
               asset_0_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Cash")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.asset_0_curr?.toString() || "",
               asset_1_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Savings")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.asset_1_curr?.toString() || "",
               asset_2_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Stocks and Bonds")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.asset_2_curr?.toString() || "",
               asset_3_curr:
-                data.assets
-                  ?.find(
-                    (a) => a.category_name === "Personal/Residential Property",
-                  )
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.asset_3_curr?.toString() || "",
               asset_4_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Investment Property")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.asset_4_curr?.toString() || "",
               asset_5_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Real Estate")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.asset_5_curr?.toString() || "",
               asset_6_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Other Parental Property")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.asset_6_curr?.toString() || "",
               asset_7_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Vehicle")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.asset_7_curr?.toString() || "",
               asset_8_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Funds/Unit Trusts")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.asset_8_curr?.toString() || "",
               asset_9_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Pensions")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.asset_9_curr?.toString() || "",
               asset_10_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Business Shareholding")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.asset_10_curr?.toString() || "",
               asset_11_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Net Business Interest")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.asset_11_curr?.toString() || "",
+              asset_0_last:
+                data.assetsLiabilities?.asset_0_last?.toString() || "",
+              asset_1_last:
+                data.assetsLiabilities?.asset_1_last?.toString() || "",
+              asset_2_last:
+                data.assetsLiabilities?.asset_2_last?.toString() || "",
+              asset_3_last:
+                data.assetsLiabilities?.asset_3_last?.toString() || "",
+              asset_4_last:
+                data.assetsLiabilities?.asset_4_last?.toString() || "",
+              asset_5_last:
+                data.assetsLiabilities?.asset_5_last?.toString() || "",
+              asset_6_last:
+                data.assetsLiabilities?.asset_6_last?.toString() || "",
+              asset_7_last:
+                data.assetsLiabilities?.asset_7_last?.toString() || "",
+              asset_8_last:
+                data.assetsLiabilities?.asset_8_last?.toString() || "",
+              asset_9_last:
+                data.assetsLiabilities?.asset_9_last?.toString() || "",
+              asset_10_last:
+                data.assetsLiabilities?.asset_10_last?.toString() || "",
+              asset_11_last:
+                data.assetsLiabilities?.asset_11_last?.toString() || "",
               liab_0_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Personal Loans")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.liab_0_curr?.toString() || "",
+              liab_0_last:
+                data.assetsLiabilities?.liab_0_last?.toString() || "",
               liab_1_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Margin Account")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.liab_1_curr?.toString() || "",
+              liab_1_last:
+                data.assetsLiabilities?.liab_1_last?.toString() || "",
               liab_2_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Residential Mortgage(s)")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.liab_2_curr?.toString() || "",
+              liab_2_last:
+                data.assetsLiabilities?.liab_2_last?.toString() || "",
               liab_3_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Loan Guarantees")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.liab_3_curr?.toString() || "",
+              liab_3_last:
+                data.assetsLiabilities?.liab_3_last?.toString() || "",
               liab_4_curr:
-                data.assets
-                  ?.find(
-                    (a) =>
-                      a.category_name === "Investment Property Mortgage(s)",
-                  )
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.liab_4_curr?.toString() || "",
+              liab_4_last:
+                data.assetsLiabilities?.liab_4_last?.toString() || "",
               liab_5_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Business Loans/security")
-                  ?.current_year_val?.toString() || "",
+                data.assetsLiabilities?.liab_5_curr?.toString() || "",
+              liab_5_last:
+                data.assetsLiabilities?.liab_5_last?.toString() || "",
               liab_6_curr:
-                data.assets
-                  ?.find((a) => a.category_name === "Other (Please specify)")
-                  ?.current_year_val?.toString() || "",
-              businessName1:
-                data.assets?.find((a) => a.item_index === 100)
-                  ?.other_description || "",
-              businessName2:
-                data.assets?.find((a) => a.item_index === 101)
-                  ?.other_description || "",
-              businessOther:
-                data.assets?.find((a) => a.item_index === 102)
-                  ?.other_description || "",
+                data.assetsLiabilities?.liab_6_curr?.toString() || "",
+              liab_6_last:
+                data.assetsLiabilities?.liab_6_last?.toString() || "",
+              businessName1: data.assetsLiabilities?.businessName1 || "",
+              businessName2: data.assetsLiabilities?.businessName2 || "",
+              businessOther: data.assetsLiabilities?.businessOther || "",
             },
-            // Property Details
+
+            // Property Details - data.propertyDetails
             propertyDetails:
-              data.property && data.property.length > 0
-                ? data.property
-                : [
-                    {
-                      type: "",
-                      location: "",
-                      purchaseDate: "",
-                      purchasePrice: "",
-                      mortgage: "",
-                      currentValue: "",
-                      frequencyVisits: "",
-                    },
-                    {
-                      type: "",
-                      location: "",
-                      purchaseDate: "",
-                      purchasePrice: "",
-                      mortgage: "",
-                      currentValue: "",
-                      frequencyVisits: "",
-                    },
-                    {
-                      type: "",
-                      location: "",
-                      purchaseDate: "",
-                      purchasePrice: "",
-                      mortgage: "",
-                      currentValue: "",
-                      frequencyVisits: "",
-                    },
-                    {
-                      type: "",
-                      location: "",
-                      purchaseDate: "",
-                      purchasePrice: "",
-                      mortgage: "",
-                      currentValue: "",
-                      frequencyVisits: "",
-                    },
-                    {
-                      type: "",
-                      location: "",
-                      purchaseDate: "",
-                      purchasePrice: "",
-                      mortgage: "",
-                      currentValue: "",
-                      frequencyVisits: "",
-                    },
-                    {
-                      type: "",
-                      location: "",
-                      purchaseDate: "",
-                      purchasePrice: "",
-                      mortgage: "",
-                      currentValue: "",
-                      frequencyVisits: "",
-                    },
-                    {
-                      type: "",
-                      location: "",
-                      purchaseDate: "",
-                      purchasePrice: "",
-                      mortgage: "",
-                      currentValue: "",
-                      frequencyVisits: "",
-                    },
-                    {
-                      type: "",
-                      location: "",
-                      purchaseDate: "",
-                      purchasePrice: "",
-                      mortgage: "",
-                      currentValue: "",
-                      frequencyVisits: "",
-                    },
-                  ],
-            // Bank Details
+              data.propertyDetails ||
+              Array(8)
+                .fill()
+                .map(() => ({
+                  location: "",
+                  purchaseDate: "",
+                  purchasePrice: "",
+                  mortgage: "",
+                  currentValue: "",
+                  frequencyVisits: "",
+                })),
+
+            // Bank Details - data.bankDetails
             bankDetails: {
-              bankName: data.bank?.bank_name || "",
-              accountHeld: data.bank?.account_tenure || "",
-              address: data.bank?.bank_address || "",
-              iban: data.bank?.bank_iban || "",
-              accountNumber: data.bank?.bank_account_number || "",
-              relationship: data.bank?.payor_relationship || "",
-              referenceContact: data.bank?.bank_reference || "",
-              email: data.bank?.bank_email || "",
+              bankName:
+                data.bankDetails?.bankName || data.bank?.bank_name || "",
+              accountHeld:
+                data.bankDetails?.accountHeld ||
+                data.bank?.account_tenure ||
+                "",
+              address:
+                data.bankDetails?.address || data.bank?.bank_address || "",
+              iban: data.bankDetails?.iban || data.bank?.bank_iban || "",
+              accountNumber:
+                data.bankDetails?.accountNumber ||
+                data.bank?.bank_account_number ||
+                "",
+              relationship:
+                data.bankDetails?.relationship ||
+                data.bank?.payor_relationship ||
+                "",
+              referenceContact:
+                data.bankDetails?.referenceContact ||
+                data.bank?.bank_reference ||
+                "",
+              email: data.bankDetails?.email || data.bank?.bank_email || "",
             },
-            // Policy Beneficiary
-            policyBeneficiary:
-              data.beneficiary && data.beneficiary.length > 0
-                ? data.beneficiary
-                : [
-                    {
-                      name: "",
-                      type: "",
-                      relationship: "",
-                      dateOfBirth: "",
-                      passportNo: "",
-                      share: "",
-                    },
-                    {
-                      name: "",
-                      type: "",
-                      relationship: "",
-                      dateOfBirth: "",
-                      passportNo: "",
-                      share: "",
-                    },
-                    {
-                      name: "",
-                      type: "",
-                      relationship: "",
-                      dateOfBirth: "",
-                      passportNo: "",
-                      share: "",
-                    },
-                    {
-                      name: "",
-                      type: "",
-                      relationship: "",
-                      dateOfBirth: "",
-                      passportNo: "",
-                      share: "",
-                    },
-                  ],
-            // Spouse Details
+
+            // Policy Beneficiary - data.policyBeneficiary or data.beneficiary
+            policyBeneficiary: data.policyBeneficiary ||
+              data.beneficiary || [
+                {
+                  name: "",
+                  type: "",
+                  relationship: "",
+                  dateOfBirth: "",
+                  passportNo: "",
+                  share: "",
+                },
+                {
+                  name: "",
+                  type: "",
+                  relationship: "",
+                  dateOfBirth: "",
+                  passportNo: "",
+                  share: "",
+                },
+                {
+                  name: "",
+                  type: "",
+                  relationship: "",
+                  dateOfBirth: "",
+                  passportNo: "",
+                  share: "",
+                },
+                {
+                  name: "",
+                  type: "",
+                  relationship: "",
+                  dateOfBirth: "",
+                  passportNo: "",
+                  share: "",
+                },
+              ],
+
+            // Spouse Details - data.spouseDetails
             spouseDetails: {
-              name: data.spouse?.full_name || "",
-              relationship: data.spouse?.relationship || "",
-              nationality: data.spouse?.nationality || "",
-              dateOfBirth: data.spouse?.date_of_birth || "",
-              contactNumber: data.spouse?.phone_number || "",
-              email: data.spouse?.email_address || "",
-              currentAddress: data.spouse?.res_address || "",
-              city: data.spouse?.res_city || "",
-              country: data.spouse?.res_country || "",
-              postalCode: data.spouse?.res_zip || "",
-              countryOfResidence: data.spouse?.res_country_residency || "",
-              permanentAddress: data.spouse?.perm_address || "",
-              permanentCity: data.spouse?.perm_city || "",
-              permanentCountry: data.spouse?.perm_country || "",
-              permanentPostalCode: data.spouse?.perm_zip || "",
-              smokingStatus: data.spouse?.smoking_status || "",
-              employmentRole: data.spouse?.job_role || "",
-              companyName: data.spouse?.company_name || "",
+              name: data.spouseDetails?.name || data.spouse?.full_name || "",
+              relationship:
+                data.spouseDetails?.relationship ||
+                data.spouse?.relationship ||
+                "",
+              nationality:
+                data.spouseDetails?.nationality ||
+                data.spouse?.nationality ||
+                "",
+              dateOfBirth:
+                data.spouseDetails?.dateOfBirth ||
+                data.spouse?.date_of_birth ||
+                "",
+              contactNumber:
+                data.spouseDetails?.contactNumber ||
+                data.spouse?.phone_number ||
+                "",
+              email:
+                data.spouseDetails?.email || data.spouse?.email_address || "",
+              currentAddress:
+                data.spouseDetails?.currentAddress ||
+                data.spouse?.res_address ||
+                "",
+              city: data.spouseDetails?.city || data.spouse?.res_city || "",
+              country:
+                data.spouseDetails?.country || data.spouse?.res_country || "",
+              postalCode:
+                data.spouseDetails?.postalCode || data.spouse?.res_zip || "",
+              countryOfResidence:
+                data.spouseDetails?.countryOfResidence ||
+                data.spouse?.res_country_residency ||
+                "",
+              permanentAddress:
+                data.spouseDetails?.permanentAddress ||
+                data.spouse?.perm_address ||
+                "",
+              permanentCity:
+                data.spouseDetails?.permanentCity ||
+                data.spouse?.perm_city ||
+                "",
+              permanentCountry:
+                data.spouseDetails?.permanentCountry ||
+                data.spouse?.perm_country ||
+                "",
+              permanentPostalCode:
+                data.spouseDetails?.permanentPostalCode ||
+                data.spouse?.perm_zip ||
+                "",
+              smokingStatus:
+                data.spouseDetails?.smokingStatus ||
+                data.spouse?.smoking_status ||
+                "",
+              employmentRole:
+                data.spouseDetails?.employmentRole ||
+                data.spouse?.job_role ||
+                "",
+              companyName:
+                data.spouseDetails?.companyName ||
+                data.spouse?.company_name ||
+                "",
             },
-            // Dependent Details
-            dependentDetails:
-              data.dependent && data.dependent.length > 0
-                ? data.dependent
-                : [
-                    {
-                      name: "",
-                      relationship: "",
-                      nationality: "",
-                      dateOfBirth: "",
-                    },
-                    {
-                      name: "",
-                      relationship: "",
-                      nationality: "",
-                      dateOfBirth: "",
-                    },
-                  ],
+
+            // Dependent Details - data.dependentDetails
+            dependentDetails: data.dependentDetails ||
+              data.dependent || [
+                {
+                  name: "",
+                  relationship: "",
+                  nationality: "",
+                  dateOfBirth: "",
+                },
+                {
+                  name: "",
+                  relationship: "",
+                  nationality: "",
+                  dateOfBirth: "",
+                },
+              ],
           };
 
           // Set the form data
@@ -597,7 +679,7 @@ function AppContent() {
     };
 
     loadEditData();
-  }, []);
+  }, [setFormData]);
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -649,20 +731,52 @@ function AppContent() {
       const fields = form.getFields();
 
       // Create a map of field names to their values
-      const extractedData = {};
+      const normalizeFieldKey = (key) =>
+        key
+          ?.toString()
+          .trim()
+          .toLowerCase()
+          .replace(/[_\s]+/g, "-")
+          .replace(/[^a-z0-9-]/g, "") || "";
+
+      const extractedDataRaw = {};
+      const extractedData = new Proxy(extractedDataRaw, {
+        get(target, prop) {
+          if (typeof prop !== "string") return target[prop];
+          if (prop in target) return target[prop];
+          const normalizedProp = normalizeFieldKey(prop);
+          return normalizedProp ? target[normalizedProp] : undefined;
+        },
+      });
 
       fields.forEach((field) => {
         const name = field.getName();
         let value = "";
         try {
-          value = field.getText();
+          if (typeof field.getText === "function") {
+            value = field.getText() || "";
+          }
+
+          if (!value && typeof field.getValue === "function") {
+            const rawValue = field.getValue();
+            value = rawValue != null ? rawValue.toString() : "";
+          }
         } catch {
           value = "";
         }
-        extractedData[name] = value;
+
+        extractedDataRaw[name] = value;
+        const normalizedName = normalizeFieldKey(name);
+        if (normalizedName) {
+          extractedDataRaw[normalizedName] = value;
+        }
       });
 
-      console.log("Extracted PDF Data with Field Names:", extractedData);
+      console.log("Extracted PDF Data with Field Names:", extractedDataRaw);
+      console.log(
+        "Normalized PDF Field Keys:",
+        Object.keys(extractedDataRaw).filter((key) => key.includes("-")),
+      );
       console.log("PDF URL saved to localStorage:", publicUrl);
 
       // Helper function to check if a value is a placeholder

@@ -2371,6 +2371,42 @@ body {
   font-size: 1rem;
 }
 
+.file-upload-container {
+  margin: 0 auto;
+}
+
+.upload-area {
+  text-align: center;
+}
+
+.upload-label {
+  display: block;
+  background: #f8f9fa;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 40px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-label:hover {
+  border-color: #667eea;
+  background: #f0f0f0;
+  transform: translateY(-2px);
+}
+
+.upload-prompt span {
+  font-size: 1.2rem;
+  display: block;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.upload-prompt small {
+  font-size: 0.8rem;
+  color: #666;
+}
+
 .upload-info strong {
   color: #667eea;
 }
@@ -2774,156 +2810,6 @@ body {
   color: #666;
   font-size: 0.9rem;
   word-break: break-word;
-}
-
-/* Add to pages/CIS/CIS.css or create a new FileUpload.css */
-
-.file-upload-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  animation: fadeIn 0.2s ease-out;
-}
-
-.modal-content {
-  position: relative;
-  background: white;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  z-index: 1001;
-  animation: slideUp 0.3s ease-out;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.modal-header h3 {
-  margin: 0;
-  color: #333;
-  font-size: 1.2rem;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #999;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-
-.close-btn:hover {
-  color: #333;
-  background: #f0f0f0;
-}
-
-.modal-body {
-  padding: 30px;
-}
-
-.file-upload-container {
-  margin: 0 auto;
-}
-
-.upload-area {
-  text-align: center;
-}
-
-.upload-label {
-  display: block;
-  background: #f8f9fa;
-  border: 2px dashed #ccc;
-  border-radius: 8px;
-  padding: 40px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.upload-label:hover {
-  border-color: #667eea;
-  background: #f0f0f0;
-  transform: translateY(-2px);
-}
-
-.upload-prompt span {
-  font-size: 1.2rem;
-  display: block;
-  margin-bottom: 10px;
-  color: #333;
-}
-
-.upload-prompt small {
-  font-size: 0.8rem;
-  color: #666;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Responsive styles */
-@media (max-width: 768px) {
-  .modal-content {
-    width: 95%;
-    margin: 10px;
-  }
-
-  .modal-body {
-    padding: 20px;
-  }
-
-  .upload-label {
-    padding: 30px 20px;
-  }
-
-  .upload-prompt span {
-    font-size: 1rem;
-  }
 }
 
 .upload-btn {
@@ -3537,3 +3423,381 @@ body.dark-mode .form-cell select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b94a3' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 }
 
+/* Add these styles to fix visibility issues with loading, headers, and buttons */
+
+/* Fix loading spinner text visibility */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+.loading-spinner:not(:empty) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  border: none;
+  animation: none;
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 500;
+  background: transparent;
+}
+
+/* Dark mode loading text */
+body.dark-mode .loading-spinner:not(:empty) {
+  color: #e8edf2;
+}
+
+/* Fix modal header visibility - ensure titles are visible */
+.modal-header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+body.dark-mode .modal-header h3 {
+  color: #ffffff;
+}
+
+/* Fix Inquiry Summary header in modal */
+.modal-header h3,
+.modal-header h2 {
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+body.dark-mode .modal-header h3,
+body.dark-mode .modal-header h2 {
+  color: #ffffff;
+}
+
+/* Fix Full Review modal header */
+.full-review-modal .modal-header h3 {
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+body.dark-mode .full-review-modal .modal-header h3 {
+  color: #ffffff;
+}
+
+/* Fix Action View button visibility */
+.cis-action-btn {
+  background: #0f1f45;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cis-action-btn:hover {
+  background: #1a3260;
+}
+
+/* Dark mode action button */
+body.dark-mode .cis-action-btn {
+  background: #d4a84b;
+  color: #0a142e;
+}
+
+body.dark-mode .cis-action-btn:hover {
+  background: #e6bd5c;
+}
+
+/* Fix section headers in summary modal */
+.detail-section h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+body.dark-mode .detail-section h4 {
+  color: #e8edf2;
+}
+
+/* Fix personal information section in summary modal */
+.detail-section p {
+  color: #374151;
+  font-size: 13px;
+  margin: 6px 0;
+}
+
+.detail-section p strong {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+body.dark-mode .detail-section p {
+  color: #b9c3cf;
+}
+
+body.dark-mode .detail-section p strong {
+  color: #e8edf2;
+}
+
+/* Fix no data message */
+.no-data {
+  color: #9ca3af;
+  font-style: italic;
+  padding: 8px 0;
+  font-size: 13px;
+}
+
+body.dark-mode .no-data {
+  color: #8b94a3;
+}
+
+/* Fix section header collapsible */
+.section-header-collapsible {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 0;
+  margin-bottom: 8px;
+}
+
+.section-header-collapsible h4 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+body.dark-mode .section-header-collapsible h4 {
+  color: #e8edf2;
+}
+
+/* Fix section content text */
+.section-content p {
+  margin: 6px 0;
+  font-size: 13px;
+  color: #374151;
+}
+
+.section-content p strong {
+  color: #1f2937;
+}
+
+body.dark-mode .section-content p {
+  color: #b9c3cf;
+}
+
+body.dark-mode .section-content p strong {
+  color: #e8edf2;
+}
+
+/* Fix detail actions buttons */
+.detail-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.status-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.status-btn.full-review {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.status-btn.full-review:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.status-btn.archive {
+  background-color: #6b7280;
+  color: white;
+}
+
+.status-btn.archive:hover {
+  background-color: #4b5563;
+  transform: translateY(-1px);
+}
+
+/* Dark mode detail buttons */
+body.dark-mode .status-btn.full-review {
+  background-color: #d4a84b;
+  color: #0a142e;
+}
+
+body.dark-mode .status-btn.full-review:hover {
+  background-color: #e6bd5c;
+}
+
+body.dark-mode .status-btn.archive {
+  background-color: #4b5563;
+  color: #e8edf2;
+}
+
+body.dark-mode .status-btn.archive:hover {
+  background-color: #6b7280;
+}
+
+/* Fix full review section headers */
+.full-review-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #3b82f6;
+  display: inline-block;
+}
+
+body.dark-mode .full-review-section h3 {
+  color: #e8edf2;
+  border-bottom-color: #d4a84b;
+}
+
+/* Fix full review info grid text */
+.full-review-section .info-grid p {
+  color: #374151;
+}
+
+.full-review-section .info-grid p strong {
+  color: #1f2937;
+}
+
+body.dark-mode .full-review-section .info-grid p {
+  color: #b9c3cf;
+}
+
+body.dark-mode .full-review-section .info-grid p strong {
+  color: #e8edf2;
+}
+
+/* Fix sub-section text */
+.sub-section p {
+  color: #374151;
+}
+
+.sub-section p strong {
+  color: #1f2937;
+}
+
+body.dark-mode .sub-section p {
+  color: #b9c3cf;
+}
+
+body.dark-mode .sub-section p strong {
+  color: #e8edf2;
+}
+
+/* Fix assets-liabilities grid */
+.assets-liabilities-grid h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+body.dark-mode .assets-liabilities-grid h4 {
+  color: #d4a84b;
+}
+
+/* Ensure modal close button is visible */
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.modal-close:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+body.dark-mode .modal-close {
+  color: #b9c3cf;
+}
+
+body.dark-mode .modal-close:hover {
+  background: #2d2f3e;
+  color: #ffffff;
+}
+
+/* Fix icon buttons in modal header */
+.modal-header-actions .icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  transition: all 0.2s;
+}
+
+.modal-header-actions .icon-btn:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+body.dark-mode .modal-header-actions .icon-btn {
+  color: #b9c3cf;
+}
+
+body.dark-mode .modal-header-actions .icon-btn:hover {
+  background-color: #2d2f3e;
+  color: #ffffff;
+}
+
+/* Fix table cell text in dark mode */
+.cis-table td {
+  color: #1e293b;
+}
+
+body.dark-mode .cis-table td {
+  color: #e8edf2;
+}
+
+/* Fix search input placeholder visibility */
+.cis-search-input::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
+body.dark-mode .cis-search-input::placeholder {
+  color: #8b94a3;
+}
