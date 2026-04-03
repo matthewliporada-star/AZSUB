@@ -13,6 +13,11 @@ const ProfileLayout = ({ children }) => {
         return <MPLayout title="Profile Info">{children}</MPLayout>;
     }
 
+    // Super admins, admins, and other users use the MainLayout
+    if (userRole === 'SUPER_ADMIN' || userRole === 'ADMIN') {
+        return <MainLayout>{children}</MainLayout>;
+    }
+
     return <MainLayout>{children}</MainLayout>;
 };
 

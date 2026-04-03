@@ -9,7 +9,7 @@ backend
 - node server.cjs
 - npm install nodemai
 ler
-- npm install pdf-lib
+- -npm list @babel/core @babel/generator
 -npm list @babel/core @babel/generator
 
 Credentials
@@ -26,3 +26,11 @@ archieverania@outlook.com
 -AP
 Nate
 Password123!
+
+-SuperAdmin
+030620
+pass.#Ca0426
+
+-admin
+121920
+pass.1234567890

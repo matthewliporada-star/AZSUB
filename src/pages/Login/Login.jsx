@@ -265,7 +265,7 @@ function Login() {
         avatarUrl: fullProfile.avatar_url
       });
 
-      const routeMap = { ADMIN: "/admin", AL: "/al", AP: "/ap", MP: "/mp", MD: "/md" };
+      const routeMap = { ADMIN: "/admin", AL: "/al", AP: "/ap", MP: "/mp", MD: "/md", SUPER_ADMIN: "/super-admin" };
       navigate(`${routeMap[role] || ""}/dashboard`);
 
     } catch (err) {
