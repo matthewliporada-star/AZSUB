@@ -12,6 +12,10 @@ import {
   ChevronDown,
   ChevronUp,
   Edit,
+  RotateCcw,
+  Upload,
+  Mail,
+  Phone,
 } from "lucide-react";
 import supabase from "../../config/supabaseClient.js";
 import "./CIS.css";
@@ -19,13 +23,15 @@ import "./CIS.css";
 const CISDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [inquiries, setInquiries] = useState([]);
+  const [archivedRecords, setArchivedRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showArchivedModal, setShowArchivedModal] = useState(false);
   const [stats, setStats] = useState({
     totalInquiries: 0,
     pdfsSent: 0,
     totalActive: 0,
-    deactivated: 0,
+    archived: 0,
   });
   const [selectedInquiry, setSelectedInquiry] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -68,6 +74,7 @@ const CISDashboard = () => {
   useEffect(() => {
     fetchInquiries();
     fetchStats();
+    fetchArchivedRecords();
   }, []);
 
   const fetchInquiries = async () => {
@@ -85,10 +92,12 @@ const CISDashboard = () => {
         return;
       }
 
+      // Fetch only non-archived records
       const { data, error } = await supabase
         .from("personal_information")
         .select("id, full_name, created_at, email, mobile_no")
         .eq("user_id", user.id)
+        .eq("is_archived", false)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -116,6 +125,37 @@ const CISDashboard = () => {
     }
   };
 
+  const fetchArchivedRecords = async () => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) return;
+
+      const { data: archivedData, error: archivedError } = await supabase
+        .from("personal_information")
+        .select("id, full_name, created_at, email, mobile_no, archived_at")
+        .eq("user_id", user.id)
+        .eq("is_archived", true)
+        .order("archived_at", { ascending: false });
+
+      if (!archivedError && archivedData) {
+        const formattedArchived = archivedData.map((item) => ({
+          id: item.id,
+          fullname: item.full_name || "N/A",
+          email: item.email || "N/A",
+          mobile: item.mobile_no || "N/A",
+          date: new Date(item.created_at).toLocaleDateString(),
+          archived_at: item.archived_at,
+        }));
+        setArchivedRecords(formattedArchived);
+      }
+    } catch (error) {
+      console.error("Error fetching archived records:", error);
+    }
+  };
+
   const fetchStats = async () => {
     try {
       const {
@@ -127,46 +167,50 @@ const CISDashboard = () => {
           totalInquiries: 0,
           pdfsSent: 0,
           totalActive: 0,
-          deactivated: 0,
+          archived: 0,
         });
         return;
       }
 
+      // Total non-archived records
       const { count: totalCount } = await supabase
         .from("personal_information")
         .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
+        .eq("is_archived", false);
 
       const startOfMonth = new Date();
       startOfMonth.setDate(1);
       startOfMonth.setHours(0, 0, 0, 0);
 
+      // PDFs uploaded this month (non-archived)
       const { count: monthCount } = await supabase
         .from("personal_information")
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id)
-        .gte("created_at", startOfMonth.toISOString());
+        .eq("is_archived", false)
+        .gte("created_at", startOfMonth.toISOString())
+        .not("pdf_url", "is", null);
 
-      // Calculate active and deactivated accounts
-      // You'll need to add a 'status' field to your personal_information table
-      // or determine based on some other logic
+      // Total active (non-archived)
       const { count: activeCount } = await supabase
         .from("personal_information")
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id)
-        .eq("status", "active"); // Assuming you have a status column
+        .eq("is_archived", false);
 
-      const { count: deactivatedCount } = await supabase
+      // Archived count
+      const { count: archivedCount } = await supabase
         .from("personal_information")
         .select("*", { count: "exact", head: true })
         .eq("user_id", user.id)
-        .eq("status", "deactivated"); // Assuming you have a status column
+        .eq("is_archived", true);
 
       setStats({
         totalInquiries: totalCount || 0,
         pdfsSent: monthCount || 0,
         totalActive: activeCount || 0,
-        deactivated: deactivatedCount || 0,
+        archived: archivedCount || 0,
       });
     } catch (error) {
       console.error("Error fetching stats:", error);
@@ -313,38 +357,6 @@ const CISDashboard = () => {
           .eq("personal_info_id", inquiry.id),
       ]);
 
-      if (personalResult.error)
-        console.error("Personal error:", personalResult.error);
-      if (travelResult.error)
-        console.error("Travel error:", travelResult.error);
-      if (habitsResult.error)
-        console.error("Habits error:", habitsResult.error);
-      if (medicalResult.error)
-        console.error("Medical error:", medicalResult.error);
-      if (familyMedicalResult.error)
-        console.error("Family Medical error:", familyMedicalResult.error);
-      if (insuranceResult.error)
-        console.error("Insurance error:", insuranceResult.error);
-      if (businessResult.error)
-        console.error("Business error:", businessResult.error);
-      if (incomeSourcesResult.error)
-        console.error("Income Sources error:", incomeSourcesResult.error);
-      if (financialResult.error)
-        console.error("Financial error:", financialResult.error);
-      if (assetsResult.error)
-        console.error("Assets error:", assetsResult.error);
-      if (netWorthResult.error)
-        console.error("Net Worth error:", netWorthResult.error);
-      if (propertyResult.error)
-        console.error("Property error:", propertyResult.error);
-      if (bankResult.error) console.error("Bank error:", bankResult.error);
-      if (beneficiaryResult.error)
-        console.error("Beneficiary error:", beneficiaryResult.error);
-      if (spouseResult.error)
-        console.error("Spouse error:", spouseResult.error);
-      if (dependentResult.error)
-        console.error("Dependent error:", dependentResult.error);
-
       setFullReviewData({
         personal: personalResult.data || null,
         travel: travelResult.data || [],
@@ -371,7 +383,6 @@ const CISDashboard = () => {
     }
   };
 
-  // Handle Edit - Load all data and redirect to CIS form with edit mode
   // Handle Edit - Load all data and redirect to CIS form with edit mode
   const handleEdit = async (inquiry) => {
     try {
@@ -465,9 +476,6 @@ const CISDashboard = () => {
           .select("*")
           .eq("personal_info_id", inquiry.id),
       ]);
-
-      // DEBUG: Log assets result
-      console.log("Assets result from Supabase:", assetsResult.data);
 
       // Helper function to get asset value by category name and type
       const getAssetValue = (categoryName, field = "current_year_val") => {
@@ -701,9 +709,7 @@ const CISDashboard = () => {
             financialResult.data?.[0]?.expenditure_frequency || "Monthly",
         },
 
-        // ASSETS & LIABILITIES - Properly mapped with current and last year values
         assetsLiabilities: {
-          // Assets Current Year (12 assets)
           asset_0_curr: getAssetValue("Cash"),
           asset_1_curr: getAssetValue("Savings"),
           asset_2_curr: getAssetValue("Stocks and Bonds"),
@@ -716,8 +722,6 @@ const CISDashboard = () => {
           asset_9_curr: getAssetValue("Pensions"),
           asset_10_curr: getAssetValue("Business Shareholding"),
           asset_11_curr: getAssetValue("Net Business Interest"),
-
-          // Assets Last Year
           asset_0_last: getAssetLastValue("Cash"),
           asset_1_last: getAssetLastValue("Savings"),
           asset_2_last: getAssetLastValue("Stocks and Bonds"),
@@ -730,8 +734,6 @@ const CISDashboard = () => {
           asset_9_last: getAssetLastValue("Pensions"),
           asset_10_last: getAssetLastValue("Business Shareholding"),
           asset_11_last: getAssetLastValue("Net Business Interest"),
-
-          // Liabilities Current Year (7 liabilities)
           liab_0_curr: getLiabilityValue("Personal Loans"),
           liab_1_curr: getLiabilityValue("Margin Account"),
           liab_2_curr: getLiabilityValue("Residential Mortgage(s)"),
@@ -739,8 +741,6 @@ const CISDashboard = () => {
           liab_4_curr: getLiabilityValue("Investment Property Mortgage(s)"),
           liab_5_curr: getLiabilityValue("Business Loans/security"),
           liab_6_curr: getLiabilityValue("Other (Please specify)"),
-
-          // Liabilities Last Year
           liab_0_last: getLiabilityLastValue("Personal Loans"),
           liab_1_last: getLiabilityLastValue("Margin Account"),
           liab_2_last: getLiabilityLastValue("Residential Mortgage(s)"),
@@ -748,8 +748,6 @@ const CISDashboard = () => {
           liab_4_last: getLiabilityLastValue("Investment Property Mortgage(s)"),
           liab_5_last: getLiabilityLastValue("Business Loans/security"),
           liab_6_last: getLiabilityLastValue("Other (Please specify)"),
-
-          // Business Names
           businessName1: businessName1,
           businessName2: businessName2,
           businessOther: businessOther,
@@ -826,16 +824,6 @@ const CISDashboard = () => {
         editId: inquiry.id,
       };
 
-      // DEBUG: Log the mapped assets data
-      console.log("=== MAPPED ASSETS DATA ===");
-      console.log("asset_0_curr:", editFormData.assetsLiabilities.asset_0_curr);
-      console.log("asset_1_curr:", editFormData.assetsLiabilities.asset_1_curr);
-      console.log("liab_0_curr:", editFormData.assetsLiabilities.liab_0_curr);
-      console.log(
-        "businessName1:",
-        editFormData.assetsLiabilities.businessName1,
-      );
-
       localStorage.setItem("cis_edit_data", JSON.stringify(editFormData));
       localStorage.setItem("edit_mode", "true");
       localStorage.setItem("edit_id", inquiry.id);
@@ -854,17 +842,66 @@ const CISDashboard = () => {
     }
   };
 
-  const handleArchive = async (id) => {
-    if (!confirm("Are you sure you want to archive this inquiry?")) return;
+  const handleArchive = async (inquiry) => {
+    if (!confirm(`Are you sure you want to archive ${inquiry.fullname}?`))
+      return;
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user logged in");
+
+      const { error: updateError } = await supabase
+        .from("personal_information")
+        .update({
+          is_archived: true,
+          archived_at: new Date().toISOString(),
+          archived_by: user.id,
+        })
+        .eq("id", inquiry.id)
+        .eq("user_id", user.id);
+
+      if (updateError) throw updateError;
+
       alert("Inquiry archived successfully!");
       fetchInquiries();
       fetchStats();
+      fetchArchivedRecords();
       setShowModal(false);
       setShowFullReviewModal(false);
     } catch (error) {
       console.error("Error archiving:", error);
-      alert("Failed to archive inquiry");
+      alert("Failed to archive inquiry: " + error.message);
+    }
+  };
+
+  const handleRestore = async (record) => {
+    if (!confirm(`Restore ${record.fullname} from archive?`)) return;
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user logged in");
+
+      const { error: updateError } = await supabase
+        .from("personal_information")
+        .update({
+          is_archived: false,
+          archived_at: null,
+          archived_by: null,
+        })
+        .eq("id", record.id)
+        .eq("user_id", user.id);
+
+      if (updateError) throw updateError;
+
+      alert("Record restored successfully!");
+      fetchInquiries();
+      fetchStats();
+      fetchArchivedRecords();
+    } catch (error) {
+      console.error("Error restoring record:", error);
+      alert("Failed to restore record: " + error.message);
     }
   };
 
@@ -901,30 +938,45 @@ const CISDashboard = () => {
     );
   };
 
+  const formatDateTime = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const statsCards = [
     {
       title: "TOTAL CLIENTS",
       value: stats.totalInquiries,
       subtext: "All-time inquiries",
       icon: <Users size={24} />,
+      onClick: null,
     },
     {
-      title: "PDFS SENT",
+      title: "PDFS UPLOAD",
       value: stats.pdfsSent,
       subtext: "This Month",
-      icon: <Send size={24} />,
+      icon: <Upload size={24} />,
+      onClick: null,
     },
     {
       title: "TOTAL ACTIVE",
-      value: stats.totalActive || 0,
+      value: stats.totalActive,
       subtext: "Active Accounts",
       icon: <Users size={24} />,
+      onClick: null,
     },
     {
-      title: "DEACTIVATED",
-      value: stats.deactivated || 0,
-      subtext: "Deactivated Accounts",
-      icon: <XCircle size={24} />,
+      title: "ARCHIVED/DEACTIVATE",
+      value: stats.archived,
+      subtext: "Archived Accounts",
+      icon: <Archive size={24} />,
+      onClick: () => setShowArchivedModal(true),
     },
   ];
 
@@ -955,7 +1007,12 @@ const CISDashboard = () => {
 
       <div className="cis-grid">
         {statsCards.map((stat, index) => (
-          <div key={index} className="cis-card">
+          <div
+            key={index}
+            className={`cis-card ${stat.onClick ? "clickable" : ""}`}
+            onClick={stat.onClick}
+            style={{ cursor: stat.onClick ? "pointer" : "default" }}
+          >
             <div className="cis-card-top">
               <div>
                 <p className="cis-card-title">{stat.title}</p>
@@ -1016,6 +1073,107 @@ const CISDashboard = () => {
           </table>
         )}
       </div>
+
+      {/* Archived Records Modal */}
+      {showArchivedModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowArchivedModal(false)}
+        >
+          <div
+            className="modal-content archived-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <div className="modal-title">
+                <Archive size={20} />
+                <h3>Archived Records</h3>
+              </div>
+              <button
+                className="modal-close"
+                onClick={() => setShowArchivedModal(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="modal-body archived-modal-body">
+              {archivedRecords.length === 0 ? (
+                <div className="no-data">
+                  <Archive size={48} strokeWidth={1} />
+                  <p>No archived records found</p>
+                </div>
+              ) : (
+                <div className="table-responsive">
+                  <table className="cis-table archived-table">
+                    <thead>
+                      <tr>
+                        <th>Client Name</th>
+                        <th>Contact Info</th>
+                        <th>Archived Date</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {archivedRecords.map((record) => (
+                        <tr key={record.id} className="archived-row">
+                          <td>
+                            <div className="client-info">
+                              <div className="client-avatar archived-avatar">
+                                {record.fullname?.charAt(0) || "U"}
+                              </div>
+                              <div>
+                                <div className="client-name">
+                                  {record.fullname}
+                                </div>
+                                <div className="client-id">
+                                  ID: {record.id.slice(0, 8)}...
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="contact-info">
+                              <div>
+                                <Mail size={14} /> {record.email}
+                              </div>
+                              <div>
+                                <Phone size={14} /> {record.mobile}
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="date-info">
+                              <Archive size={14} />
+                              {formatDateTime(record.archived_at)}
+                            </div>
+                          </td>
+                          <td>
+                            <button
+                              className="btn-unarchive"
+                              onClick={() => handleRestore(record)}
+                            >
+                              <RotateCcw size={16} />
+                              Restore
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button
+                className="btn-secondary"
+                onClick={() => setShowArchivedModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Summary View Modal */}
       {showModal && selectedInquiry && (
@@ -1137,7 +1295,7 @@ const CISDashboard = () => {
                 </button>
                 <button
                   className="status-btn archive"
-                  onClick={() => handleArchive(selectedInquiry.id)}
+                  onClick={() => handleArchive(selectedInquiry)}
                 >
                   <Archive size={18} />
                   Archive

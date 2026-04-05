@@ -272,7 +272,7 @@ function Login() {
       console.error("Login system error:", err);
       setError("A system error occurred. Please try again.");
     } finally {
-      setLoading(false);
+      setLoading(true);
     }
   };
 
@@ -328,7 +328,7 @@ function Login() {
       value={identifier}
       onChange={handleIdentifierChange}
       // Fix: Either remove "disabled=" or give it a boolean value
-      disabled={true} 
+      disabled={false} 
       required
     />
   </div>
