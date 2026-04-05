@@ -527,7 +527,7 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
   if (userRole === "MP") menuItems = mpMenuItems;
   else if (userRole === "AL") menuItems = alMenuItems;
   else if (userRole === "MD") menuItems = mdMenuItems;
-  else if (userRole === "ADMIN") menuItems = adminMenuItems;
+  else if (userRole?.toUpperCase() === "ADMIN") menuItems = adminMenuItems;
   else if (userRole === "SUPER_ADMIN") menuItems = superAdminMenuItems;
 
   return (
