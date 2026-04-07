@@ -46,7 +46,6 @@ import ALTeamPerformance from './pages/AL/PerformanceDashboardPage';
 import CIS from './pages/CIS/CIS';
 
 // MP Pages
-
 import MPDashboard from './pages/MP/MP-Dashboard';
 import ALPerformance from './pages/MP/ALPerformance';
 import APPerformance from './pages/MP/APPerformance';
@@ -62,7 +61,7 @@ function App() {
     <AppProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
-           {/* Public Routes */}
+          {/* Public Routes */}
           <Route path="/verify-identity" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Navigate to="/verify-identity" replace />} />
@@ -74,7 +73,13 @@ function App() {
           <Route path="/ap/submission" element={<MainLayout><SubmissionPage /></MainLayout>} />
           <Route path="/ap/serial-history" element={<MainLayout><SerialHistoryPage /></MainLayout>} />
           <Route path="/ap/doc-history" element={<MainLayout><DocHistoryPage /></MainLayout>} />
-
+          
+          {/* NEW: AP CIS routes */}
+          <Route path="/ap/cis" element={<MainLayout><Outlet /></MainLayout>}>
+            <Route index element={<CIS />} />
+            <Route path="CISDashboard" element={<CISDashboard />} />
+            <Route path="record" element={<CISRecord />} />
+          </Route>
 
           {/* Standalone Application Form Route */}
           <Route path="/application-form/:formType" element={<FormPage />} />
@@ -94,7 +99,13 @@ function App() {
           {/* Super-Admin Routes */}
           <Route path="/super-admin/dashboard" element={<MainLayout><SuperAdminDashboard /></MainLayout>} />
           <Route path="/super-admin/ManageUsers" element={<MainLayout><SuperAdminManageUsers /></MainLayout>} />
-
+          
+          {/* NEW: Super-Admin CIS routes */}
+          <Route path="/super-admin/cis" element={<MainLayout><Outlet /></MainLayout>}>
+            <Route index element={<CIS />} />
+            <Route path="CISDashboard" element={<CISDashboard />} />
+            <Route path="record" element={<CISRecord />} />
+          </Route>
 
           {/* AL Routes - Same as AP plus Team Performance */}
           <Route path="/al/dashboard" element={<MainLayout><ALDashboard /></MainLayout>} />
@@ -105,27 +116,24 @@ function App() {
           <Route path="/al/serial-history" element={<MainLayout><SerialHistoryPage /></MainLayout>} />
           <Route path="/al/doc-history" element={<MainLayout><DocHistoryPage /></MainLayout>} />
           <Route path="/al/cis" element={<MainLayout><Outlet /></MainLayout>}>
-          <Route index element={<CIS />} />
-          <Route path="CISDashboard" element={<CISDashboard />} />
-          <Route path="record" element={<CISRecord />} />
+            <Route index element={<CIS />} />
+            <Route path="CISDashboard" element={<CISDashboard />} />
+            <Route path="record" element={<CISRecord />} />
           </Route>
-          
 
           {/* MD/MP Routes */}
           <Route element={<MPDataProvider><Outlet /></MPDataProvider>}>
-          <Route path="/mp/dashboard" element={<MPLayout><MPDashboard /></MPLayout>} />
-          <Route path="/mp/al-performance" element={<MPLayout><ALPerformance /></MPLayout>} />
-          <Route path="/mp/ap-performance" element={<MPLayout><APPerformance /></MPLayout>} />
-         
-
-         {/* FIXED: CIS routes inside provider */}
-          <Route path="/mp/cis" element={<MPLayout />}>
-          <Route index element={<CIS />} />
-          <Route path="CISDashboard" element={<CISDashboard />} />
-          <Route path="record" element={<CISRecord />} />
+            <Route path="/mp/dashboard" element={<MPLayout><MPDashboard /></MPLayout>} />
+            <Route path="/mp/al-performance" element={<MPLayout><ALPerformance /></MPLayout>} />
+            <Route path="/mp/ap-performance" element={<MPLayout><APPerformance /></MPLayout>} />
+            
+            {/* CIS routes inside MP provider */}
+            <Route path="/mp/cis" element={<MPLayout />}>
+              <Route index element={<CIS />} />
+              <Route path="CISDashboard" element={<CISDashboard />} />
+              <Route path="record" element={<CISRecord />} />
+            </Route>
           </Route>
-          </Route>
-
 
           {/* MD Routes with MD Data Provider */}
           <Route element={<MDDataProvider><Outlet /></MDDataProvider>}>
@@ -134,7 +142,6 @@ function App() {
             <Route path="/md/al-performance" element={<MDALPerformance />} />
             <Route path="/md/ap-performance" element={<MDAPPerformance />} />
           </Route>
-
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/login" replace />} />

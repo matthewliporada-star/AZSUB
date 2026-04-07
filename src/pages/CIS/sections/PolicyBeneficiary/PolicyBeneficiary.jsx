@@ -5,7 +5,7 @@ import Select from "../../components/Select";
 import { useForm } from "../../context/FormContext";
 
 export default function PolicyBeneficiary() {
-  const { formData, updateFormData } = useForm();
+  const { formData, setFormData, updateFormData } = useForm();
   const policyBeneficiary = formData.policyBeneficiary || [];
 
   const handleChange = (idx, field, value) => {
@@ -14,23 +14,49 @@ export default function PolicyBeneficiary() {
       newBeneficiaries[idx] = {};
     }
     newBeneficiaries[idx][field] = value;
-    updateFormData("policyBeneficiary", newBeneficiaries);
+    setFormData((prev) => ({
+      ...prev,
+      policyBeneficiary: newBeneficiaries,
+    }));
   };
 
   const addRow = () => {
-    const newBeneficiaries = [...policyBeneficiary, {}];
-    updateFormData("policyBeneficiary", newBeneficiaries);
+    setFormData((prev) => ({
+      ...prev,
+      policyBeneficiary: [
+        ...(prev.policyBeneficiary || []),
+        {
+          name: "",
+          type: "",
+          relationship: "",
+          dateOfBirth: "",
+          passportNo: "",
+          share: "",
+        },
+      ],
+    }));
   };
 
   const removeRow = (idx) => {
-    const newBeneficiaries = policyBeneficiary.filter(
-      (_, index) => index !== idx,
-    );
-    updateFormData("policyBeneficiary", newBeneficiaries);
+    setFormData((prev) => ({
+      ...prev,
+      policyBeneficiary: (prev.policyBeneficiary || []).filter(
+        (_, index) => index !== idx,
+      ),
+    }));
   };
 
   return (
-    <Section number={11} title="Policy Beneficiary" isTable>
+    <Section
+      number={11}
+      title="Policy Beneficiary"
+      isTable
+      action={
+        <button type="button" className="add-row-btn" onClick={addRow}>
+          + Add Beneficiary
+        </button>
+      }
+    >
       <div className="table-wrap">
         <div className="table-header">
           <span>Name</span>
@@ -95,6 +121,7 @@ export default function PolicyBeneficiary() {
                   type="button"
                   onClick={() => removeRow(idx)}
                   className="remove-row-btn"
+                  disabled={policyBeneficiary.length <= 1}
                 >
                   Remove
                 </button>
@@ -102,12 +129,6 @@ export default function PolicyBeneficiary() {
             </div>
           );
         })}
-
-        <div className="add-row-container">
-          <button type="button" onClick={addRow} className="add-row-btn">
-            + Add Beneficiary
-          </button>
-        </div>
       </div>
     </Section>
   );

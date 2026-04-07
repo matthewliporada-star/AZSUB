@@ -8,12 +8,7 @@ export default function PropertyDetails() {
   const propertyDetails = formData.propertyDetails || [];
 
   const handleUpdate = (idx, field, value) => {
-    const newProperties = [...propertyDetails];
-    if (!newProperties[idx]) {
-      newProperties[idx] = {};
-    }
-    newProperties[idx][field] = value;
-    updateFormData("propertyDetails", newProperties);
+    updateFormData("propertyDetails", { index: idx, field }, value);
   };
 
   const renderPropRow = (idx, isFirstRow = false, sectionType = "") => {

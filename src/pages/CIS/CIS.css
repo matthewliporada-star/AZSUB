@@ -271,6 +271,12 @@ body {
   letter-spacing: 0.5px;
 }
 
+.section-action {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
 .section-body {
   padding: 20px 22px;
 }
@@ -536,23 +542,22 @@ body {
   width: calc(100% + 44px);
 }
 
-.sub-header:first-child {
-  margin-top: -20px;
+.sub-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 20px -22px 12px;
+  padding: 0 22px;
+  width: calc(100% + 44px);
+  flex-wrap: wrap;
 }
 
-.sub-header::before {
-  content: "";
-  width: 3px;
-  height: 12px;
-  background: var(--gold);
-  border-radius: 2px;
-  flex-shrink: 0;
+.sub-header-row .add-row-btn {
+  margin-top: 0;
+  margin-left: auto;
 }
-
-/* ═══════════════════════════════════
-   INCOME TABLE
-═══════════════════════════════════ */
-.income-header {
+═══════════════════════════════════ */ .income-header {
   display: grid;
   grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
   background: var(--navy);
@@ -2845,29 +2850,51 @@ body {
 }
 
 .add-row-btn {
-  padding: 0.5rem 1rem;
-  background-color: #4caf50;
-  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-height: 28px;
+  padding: 0 10px;
+  background-color: #28a745;
+  color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-}
-
-.remove-row-btn {
-  padding: 0.25rem 0.5rem;
-  background-color: #f44336;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.remove-row-btn:hover {
-  background-color: #da190b;
+  font-size: 0.84rem;
 }
 
 .add-row-btn:hover {
-  background-color: #45a049;
+  background-color: #23943b;
+}
+
+.add-row-btn:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 2px;
+}
+
+.remove-row-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 10px;
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.84rem;
+}
+
+.remove-row-btn:hover {
+  background-color: #d32f2f;
+}
+
+.remove-row-btn:disabled {
+  background-color: #dcdcdc;
+  color: #707070;
+  cursor: not-allowed;
 }
 
 /* Collapsible Section Headers */
@@ -4095,7 +4122,6 @@ body.dark-mode .cis-search-input::placeholder {
   font-weight: 600;
   color: var(--text);
   margin: 0;
-  
 }
 
 .modal-close {
@@ -4147,29 +4173,29 @@ body.dark-mode .cis-search-input::placeholder {
   .full-record-modal {
     width: 98%;
   }
-  
+
   .assets-liabilities-grid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .info-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .section-content {
     padding-left: 12px;
   }
-  
+
   .record-header {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .record-meta {
     justify-content: center;
   }
-  
+
   .sub-section p strong {
     min-width: 100px;
   }
@@ -4181,26 +4207,26 @@ body.dark-mode .cis-search-input::placeholder {
     position: relative;
     background: white;
   }
-  
+
   .full-record-modal {
     max-width: 100%;
     box-shadow: none;
   }
-  
+
   .modal-footer,
   .modal-close {
     display: none;
   }
-  
+
   .full-record-body {
     overflow: visible;
     max-height: none;
   }
-  
+
   .section-header-collapsible svg {
     display: none;
   }
-  
+
   .section-content {
     display: block !important;
   }
@@ -4307,7 +4333,9 @@ body.dark-mode .status-badge.archived {
 /* Clickable Stat Card */
 .cis-card.clickable {
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .cis-card.clickable:hover {
@@ -4420,11 +4448,11 @@ body.dark-mode .btn-unarchive:hover {
   .archived-modal {
     width: 95%;
   }
-  
+
   .archived-table {
     min-width: 500px;
   }
-  
+
   .btn-unarchive {
     padding: 6px 12px;
     font-size: 11px;

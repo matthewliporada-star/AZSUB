@@ -25,7 +25,7 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
     </svg>
   );
 
-  // AP Menu Items
+  // AP Menu Items (UPDATED: Added CIS dropdown)
   const apMenuItems = [
     {
       path: "/ap/dashboard",
@@ -130,6 +130,18 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
           <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
         </svg>
       ),
+    },
+    // NEW: CIS Dropdown for AP
+    {
+      path: "#cis",
+      label: "Client Information System",
+      icon: cisIcon,
+      isDropdown: true,
+      subItems: [
+        { path: "/ap/cis/CISDashboard", label: "Dashboard" },
+        { path: "/ap/cis", label: "Fill Out" },
+        { path: "/ap/cis/record", label: "Record" },
+      ],
     },
   ];
 
@@ -437,7 +449,7 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
     },
   ];
 
-  // Super-Admin Menu Items
+  // Super-Admin Menu Items (UPDATED: Added CIS dropdown)
   const superAdminMenuItems = [
     {
       path: "/super-admin/dashboard",
@@ -476,6 +488,18 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
           <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
         </svg>
       ),
+    },
+    // NEW: CIS Dropdown for Super Admin
+    {
+      path: "#cis",
+      label: "Client Information System",
+      icon: cisIcon,
+      isDropdown: true,
+      subItems: [
+        { path: "/super-admin/cis/CISDashboard", label: "Dashboard" },
+        { path: "/super-admin/cis", label: "Fill Out" },
+        { path: "/super-admin/cis/record", label: "Record" },
+      ],
     },
   ];
 
