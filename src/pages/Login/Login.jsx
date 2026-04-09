@@ -7,20 +7,20 @@ import "./Login.css";
 import supabase from "../../config/supabaseClient";
 
 function Login() {
-   const navigate = useNavigate();
-   const location = useLocation();
-   const { setUserRole, setCurrentUser, darkMode, toggleDarkMode } = useApp();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { setUserRole, setCurrentUser, darkMode, toggleDarkMode } = useApp();
 
-   // --- Forced Verification Check ---
-   useEffect(() => {
-     const isVerified = localStorage.getItem("is_verified") === "true";
-     if (!isVerified) {
-       navigate("/verify-identity", { replace: true });
-     }
-   }, [navigate]);
+  // --- Forced Verification Check ---
+  useEffect(() => {
+    const isVerified = localStorage.getItem("is_verified") === "true";
+    if (!isVerified) {
+      navigate("/verify-identity", { replace: true });
+    }
+  }, [navigate]);
 
-   // --- Form States ---
-   const [identifier, setIdentifier] = useState(location.state?.email || ""); // email or username
+  // --- Form States ---
+  const [identifier, setIdentifier] = useState(location.state?.email || ""); // email or username
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -28,10 +28,10 @@ function Login() {
 
   // --- Persistent Security States ---
   const [attempts, setAttempts] = useState(() =>
-    parseInt(localStorage.getItem("login_attempts") || "0")
+    parseInt(localStorage.getItem("login_attempts") || "0"),
   );
-  const [isSecondChance, setIsSecondChance] = useState(() =>
-    localStorage.getItem("is_second_chance") === "true"
+  const [isSecondChance, setIsSecondChance] = useState(
+    () => localStorage.getItem("is_second_chance") === "true",
   );
   const [cooldown, setCooldown] = useState(0);
 
@@ -45,8 +45,12 @@ function Login() {
         setError("");
         try {
           // Wait briefly to ensure Supabase client processes the hash and establishes the session
-          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-          if (sessionError || !session) throw new Error("Invalid or expired recovery link.");
+          const {
+            data: { session },
+            error: sessionError,
+          } = await supabase.auth.getSession();
+          if (sessionError || !session)
+            throw new Error("Invalid or expired recovery link.");
 
           // 1. Fetch user's profile to get last name for generating default password
           const { data: profile } = await supabase
@@ -55,40 +59,44 @@ function Login() {
             .eq("id", session.user.id)
             .single();
 
-          if (!profile || !profile.last_name) throw new Error("User profile incomplete. Cannot reset.");
+          if (!profile || !profile.last_name)
+            throw new Error("User profile incomplete. Cannot reset.");
 
           // 2. Generate Default Password: #FirstTwoLettersOfLastNameMMYYYY
           const firstTwo = profile.last_name.trim().substring(0, 2);
-          const formattedName = `${firstTwo.charAt(0).toUpperCase()}${firstTwo.length > 1 ? firstTwo.charAt(1).toLowerCase() : 'x'}`;
+          const formattedName = `${firstTwo.charAt(0).toUpperCase()}${firstTwo.length > 1 ? firstTwo.charAt(1).toLowerCase() : "x"}`;
           const now = new Date();
-          const month = String(now.getMonth() + 1).padStart(2, '0');
+          const month = String(now.getMonth() + 1).padStart(2, "0");
           const year = now.getFullYear();
           const defaultPwd = `#${formattedName}${month}${year}`;
 
           // 3. Forcefully Update the Password
-          const { error: updateError } = await supabase.auth.updateUser({ password: defaultPwd });
+          const { error: updateError } = await supabase.auth.updateUser({
+            password: defaultPwd,
+          });
           if (updateError) throw updateError;
 
           // 4. Log the activity
           await supabase.from("activity_logs").insert({
             action: "USER_UPDATE",
             details: `Password automatically reset to default via recovery link for ${profile.first_name} ${profile.last_name}`,
-            performed_by: session.user.id
+            performed_by: session.user.id,
           });
 
           // 5. Create admin notification
           await supabase.from("admin_notifications").insert({
             message: `${profile.first_name} ${profile.last_name} has reset their password and activated their account`,
-            type: 'password_reset_completed',
+            type: "password_reset_completed",
             target_user_id: session.user.id,
-            is_read: false
+            is_read: false,
           });
 
           await supabase.auth.signOut();
           window.location.hash = ""; // Clear hash
           setError(""); // Clear error just in case
-          alert(`Success! Your password has been reset to the default format.\nYour default password is: ${defaultPwd}\n\nPlease log in using this password.`);
-
+          alert(
+            `Success! Your password has been reset to the default format.\nYour default password is: ${defaultPwd}\n\nPlease log in using this password.`,
+          );
         } catch (err) {
           console.error("Recovery Error:", err);
           setError(err.message || "Failed to reset password from link.");
@@ -186,7 +194,7 @@ function Login() {
             await supabase.from("activity_logs").insert({
               action: "USER_DEACTIVATED",
               details: `Account auto-deactivated: ${lookupId}`,
-              performed_by: targetUser.id
+              performed_by: targetUser.id,
             });
           }
         } catch (err) {
@@ -196,7 +204,9 @@ function Login() {
     } else {
       setAttempts(newCount);
       const remaining = 5 - newCount;
-      setError(`Incorrect credentials. ${remaining} attempts left ${isSecondChance ? "before lockout" : "before cooldown"}.`);
+      setError(
+        `Incorrect credentials. ${remaining} attempts left ${isSecondChance ? "before lockout" : "before cooldown"}.`,
+      );
     }
   };
 
@@ -230,10 +240,11 @@ function Login() {
       }
 
       // 2. AUTHENTICATION
-      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: profileCheck.email,
-        password,
-      });
+      const { data: authData, error: signInError } =
+        await supabase.auth.signInWithPassword({
+          email: profileCheck.email,
+          password,
+        });
 
       if (signInError) {
         await handleFailure(identifier);
@@ -261,13 +272,26 @@ function Login() {
         ...fullProfile,
         email: authData.user.email,
         role: role,
-        name: `${fullProfile.first_name || ''} ${fullProfile.last_name || ''}`.trim() || fullProfile.username,
-        avatarUrl: fullProfile.avatar_url
+        name:
+          `${fullProfile.first_name || ""} ${fullProfile.last_name || ""}`.trim() ||
+          fullProfile.username,
+        avatarUrl: fullProfile.avatar_url,
       });
 
-      const routeMap = { ADMIN: "/admin", AL: "/al", AP: "/ap", MP: "/mp", MD: "/md", SUPER_ADMIN: "/super-admin" };
-      navigate(`${routeMap[role] || ""}/dashboard`);
+      if (fullProfile.status === "Waiting for Access") {
+        navigate("/waiting");
+        return;
+      }
 
+      const routeMap = {
+        ADMIN: "/admin",
+        AL: "/al",
+        AP: "/ap",
+        MP: "/mp",
+        MD: "/md",
+        SUPER_ADMIN: "/super-admin",
+      };
+      navigate(`${routeMap[role] || ""}/dashboard`);
     } catch (err) {
       console.error("Login system error:", err);
       setError("A system error occurred. Please try again.");
@@ -284,7 +308,17 @@ function Login() {
         title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
       >
         {darkMode ? (
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <circle cx="12" cy="12" r="5"></circle>
             <line x1="12" y1="1" x2="12" y2="3"></line>
             <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -296,7 +330,17 @@ function Login() {
             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
           </svg>
         ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
         )}
@@ -306,7 +350,9 @@ function Login() {
           <img src={LeftImage} alt="Insurance Image" className="animate-cfs" />
           <h2>Explore Our Insurance Solutions</h2>
           <p>
-            At Caelum, we offer insurance plans in the Philippines to address Filipinos' most common financial needs. Whatever your financial need, we are with you in your journey to a more secure tomorrow.
+            At Caelum, we offer insurance plans in the Philippines to address
+            Filipinos' most common financial needs. Whatever your financial
+            need, we are with you in your journey to a more secure tomorrow.
           </p>
         </div>
 
@@ -318,20 +364,20 @@ function Login() {
 
           <h2 className="signin-prompt">SIGN IN</h2>
 
-<form onSubmit={handleLogin}>
-  <div className="form-group">
-    <label className="form-label">Email</label>
-    <input
-      type="text"
-      className="form-input"
-      placeholder="Enter your username or email"
-      value={identifier}
-      onChange={handleIdentifierChange}
-      // Fix: Either remove "disabled=" or give it a boolean value
-      disabled={false} 
-      required
-    />
-  </div>
+          <form onSubmit={handleLogin}>
+            <div className="form-group">
+              <label className="form-label">Email</label>
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Enter your username or email"
+                value={identifier}
+                onChange={handleIdentifierChange}
+                // Fix: Either remove "disabled=" or give it a boolean value
+                disabled={false}
+                required
+              />
+            </div>
             <div className="form-group">
               <label className="form-label">Password</label>
               <div className="password-wrapper">
@@ -351,14 +397,34 @@ function Login() {
                   aria-label="Toggle password visibility"
                 >
                   {showPassword ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
                       <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
                       <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7c.44 0 .87-.03 1.28-.09" />
                       <line x1="2" y1="2" x2="22" y2="22" />
                     </svg>
                   ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>

@@ -65,7 +65,7 @@ const ManageUsers = () => {
     firstName: "",
     lastName: "",
     email: "",
-    position: "Admin",
+    position: "ADMIN",        // Default to ADMIN (uppercase to match DB)
     password: "",
     reportsTo: "",
     intermediary_code: "",
@@ -78,6 +78,14 @@ const ManageUsers = () => {
   const [potentialUplines, setPotentialUplines] = useState([]);
   const [viewingSupervisor, setViewingSupervisor] = useState(null);
   const [viewingCreatedAccounts, setViewingCreatedAccounts] = useState([]);
+
+  // -- Access Control State for Edit Modal --
+  const [cisAccess, setCisAccess] = useState("Disable");
+  const [azSubAccess, setAzSubAccess] = useState("Disable");
+  const [viewCisAccess, setViewCisAccess] = useState("Disable");
+  const [viewAzSubAccess, setViewAzSubAccess] = useState("Disable");
+  const [isSavingAccess, setIsSavingAccess] = useState(false);
+  const [accessSaveMsg, setAccessSaveMsg] = useState("");
 
   // -- Role Statistics --
   const [roleCounts, setRoleCounts] = useState({
@@ -236,13 +244,17 @@ const ManageUsers = () => {
     const counts = { AL: 0, AP: 0, MD: 0, MP: 0, ADMIN: 0, SUPER_ADMIN: 0 };
     userData.forEach((u) => {
       const role = u.account_type?.toUpperCase();
-      const normalizedRole =
-        role === "ADMIN"
-          ? "ADMIN"
-          : role === "SUPER_ADMIN"
-            ? "SUPER_ADMIN"
-            : role;
-      if (counts.hasOwnProperty(normalizedRole)) {
+      // Normalize role strings to match our keys
+      let normalizedRole = role;
+      if (role === "ADMIN") normalizedRole = "ADMIN";
+      else if (role === "SUPER_ADMIN") normalizedRole = "SUPER_ADMIN";
+      else if (role === "AL") normalizedRole = "AL";
+      else if (role === "AP") normalizedRole = "AP";
+      else if (role === "MD") normalizedRole = "MD";
+      else if (role === "MP") normalizedRole = "MP";
+      else normalizedRole = null;
+      
+      if (normalizedRole && counts.hasOwnProperty(normalizedRole)) {
         counts[normalizedRole]++;
       }
     });
@@ -252,8 +264,14 @@ const ManageUsers = () => {
   // -- Hierarchy Logic --
   const fetchPotentialUplines = useCallback(
     async (role, excludeUserId = null) => {
-      const roleMap = { AP: "AL", AL: "MP" };
-      const uplineRole = roleMap[role];
+      // Define hierarchy: AP -> AL, AL -> MP, MD -> MP (MD can also report to MP)
+      // For simplicity, we'll allow MD to report to MP, and AP to AL, AL to MP
+      let uplineRole = null;
+      if (role === "AP") uplineRole = "AL";
+      else if (role === "AL") uplineRole = "MP";
+      else if (role === "MD") uplineRole = "MP"; // MD reports to MP
+      // ADMIN and SUPER_ADMIN don't have uplines in this hierarchy
+      
       if (!uplineRole) {
         setPotentialUplines([]);
         return;
@@ -265,6 +283,7 @@ const ManageUsers = () => {
         .neq("id", excludeUserId || "");
 
       if (!error) setPotentialUplines(data || []);
+      else setPotentialUplines([]);
     },
     [],
   );
@@ -330,7 +349,7 @@ const ManageUsers = () => {
       firstName: "",
       lastName: "",
       email: "",
-      position: "Admin",
+      position: "ADMIN",
       password: "",
       reportsTo: "",
       intermediary_code: "",
@@ -339,6 +358,12 @@ const ManageUsers = () => {
     setSuccessMsg("");
     setViewingSupervisor(null);
     setViewingCreatedAccounts([]);
+    // Reset access control state
+    setCisAccess("Disable");
+    setAzSubAccess("Disable");
+    setViewCisAccess("Disable");
+    setViewAzSubAccess("Disable");
+    setAccessSaveMsg("");
   };
 
   const openAddModal = () => {
@@ -347,7 +372,7 @@ const ManageUsers = () => {
       firstName: "",
       lastName: "",
       email: "",
-      position: "Admin",
+      position: "ADMIN",
       password: "",
       reportsTo: "",
       intermediary_code: "",
@@ -365,24 +390,32 @@ const ManageUsers = () => {
       position: u.account_type,
       password: "",
       reportsTo: "",
-      intermediary_code: u.intermediary_code || "", // Add this line
+      intermediary_code: u.intermediary_code || "",
     });
 
-    const { data } = await supabase
+    // Fetch current hierarchy
+    const { data: hierarchyData } = await supabase
       .from("user_hierarchy")
       .select("report_to_id")
       .eq("user_id", u.id)
       .eq("is_active", true)
       .maybeSingle();
 
-    if (data)
-      setFormData((prev) => ({ ...prev, reportsTo: data.report_to_id }));
+    if (hierarchyData)
+      setFormData((prev) => ({ ...prev, reportsTo: hierarchyData.report_to_id }));
+
+    // Fetch access control settings for this user (only for AL, AP, MD, MP)
+    await fetchUserAccessSettings(u.id);
 
     setShowAddModal(true);
   };
 
   const openViewModal = async (u) => {
     setSelectedUser(u);
+    
+    // Fetch access settings for view mode
+    await fetchUserAccessSettingsForView(u.id);
+    
     setShowViewModal(true);
 
     const userId = u.id;
@@ -427,6 +460,121 @@ const ManageUsers = () => {
     setViewingCreatedAccounts(sortedCreatedByAccounts);
   };
 
+  // Fetch user access settings for view mode
+  const fetchUserAccessSettingsForView = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from("user_access")
+        .select("cis_access, az_sub_access")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching access settings:", error);
+        return;
+      }
+
+      if (data) {
+        setViewCisAccess(data.cis_access || "Disable");
+        setViewAzSubAccess(data.az_sub_access || "Disable");
+      } else {
+        setViewCisAccess("Disable");
+        setViewAzSubAccess("Disable");
+      }
+    } catch (err) {
+      console.error("Error fetching access settings:", err);
+    }
+  };
+
+  // Fetch user access settings from user_access table
+  const fetchUserAccessSettings = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from("user_access")
+        .select("cis_access, az_sub_access")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching access settings:", error);
+        return;
+      }
+
+      if (data) {
+        setCisAccess(data.cis_access || "Disable");
+        setAzSubAccess(data.az_sub_access || "Disable");
+      } else {
+        // Default values if no record exists
+        setCisAccess("Disable");
+        setAzSubAccess("Disable");
+      }
+    } catch (err) {
+      console.error("Error fetching access settings:", err);
+    }
+  };
+
+  // Save access settings for the current user (called from Edit modal)
+  const saveAccessSettings = async () => {
+    if (!selectedUser) return;
+    
+    setIsSavingAccess(true);
+    setAccessSaveMsg("");
+    
+    try {
+      // Check if record exists
+      const { data: existing, error: checkError } = await supabase
+        .from("user_access")
+        .select("id")
+        .eq("user_id", selectedUser.id)
+        .maybeSingle();
+      
+      if (checkError && checkError.code !== "PGRST116") {
+        throw checkError;
+      }
+      
+      let result;
+      if (existing) {
+        // Update existing record
+        result = await supabase
+          .from("user_access")
+          .update({
+            cis_access: cisAccess,
+            az_sub_access: azSubAccess,
+            updated_at: new Date().toISOString(),
+            updated_by: user?.id,
+          })
+          .eq("user_id", selectedUser.id);
+      } else {
+        // Insert new record
+        result = await supabase
+          .from("user_access")
+          .insert({
+            user_id: selectedUser.id,
+            cis_access: cisAccess,
+            az_sub_access: azSubAccess,
+            created_by: user?.id,
+          });
+      }
+      
+      if (result.error) throw result.error;
+      
+      setAccessSaveMsg("Access settings saved successfully!");
+      setTimeout(() => setAccessSaveMsg(""), 3000);
+      
+      // Log activity
+      await logActivity(
+        "ACCESS_UPDATE",
+        `Updated access for ${selectedUser.first_name} ${selectedUser.last_name}: CIS=${cisAccess}, AZ SUB=${azSubAccess}`,
+      );
+    } catch (err) {
+      console.error("Error saving access settings:", err);
+      setAccessSaveMsg("Failed to save settings: " + err.message);
+      setTimeout(() => setAccessSaveMsg(""), 3000);
+    } finally {
+      setIsSavingAccess(false);
+    }
+  };
+
   const submitUser = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -445,11 +593,18 @@ const ManageUsers = () => {
             account_type: formData.position,
             intermediary_code: formData.intermediary_code
               ? parseInt(formData.intermediary_code)
-              : null, // Add this line
+              : null,
           })
           .eq("id", userIdToProcess);
 
         if (error) throw error;
+        
+        // Also save access settings if user is AL, AP, MD, MP
+        const role = formData.position?.toUpperCase();
+        if (role === "AL" || role === "AP" || role === "MD" || role === "MP") {
+          await saveAccessSettings();
+        }
+        
         await logActivity(
           "USER_UPDATE",
           `Updated user details for ${formData.firstName} ${formData.lastName}`,
@@ -466,7 +621,7 @@ const ManageUsers = () => {
                 last_name: formData.lastName,
                 account_type: formData.position,
                 status: "Active",
-                intermediary_code: formData.intermediary_code, // Add this line
+                intermediary_code: formData.intermediary_code,
               },
             },
           },
@@ -488,7 +643,7 @@ const ManageUsers = () => {
           status: "Active",
           intermediary_code: formData.intermediary_code
             ? parseInt(formData.intermediary_code)
-            : null, // Add this line
+            : null,
         });
 
         await logActivity(
@@ -673,18 +828,33 @@ const ManageUsers = () => {
   };
 
   // -- Render Helpers --
+  // Filter users based on showInactive toggle - show all users (not just admins)
   const filteredUsers = users.filter((u) => {
     const status = u.status || "Active";
     const isStatusMatch = showInactive
       ? status === "Inactive"
       : status === "Active";
-    const isAdmin = u.account_type?.toUpperCase() === "ADMIN";
-    return isStatusMatch && isAdmin;
+    // Remove the isAdmin filter to show all account types
+    return isStatusMatch;
   });
 
   const unreadNotificationsCount = notifications.filter(
     (n) => !n.is_read,
   ).length;
+
+  // Check if selected user role should show access controls in Edit modal (AL, AP, MD, MP)
+  const shouldShowAccessControls = () => {
+    if (!selectedUser) return false;
+    const role = selectedUser.account_type?.toUpperCase();
+    return role === "AL" || role === "AP" || role === "MD" || role === "MP";
+  };
+
+  // Check if selected user is Admin or Super Admin to show Hierarchy section
+  const shouldShowHierarchy = () => {
+    if (!selectedUser) return false;
+    const role = selectedUser.account_type?.toUpperCase();
+    return role === "ADMIN" || role === "SUPER_ADMIN";
+  };
 
   return (
     <div className="dashboard-content" style={{ padding: "40px 50px" }}>
@@ -1095,7 +1265,7 @@ const ManageUsers = () => {
       {/* Add/Edit Modal */}
       {showAddModal && (
         <div className="modal-overlay">
-          <div className="modal-content">
+          <div className="modal-content" style={{ maxWidth: "600px" }}>
             <div className="modal-title">
               {isEditMode ? "Edit User" : "Add New User"}
             </div>
@@ -1169,37 +1339,44 @@ const ManageUsers = () => {
                     value={formData.position}
                     onChange={handleFormChange}
                   >
-                    <option value="Admin">Admin</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="SUPER_ADMIN">Super Admin</option>
+                    <option value="MP">Management Partner (MP)</option>
+                    <option value="MD">Managing Director (MD)</option>
+                    <option value="AL">Agency Leader (AL)</option>
+                    <option value="AP">Agency Partner (AP)</option>
                   </select>
                 </div>
               </div>
-              {formData.position && (
-                <div className="input-group">
-                  <label>Intermediary Code</label>
-                  <input
-                    type="text"
-                    name="intermediary_code"
-                    value={formData.intermediary_code}
-                    onChange={handleFormChange}
-                    placeholder="Enter 8-digit code"
-                    maxLength="8"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    title="Please enter numbers only (max 8 digits)"
-                  />
-                  <small
-                    style={{
-                      color: "#6b7280",
-                      fontSize: "11px",
-                      marginTop: "4px",
-                      display: "block",
-                    }}
-                  >
-                    Max 8 digits, numbers only
-                  </small>
-                </div>
-              )}
-              {(formData.position === "AP" || formData.position === "AL") && (
+              
+              {/* Intermediary Code field - shown for all roles but optional */}
+              <div className="input-group">
+                <label>Intermediary Code (Optional)</label>
+                <input
+                  type="text"
+                  name="intermediary_code"
+                  value={formData.intermediary_code}
+                  onChange={handleFormChange}
+                  placeholder="Enter 8-digit code"
+                  maxLength="8"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  title="Please enter numbers only (max 8 digits)"
+                />
+                <small
+                  style={{
+                    color: "#6b7280",
+                    fontSize: "11px",
+                    marginTop: "4px",
+                    display: "block",
+                  }}
+                >
+                  Max 8 digits, numbers only
+                </small>
+              </div>
+              
+              {/* Reports To field - shown for AP, AL, MD */}
+              {(formData.position === "AP" || formData.position === "AL" || formData.position === "MD") && (
                 <div className="input-group">
                   <label>Reports To</label>
                   <select
@@ -1210,10 +1387,152 @@ const ManageUsers = () => {
                     <option value="">-- Select Supervisor --</option>
                     {potentialUplines.map((u) => (
                       <option key={u.id} value={u.id}>
-                        {u.first_name} {u.last_name}
+                        {u.first_name} {u.last_name} ({u.account_type})
                       </option>
                     ))}
                   </select>
+                  {potentialUplines.length === 0 && (
+                    <small style={{ color: "#ef4444", display: "block", marginTop: "4px" }}>
+                      No suitable supervisor found for this role.
+                    </small>
+                  )}
+                </div>
+              )}
+
+              {/* Access Controls Section - Only shown in Edit mode for AL, AP, MD, MP */}
+              {isEditMode && shouldShowAccessControls() && (
+                <div
+                  className="access-controls-section"
+                  style={{
+                    borderTop: "1px solid var(--border-color)",
+                    marginTop: "20px",
+                    paddingTop: "20px",
+                  }}
+                >
+                  <h3
+                    style={{
+                      fontSize: "16px",
+                      marginBottom: "15px",
+                      color: "var(--primary-color)",
+                    }}
+                  >
+                    Access Controls
+                  </h3>
+                  
+                  <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    {/* CIS Access Dropdown */}
+                    <div className="input-group" style={{ marginBottom: 0 }}>
+                      <label style={{ fontWeight: "600", marginBottom: "8px", display: "block" }}>
+                        CIS Access
+                      </label>
+                      <select
+                        value={cisAccess}
+                        onChange={(e) => setCisAccess(e.target.value)}
+                        style={{
+                          width: "100%",
+                          padding: "10px 12px",
+                          borderRadius: "8px",
+                          border: "1px solid #d0d5dd",
+                          fontSize: "14px",
+                          backgroundColor: "#fff",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <option value="Enable">Enable</option>
+                        <option value="Disable">Disable</option>
+                      </select>
+                    </div>
+
+                    {/* AZ SUB Access Dropdown */}
+                    <div className="input-group" style={{ marginBottom: 0 }}>
+                      <label style={{ fontWeight: "600", marginBottom: "8px", display: "block" }}>
+                        AZ SUB Access
+                      </label>
+                      <select
+                        value={azSubAccess}
+                        onChange={(e) => setAzSubAccess(e.target.value)}
+                        style={{
+                          width: "100%",
+                          padding: "10px 12px",
+                          borderRadius: "8px",
+                          border: "1px solid #d0d5dd",
+                          fontSize: "14px",
+                          backgroundColor: "#fff",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <option value="Enable">Enable</option>
+                        <option value="Disable">Disable</option>
+                      </select>
+                    </div>
+
+                    {accessSaveMsg && (
+                      <p
+                        style={{
+                          marginTop: "8px",
+                          fontSize: "12px",
+                          color: accessSaveMsg.includes("successfully") ? "#10b981" : "#ef4444",
+                        }}
+                      >
+                        {accessSaveMsg}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Hierarchy Section - Only shown in Edit mode for Admin/Super Admin */}
+              {isEditMode && shouldShowHierarchy() && (
+                <div
+                  className="hierarchy-section"
+                  style={{
+                    borderTop: "1px solid var(--border-color)",
+                    marginTop: "20px",
+                    paddingTop: "20px",
+                  }}
+                >
+                  <h3
+                    style={{
+                      fontSize: "16px",
+                      marginBottom: "15px",
+                      color: "var(--primary-color)",
+                    }}
+                  >
+                    Hierarchy
+                  </h3>
+
+                  <div className="hierarchy-item">
+                    <label>Created Accounts ({viewingCreatedAccounts.length})</label>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "8px",
+                        marginTop: "10px",
+                      }}
+                    >
+                      {viewingCreatedAccounts.map((sub, idx) => (
+                        <div key={idx} className="hierarchy-card">
+                          <span>
+                            {sub.first_name} {sub.last_name}
+                          </span>
+                          <span
+                            className="status-badge active"
+                            style={{ fontSize: "10px" }}
+                          >
+                            {sub.account_type}
+                          </span>
+                        </div>
+                      ))}
+                      {viewingCreatedAccounts.length === 0 && (
+                        <div className="hierarchy-card">
+                          <span style={{ color: "#999" }}>
+                            No created accounts found
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -1255,10 +1574,10 @@ const ManageUsers = () => {
         </div>
       )}
 
-      {/* View Modal */}
+      {/* View Modal - Read Only with Access Controls Display */}
       {showViewModal && selectedUser && (
         <div className="modal-overlay">
-          <div className="modal-content">
+          <div className="modal-content" style={{ maxWidth: "500px" }}>
             <div className="modal-title">View User Details</div>
 
             <div className="modal-form">
@@ -1299,59 +1618,69 @@ const ManageUsers = () => {
                 />
               </div>
 
-              <div
-                className="hierarchy-section"
-                style={{
-                  borderTop: "1px solid var(--border-color)",
-                  marginTop: "20px",
-                  paddingTop: "20px",
-                }}
-              >
-                <h3
+              {/* Access Controls Display - Only shown for AL, AP, MD, MP */}
+              {shouldShowAccessControls() && (
+                <div
+                  className="access-controls-section"
                   style={{
-                    fontSize: "16px",
-                    marginBottom: "15px",
-                    color: "var(--primary-color)",
+                    borderTop: "1px solid var(--border-color)",
+                    marginTop: "20px",
+                    paddingTop: "20px",
                   }}
                 >
-                  Hierarchy
-                </h3>
-
-                <div className="hierarchy-item" style={{ marginTop: "20px" }}>
-                  <label>
-                    Created Accounts ({viewingCreatedAccounts.length})
-                  </label>
-                  <div
+                  <h3
                     style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "8px",
-                      marginTop: "10px",
+                      fontSize: "16px",
+                      marginBottom: "15px",
+                      color: "var(--primary-color)",
                     }}
                   >
-                    {viewingCreatedAccounts.map((sub, idx) => (
-                      <div key={idx} className="hierarchy-card">
-                        <span>
-                          {sub.first_name} {sub.last_name}
-                        </span>
-                        <span
-                          className="status-badge active"
-                          style={{ fontSize: "10px" }}
-                        >
-                          {sub.account_type}
-                        </span>
+                    Access Controls
+                  </h3>
+                  
+                  <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    {/* CIS Access Display */}
+                    <div className="input-group" style={{ marginBottom: 0 }}>
+                      <label style={{ fontWeight: "600", marginBottom: "8px", display: "block" }}>
+                        CIS Access
+                      </label>
+                      <div
+                        style={{
+                          display: "inline-block",
+                          padding: "6px 12px",
+                          borderRadius: "20px",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                          backgroundColor: viewCisAccess === "Enable" ? "#d1fae5" : "#fee2e2",
+                          color: viewCisAccess === "Enable" ? "#065f46" : "#991b1b",
+                        }}
+                      >
+                        {viewCisAccess}
                       </div>
-                    ))}
-                    {viewingCreatedAccounts.length === 0 && (
-                      <div className="hierarchy-card">
-                        <span style={{ color: "#999" }}>
-                          No created accounts found
-                        </span>
+                    </div>
+
+                    {/* AZ SUB Access Display */}
+                    <div className="input-group" style={{ marginBottom: 0 }}>
+                      <label style={{ fontWeight: "600", marginBottom: "8px", display: "block" }}>
+                        AZ SUB Access
+                      </label>
+                      <div
+                        style={{
+                          display: "inline-block",
+                          padding: "6px 12px",
+                          borderRadius: "20px",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                          backgroundColor: viewAzSubAccess === "Enable" ? "#d1fae5" : "#fee2e2",
+                          color: viewAzSubAccess === "Enable" ? "#065f46" : "#991b1b",
+                        }}
+                      >
+                        {viewAzSubAccess}
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
             <div className="modal-buttons">
               <button

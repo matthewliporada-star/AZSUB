@@ -1,14 +1,71 @@
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useApp } from "../../context/AppContext";
+import supabase from "../../config/supabaseClient";
 // [CHANGE] Import the new logo
 import logoLight from "../../assets/logo1.png";
 import logoDark from "../../assets/White logo.png";
 
 const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
   const location = useLocation();
-  const { userRole, loading, darkMode } = useApp();
+  const { userRole, currentUser, loading, darkMode } = useApp();
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [cisAccess, setCisAccess] = useState("Disable");
+  const [azSubAccess, setAzSubAccess] = useState("Disable");
+  const [userRoleState, setUserRoleState] = useState(null);
+
+  // Fetch user access settings
+  useEffect(() => {
+    const getUserAccess = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("account_type")
+          .eq("id", session.user.id)
+          .single();
+        
+        if (profile) {
+          setUserRoleState(profile.account_type?.toUpperCase());
+        }
+
+        // For AL, AP, MD, MP - check access settings
+        const rolesWithAccess = ["AL", "AP", "MD", "MP"];
+        if (rolesWithAccess.includes(profile?.account_type?.toUpperCase())) {
+          const { data: accessData } = await supabase
+            .from("user_access")
+            .select("cis_access, az_sub_access")
+            .eq("user_id", session.user.id)
+            .maybeSingle();
+          
+          if (accessData) {
+            setCisAccess(accessData.cis_access || "Disable");
+            setAzSubAccess(accessData.az_sub_access || "Disable");
+          } else {
+            setCisAccess("Disable");
+            setAzSubAccess("Disable");
+          }
+        } else {
+          // Admins and Super Admins always see full menu
+          setCisAccess("Enable");
+          setAzSubAccess("Enable");
+        }
+      } catch (err) {
+        console.error("Error getting user access:", err);
+      }
+    };
+
+    getUserAccess();
+  }, []);
+
+  // Check if only CIS access is enabled (and AZ SUB is disabled)
+  const isOnlyCISAccess = cisAccess === "Enable" && azSubAccess === "Disable";
+  // Check if both are enabled (full access)
+  const hasFullAccess = cisAccess === "Enable" && azSubAccess === "Enable";
+  // Check if only AZ SUB is enabled
+  const isOnlyAZSubAccess = cisAccess === "Disable" && azSubAccess === "Enable";
 
   // Add near the top, after other imports
   const cisIcon = (
@@ -25,8 +82,23 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
     </svg>
   );
 
-  // AP Menu Items (UPDATED: Added CIS dropdown)
-  const apMenuItems = [
+  // CIS Only Menu Items (for when only CIS access is enabled)
+  const getCISOnlyMenuItems = (rolePath) => [
+    {
+      path: "#cis",
+      label: "Client Information System",
+      icon: cisIcon,
+      isDropdown: true,
+      subItems: [
+        { path: `/${rolePath}/cis/CISDashboard`, label: "Dashboard" },
+        { path: `/${rolePath}/cis`, label: "Fill Out" },
+        { path: `/${rolePath}/cis/record`, label: "Record" },
+      ],
+    },
+  ];
+
+  // Full Menu Items (when both access are enabled or for admins)
+  const getFullAPMenuItems = () => [
     {
       path: "/ap/dashboard",
       label: "Dashboard",
@@ -131,7 +203,6 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
         </svg>
       ),
     },
-    // NEW: CIS Dropdown for AP
     {
       path: "#cis",
       label: "Client Information System",
@@ -145,76 +216,7 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
     },
   ];
 
-  // MP Menu Items
-  const mpMenuItems = [
-    {
-      path: "/mp/dashboard",
-      label: "Dashboard",
-      icon: (
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <rect x="3" y="3" width="7" height="7"></rect>
-          <rect x="14" y="3" width="7" height="7"></rect>
-          <rect x="14" y="14" width="7" height="7"></rect>
-          <rect x="3" y="14" width="7" height="7"></rect>
-        </svg>
-      ),
-    },
-    {
-      path: "/mp/clients",
-      label: "Client Profiles",
-      icon: (
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-        </svg>
-      ),
-    },
-    {
-      path: "/mp/submission",
-      label: "Submission",
-      icon: (
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-          <polyline points="13 2 13 9 20 9"></polyline>
-        </svg>
-      ),
-    },
-    {
-      path: "#cis",
-      label: "Client Information System",
-      icon: cisIcon,
-      isDropdown: true,
-      subItems: [
-        { path: "/mp/cis/CISDashboard", label: "Dashboard" },
-        { path: "/mp/cis", label: "Fill Out" },
-        { path: "/mp/cis/record", label: "Record" },
-      ],
-    },
-  ];
-
-  // AL Menu Items - Same as AP plus Team Performance
-  const alMenuItems = [
+  const getFullALMenuItems = () => [
     {
       path: "/al/dashboard",
       label: "Dashboard",
@@ -351,7 +353,107 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
     },
   ];
 
-  // Admin Menu Items
+  const getFullMPMenuItems = () => [
+    {
+      path: "/mp/dashboard",
+      label: "Dashboard",
+      icon: (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+      ),
+    },
+    {
+      path: "/mp/clients",
+      label: "Client Profiles",
+      icon: (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+        </svg>
+      ),
+    },
+    {
+      path: "/mp/submission",
+      label: "Submission",
+      icon: (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+          <polyline points="13 2 13 9 20 9"></polyline>
+        </svg>
+      ),
+    },
+    {
+      path: "#cis",
+      label: "Client Information System",
+      icon: cisIcon,
+      isDropdown: true,
+      subItems: [
+        { path: "/mp/cis/CISDashboard", label: "Dashboard" },
+        { path: "/mp/cis", label: "Fill Out" },
+        { path: "/mp/cis/record", label: "Record" },
+      ],
+    },
+  ];
+
+  const getFullMDMenuItems = () => [
+    {
+      path: "/md/dashboard",
+      label: "Dashboard",
+      icon: (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+      ),
+    },
+    {
+      path: "#cis",
+      label: "Client Information System",
+      icon: cisIcon,
+      isDropdown: true,
+      subItems: [
+        { path: "/md/cis/CISDashboard", label: "Dashboard" },
+        { path: "/md/cis", label: "Fill Out" },
+        { path: "/md/cis/record", label: "Record" },
+      ],
+    },
+  ];
+
+  // Admin Menu Items (always full access)
   const adminMenuItems = [
     {
       path: "/admin/dashboard",
@@ -449,7 +551,7 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
     },
   ];
 
-  // Super-Admin Menu Items (UPDATED: Added CIS dropdown)
+  // Super-Admin Menu Items (always full access)
   const superAdminMenuItems = [
     {
       path: "/super-admin/dashboard",
@@ -489,7 +591,6 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
         </svg>
       ),
     },
-    // NEW: CIS Dropdown for Super Admin
     {
       path: "#cis",
       label: "Client Information System",
@@ -503,40 +604,6 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
     },
   ];
 
-  // MD Menu Items
-  const mdMenuItems = [
-    {
-      path: "/md/dashboard",
-      label: "Dashboard",
-      icon: (
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <rect x="3" y="3" width="7" height="7"></rect>
-          <rect x="14" y="3" width="7" height="7"></rect>
-          <rect x="14" y="14" width="7" height="7"></rect>
-          <rect x="3" y="14" width="7" height="7"></rect>
-        </svg>
-      ),
-    },
-    {
-      path: "#cis",
-      label: "Client Information System",
-      icon: cisIcon,
-      isDropdown: true,
-      subItems: [
-        { path: "/md/cis/CISDashboard", label: "Dashboard" },
-        { path: "/md/cis", label: "Fill Out" },
-        { path: "/md/cis/record", label: "Record" },
-      ],
-    },
-  ];
-
   if (loading) {
     return (
       <div
@@ -546,13 +613,54 @@ const Sidebar = ({ sidebarOpen = true, setSidebarOpen }) => {
     );
   }
 
-  // Select menu items based on user role
-  let menuItems = apMenuItems;
-  if (userRole === "MP") menuItems = mpMenuItems;
-  else if (userRole === "AL") menuItems = alMenuItems;
-  else if (userRole === "MD") menuItems = mdMenuItems;
-  else if (userRole?.toUpperCase() === "ADMIN") menuItems = adminMenuItems;
-  else if (userRole === "SUPER_ADMIN") menuItems = superAdminMenuItems;
+  const isWaitingAccess = currentUser?.status === "Waiting for Access";
+  const role = userRole?.toUpperCase();
+
+  // Determine which menu items to show based on access settings
+  let menuItems = [];
+  
+  if (!isWaitingAccess) {
+    // For Admins and Super Admins - always show full menu
+    if (role === "ADMIN") {
+      menuItems = adminMenuItems;
+    } else if (role === "SUPER_ADMIN") {
+      menuItems = superAdminMenuItems;
+    }
+    // For AL, AP, MD, MP - check access settings
+    else if (role === "AP") {
+      if (isOnlyCISAccess) {
+        // Only show CIS menu
+        menuItems = getCISOnlyMenuItems("ap");
+      } else if (hasFullAccess || isOnlyAZSubAccess) {
+        // Show full menu (both access or only AZ SUB)
+        menuItems = getFullAPMenuItems();
+      }
+    } else if (role === "AL") {
+      if (isOnlyCISAccess) {
+        // Only show CIS menu
+        menuItems = getCISOnlyMenuItems("al");
+      } else if (hasFullAccess || isOnlyAZSubAccess) {
+        // Show full menu (both access or only AZ SUB)
+        menuItems = getFullALMenuItems();
+      }
+    } else if (role === "MP") {
+      if (isOnlyCISAccess) {
+        // Only show CIS menu
+        menuItems = getCISOnlyMenuItems("mp");
+      } else if (hasFullAccess || isOnlyAZSubAccess) {
+        // Show full menu (both access or only AZ SUB)
+        menuItems = getFullMPMenuItems();
+      }
+    } else if (role === "MD") {
+      if (isOnlyCISAccess) {
+        // Only show CIS menu
+        menuItems = getCISOnlyMenuItems("md");
+      } else if (hasFullAccess || isOnlyAZSubAccess) {
+        // Show full menu (both access or only AZ SUB)
+        menuItems = getFullMDMenuItems();
+      }
+    }
+  }
 
   return (
     <aside className={`sidebar ${sidebarOpen ? "" : "collapsed"}`}>

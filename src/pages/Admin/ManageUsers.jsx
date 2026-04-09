@@ -634,7 +634,7 @@ const ManageUsers = () => {
                 first_name: formData.firstName,
                 last_name: formData.lastName,
                 account_type: formData.position,
-                status: "Active",
+                status: "Waiting for Access",
                 intermediary_code: formData.intermediary_code,
               },
             },
@@ -654,7 +654,7 @@ const ManageUsers = () => {
           last_name: formData.lastName,
           email: formData.email,
           account_type: formData.position,
-          status: "Active",
+          status: "Waiting for Access",
           intermediary_code: formData.intermediary_code
             ? parseInt(formData.intermediary_code)
             : null,
