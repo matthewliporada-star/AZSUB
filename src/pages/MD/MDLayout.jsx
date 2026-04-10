@@ -1,6 +1,6 @@
-// MDLayout.jsx - Admin-styled layout for Management Directors
-import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+// MDLayout.jsx - Admin-styled layout for Management Directors (Add User button removed)
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import './MD_Styles.css';
 // Import logos (adjust paths as needed)
@@ -13,6 +13,14 @@ const MDLayout = ({ children, title = 'Dashboard' }) => {
     const { currentUser, userRole, darkMode, toggleDarkMode } = useApp();
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [selectedPath, setSelectedPath] = useState(location.pathname);
+
+    // Keep the active highlight in sync with routing
+    useEffect(() => {
+        setSelectedPath(location.pathname);
+    }, [location.pathname]);
+
+    const isActive = (path) => selectedPath === path;
 
     const mdMenuItems = [
         {
@@ -34,7 +42,7 @@ const MDLayout = ({ children, title = 'Dashboard' }) => {
             path: '/md/ap-performance',
             label: 'Agency Partners',
             icon: <i className="fa-solid fa-user-group"></i>
-        }
+        },
     ];
 
     const handleLogout = async () => {
@@ -66,14 +74,16 @@ const MDLayout = ({ children, title = 'Dashboard' }) => {
 
                 <div className="sidebar-menu">
                     {mdMenuItems.map((item) => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`sidebar-item ${location.pathname === item.path ? 'active' : ''}`}
-                        >
-                            <div className="sidebar-icon">{item.icon}</div>
-                            {sidebarOpen && <span>{item.label}</span>}
-                        </Link>
+                        <div key={item.path}>
+                            <Link
+                                to={item.path}
+                                className={`sidebar-item ${isActive(item.path) ? 'active' : ''}`}
+                                onClick={() => setSelectedPath(item.path)}
+                            >
+                                <div className="sidebar-icon">{item.icon}</div>
+                                {sidebarOpen && <span>{item.label}</span>}
+                            </Link>
+                        </div>
                     ))}
                 </div>
 
@@ -104,6 +114,7 @@ const MDLayout = ({ children, title = 'Dashboard' }) => {
                         >
                             <i className={`fa-solid ${darkMode ? 'fa-sun' : 'fa-moon'}`}></i>
                         </button>
+
                         <button
                             className="md-user-profile-btn"
                             onClick={() => setShowProfileMenu(!showProfileMenu)}
@@ -142,7 +153,7 @@ const MDLayout = ({ children, title = 'Dashboard' }) => {
                             <h1>{title}</h1>
                         </div>
                     )}
-                    {children}
+                    {children ? children : <Outlet />}
                 </div>
             </main>
         </div>

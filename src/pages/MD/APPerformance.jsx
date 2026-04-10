@@ -1,5 +1,5 @@
 // APPerformance.jsx - Agency Partners performance page for MD
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { APPageSkeleton } from './MDSkeletons';
@@ -66,6 +66,7 @@ const APPerformance = () => {
             al: 'All',
             search: ''
         });
+        refreshData(new Date().getMonth(), currentYear);
     };
 
     // Get AP performance status
@@ -126,10 +127,10 @@ const APPerformance = () => {
     const totalAPs = filteredAPs.length;
     const activeAPs = filteredAPs.filter(ap => ap.monthlyCases > 0).length;
     const performingAPs = filteredAPs.filter(ap => getAPPerformanceStatus(ap.monthlyCases) === 'PERFORMING').length;
-    const totalANP = filteredAPs.reduce((sum, ap) => sum + ap.totalANP, 0);
-    const monthlyANP = filteredAPs.reduce((sum, ap) => sum + ap.monthlyANP, 0);
-    const totalCases = filteredAPs.reduce((sum, ap) => sum + ap.totalCases, 0);
-    const monthlyCases = filteredAPs.reduce((sum, ap) => sum + ap.monthlyCases, 0);
+    const totalANP = filteredAPs.reduce((sum, ap) => sum + (ap.totalANP || 0), 0);
+    const monthlyANP = filteredAPs.reduce((sum, ap) => sum + (ap.monthlyANP || 0), 0);
+    const totalCases = filteredAPs.reduce((sum, ap) => sum + (ap.totalCases || 0), 0);
+    const monthlyCases = filteredAPs.reduce((sum, ap) => sum + (ap.monthlyCases || 0), 0);
 
     // Get unique statuses for filter
     const uniqueStatuses = ['All', 'PERFORMING', 'AVERAGE', 'NEEDS IMPROVEMENT'];
@@ -236,25 +237,25 @@ const APPerformance = () => {
             <div className="dashboard-grid">
                 <div className="stat-card hover-card" style={{ borderLeft: '4px solid #002B5C' }}>
                     <div className="stat-label">Total Agency Partners</div>
-                    <div className="stat-value">{totalAPs}</div>
+                    <div className="stat-value">{totalAPs.toLocaleString()}</div>
                     <div className="stat-subtext">In network</div>
                 </div>
 
                 <div className="stat-card hover-card" style={{ borderLeft: '4px solid #28a745' }}>
                     <div className="stat-label">Active APs</div>
-                    <div className="stat-value">{activeAPs}</div>
+                    <div className="stat-value">{activeAPs.toLocaleString()}</div>
                     <div className="stat-subtext">{totalAPs > 0 ? ((activeAPs / totalAPs) * 100).toFixed(1) : 0}% Active Rate</div>
                 </div>
 
                 <div className="stat-card hover-card" style={{ borderLeft: '4px solid #0055b8' }}>
                     <div className="stat-label">Total ANP</div>
-                    <div className="stat-value">₱ {(totalANP / 1000000).toFixed(1)}M</div>
+                    <div className="stat-value">₱ {totalANP.toLocaleString()}</div>
                     <div className="stat-subtext">Cumulative from APs</div>
                 </div>
 
                 <div className="stat-card hover-card" style={{ borderLeft: '4px solid #3b82f6' }}>
                     <div className="stat-label">Monthly Cases</div>
-                    <div className="stat-value">{monthlyCases.toLocaleString()}</div>
+                    <div className="stat-value">{(monthlyCases + filteredAPs.reduce((sum, ap) => sum + (ap.monthlyDeclined || 0), 0)).toLocaleString()}</div>
                     <div className="stat-subtext">{months[selectedMonth]} {selectedYear}</div>
                 </div>
             </div>
@@ -264,8 +265,8 @@ const APPerformance = () => {
                 <div className="container-header">
                     <h2>Agency Partners Detailed View - {months[appliedFilters.month]} {appliedFilters.year}</h2>
                     <div className="card-header-stats">
-                        <span className="stat-badge">Showing: {filteredAPs.length} of {apPerformance.length}</span>
-                        <span className="stat-badge status-active">Active: {activeAPs}</span>
+                        <span className="stat-badge">Showing: {filteredAPs.length.toLocaleString()} of {apPerformance.length.toLocaleString()}</span>
+                        <span className="stat-badge status-active">Active: {activeAPs.toLocaleString()}</span>
                     </div>
                 </div>
                 <div className="container-body">
@@ -319,7 +320,7 @@ const APPerformance = () => {
                                         </td>
                                         <td>
                                             <div style={{ fontWeight: '600' }}>
-                                                {ap.monthlyCases || 0}
+                                                {(ap.monthlyCases || 0).toLocaleString()}
                                             </div>
                                         </td>
                                         <td>
@@ -345,6 +346,13 @@ const APPerformance = () => {
                                     </tr>
                                 );
                             })}
+                            {filteredAPs.length === 0 && (
+                                <tr>
+                                    <td colSpan="10" style={{ textAlign: 'center', padding: '40px' }}>
+                                        No Agency Partners found matching the filters.
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
@@ -403,11 +411,11 @@ const APPerformance = () => {
                                 </div>
                                 <div style={{ background: darkMode ? '#252525' : '#f8fafc', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
                                     <div style={{ fontSize: '12px', color: darkMode ? '#94a3b8' : '#64748b' }}>Total Cases</div>
-                                    <div style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a' }}>{selectedAP.totalCases || 0}</div>
+                                    <div style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a' }}>{(selectedAP.totalCases || 0).toLocaleString()}</div>
                                 </div>
                                 <div style={{ background: darkMode ? '#252525' : '#f8fafc', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
                                     <div style={{ fontSize: '12px', color: darkMode ? '#94a3b8' : '#64748b' }}>Monthly Cases</div>
-                                    <div style={{ fontSize: '20px', fontWeight: '700', color: '#f39c12' }}>{selectedAP.monthlyCases || 0}</div>
+                                    <div style={{ fontSize: '20px', fontWeight: '700', color: '#f39c12' }}>{(selectedAP.monthlyCases || 0).toLocaleString()}</div>
                                 </div>
                             </div>
 

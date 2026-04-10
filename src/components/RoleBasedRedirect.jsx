@@ -1,17 +1,18 @@
 // src/components/RoleBasedRedirect.jsx
-import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import supabase from "../config/supabaseClient";
 
 const RoleBasedRedirect = () => {
-  const [redirectPath, setRedirectPath] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkAccessAndRedirect = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
+
         if (!session) {
-          setRedirectPath("/login");
+          navigate("/login", { replace: true });
           return;
         }
 
@@ -23,11 +24,6 @@ const RoleBasedRedirect = () => {
 
         const role = profile?.account_type?.toLowerCase();
         
-        if (!role) {
-          setRedirectPath("/login");
-          return;
-        }
-
         const { data: accessData } = await supabase
           .from("user_access")
           .select("cis_access, az_sub_access")
@@ -36,29 +32,32 @@ const RoleBasedRedirect = () => {
 
         const cis = accessData?.cis_access || "Disable";
         const azSub = accessData?.az_sub_access || "Disable";
-        
-        const isOnlyCISAccess = cis === "Enable" && azSub === "Disable";
-        
-        if (isOnlyCISAccess) {
-          window.location.replace(`/${role}/cis/CISDashboard`);
+
+        // Admin override
+        if (role === "super_admin" || role === "admin") {
+          navigate(`/${role}/dashboard`, { replace: true });
           return;
         }
-        
-        setRedirectPath(`/${role}/dashboard`);
+
+        // Logic for AL and other specific roles
+        if (cis === "Enable" && azSub === "Disable") {
+          navigate(`/${role}/cis/CISDashboard`, { replace: true });
+        } else if (azSub === "Enable") {
+          navigate(`/${role}/dashboard`, { replace: true });
+        } else {
+          navigate("/waiting", { replace: true });
+        }
+
       } catch (err) {
         console.error("Error in role redirect:", err);
-        setRedirectPath("/login");
+        navigate("/login", { replace: true });
       }
     };
 
     checkAccessAndRedirect();
-  }, []);
+  }, [navigate]);
 
-  if (!redirectPath) {
-    return null;
-  }
-
-  return <Navigate to={redirectPath} replace />;
+  return null;
 };
 
 export default RoleBasedRedirect;
