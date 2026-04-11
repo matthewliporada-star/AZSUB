@@ -1,5 +1,5 @@
 // src/components/ProtectedRoute.jsx
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { createPortal } from "react-dom";
 import supabase from "../config/supabaseClient";
@@ -18,8 +18,8 @@ const FullScreenLoader = () => {
       zIndex: 999999,
     }}>
       <div style={{
-        width: '50px',
-        height: '50px',
+        width: '40px',
+        height: '40px',
         border: '4px solid #f3f4f6',
         borderTop: '4px solid #003781',
         borderRadius: '50%',
@@ -30,7 +30,7 @@ const FullScreenLoader = () => {
         body { overflow: hidden; }
       `}</style>
     </div>,
-    document.body  // ← Renders OUTSIDE your layout tree entirely
+    document.body
   );
 };
 
@@ -43,9 +43,14 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   useEffect(() => {
     const checkAccess = async () => {
       try {
+        console.log("=== ProtectedRoute Debug ===");
+        console.log("Path:", location.pathname);
+        console.log("Required Role:", requiredRole);
+        
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
+          console.log("No session, redirect to login");
           setRedirectPath("/login");
           return;
         }
@@ -57,9 +62,12 @@ const ProtectedRoute = ({ children, requiredRole }) => {
           .single();
 
         const role = profile?.account_type?.toLowerCase();
+        console.log("User Role:", role);
 
+        // Check role requirement
         if (requiredRole && role !== requiredRole.toLowerCase() && 
             role !== "super_admin" && role !== "admin") {
+          console.log(`Role mismatch: required ${requiredRole}, user has ${role}`);
           setRedirectPath("/waiting");
           return;
         }
@@ -74,26 +82,45 @@ const ProtectedRoute = ({ children, requiredRole }) => {
         const azSub = accessData?.az_sub_access || "Disable";
         
         const isCISRoute = location.pathname.includes("/cis");
+        console.log("CIS Access:", cis);
+        console.log("AZ Sub Access:", azSub);
+        console.log("Is CIS Route:", isCISRoute);
 
-        if (role !== "super_admin" && role !== "admin") {
-          if (cis === "Enable" && azSub === "Disable" && !isCISRoute) {
-            setRedirectPath(`/${role}/cis/CISDashboard`);
-            return;
-          }
-          if (azSub === "Enable" && cis === "Disable" && isCISRoute) {
-            setRedirectPath(`/${role}/dashboard`);
-            return;
-          }
-          if (cis === "Disable" && azSub === "Disable") {
-            setRedirectPath("/waiting");
-            return;
-          }
+        // Super Admin and Admin have full access
+        if (role === "super_admin" || role === "admin") {
+          console.log("Admin access granted");
+          setHasAccess(true);
+          return;
         }
 
-        setHasAccess(true);
+        // For regular users
+        // If it's a CIS route
+        if (isCISRoute) {
+          if (cis === "Enable") {
+            console.log("CIS access granted");
+            setHasAccess(true);
+          } else {
+            console.log("CIS access denied");
+            setRedirectPath("/waiting?type=cis");
+          }
+        } 
+        // If it's a regular AZ Sub route
+        else {
+          if (azSub === "Enable") {
+            console.log("AZ Sub access granted");
+            setHasAccess(true);
+          } else if (cis === "Enable") {
+            // User has CIS but trying to access non-CIS route
+            console.log("User has CIS only, redirecting to CIS dashboard");
+            setRedirectPath(`/${role}/cis/CISDashboard`);
+          } else {
+            console.log("No access granted");
+            setRedirectPath("/waiting");
+          }
+        }
       } catch (err) {
         console.error("Error checking access:", err);
-        setHasAccess(false);
+        setRedirectPath("/waiting");
       } finally {
         setIsLoading(false);
       }
@@ -103,17 +130,20 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   }, [location.pathname, requiredRole]);
 
   if (isLoading) {
-    return <FullScreenLoader />;  // ← Uses portal, escapes layout
+    return <FullScreenLoader />;
   }
 
   if (redirectPath && location.pathname !== redirectPath) {
+    console.log("Redirecting to:", redirectPath);
     return <Navigate to={redirectPath} replace />;
   }
 
   if (!hasAccess) {
+    console.log("No access, redirect to waiting");
     return <Navigate to="/waiting" replace />;
   }
 
+  console.log("Access granted, rendering children");
   return children;
 };
 

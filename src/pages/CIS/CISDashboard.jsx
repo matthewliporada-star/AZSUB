@@ -1028,8 +1028,23 @@ const CISDashboard = () => {
       <div className="cis-table-container">
         <h2 className="cis-table-title">Clients</h2>
         {loading ? (
-          <div className="loading-spinner">Loading inquiries...</div>
-        ) : (
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    padding: '60px',
+    minHeight: '300px'
+  }}>
+    <div style={{
+      width: '40px',
+      height: '40px',
+      border: '3px solid #e2e8f0',
+      borderTopColor: '#003781',
+      borderRadius: '50%',
+      animation: 'spin 0.8s linear infinite',
+    }} />
+  </div>
+) : (
           <table className="cis-table">
             <thead>
               <tr>

@@ -67,13 +67,8 @@ import MDMPPerformance from "./pages/MD/MPPerformance";
 import MDALPerformance from "./pages/MD/ALPerformance";
 import MDAPPerformance from "./pages/MD/APPerformance";
 
-// Loading Component
-
 // Main App Routes with Loading State
 const AppRoutes = () => {
-
-
-
   return (
     <Routes>
       {/* ==================== PUBLIC ROUTES ==================== */}
@@ -150,7 +145,7 @@ const AppRoutes = () => {
         }
       />
 
-      {/* AP CIS Routes */}
+      {/* AP CIS Routes - ONE ProtectedRoute at parent level */}
       <Route
         path="/ap/cis"
         element={
@@ -275,7 +270,7 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Super Admin CIS Routes */}
+      {/* Super Admin CIS Routes - ONE ProtectedRoute at parent level */}
       <Route
         path="/super-admin/cis"
         element={
@@ -363,7 +358,7 @@ const AppRoutes = () => {
         }
       />
 
-      {/* AL CIS Routes */}
+      {/* AL CIS Routes - ONE ProtectedRoute at parent level */}
       <Route
         path="/al/cis"
         element={
@@ -441,7 +436,7 @@ const AppRoutes = () => {
         }
       />
 
-      {/* MP CIS Routes */}
+      {/* MP CIS Routes - ONE ProtectedRoute at parent level */}
       <Route
         path="/mp/cis"
         element={

@@ -9,9 +9,12 @@ const RoleBasedRedirect = () => {
   useEffect(() => {
     const checkAccessAndRedirect = async () => {
       try {
+        console.log("=== RoleBasedRedirect Debug ===");
+        
         const { data: { session } } = await supabase.auth.getSession();
 
         if (!session) {
+          console.log("No session, redirect to login");
           navigate("/login", { replace: true });
           return;
         }
@@ -23,6 +26,7 @@ const RoleBasedRedirect = () => {
           .single();
 
         const role = profile?.account_type?.toLowerCase();
+        console.log("User Role:", role);
         
         const { data: accessData } = await supabase
           .from("user_access")
@@ -32,22 +36,34 @@ const RoleBasedRedirect = () => {
 
         const cis = accessData?.cis_access || "Disable";
         const azSub = accessData?.az_sub_access || "Disable";
+        
+        console.log("CIS Access:", cis);
+        console.log("AZ Sub Access:", azSub);
 
-        // Admin override
+        // Super Admin and Admin go to dashboard
         if (role === "super_admin" || role === "admin") {
+          console.log("Admin, redirect to dashboard");
           navigate(`/${role}/dashboard`, { replace: true });
           return;
         }
 
-        // Logic for AL and other specific roles
+        // CIS only access
         if (cis === "Enable" && azSub === "Disable") {
+          console.log("CIS only, redirect to CIS Dashboard");
           navigate(`/${role}/cis/CISDashboard`, { replace: true });
-        } else if (azSub === "Enable") {
-          navigate(`/${role}/dashboard`, { replace: true });
-        } else {
-          navigate("/waiting", { replace: true });
+          return;
         }
-
+        
+        // AZ Sub access (with or without CIS)
+        if (azSub === "Enable") {
+          console.log("AZ Sub access, redirect to dashboard");
+          navigate(`/${role}/dashboard`, { replace: true });
+          return;
+        }
+        
+        // No access
+        console.log("No access, redirect to waiting");
+        navigate("/waiting", { replace: true });
       } catch (err) {
         console.error("Error in role redirect:", err);
         navigate("/login", { replace: true });
