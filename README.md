@@ -6,7 +6,7 @@ frontend
 
 backend
 - cd backend
-- node server.js
+- node server.cjs
 - npm install nodemai
 ler
 - -npm list @babel/core @babel/generator
