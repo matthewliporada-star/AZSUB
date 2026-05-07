@@ -8,30 +8,6 @@ import "./Style/ManageUsers.css";
 
 import LogoImage from "../../assets/logo1.png";
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const insertProfileWithRetry = async (profileData, maxAttempts = 8) => {
-  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-    const { error } = await supabase
-      .from("profiles")
-      .upsert(profileData, { onConflict: "id" });
-
-    if (!error) return;
-
-    const message = error?.message || error?.msg || String(error);
-    const isForeignKeyError =
-      message.includes("profiles_id_fkey") ||
-      message.includes("foreign key constraint");
-
-    if (!isForeignKeyError || attempt === maxAttempts) {
-      throw error;
-    }
-
-    // Exponential backoff: 500ms, 1s, 1.5s, 2s, 2.5s, 3s, 3.5s
-    await sleep(500 * attempt);
-  }
-};
-
 const ManageUsers = () => {
   const navigate = useNavigate();
   const { darkMode, toggleDarkMode } = useApp();
@@ -611,40 +587,24 @@ const ManageUsers = () => {
         );
         setSuccessMsg("User updated successfully!");
       } else {
-        const { data: authData, error: authError } = await supabase.auth.signUp(
-          {
+        const createRes = await fetch("http://localhost:3000/api/admin/create-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
             email: formData.email,
             password: formData.password,
-            options: {
-              data: {
-                first_name: formData.firstName,
-                last_name: formData.lastName,
-                account_type: formData.position,
-                status: "Active",
-                intermediary_code: formData.intermediary_code,
-              },
-            },
-          },
-        );
-
-        if (authError) throw authError;
-        userIdToProcess = authData.user?.id;
-
-        if (!userIdToProcess) {
-          throw new Error("Signup succeeded but did not return a user ID.");
-        }
-
-        await insertProfileWithRetry({
-          id: userIdToProcess,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email,
-          account_type: formData.position,
-          status: "Active",
-          intermediary_code: formData.intermediary_code
-            ? parseInt(formData.intermediary_code)
-            : null,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            accountType: formData.position,
+            status: "Active",
+            intermediaryCode: formData.intermediary_code,
+          }),
         });
+
+        const createResult = await createRes.json();
+        if (!createResult.success) throw new Error(createResult.message);
+        userIdToProcess = createResult.userId;
+
 
         await logActivity(
           "USER_CREATE",

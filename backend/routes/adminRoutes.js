@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/supabase');
+const { sendGraphEmail } = require('../config/graphMailer');
 
 // Get all serial numbers for admin dashboard
 router.get('/admin/serial-numbers', async (req, res) => {
@@ -116,69 +117,98 @@ router.patch('/form-submissions/:id/status', async (req, res) => {
     }
 });
 
+// Create User - uses admin API to bypass email confirmation
+router.post('/admin/create-user', async (req, res) => {
+  try {
+    const { email, password, firstName, lastName, accountType, status, intermediaryCode } = req.body;
+
+    // Create auth user immediately (no email confirmation needed)
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { first_name: firstName, last_name: lastName, account_type: accountType, status: status || 'Active' },
+    });
+
+    if (authError) return res.status(400).json({ success: false, message: authError.message });
+
+    const userId = authData.user.id;
+
+    // Insert profile
+    const { error: profileError } = await supabase.from('profiles').upsert({
+      id: userId,
+      first_name: firstName,
+      last_name: lastName,
+      email,
+      account_type: accountType,
+      status: status || 'Active',
+      intermediary_code: intermediaryCode ? parseInt(intermediaryCode) : null,
+    }, { onConflict: 'id' });
+
+    if (profileError) {
+      // Rollback: delete the auth user if profile insert fails
+      await supabase.auth.admin.deleteUser(userId);
+      return res.status(400).json({ success: false, message: profileError.message });
+    }
+
+    // Send welcome email with credentials
+    try {
+      await sendGraphEmail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Welcome to Caelum Financial Solutions',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto;">
+            <h2 style="color: #1a1a2e;">Welcome, ${firstName}!</h2>
+            <p>Your account has been created. Here are your login credentials:</p>
+            <div style="background: #f4f4f4; padding: 16px; border-radius: 8px; margin: 16px 0;">
+              <p><strong>Email:</strong> ${email}</p>
+              <p><strong>Password:</strong> ${password}</p>
+              <p><strong>Role:</strong> ${accountType}</p>
+            </div>
+            <p>Please log in and change your password as soon as possible.</p>
+            <p style="color: #888; font-size: 12px;">Caelum Financial Solutions</p>
+          </div>
+        `
+      });
+    } catch (emailErr) {
+      console.error('Welcome email failed:', emailErr.message);
+    }
+
+    res.json({ success: true, userId, message: 'User created successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // Reset User Password - Generate default password and update auth
 router.post('/admin/reset-password', async (req, res) => {
   try {
-    const { userId, email, lastName } = req.body;
-    
-    // Generate default password
+    const { userId, lastName } = req.body;
+
     const month = String(new Date().getMonth() + 1).padStart(2, '0');
     const year = String(new Date().getFullYear()).slice(-2);
     const passwordPrefix = lastName.slice(0, 2);
     const defaultPassword = `#${passwordPrefix.charAt(0).toUpperCase()}${passwordPrefix.charAt(1).toLowerCase()}${month}${year}`;
-    
-    // Update user password with Supabase admin
-    const { data: updateData, error: updateError } = await supabase.auth.admin.updateUserById(userId, {
+
+    const { error: updateError } = await supabase.auth.admin.updateUserById(userId, {
       password: defaultPassword,
       email_confirm: true,
     });
-    
-    if (updateError) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Failed to update password: ' + updateError.message 
-      });
-    }
-    
-    // Update user status to Active in profiles table
+
+    if (updateError) return res.status(400).json({ success: false, message: 'Failed to update password: ' + updateError.message });
+
     const { error: profileError } = await supabase
       .from('profiles')
       .update({ status: 'Active' })
       .eq('id', userId);
-    
-    if (profileError) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Failed to update profile: ' + profileError.message 
-      });
-    }
-    
-    // Send password reset email with custom password via Supabase
-    const { error: emailError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.FRONTEND_URL}/auth/reset-password`,
-      data: {
-        custom_password: defaultPassword
-      }
-    });
-    
-    if (emailError) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Failed to send email: ' + emailError.message 
-      });
-    }
-    
-    res.json({ 
-      success: true, 
-      message: 'Password reset email sent',
-      generatedPassword: defaultPassword 
-    });
-    
+
+    if (profileError) return res.status(400).json({ success: false, message: 'Failed to update profile: ' + profileError.message });
+
+    res.json({ success: true, message: 'Password reset successfully', generatedPassword: defaultPassword });
+
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: error.message 
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 

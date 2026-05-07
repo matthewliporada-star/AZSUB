@@ -74,7 +74,7 @@ const AppRoutes = () => {
       {/* ==================== PUBLIC ROUTES ==================== */}
       <Route path="/verify-identity" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/" element={<Navigate to="/verify-identity" replace />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/waiting" element={<WaitingForAccess />} />
 
       {/* ==================== ROLE BASE REDIRECTS ==================== */}
